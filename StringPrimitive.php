@@ -320,7 +320,7 @@ class StringPrimitive implements PrimitiveInterface, StringableInterface
     public function words($charlist = '')
     {
         return new TypedCollection(
-            sefl::class,
+            self::class,
             str_word_count($this->value, 2, (string) $charlist)
         );
     }
