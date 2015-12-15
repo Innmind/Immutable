@@ -3,6 +3,7 @@
 namespace Innmind\Immutable;
 
 use Innmind\Immutable\Exception\TypeException;
+use Innmind\Immutable\Exception\RegexException;
 
 class StringPrimitive implements PrimitiveInterface, StringableInterface
 {
@@ -357,7 +358,7 @@ class StringPrimitive implements PrimitiveInterface, StringableInterface
         $value = preg_match((string) $regex, $this->value, null, $flags, $offset);
 
         if ($value === false) {
-            throw new \Exception('Regular expression failed');
+            throw new RegexException('', preg_last_error());
         }
 
         return new BooleanPrimitive((bool) $value);
@@ -386,7 +387,7 @@ class StringPrimitive implements PrimitiveInterface, StringableInterface
         );
 
         if ($value === false) {
-            throw new \Exception('Regular expression failed');
+            throw new RegexException('', preg_last_error());
         }
 
         return new TypedCollection(self::class, $matches);
@@ -413,7 +414,7 @@ class StringPrimitive implements PrimitiveInterface, StringableInterface
         );
 
         if ($value === null) {
-            throw new \Exception('Regular expression failed');
+            throw new RegexException('', preg_last_error());
         }
 
         return new self($value);
