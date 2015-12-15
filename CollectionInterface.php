@@ -11,7 +11,7 @@ interface CollectionInterface extends PrimitiveInterface, \Iterator, \ArrayAcces
      *
      * @return CollectionInterface
      */
-    public function filter(callable $filter);
+    public function filter(callable $filter = null);
 
     /**
      * Returns a new collection which contains the intersection of both collections
