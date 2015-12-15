@@ -44,7 +44,7 @@ interface CollectionInterface extends PrimitiveInterface, \Iterator, \ArrayAcces
      * @param callable $reducer
      * @param mixed $initial
      *
-     * @return CollectionInterface
+     * @return mixed
      */
     public function reduce(callable $reducer, $initial = null);
 
