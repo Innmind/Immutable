@@ -14,7 +14,7 @@ class RegexException extends \Exception implements ExceptionInterface
     public function __construct($message = '', $code = 0)
     {
         if ($message === '') {
-            switch $code {
+            switch ($code) {
                 case self::INTERNAL_ERROR:
                     $message = 'Internal error';
                     break;
