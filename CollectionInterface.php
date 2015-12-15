@@ -119,7 +119,7 @@ interface CollectionInterface extends PrimitiveInterface, \Iterator, \ArrayAcces
      *
      * @return CollectionInterface
      */
-    public function diff(CollectionInterface ...$collections);
+    public function diff(CollectionInterface $collections);
 
     /**
      * Return a new collection with the keys and values flipped
