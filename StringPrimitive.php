@@ -190,7 +190,7 @@ class StringPrimitive implements PrimitiveInterface, StringableInterface
      * Pad to the right
      *
      * @param int $length
-     * @param string $charater
+     * @param string $character
      *
      * @return StringPrimitive
      */
@@ -203,7 +203,7 @@ class StringPrimitive implements PrimitiveInterface, StringableInterface
      * Pad to the left
      *
      * @param int $length
-     * @param string $charater
+     * @param string $character
      *
      * @return StringPrimitive
      */
@@ -216,7 +216,7 @@ class StringPrimitive implements PrimitiveInterface, StringableInterface
      * Pad both sides
      *
      * @param int $length
-     * @param string $charater
+     * @param string $character
      *
      * @return StringPrimitive
      */
