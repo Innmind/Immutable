@@ -152,6 +152,8 @@ interface CollectionInterface extends PrimitiveInterface, \Iterator, \ArrayAcces
      *
      * @param int $num
      *
+     * @throws OutOfBoundException If the num is higher than the collection length
+     *
      * @return CollectionInterface
      */
     public function rand($num = 1);
@@ -291,7 +293,7 @@ interface CollectionInterface extends PrimitiveInterface, \Iterator, \ArrayAcces
      * @param mixed $key
      * @param boolean $strict When strict it uses array_key_exists, otherwise isset
      *
-     * @return boolean
+     * @return BooleanPrimitive
      */
     public function hasKey($key, $strict = true);
 
@@ -326,6 +328,8 @@ interface CollectionInterface extends PrimitiveInterface, \Iterator, \ArrayAcces
      *
      * @param int $flags
      *
+     * @throws Exception If the sort failed
+     *
      * @return CollectionInterface
      */
     public function sort($flags = SORT_REGULAR);
@@ -334,6 +338,8 @@ interface CollectionInterface extends PrimitiveInterface, \Iterator, \ArrayAcces
      * Return a new collection with the sorted values and indexes preserved
      *
      * @param int $flags
+     *
+     * @throws Exception If the sort failed
      *
      * @return CollectionInterface
      */
@@ -344,6 +350,8 @@ interface CollectionInterface extends PrimitiveInterface, \Iterator, \ArrayAcces
      *
      * @param int $flags
      *
+     * @throws Exception If the sort failed
+     *
      * @return CollectionInterface
      */
     public function keySort($flags = SORT_REGULAR);
@@ -352,6 +360,8 @@ interface CollectionInterface extends PrimitiveInterface, \Iterator, \ArrayAcces
      * Return a new collection sorted by keys via the given sorter
      *
      * @param callable $sorter
+     *
+     * @throws Exception If the sort failed
      *
      * @return CollectionInterface
      */
@@ -362,6 +372,8 @@ interface CollectionInterface extends PrimitiveInterface, \Iterator, \ArrayAcces
      *
      * @param int $flags
      *
+     * @throws Exception If the sort failed
+     *
      * @return CollectionInterface
      */
     public function reverseSort($flags = SORT_REGULAR);
@@ -370,6 +382,8 @@ interface CollectionInterface extends PrimitiveInterface, \Iterator, \ArrayAcces
      * Return a new collection sorted via the given sorter
      *
      * @param callable $sorter
+     *
+     * @throws Exception If the sort failed
      *
      * @return CollectionInterface
      */
@@ -380,6 +394,8 @@ interface CollectionInterface extends PrimitiveInterface, \Iterator, \ArrayAcces
      *
      * @param int $flags
      *
+     * @throws Exception If the sort failed
+     *
      * @return CollectionInterface
      */
     public function associativeReverseSort($flags = SORT_REGULAR);
@@ -388,6 +404,8 @@ interface CollectionInterface extends PrimitiveInterface, \Iterator, \ArrayAcces
      * Return a new collection sorted by keys in the reversed order
      *
      * @param int $flags
+     *
+     * @throws Exception If the sort failed
      *
      * @return CollectionInterface
      */
@@ -398,12 +416,16 @@ interface CollectionInterface extends PrimitiveInterface, \Iterator, \ArrayAcces
      *
      * @param callable $sorter
      *
+     * @throws Exception If the sort failed
+     *
      * @return CollectionInterface
      */
     public function uassociativeSort(callable $sorter);
 
     /**
      * Return a new collection with a natural sort applied to it
+     *
+     * @throws Exception If the sort failed
      *
      * @return CollectionInterface
      */
