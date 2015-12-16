@@ -355,7 +355,8 @@ class StringPrimitive implements PrimitiveInterface, StringableInterface
      */
     public function match($regex, $flags = 0, $offset = 0)
     {
-        $value = preg_match((string) $regex, $this->value, null, $flags, $offset);
+        $matches = [];
+        $value = preg_match((string) $regex, $this->value, $matches, $flags, $offset);
 
         if ($value === false) {
             throw new RegexException('', preg_last_error());
