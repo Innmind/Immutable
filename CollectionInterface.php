@@ -277,15 +277,6 @@ interface CollectionInterface extends PrimitiveInterface, \Iterator, \ArrayAcces
     public function ukeyDiff(CollectionInterface $collection, callable $differ);
 
     /**
-     * Return a new collection with the sort flags applied
-     *
-     * @param int $flags
-     *
-     * @return CollectionInterface
-     */
-    public function multisort(...$flags);
-
-    /**
      * Returns a new collection with diff applied to both values and keys
      *
      * @param CollectionInterface $collection
