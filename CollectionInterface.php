@@ -231,7 +231,7 @@ interface CollectionInterface extends PrimitiveInterface, \Iterator, \ArrayAcces
     public function product();
 
     /**
-     * Return a new collection with elements replace from the given collection
+     * Return a new collection with elements replaced from the given collection
      *
      * @param CollectionInterface $collection
      *
