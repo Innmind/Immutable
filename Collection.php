@@ -5,6 +5,8 @@ namespace Innmind\Immutable;
 use Innmind\Immutable\Exception\SortException;
 use Innmind\Immutable\Exception\OutOfBoundException;
 use Innmind\Immutable\Exception\RuntimeException;
+use Innmind\Immutable\Exception\InvalidArgumentException;
+use Innmind\Immutable\Exception\LogicException;
 
 class Collection implements CollectionInterface
 {
@@ -621,5 +623,92 @@ class Collection implements CollectionInterface
         }
 
         return new self($took);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function count()
+    {
+        return count($this->values);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function current()
+    {
+        return current($this->values);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function key()
+    {
+        return key($this->values);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function next()
+    {
+        next($this->values);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function rewind()
+    {
+        reset($this->values);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function valid()
+    {
+        return $this->key() !== null;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function offsetExists($offset)
+    {
+        return $this->hasKey($offset);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function offsetGet($offset)
+    {
+        if (!$this->hasKey($offset)) {
+            throw new InvalidArgumentException(sprintf(
+                'Unknown index %s',
+                $offset
+            ));
+        }
+
+        return $this->values[$offset];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function offsetSet($offset, $value)
+    {
+        throw new LogicException('You can\'t modify an immutable collection');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function offsetUnset($offset)
+    {
+        throw new LogicException('You can\'t modify an immutable collection');
     }
 }
