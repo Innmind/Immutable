@@ -485,13 +485,4 @@ interface CollectionInterface extends PrimitiveInterface, \Iterator, \ArrayAcces
      * @return CollectionInterface
      */
     public function take($size, $preserveKeys = false);
-
-    /**
-     * Add all the values of the collection to the current one
-     *
-     * @param CollectionInterface $collection
-     *
-     * @return CollectionInterface
-     */
-    public function append(CollectionInterface $collection);
 }
