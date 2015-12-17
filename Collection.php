@@ -2,6 +2,8 @@
 
 namespace Innmind\Immutable;
 
+use Innmind\Immutable\Exception\SortException;
+
 class Collection implements CollectionInterface
 {
     private $values;
@@ -394,7 +396,7 @@ class Collection implements CollectionInterface
         $bool = sort($values, (int) $flags);
 
         if ($bool === false) {
-            throw new \Exception('Sort failure');
+            throw new SortException('Sort failure');
         }
 
         return new self($values);
@@ -409,7 +411,7 @@ class Collection implements CollectionInterface
         $bool = asort($values, (int) $flags);
 
         if ($bool === false) {
-            throw new \Exception('Sort failure');
+            throw new SortException('Sort failure');
         }
 
         return new self($values);
@@ -424,7 +426,7 @@ class Collection implements CollectionInterface
         $bool = ksort($values, (int) $flags);
 
         if ($bool === false) {
-            throw new \Exception('Sort failure');
+            throw new SortException('Sort failure');
         }
 
         return new self($values);
@@ -439,7 +441,97 @@ class Collection implements CollectionInterface
         $bool = uksort($values, $sorter);
 
         if ($bool === false) {
-            throw new \Exception('Sort failure');
+            throw new SortException('Sort failure');
+        }
+
+        return new self($values);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function reverseSort($flags = SORT_REGULAR)
+    {
+        $values = $this->values;
+        $bool = rsort($values, (int) $flags);
+
+        if ($bool === false) {
+            throw new SortException('Sort failure');
+        }
+
+        return new self($values);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function usort(callable $sorter)
+    {
+        $values = $this->values;
+        $bool = usort($values, $sorter);
+
+        if ($bool === false) {
+            throw new SortException('Sort failure');
+        }
+
+        return new self($values);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function associativeReverseSort($flags = SORT_REGULAR)
+    {
+        $values = $this->values;
+        $bool = arsort($values, (int) $flags);
+
+        if ($bool === false) {
+            throw new SortException('Sort failure');
+        }
+
+        return new self($values);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function keyReverseSort($flags = SORT_REGULAR)
+    {
+        $values = $this->values;
+        $bool = krsort($values, (int) $flags);
+
+        if ($bool === false) {
+            throw new SortException('Sort failure');
+        }
+
+        return new self($values);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function uassociativeSort(callable $sorter)
+    {
+        $values = $this->values;
+        $bool = uasort($values, $sorter);
+
+        if ($bool === false) {
+            throw new SortException('Sort failure');
+        }
+
+        return new self($values);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function naturalSort()
+    {
+        $values = $this->values;
+        $bool = natsort($values);
+
+        if ($bool === false) {
+            throw new SortException('Sort failure');
         }
 
         return new self($values);

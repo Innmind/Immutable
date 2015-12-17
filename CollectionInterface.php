@@ -328,7 +328,7 @@ interface CollectionInterface extends PrimitiveInterface, \Iterator, \ArrayAcces
      *
      * @param int $flags
      *
-     * @throws Exception If the sort failed
+     * @throws SortException If the sort failed
      *
      * @return CollectionInterface
      */
@@ -339,7 +339,7 @@ interface CollectionInterface extends PrimitiveInterface, \Iterator, \ArrayAcces
      *
      * @param int $flags
      *
-     * @throws Exception If the sort failed
+     * @throws SortException If the sort failed
      *
      * @return CollectionInterface
      */
@@ -350,7 +350,7 @@ interface CollectionInterface extends PrimitiveInterface, \Iterator, \ArrayAcces
      *
      * @param int $flags
      *
-     * @throws Exception If the sort failed
+     * @throws SortException If the sort failed
      *
      * @return CollectionInterface
      */
@@ -361,7 +361,7 @@ interface CollectionInterface extends PrimitiveInterface, \Iterator, \ArrayAcces
      *
      * @param callable $sorter
      *
-     * @throws Exception If the sort failed
+     * @throws SortException If the sort failed
      *
      * @return CollectionInterface
      */
@@ -372,7 +372,7 @@ interface CollectionInterface extends PrimitiveInterface, \Iterator, \ArrayAcces
      *
      * @param int $flags
      *
-     * @throws Exception If the sort failed
+     * @throws SortException If the sort failed
      *
      * @return CollectionInterface
      */
@@ -383,7 +383,7 @@ interface CollectionInterface extends PrimitiveInterface, \Iterator, \ArrayAcces
      *
      * @param callable $sorter
      *
-     * @throws Exception If the sort failed
+     * @throws SortException If the sort failed
      *
      * @return CollectionInterface
      */
@@ -394,7 +394,7 @@ interface CollectionInterface extends PrimitiveInterface, \Iterator, \ArrayAcces
      *
      * @param int $flags
      *
-     * @throws Exception If the sort failed
+     * @throws SortException If the sort failed
      *
      * @return CollectionInterface
      */
@@ -405,7 +405,7 @@ interface CollectionInterface extends PrimitiveInterface, \Iterator, \ArrayAcces
      *
      * @param int $flags
      *
-     * @throws Exception If the sort failed
+     * @throws SortException If the sort failed
      *
      * @return CollectionInterface
      */
@@ -416,7 +416,7 @@ interface CollectionInterface extends PrimitiveInterface, \Iterator, \ArrayAcces
      *
      * @param callable $sorter
      *
-     * @throws Exception If the sort failed
+     * @throws SortException If the sort failed
      *
      * @return CollectionInterface
      */
@@ -425,7 +425,7 @@ interface CollectionInterface extends PrimitiveInterface, \Iterator, \ArrayAcces
     /**
      * Return a new collection with a natural sort applied to it
      *
-     * @throws Exception If the sort failed
+     * @throws SortException If the sort failed
      *
      * @return CollectionInterface
      */
