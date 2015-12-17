@@ -33,7 +33,11 @@ class Collection implements CollectionInterface
         if ($filter === null) {
             $values = array_filter($this->values);
         } else {
-            $values = array_filter($this->values, $filter);
+            $values = array_filter(
+                $this->values,
+                $filter,
+                ARRAY_FILTER_USE_BOTH
+            );
         }
 
         return new self($values);
