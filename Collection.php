@@ -168,7 +168,15 @@ class Collection implements CollectionInterface
      */
     public function keys($search = null, $strict = true)
     {
-        return new self(array_keys($this->values, $search, (bool) $strict));
+        $args = func_get_args();
+
+        if (count($args) > 0) {
+            $keys = array_keys($this->values, $search, (bool) $strict);
+        } else {
+            $keys = array_keys($this->values);
+        }
+
+        return new self($keys);
     }
 
     /**
