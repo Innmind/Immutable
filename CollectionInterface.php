@@ -470,6 +470,8 @@ interface CollectionInterface extends PrimitiveInterface, \Iterator, \ArrayAcces
     /**
      * Return a new collection with the values order shuffled
      *
+     * @throws RuntimeException If the operation fails
+     *
      * @return CollectionInterface
      */
     public function shuffle();

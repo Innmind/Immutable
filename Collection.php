@@ -3,6 +3,8 @@
 namespace Innmind\Immutable;
 
 use Innmind\Immutable\Exception\SortException;
+use Innmind\Immutable\Exception\OutOfBoundException;
+use Innmind\Immutable\Exception\RuntimeException;
 
 class Collection implements CollectionInterface
 {
@@ -535,5 +537,89 @@ class Collection implements CollectionInterface
         }
 
         return new self($values);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function first()
+    {
+        if ($this->count() === 0) {
+            throw new OutOfBoundException('There is no first item');
+        }
+
+        return array_values($this->values)[0];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function last()
+    {
+        if ($this->count() === 0) {
+            throw new OutOfBoundException('There is no last item');
+        }
+
+        $values = array_values($this->values);
+
+        return end($values);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function each(callable $callback)
+    {
+        foreach ($this->values as $key => $value) {
+            $callback($key, $value);
+        }
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function join($separator)
+    {
+        return implode((string) $separator, $this->values);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function shuffle()
+    {
+        $values = $this->values;
+        $result = shuffle($values);
+
+        if ($result === false) {
+            throw new RuntimeException('Shuffle operation failed');
+        }
+
+        return new self($values);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function take($size, $preserveKeys = false)
+    {
+        $took = [];
+        $keys = array_keys($this->values);
+        $size = (int) $size;
+
+        while (count($took) < $size) {
+            $random = mt_rand(0, count($keys) - 1);
+            $key = $keys[$random];
+            $took[$key] = $this->values[$key];
+            unset($keys[$random]);
+        }
+
+        if ($preserveKeys === false) {
+            $took = array_values($took);
+        }
+
+        return new self($took);
     }
 }
