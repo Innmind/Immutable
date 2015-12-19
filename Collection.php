@@ -369,7 +369,7 @@ class Collection implements CollectionInterface
             $bool = isset($this->values[$key]);
         }
 
-        return new BooleanPrimitive($bool);
+        return $bool;
     }
 
     /**

@@ -293,7 +293,7 @@ interface CollectionInterface extends PrimitiveInterface, \Iterator, \ArrayAcces
      * @param mixed $key
      * @param boolean $strict When strict it uses array_key_exists, otherwise isset
      *
-     * @return BooleanPrimitive
+     * @return bool
      */
     public function hasKey($key, $strict = true);
 
