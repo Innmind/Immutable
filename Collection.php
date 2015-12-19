@@ -195,7 +195,7 @@ class Collection implements CollectionInterface
      */
     public function rand($num = 1)
     {
-        if ((int) $num > $this->count()->toPrimitive()) {
+        if ((int) $num > $this->count()) {
             throw new OutOfBoundException(
                 'Trying to return a wider collection than the current one'
             );
