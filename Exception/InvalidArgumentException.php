@@ -2,6 +2,6 @@
 
 namespace Innmind\Immutable\Exception;
 
-class InvalidArgumentException extends \Exception implements ExceptionInterface
+class InvalidArgumentException extends \InvalidArgumentException implements ExceptionInterface
 {
 }
