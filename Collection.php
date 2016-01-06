@@ -624,7 +624,9 @@ class Collection implements CollectionInterface
         $size = (int) $size;
 
         while (count($took) < $size) {
-            $random = mt_rand(0, count($keys) - 1);
+            do {
+                $random = mt_rand(0, count($keys) - 1);
+            } while (!isset($keys[$random]));
             $key = $keys[$random];
             $took[$key] = $this->values[$key];
             unset($keys[$random]);
