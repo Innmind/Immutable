@@ -636,4 +636,336 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($d1, $c->toPrimitive());
         $this->assertSame($d2, $c2->toPrimitive());
     }
+
+    public function testSort()
+    {
+        $c = new Collection([4, 3, 2, 1]);
+
+        $c2 = $c->sort();
+        $this->assertInstanceOf(Collection::class, $c2);
+        $this->assertNotSame($c, $c2);
+        $this->assertSame([1, 2, 3, 4], $c2->toPrimitive());
+        $this->assertSame([4, 3, 2, 1], $c->toPrimitive());
+
+        $c = new Collection($d = ['Orange1', 'orange2', 'Orange3', 'orange20']);
+
+        $c2 = $c->sort(SORT_NATURAL | SORT_FLAG_CASE);
+        $this->assertInstanceOf(Collection::class, $c2);
+        $this->assertNotSame($c, $c2);
+        $this->assertSame(
+            ['Orange1', 'orange2', 'Orange3', 'orange20'],
+            $c2->toPrimitive()
+        );
+        $this->assertSame($d, $c->toPrimitive());
+    }
+
+    public function testAssociativeSort()
+    {
+        $c = new Collection(
+            $d = ['d' => 'lemon', 'a' => 'orange', 'b' => 'banana', 'c' => 'apple']
+        );
+
+        $c2 = $c->associativeSort();
+        $this->assertInstanceOf(Collection::class, $c2);
+        $this->assertNotSame($c, $c2);
+        $this->assertSame(
+            ['c' => 'apple', 'b' => 'banana', 'd' => 'lemon', 'a' => 'orange'],
+            $c2->toPrimitive()
+        );
+        $this->assertSame($d, $c->toPrimitive());
+    }
+
+    public function testKeySort()
+    {
+        $c = new Collection(
+            $d = ['d' => 'lemon', 'a' => 'orange', 'b' => 'banana', 'c' => 'apple']
+        );
+
+        $c2 = $c->keySort();
+        $this->assertInstanceOf(Collection::class, $c2);
+        $this->assertNotSame($c, $c2);
+        $this->assertSame(
+            ['a' => 'orange', 'b' => 'banana', 'c' => 'apple', 'd' => 'lemon'],
+            $c2->toPrimitive()
+        );
+        $this->assertSame($d, $c->toPrimitive());
+    }
+
+    public function testUkeySort()
+    {
+        $c = new Collection(
+            $d = ['John' => 1, 'the Earth' => 2, 'an apple' => 3, 'a banana' => 4]
+        );
+
+        $c2 = $c->ukeySort(function ($a, $b) {
+            $a = preg_replace('@^(a|an|the) @', '', $a);
+            $b = preg_replace('@^(a|an|the) @', '', $b);
+
+            return strcasecmp($a, $b);
+        });
+        $this->assertInstanceOf(Collection::class, $c2);
+        $this->assertNotSame($c, $c2);
+        $this->assertSame(
+            ['an apple' => 3, 'a banana' => 4, 'the Earth' => 2, 'John' => 1],
+            $c2->toPrimitive()
+        );
+        $this->assertSame($d, $c->toPrimitive());
+    }
+
+    public function testReverseSort()
+    {
+        $c = new Collection(
+            $d = ['lemon', 'orange', 'banana', 'apple']
+        );
+
+        $c2 = $c->reverseSort();
+        $this->assertInstanceOf(Collection::class, $c2);
+        $this->assertNotSame($c, $c2);
+        $this->assertSame(['orange', 'lemon', 'banana', 'apple'], $c2->toPrimitive());
+        $this->assertSame($d, $c->toPrimitive());
+    }
+
+    public function testUsort()
+    {
+        $c = new Collection($d = [3, 2, 5, 6, 1]);
+
+        $c2 = $c->usort(function ($a, $b) {
+            if ($a == $b) {
+                return 0;
+            }
+
+            return ($a < $b) ? -1 : 1;
+        });
+        $this->assertInstanceOf(Collection::class, $c2);
+        $this->assertNotSame($c, $c2);
+        $this->assertSame([1, 2, 3, 5, 6], $c2->toPrimitive());
+        $this->assertSame($d, $c->toPrimitive());
+    }
+
+    public function testAssociativeReverseSort()
+    {
+        $c = new Collection(
+            $d = ['d' => 'lemon', 'a' => 'orange', 'b' => 'banana', 'c' => 'apple']
+        );
+
+        $c2 = $c->associativeReverseSort();
+        $this->assertInstanceOf(Collection::class, $c2);
+        $this->assertNotSame($c, $c2);
+        $this->assertSame(
+            ['a' => 'orange', 'd' => 'lemon', 'b' => 'banana', 'c' => 'apple'],
+            $c2->toPrimitive()
+        );
+        $this->assertSame($d, $c->toPrimitive());
+    }
+
+    public function testKeyReverseSort()
+    {
+        $c = new Collection(
+            $d = ['d' => 'lemon', 'a' => 'orange', 'b' => 'banana', 'c' => 'apple']
+        );
+
+        $c2 = $c->keyReverseSort();
+        $this->assertInstanceOf(Collection::class, $c2);
+        $this->assertNotSame($c, $c2);
+        $this->assertSame(
+            ['d' => 'lemon', 'c' => 'apple', 'b' => 'banana', 'a' => 'orange'],
+            $c2->toPrimitive()
+        );
+        $this->assertSame($d, $c->toPrimitive());
+    }
+
+    public function testUassociativeSort()
+    {
+        $c = new Collection(
+            $d = ['a' => 4, 'b' => 8, 'c' => -1, 'd' => -9, 'e' => 2, 'f' => 5, 'g' => 3, 'h' => -4]
+        );
+
+        $c2 = $c->uassociativeSort(function ($a, $b) {
+            if ($a == $b) {
+                return 0;
+            }
+
+            return ($a < $b) ? -1 : 1;
+        });
+        $this->assertInstanceOf(Collection::class, $c2);
+        $this->assertNotSame($c, $c2);
+        $this->assertSame(
+            ['d' => -9, 'h' => -4, 'c' => -1, 'e' => 2, 'g' => 3, 'a' => 4, 'f' => 5, 'b' => 8],
+            $c2->toPrimitive()
+        );
+        $this->assertSame($d, $c->toPrimitive());
+    }
+
+    public function testNaturalSort()
+    {
+        $c = new Collection(
+            $d = ['img12.png', 'img10.png', 'img2.png', 'img1.png']
+        );
+
+        $c2 = $c->naturalSort();
+        $this->assertInstanceOf(Collection::class, $c2);
+        $this->assertNotSame($c, $c2);
+        $this->assertSame(
+            [3 => 'img1.png', 2 => 'img2.png', 1 => 'img10.png', 0 => 'img12.png'],
+            $c2->toPrimitive()
+        );
+        $this->assertSame($d, $c->toPrimitive());
+    }
+
+    public function testFirst()
+    {
+        $c = new Collection([1, 2, 3]);
+
+        $this->assertSame(1, $c->first());
+        $this->assertSame([1, 2, 3], $c->toPrimitive());
+    }
+
+    /**
+     * @expectedException Innmind\Immutable\Exception\OutOfBoundException
+     * @expectedExceptionMessage There is no first item
+     */
+    public function testThrowWhenNoFirstItem()
+    {
+        $c = new Collection([]);
+        $c->first();
+    }
+
+    public function testLast()
+    {
+        $c = new Collection([1, 2, 3]);
+
+        $this->assertSame(3, $c->last());
+        $this->assertSame([1, 2, 3], $c->toPrimitive());
+    }
+
+    /**
+     * @expectedException Innmind\Immutable\Exception\OutOfBoundException
+     * @expectedExceptionMessage There is no last item
+     */
+    public function testThrowWhenNoLastItem()
+    {
+        $c = new Collection([]);
+        $c->last();
+    }
+
+    public function testEach()
+    {
+        $c = new Collection([1, 2, 3]);
+        $count = 0;
+        $c->each(function ($key, $value) use (&$count) {
+            $count++;
+            $this->assertSame($key, $value - 1);
+
+            return 1;
+        });
+        $this->assertSame(3, $count);
+        $this->assertSame([1, 2, 3], $c->toPrimitive());
+    }
+
+    public function testJoin()
+    {
+        $c = new Collection($d = ['foo', 'bar', 'baz']);
+
+        $string = $c->join('|');
+        $this->assertSame('foo|bar|baz', $string);
+        $this->assertSame($d, $c->toPrimitive());
+    }
+
+    public function testShuffle()
+    {
+        $c = new Collection($d = range(1, 10));
+
+        $c2 = $c->shuffle();
+        $this->assertInstanceOf(Collection::class, $c2);
+        $this->assertNotSame($c, $c2);
+        $this->assertSame($d, $c->toPrimitive());
+        $this->assertSame(10, $c2->count());
+        $shuffled = $c2->toPrimitive();
+
+        foreach ($d as $i) {
+            $this->assertTrue(in_array($i, $shuffled, true));
+        }
+    }
+
+    public function testTake()
+    {
+        $c = new Collection($d = range(1, 10));
+
+        $c2 = $c->take(2);
+        $this->assertInstanceOf(Collection::class, $c2);
+        $this->assertNotSame($c, $c2);
+        $this->assertSame([0, 1], array_keys($c2->toPrimitive()));
+        $this->assertTrue(in_array($c2->toPrimitive()[0], $d, true));
+        $this->assertTrue(in_array($c2->toPrimitive()[1], $d, true));
+
+        $c3 = $c->take(2, true);
+        $this->assertInstanceOf(Collection::class, $c3);
+        $this->assertNotSame($c, $c3);
+        $this->assertSame(2, $c3->count());
+        $this->assertTrue(in_array(array_values($c3->toPrimitive())[0], $d, true));
+        $this->assertTrue(in_array(array_values($c3->toPrimitive())[1], $d, true));
+    }
+
+    public function testCount()
+    {
+        $c = new Collection([1, 2, 3]);
+
+        $this->assertSame(3, count($c));
+    }
+
+    public function testIteratorInterface()
+    {
+        $c = new Collection(range(1, 2));
+
+        $this->assertSame(1, $c->current());
+        $this->assertSame(0, $c->key());
+        $this->assertSame(null, $c->next());
+        $this->assertSame(2, $c->current());
+        $this->assertSame(1, $c->key());
+        $this->assertTrue($c->valid());
+        $this->assertSame(null, $c->rewind());
+        $this->assertSame(0, $c->key());
+        $c->next();
+        $c->next();
+        $this->assertFalse($c->valid());
+    }
+
+    public function testArrayAccessInterface()
+    {
+        $c = new Collection([1, 2]);
+
+        $this->assertTrue(isset($c[0]));
+        $this->assertSame(1, $c[0]);
+    }
+
+    /**
+     * @expectedException Innmind\Immutable\Exception\InvalidArgumentException
+     * @expectedExceptionMessage Unknown index foo
+     */
+    public function testThrowWhenTryingToAccessUnknownElement()
+    {
+        $c = new Collection([]);
+
+        $c['foo'];
+    }
+
+    /**
+     * @expectedException Innmind\Immutable\Exception\LogicException
+     * @expectedExceptionMessage You can't modify an immutable collection
+     */
+    public function testThrowWhenTryingToAddAnElement()
+    {
+        $c = new Collection([]);
+        $c['foo'] = 'bar';
+    }
+
+    /**
+     * @expectedException Innmind\Immutable\Exception\LogicException
+     * @expectedExceptionMessage You can't modify an immutable collection
+     */
+    public function testThrowWhenTryingToUnsetAnElement()
+    {
+        $c = new Collection([]);
+        unset($c['foo']);
+    }
 }
