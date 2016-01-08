@@ -59,7 +59,14 @@ class Collection implements CollectionInterface
      */
     public function chunk($size)
     {
-        return new self(array_chunk($this->values, (int) $size));
+        $chunks = array_chunk($this->values, (int) $size);
+        $subs = [];
+
+        foreach ($chunks as $chunk) {
+            $subs[] = new self($chunk);
+        }
+
+        return new self($subs);
     }
 
     /**

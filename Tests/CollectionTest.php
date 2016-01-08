@@ -59,7 +59,12 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
 
         $this->assertInstanceOf(Collection::class, $c2);
         $this->assertNotSame($c, $c2);
-        $this->assertSame([[0, 0], [0, 0], [0]], $c2->toPrimitive());
+        $this->assertInstanceOf(Collection::class, $c2[0]);
+        $this->assertInstanceOf(Collection::class, $c2[1]);
+        $this->assertInstanceOf(Collection::class, $c2[2]);
+        $this->assertSame([0, 0], $c2[0]->toPrimitive());
+        $this->assertSame([0, 0], $c2[1]->toPrimitive());
+        $this->assertSame([0], $c2[2]->toPrimitive());
         $this->assertSame([0, 0, 0, 0, 0], $c->toPrimitive());
     }
 
