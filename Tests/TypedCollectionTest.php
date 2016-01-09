@@ -6,7 +6,7 @@ use Innmind\Immutable\Collection;
 use Innmind\Immutable\TypedCollection;
 use Innmind\Immutable\TypedCollectionInterface;
 use Innmind\Immutable\StringPrimitive as S;
-use Innmind\Immutable\IntegerPrimitive as I;
+use Innmind\Immutable\PrimitiveInterface;
 
 class TypedCollectionTest extends \PHPUnit_Framework_TestCase
 {
@@ -1080,5 +1080,27 @@ class TypedCollectionTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($c->getType(), $c2->getType());
         $this->assertSame([0 => $c[0], 2 => $c[2]], $c2->toPrimitive());
         $this->assertSame($d, $c->toPrimitive());
+    }
+}
+
+class I implements PrimitiveInterface
+{
+    private $value;
+
+    public function __construct($value)
+    {
+        if (!is_int($value)) {
+            throw new TypeException('Value must be an integer');
+        }
+
+        $this->value = (int) $value;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function toPrimitive()
+    {
+        return $this->value;
     }
 }
