@@ -4,6 +4,7 @@ namespace Innmind\Immutable;
 
 use Innmind\Immutable\Exception\TypeException;
 use Innmind\Immutable\Exception\RegexException;
+use Innmind\Immutable\Exception\SubstringException;
 
 class StringPrimitive implements PrimitiveInterface, StringableInterface
 {
@@ -41,14 +42,20 @@ class StringPrimitive implements PrimitiveInterface, StringableInterface
      *
      * @return TypedCollection
      */
-    public function split($delimiter)
+    public function split($delimiter = null)
     {
         $delimiter = (string) $delimiter;
+        $parts = empty($delimiter) ?
+                str_split($this->value) : explode($delimiter, $this->value);
+        $strings = [];
+
+        foreach ($parts as $part) {
+            $strings[] = new self($part);
+        }
 
         return new TypedCollection(
             self::class,
-            empty($delimiter) ?
-                str_split($this->value) : explode($delimiter, $this->value)
+            $strings
         );
     }
 
@@ -61,12 +68,7 @@ class StringPrimitive implements PrimitiveInterface, StringableInterface
      */
     public function chunk($size = 1)
     {
-        $size = (int) $size;
-
-        return new TypedCollection(
-            self::class,
-            str_split($this->value, $size)
-        );
+        return $this->split()->chunk((int) $size);
     }
 
     /**
@@ -75,19 +77,22 @@ class StringPrimitive implements PrimitiveInterface, StringableInterface
      * @param string $needle
      * @param int $offset
      *
-     * @throws Exception If the string is not found
+     * @throws SubstringException If the string is not found
      *
-     * @return IntegerPrimitive
+     * @return int
      */
     public function pos($needle, $offset = 0)
     {
         $position = mb_strpos($this->value, (string) $needle, (int) $offset);
 
         if ($position === false) {
-            throw new \Exception('String not found');
+            throw new SubstringException(sprintf(
+                'Substring "%s" not found',
+                $needle
+            ));
         }
 
-        return new IntegerPrimitive($position);
+        return (int) $position;
     }
 
     /**
@@ -112,16 +117,19 @@ class StringPrimitive implements PrimitiveInterface, StringableInterface
      *
      * @param string $delimiter
      *
-     * @throws Exception If the string is not found
+     * @throws SubstringException If the string is not found
      *
      * @return StringInterface
      */
     public function str($delimiter)
     {
-        $sub = strstr($this->value, (string) $delimiter);
+        $sub = mb_strstr($this->value, (string) $delimiter);
 
         if ($sub === false) {
-            throw new \Exception('String not found');
+            throw new SubstringException(sprintf(
+                'Substring "%s" not found',
+                $delimiter
+            ));
         }
 
         return new self($sub);
@@ -150,11 +158,11 @@ class StringPrimitive implements PrimitiveInterface, StringableInterface
     /**
      * Return the string length
      *
-     * @return IntegerPrimitive
+     * @return int
      */
     public function length()
     {
-        return new IntegerPrimitive(strlen($this->value));
+        return strlen($this->value);
     }
 
     /**
@@ -232,7 +240,7 @@ class StringPrimitive implements PrimitiveInterface, StringableInterface
      * @param int $start
      * @param int $length
      *
-     * @return IntegerPrimitive
+     * @return int
      */
     public function cspn($mask, $start = 0, $length = null)
     {
@@ -249,7 +257,7 @@ class StringPrimitive implements PrimitiveInterface, StringableInterface
             );
         }
 
-        return new IntegerPrimitive($value);
+        return (int) $value;
     }
 
     /**
@@ -299,15 +307,15 @@ class StringPrimitive implements PrimitiveInterface, StringableInterface
      *
      * @param string $charlist
      *
-     * @return IntegerPrimitive
+     * @return int
      */
     public function wordCount($charlist = '')
     {
-        return new IntegerPrimitive(str_word_count(
+        return (int) str_word_count(
             $this->value,
             0,
             (string) $charlist
-        ));
+        );
     }
 
     /**
@@ -319,9 +327,15 @@ class StringPrimitive implements PrimitiveInterface, StringableInterface
      */
     public function words($charlist = '')
     {
+        $words = str_word_count($this->value, 2, (string) $charlist);
+
+        foreach ($words as &$word) {
+            $word = new self($word);
+        }
+
         return new TypedCollection(
             self::class,
-            str_word_count($this->value, 2, (string) $charlist)
+            $words
         );
     }
 
@@ -336,9 +350,15 @@ class StringPrimitive implements PrimitiveInterface, StringableInterface
      */
     public function pregSplit($regex, $limit = -1, $flags = 0)
     {
+        $strings = preg_split((string) $regex, $this->value, $limit, $flags);
+
+        foreach ($strings as &$string) {
+            $string = new self($string);
+        }
+
         return new TypedCollection(
             self::class,
-            preg_split((string) $regex, $this->value, $limit, $flags)
+            $strings
         );
     }
 
@@ -351,7 +371,7 @@ class StringPrimitive implements PrimitiveInterface, StringableInterface
      *
      * @throws Exception If the regex failed
      *
-     * @return BooleanPrimitive
+     * @return bool
      */
     public function match($regex, $flags = 0, $offset = 0)
     {
@@ -362,7 +382,7 @@ class StringPrimitive implements PrimitiveInterface, StringableInterface
             throw new RegexException('', preg_last_error());
         }
 
-        return new BooleanPrimitive((bool) $value);
+        return (bool) $value;
     }
 
     /**
@@ -386,6 +406,10 @@ class StringPrimitive implements PrimitiveInterface, StringableInterface
             $flags,
             $offset
         );
+
+        foreach ($matches as &$match) {
+            $match = new self($match);
+        }
 
         if ($value === false) {
             throw new RegexException('', preg_last_error());
