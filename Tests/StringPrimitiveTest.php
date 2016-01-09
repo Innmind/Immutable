@@ -395,4 +395,21 @@ class StringPrimitiveTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('April1,2003', (string) $s2);
         $this->assertSame('April 15, 2003', (string) $s);
     }
+
+    public function testSubstring()
+    {
+        $s = new S('foobarbaz');
+
+        $s2 = $s->substring(3);
+        $this->assertInstanceOf(S::class, $s2);
+        $this->assertNotSame($s, $s2);
+        $this->assertSame('barbaz', (string) $s2);
+        $this->assertSame('foobarbaz', (string) $s);
+
+        $s3 = $s->substring(3, 3);
+        $this->assertInstanceOf(S::class, $s3);
+        $this->assertNotSame($s, $s3);
+        $this->assertSame('bar', (string) $s3);
+        $this->assertSame('foobarbaz', (string) $s);
+    }
 }

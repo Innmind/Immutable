@@ -444,4 +444,23 @@ class StringPrimitive implements PrimitiveInterface, StringableInterface
 
         return new self($value);
     }
+
+    /**
+     * Return part of the string
+     *
+     * @param int $start
+     * @param int $length
+     *
+     * @return StringPrimitive
+     */
+    public function substring($start, $length = null)
+    {
+        if ($length === null) {
+            $sub = substr($this->value, (int) $start);
+        } else {
+            $sub = substr($this->value, (int) $start, (int) $length);
+        }
+
+        return new self($sub);
+    }
 }
