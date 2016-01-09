@@ -1,0 +1,6 @@
+tools:
+    external_code_coverage:
+        runs: 1
+filter:
+    excluded_paths:
+        - Tests/*

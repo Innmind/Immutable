@@ -1,0 +1,26 @@
+{
+    "name": "innmind/immutable",
+    "type": "library",
+    "description": "Immutable PHP primitive wrappers",
+    "keywords": ["wrapper", "immutable"],
+    "homepage": "http://github.com/Innmind/Immutable",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Baptiste Langlade",
+            "email": "langlade.baptiste@gmail.com"
+        }
+    ],
+    "support": {
+        "issues": "http://github.com/Innmind/Immutable/issues"
+    },
+    "require": {
+        "php": ">=5.6"
+    },
+    "autoload": {
+        "psr-0": {
+            "Innmind\\Immutable": ""
+        }
+    },
+    "target-dir": "Innmind/Immutable"
+}
