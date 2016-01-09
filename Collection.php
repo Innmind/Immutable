@@ -649,6 +649,18 @@ class Collection implements CollectionInterface
     /**
      * {@inheritdoc}
      */
+    public function grep($pattern, $revert = false)
+    {
+        return new self(preg_grep(
+            (string) $pattern,
+            $this->values,
+            $revert === false ? 0 : PREG_GREP_INVERT
+        ));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function count()
     {
         return count($this->values);

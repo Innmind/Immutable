@@ -485,4 +485,14 @@ interface CollectionInterface extends PrimitiveInterface, \Iterator, \ArrayAcces
      * @return CollectionInterface
      */
     public function take($size, $preserveKeys = false);
+
+    /**
+     * Return all elements matching the given regex
+     *
+     * @param string $pattern
+     * @param bool $revert
+     *
+     * @return CollectionInterface
+     */
+    public function grep($pattern, $revert = false);
 }

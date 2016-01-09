@@ -911,6 +911,23 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue(in_array(array_values($c3->toPrimitive())[1], $d, true));
     }
 
+    public function testGrep()
+    {
+        $c = new Collection(['1', '1.0', 'foo']);
+
+        $c2 = $c->grep('/^(\d+)?\.\d+$/');
+        $this->assertInstanceOf(Collection::class, $c2);
+        $this->assertNotSame($c, $c2);
+        $this->assertSame([1 => '1.0'], $c2->toPrimitive());
+        $this->assertSame(['1', '1.0', 'foo'], $c->toPrimitive());
+
+        $c2 = $c->grep('/^(\d+)?\.\d+$/', true);
+        $this->assertInstanceOf(Collection::class, $c2);
+        $this->assertNotSame($c, $c2);
+        $this->assertSame([0 => '1', 2 => 'foo'], $c2->toPrimitive());
+        $this->assertSame(['1', '1.0', 'foo'], $c->toPrimitive());
+    }
+
     public function testCount()
     {
         $c = new Collection([1, 2, 3]);

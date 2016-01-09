@@ -1057,4 +1057,28 @@ class TypedCollectionTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue(in_array(array_values($c3->toPrimitive())[0], $d, true));
         $this->assertTrue(in_array(array_values($c3->toPrimitive())[1], $d, true));
     }
+
+
+
+    public function testGrep()
+    {
+        $c = new TypedCollection(
+            S::class,
+            $d = [new S('1'), new S('1.0'), new S('foo')]
+        );
+
+        $c2 = $c->grep('/^(\d+)?\.\d+$/');
+        $this->assertInstanceOf(TypedCollection::class, $c2);
+        $this->assertNotSame($c, $c2);
+        $this->assertSame($c->getType(), $c2->getType());
+        $this->assertSame([1 => $c[1]], $c2->toPrimitive());
+        $this->assertSame($d, $c->toPrimitive());
+
+        $c2 = $c->grep('/^(\d+)?\.\d+$/', true);
+        $this->assertInstanceOf(TypedCollection::class, $c2);
+        $this->assertNotSame($c, $c2);
+        $this->assertSame($c->getType(), $c2->getType());
+        $this->assertSame([0 => $c[0], 2 => $c[2]], $c2->toPrimitive());
+        $this->assertSame($d, $c->toPrimitive());
+    }
 }

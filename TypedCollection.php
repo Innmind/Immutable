@@ -488,6 +488,17 @@ class TypedCollection extends Collection implements TypedCollectionInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function grep($pattern, $revert = false)
+    {
+        return new self(
+            $this->type,
+            parent::grep($pattern, $revert)->toPrimitive()
+        );
+    }
+
+    /**
      * Check if every element respect the given type
      *
      * @throws InvalidArgumentException If a value doesn't respect the type
