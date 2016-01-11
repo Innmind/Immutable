@@ -366,17 +366,16 @@ class StringPrimitive implements PrimitiveInterface, StringableInterface
      * Check if the string match the given regular expression
      *
      * @param string $regex
-     * @param int $flags
      * @param int $offset
      *
      * @throws Exception If the regex failed
      *
      * @return bool
      */
-    public function match($regex, $flags = 0, $offset = 0)
+    public function match($regex, $offset = 0)
     {
         $matches = [];
-        $value = preg_match((string) $regex, $this->value, $matches, $flags, $offset);
+        $value = preg_match((string) $regex, $this->value, $matches, 0, $offset);
 
         if ($value === false) {
             throw new RegexException('', preg_last_error());

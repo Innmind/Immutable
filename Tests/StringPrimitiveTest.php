@@ -361,7 +361,7 @@ class StringPrimitiveTest extends \PHPUnit_Framework_TestCase
      */
     public function testThrowWhenMatchInvalidRegex()
     {
-        (new S(''))->match('/foo/', 0, 4);
+        (new S(''))->match('/foo/', 4);
     }
 
     public function testGetMatches()
