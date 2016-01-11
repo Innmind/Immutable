@@ -193,13 +193,13 @@ class StringPrimitiveTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('foo000', (string) $s2);
         $this->assertSame('foo', (string) $s);
 
-        $s2 = $s->pad(6, '0', STR_PAD_LEFT);
+        $s2 = $s->pad(6, '0', S::PAD_LEFT);
         $this->assertInstanceOf(S::class, $s2);
         $this->assertNotSame($s, $s2);
         $this->assertSame('000foo', (string) $s2);
         $this->assertSame('foo', (string) $s);
 
-        $s2 = $s->pad(6, '0', STR_PAD_BOTH);
+        $s2 = $s->pad(6, '0', S::PAD_BOTH);
         $this->assertInstanceOf(S::class, $s2);
         $this->assertNotSame($s, $s2);
         $this->assertSame('0foo00', (string) $s2);
@@ -361,7 +361,7 @@ class StringPrimitiveTest extends \PHPUnit_Framework_TestCase
      */
     public function testThrowWhenMatchInvalidRegex()
     {
-        (new S(''))->match('/foo/', 0, 4);
+        (new S(''))->match('/foo/', 4);
     }
 
     public function testGetMatches()
@@ -382,7 +382,7 @@ class StringPrimitiveTest extends \PHPUnit_Framework_TestCase
      */
     public function testThrowWhenGettingMatchesInvalidRegex()
     {
-        (new S(''))->getMatches('/foo/', 0, 4);
+        (new S(''))->getMatches('/foo/', 4);
     }
 
     public function testPregReplace()
@@ -411,5 +411,16 @@ class StringPrimitiveTest extends \PHPUnit_Framework_TestCase
         $this->assertNotSame($s, $s3);
         $this->assertSame('bar', (string) $s3);
         $this->assertSame('foobarbaz', (string) $s);
+    }
+
+    public function testSprintf()
+    {
+        $s = new S('foo %s baz');
+
+        $s2 = $s->sprintf('bar');
+        $this->assertInstanceOf(S::class, $s2);
+        $this->assertNotSame($s, $s2);
+        $this->assertSame('foo bar baz', (string) $s2);
+        $this->assertSame('foo %s baz', (string) $s);
     }
 }

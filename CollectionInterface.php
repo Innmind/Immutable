@@ -4,6 +4,13 @@ namespace Innmind\Immutable;
 
 interface CollectionInterface extends PrimitiveInterface, \Iterator, \ArrayAccess, \Countable
 {
+    const SORT_REGULAR = 0;
+    const SORT_NUMERIC = 1;
+    const SORT_STRING = 2;
+    const SORT_LOCALE_STRING = 5;
+    const SORT_NATURAL = 6;
+    const SORT_FLAG_CASE = 8;
+
     /**
      * Returns a new collection containing the elements matching the filter
      *
@@ -216,7 +223,7 @@ interface CollectionInterface extends PrimitiveInterface, \Iterator, \ArrayAcces
      *
      * @return CollectionInterface
      */
-    public function unique($flags = SORT_REGULAR);
+    public function unique($flags = self::SORT_REGULAR);
 
     /**
      * Return a new collection with only the values
@@ -332,7 +339,7 @@ interface CollectionInterface extends PrimitiveInterface, \Iterator, \ArrayAcces
      *
      * @return CollectionInterface
      */
-    public function sort($flags = SORT_REGULAR);
+    public function sort($flags = self::SORT_REGULAR);
 
     /**
      * Return a new collection with the sorted values and indexes preserved
@@ -343,7 +350,7 @@ interface CollectionInterface extends PrimitiveInterface, \Iterator, \ArrayAcces
      *
      * @return CollectionInterface
      */
-    public function associativeSort($flags = SORT_REGULAR);
+    public function associativeSort($flags = self::SORT_REGULAR);
 
     /**
      * Return a new collection sorted by keys
@@ -354,7 +361,7 @@ interface CollectionInterface extends PrimitiveInterface, \Iterator, \ArrayAcces
      *
      * @return CollectionInterface
      */
-    public function keySort($flags = SORT_REGULAR);
+    public function keySort($flags = self::SORT_REGULAR);
 
     /**
      * Return a new collection sorted by keys via the given sorter
@@ -376,7 +383,7 @@ interface CollectionInterface extends PrimitiveInterface, \Iterator, \ArrayAcces
      *
      * @return CollectionInterface
      */
-    public function reverseSort($flags = SORT_REGULAR);
+    public function reverseSort($flags = self::SORT_REGULAR);
 
     /**
      * Return a new collection sorted via the given sorter
@@ -398,7 +405,7 @@ interface CollectionInterface extends PrimitiveInterface, \Iterator, \ArrayAcces
      *
      * @return CollectionInterface
      */
-    public function associativeReverseSort($flags = SORT_REGULAR);
+    public function associativeReverseSort($flags = self::SORT_REGULAR);
 
     /**
      * Return a new collection sorted by keys in the reversed order
@@ -409,7 +416,7 @@ interface CollectionInterface extends PrimitiveInterface, \Iterator, \ArrayAcces
      *
      * @return CollectionInterface
      */
-    public function keyReverseSort($flags = SORT_REGULAR);
+    public function keyReverseSort($flags = self::SORT_REGULAR);
 
     /**
      * Return a new collection sorted by the given sorter with preserved keys

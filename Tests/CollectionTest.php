@@ -654,7 +654,7 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
 
         $c = new Collection($d = ['Orange1', 'orange2', 'Orange3', 'orange20']);
 
-        $c2 = $c->sort(SORT_NATURAL | SORT_FLAG_CASE);
+        $c2 = $c->sort(Collection::SORT_NATURAL | Collection::SORT_FLAG_CASE);
         $this->assertInstanceOf(Collection::class, $c2);
         $this->assertNotSame($c, $c2);
         $this->assertSame(

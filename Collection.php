@@ -280,7 +280,7 @@ class Collection implements CollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function unique($flags = SORT_REGULAR)
+    public function unique($flags = self::SORT_REGULAR)
     {
         return new self(array_unique($this->values, (int) $flags));
     }
@@ -413,7 +413,7 @@ class Collection implements CollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function sort($flags = SORT_REGULAR)
+    public function sort($flags = self::SORT_REGULAR)
     {
         $values = $this->values;
         $bool = sort($values, (int) $flags);
@@ -428,7 +428,7 @@ class Collection implements CollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function associativeSort($flags = SORT_REGULAR)
+    public function associativeSort($flags = self::SORT_REGULAR)
     {
         $values = $this->values;
         $bool = asort($values, (int) $flags);
@@ -443,7 +443,7 @@ class Collection implements CollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function keySort($flags = SORT_REGULAR)
+    public function keySort($flags = self::SORT_REGULAR)
     {
         $values = $this->values;
         $bool = ksort($values, (int) $flags);
@@ -473,7 +473,7 @@ class Collection implements CollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function reverseSort($flags = SORT_REGULAR)
+    public function reverseSort($flags = self::SORT_REGULAR)
     {
         $values = $this->values;
         $bool = rsort($values, (int) $flags);
@@ -503,7 +503,7 @@ class Collection implements CollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function associativeReverseSort($flags = SORT_REGULAR)
+    public function associativeReverseSort($flags = self::SORT_REGULAR)
     {
         $values = $this->values;
         $bool = arsort($values, (int) $flags);
@@ -518,7 +518,7 @@ class Collection implements CollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function keyReverseSort($flags = SORT_REGULAR)
+    public function keyReverseSort($flags = self::SORT_REGULAR)
     {
         $values = $this->values;
         $bool = krsort($values, (int) $flags);
