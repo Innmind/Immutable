@@ -812,7 +812,7 @@ class TypedCollectionTest extends \PHPUnit_Framework_TestCase
             S::class,
             $d = [new S('Orange1'), new S('orange2'), new S('Orange3'), new S('orange20')]);
 
-        $c2 = $c->sort(SORT_NATURAL | SORT_FLAG_CASE);
+        $c2 = $c->sort(TypedCollection::SORT_NATURAL | TypedCollection::SORT_FLAG_CASE);
         $this->assertInstanceOf(TypedCollection::class, $c2);
         $this->assertNotSame($c, $c2);
         $this->assertSame($c->getType(), $c2->getType());

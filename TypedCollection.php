@@ -234,7 +234,7 @@ class TypedCollection extends Collection implements TypedCollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function unique($flags = SORT_REGULAR)
+    public function unique($flags = self::SORT_REGULAR)
     {
         return new self(
             $this->type,
@@ -358,7 +358,7 @@ class TypedCollection extends Collection implements TypedCollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function sort($flags = SORT_REGULAR)
+    public function sort($flags = self::SORT_REGULAR)
     {
         return new self(
             $this->type,
@@ -369,7 +369,7 @@ class TypedCollection extends Collection implements TypedCollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function associativeSort($flags = SORT_REGULAR)
+    public function associativeSort($flags = self::SORT_REGULAR)
     {
         return new self(
             $this->type,
@@ -380,7 +380,7 @@ class TypedCollection extends Collection implements TypedCollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function keySort($flags = SORT_REGULAR)
+    public function keySort($flags = self::SORT_REGULAR)
     {
         return new self(
             $this->type,
@@ -402,7 +402,7 @@ class TypedCollection extends Collection implements TypedCollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function reverseSort($flags = SORT_REGULAR)
+    public function reverseSort($flags = self::SORT_REGULAR)
     {
         return new self(
             $this->type,
@@ -424,7 +424,7 @@ class TypedCollection extends Collection implements TypedCollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function associativeReverseSort($flags = SORT_REGULAR)
+    public function associativeReverseSort($flags = self::SORT_REGULAR)
     {
         return new self(
             $this->type,
@@ -435,7 +435,7 @@ class TypedCollection extends Collection implements TypedCollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function keyReverseSort($flags = SORT_REGULAR)
+    public function keyReverseSort($flags = self::SORT_REGULAR)
     {
         return new self(
             $this->type,
