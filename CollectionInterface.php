@@ -4,12 +4,12 @@ namespace Innmind\Immutable;
 
 interface CollectionInterface extends PrimitiveInterface, \Iterator, \ArrayAccess, \Countable
 {
-    const SORT_REGULAR = SORT_REGULAR;
-    const SORT_NUMERIC = SORT_NUMERIC;
-    const SORT_STRING = SORT_STRING;
-    const SORT_LOCALE_STRING = SORT_LOCALE_STRING;
-    const SORT_NATURAL = SORT_NATURAL;
-    const SORT_FLAG_CASE = SORT_FLAG_CASE;
+    const SORT_REGULAR = 0;
+    const SORT_NUMERIC = 1;
+    const SORT_STRING = 2;
+    const SORT_LOCALE_STRING = 5;
+    const SORT_NATURAL = 6;
+    const SORT_FLAG_CASE = 8;
 
     /**
      * Returns a new collection containing the elements matching the filter
