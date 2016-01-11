@@ -382,7 +382,7 @@ class StringPrimitiveTest extends \PHPUnit_Framework_TestCase
      */
     public function testThrowWhenGettingMatchesInvalidRegex()
     {
-        (new S(''))->getMatches('/foo/', 0, 4);
+        (new S(''))->getMatches('/foo/', 4);
     }
 
     public function testPregReplace()

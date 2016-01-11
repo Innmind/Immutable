@@ -388,14 +388,14 @@ class StringPrimitive implements PrimitiveInterface, StringableInterface
      * Return a collection of the elements matching the regex
      *
      * @param string $regex
-     * @param int $flags
      * @param int $offset
+     * @param int $flags
      *
      * @throws Exception If the regex failed
      *
      * @return TypedCollection
      */
-    public function getMatches($regex, $flags = 0, $offset = 0)
+    public function getMatches($regex, $offset = 0, $flags = 0)
     {
         $matches = [];
         $value = preg_match(
