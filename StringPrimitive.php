@@ -463,4 +463,18 @@ class StringPrimitive implements PrimitiveInterface, StringableInterface
 
         return new self($sub);
     }
+
+    /**
+     * Return a formatted string
+     *
+     * @return StringPrimitive
+     */
+    public function sprintf()
+    {
+        $params = func_get_args();
+        array_unshift($params, $this->value);
+        $formatted = call_user_func_array('sprintf', $params);
+
+        return new self($formatted);
+    }
 }
