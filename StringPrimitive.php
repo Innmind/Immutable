@@ -8,6 +8,15 @@ use Innmind\Immutable\Exception\SubstringException;
 
 class StringPrimitive implements PrimitiveInterface, StringableInterface
 {
+    const PAD_RIGHT = STR_PAD_RIGHT;
+    const PAD_LEFT = STR_PAD_LEFT;
+    const PAD_BOTH = STR_PAD_BOTH;
+    const PREG_NO_FLAGS = 0;
+    const PREG_SPLIT_NO_EMPTY = PREG_SPLIT_NO_EMPTY;
+    const PREG_SPLIT_DELIM_CAPTURE = PREG_SPLIT_DELIM_CAPTURE;
+    const PREG_SPLIT_OFFSET_CAPTURE = PREG_SPLIT_OFFSET_CAPTURE;
+    const PREG_OFFSET_CAPTURE = PREG_OFFSET_CAPTURE;
+
     private $value;
 
     public function __construct($value)
@@ -184,7 +193,7 @@ class StringPrimitive implements PrimitiveInterface, StringableInterface
      *
      * @return StringPrimitive
      */
-    public function pad($length, $character = ' ', $direction = STR_PAD_RIGHT)
+    public function pad($length, $character = ' ', $direction = self::PAD_RIGHT)
     {
         return new self(str_pad(
             $this->value,
@@ -204,7 +213,7 @@ class StringPrimitive implements PrimitiveInterface, StringableInterface
      */
     public function rightPad($length, $character = ' ')
     {
-        return $this->pad($length, $character, STR_PAD_RIGHT);
+        return $this->pad($length, $character, self::PAD_RIGHT);
     }
 
     /**
@@ -217,7 +226,7 @@ class StringPrimitive implements PrimitiveInterface, StringableInterface
      */
     public function leftPad($length, $character = ' ')
     {
-        return $this->pad($length, $character, STR_PAD_LEFT);
+        return $this->pad($length, $character, self::PAD_LEFT);
     }
 
     /**
@@ -230,7 +239,7 @@ class StringPrimitive implements PrimitiveInterface, StringableInterface
      */
     public function uniPad($length, $character = ' ')
     {
-        return $this->pad($length, $character, STR_PAD_BOTH);
+        return $this->pad($length, $character, self::PAD_BOTH);
     }
 
     /**
@@ -348,7 +357,7 @@ class StringPrimitive implements PrimitiveInterface, StringableInterface
      *
      * @return TypedCollection
      */
-    public function pregSplit($regex, $limit = -1, $flags = 0)
+    public function pregSplit($regex, $limit = -1, $flags = self::PREG_NO_FLAGS)
     {
         $strings = preg_split((string) $regex, $this->value, $limit, $flags);
 
@@ -395,7 +404,7 @@ class StringPrimitive implements PrimitiveInterface, StringableInterface
      *
      * @return TypedCollection
      */
-    public function getMatches($regex, $offset = 0, $flags = 0)
+    public function getMatches($regex, $offset = 0, $flags = self::PREG_NO_FLAGS)
     {
         $matches = [];
         $value = preg_match(
