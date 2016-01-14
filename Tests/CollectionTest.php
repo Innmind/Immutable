@@ -928,6 +928,17 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(['1', '1.0', 'foo'], $c->toPrimitive());
     }
 
+    public function testSet()
+    {
+        $c = new Collection([1]);
+
+        $c2 = $c->set(0, 2);
+        $this->assertInstanceOf(Collection::class, $c2);
+        $this->assertNotSame($c, $c2);
+        $this->assertSame([1], $c->toPrimitive());
+        $this->assertSame([2], $c2->toPrimitive());
+    }
+
     public function testCount()
     {
         $c = new Collection([1, 2, 3]);

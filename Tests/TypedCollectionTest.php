@@ -1081,6 +1081,27 @@ class TypedCollectionTest extends \PHPUnit_Framework_TestCase
         $this->assertSame([0 => $c[0], 2 => $c[2]], $c2->toPrimitive());
         $this->assertSame($d, $c->toPrimitive());
     }
+
+    public function testSet()
+    {
+        $c = new TypedCollection(I::class, [new I(1)]);
+
+        $c2 = $c->set(0, new I(2));
+        $this->assertInstanceOf(TypedCollection::class, $c2);
+        $this->assertNotSame($c, $c2);
+        $this->assertSame($c->getType(), $c2->getType());
+        $this->assertSame(1, $c[0]->toPrimitive());
+        $this->assertSame(2, $c2[0]->toPrimitive());
+    }
+
+    /**
+     * @expectedException Innmind\Immutable\Exception\InvalidArgumentException
+     * @expectedExceptionMessage Each value must be an instance of "Innmind\Immutable\StringPrimitive"
+     */
+    public function testThrowWhenSettingDifferentTypes()
+    {
+        (new TypedCollection(S::class, []))->set(0, '');
+    }
 }
 
 class I implements PrimitiveInterface
