@@ -502,4 +502,14 @@ interface CollectionInterface extends PrimitiveInterface, \Iterator, \ArrayAcces
      * @return CollectionInterface
      */
     public function grep($pattern, $revert = false);
+
+    /**
+     * Set the element at the specified key
+     *
+     * @param mixed $key
+     * @param mixed $value
+     *
+     * @return CollectionInterface
+     */
+    public function set($key, $value);
 }

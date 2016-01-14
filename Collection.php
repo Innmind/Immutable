@@ -661,6 +661,17 @@ class Collection implements CollectionInterface
     /**
      * {@inheritdoc}
      */
+    public function set($key, $value)
+    {
+        $values = $this->values;
+        $values[$key] = $value;
+
+        return new self($values);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function count()
     {
         return count($this->values);
