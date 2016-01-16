@@ -512,4 +512,13 @@ interface CollectionInterface extends PrimitiveInterface, \Iterator, \ArrayAcces
      * @return CollectionInterface
      */
     public function set($key, $value);
+
+    /**
+     * Check if the element is in the collection
+     *
+     * @param mixed $value
+     *
+     * @return bool
+     */
+    public function contains($value);
 }

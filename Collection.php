@@ -672,6 +672,14 @@ class Collection implements CollectionInterface
     /**
      * {@inheritdoc}
      */
+    public function contains($value)
+    {
+        return in_array($value, $this->values, true);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function count()
     {
         return count($this->values);
