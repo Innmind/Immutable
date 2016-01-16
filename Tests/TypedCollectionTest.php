@@ -1094,6 +1094,16 @@ class TypedCollectionTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(2, $c2[0]->toPrimitive());
     }
 
+    public function testContains()
+    {
+        $c = new TypedCollection(I::class, [new I(42)]);
+
+        $this->assertTrue($c->contains($c[0]));
+        $this->assertFalse($c->contains(new I(42)));
+        $this->assertFalse($c->contains(42));
+        $this->assertFalse($c->contains('42'));
+    }
+
     /**
      * @expectedException Innmind\Immutable\Exception\InvalidArgumentException
      * @expectedExceptionMessage Each value must be an instance of "Innmind\Immutable\StringPrimitive"

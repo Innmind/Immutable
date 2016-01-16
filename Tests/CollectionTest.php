@@ -939,6 +939,15 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
         $this->assertSame([2], $c2->toPrimitive());
     }
 
+    public function testContains()
+    {
+        $c = new Collection(['42', 24]);
+
+        $this->assertTrue($c->contains(24));
+        $this->assertFalse($c->contains(42));
+        $this->assertTrue($c->contains('42'));
+    }
+
     public function testCount()
     {
         $c = new Collection([1, 2, 3]);

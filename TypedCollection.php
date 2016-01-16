@@ -512,6 +512,21 @@ class TypedCollection extends Collection implements TypedCollectionInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function contains($value)
+    {
+        //avoid searching the collection if we know it's not of the same type
+        try {
+            $this->validate($this->type, [$value]);
+        } catch (InvalidArgumentException $e) {
+            return false;
+        }
+
+        return parent::contains($value);
+    }
+
+    /**
      * Check if every element respect the given type
      *
      * @throws InvalidArgumentException If a value doesn't respect the type
