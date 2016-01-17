@@ -485,4 +485,41 @@ class StringPrimitive implements PrimitiveInterface, StringableInterface
 
         return new self($formatted);
     }
+
+    /**
+     * Return the string with the first letter as uppercase
+     *
+     * @return StringPrimitive
+     */
+    public function ucfirst()
+    {
+        return new self(ucfirst($this->value));
+    }
+
+    /**
+     * Return the string with the first letter as lowercase
+     *
+     * @return StringPrimitive
+     */
+    public function lcfirst()
+    {
+        return new self(lcfirst($this->value));
+    }
+
+    /**
+     * Return a CamelCase representation of the string
+     *
+     * @return StringPrimitive
+     */
+    public function camelize()
+    {
+        return new self(
+            $this
+                ->pregSplit('/_| /')
+                ->map(function($part) {
+                    return $part->ucfirst();
+                })
+                ->join('')
+        );
+    }
 }
