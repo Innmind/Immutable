@@ -57,3 +57,15 @@ $coll = new TypedCollection(S::class, ['foo']); // will throw `InvalidArgumentEx
 $coll = new TypedCollection(S::class, []);
 $coll2 = $coll->merge(new TypedCollection('stdClass', [])); // will throw `BadMethodCallException` as both collections are not of the same type
 ```
+
+## Object storages
+
+```php
+use Innmind\Immutable\ObjectStorage;
+
+$storage = (new ObjectStorage)
+    ->attach($myObject, 'some attached data')
+    ->merge($anotherObjectStorage);
+echo $storage[$myObject]; // outputs 'some attached data'
+$storage->toPrimitive(); // instance of SplObjectStorage
+```
