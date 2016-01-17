@@ -434,4 +434,15 @@ class StringPrimitiveTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('foo', (string) $s);
         $this->assertSame('Foo', (string) $s2);
     }
+
+    public function testLcfirst()
+    {
+        $s = new S('FOO');
+
+        $s2 = $s->lcfirst();
+        $this->assertInstanceOf(S::class, $s2);
+        $this->assertNotSame($s, $s2);
+        $this->assertSame('FOO', (string) $s);
+        $this->assertSame('fOO', (string) $s2);
+    }
 }

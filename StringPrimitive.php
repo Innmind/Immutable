@@ -495,4 +495,14 @@ class StringPrimitive implements PrimitiveInterface, StringableInterface
     {
         return new self(ucfirst($this->value));
     }
+
+    /**
+     * Return the string with the first letter as lowercase
+     *
+     * @return StringPrimitive
+     */
+    public function lcfirst()
+    {
+        return new self(lcfirst($this->value));
+    }
 }
