@@ -445,4 +445,15 @@ class StringPrimitiveTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('FOO', (string) $s);
         $this->assertSame('fOO', (string) $s2);
     }
+
+    public function testCamelize()
+    {
+        $s = new S('foo_bar baz');
+
+        $s2 = $s->camelize();
+        $this->assertInstanceOf(S::class, $s2);
+        $this->assertNotSame($s, $s2);
+        $this->assertSame('foo_bar baz', (string) $s);
+        $this->assertSame('FooBarBaz', (string) $s2);
+    }
 }

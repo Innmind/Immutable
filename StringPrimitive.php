@@ -505,4 +505,21 @@ class StringPrimitive implements PrimitiveInterface, StringableInterface
     {
         return new self(lcfirst($this->value));
     }
+
+    /**
+     * Return a CamelCase representation of the string
+     *
+     * @return StringPrimitive
+     */
+    public function camelize()
+    {
+        return new self(
+            $this
+                ->pregSplit('/_| /')
+                ->map(function($part) {
+                    return $part->ucfirst();
+                })
+                ->join('')
+        );
+    }
 }
