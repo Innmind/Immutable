@@ -485,4 +485,14 @@ class StringPrimitive implements PrimitiveInterface, StringableInterface
 
         return new self($formatted);
     }
+
+    /**
+     * Return the string with the first letter as uppercase
+     *
+     * @return StringPrimitive
+     */
+    public function ucfirst()
+    {
+        return new self(ucfirst($this->value));
+    }
 }
