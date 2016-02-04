@@ -252,4 +252,28 @@ class ObjectStorage implements PrimitiveInterface, \Countable, \Iterator, \Array
 
         return new self($objects);
     }
+
+    /**
+     * Apply the given filter on the collection
+     *
+     * @param Closure $filterer
+     *
+     * @return self
+     */
+    public function filter(\Closure $filterer)
+    {
+        $objects = new \SplObjectStorage;
+
+        foreach ($this->objects as $object) {
+            $data = $this->objects[$object];
+
+            if ($filterer($object, $data) === true) {
+                $objects->attach($object, $data);
+            }
+        }
+
+        $this->rewind();
+
+        return new self($objects);
+    }
 }

@@ -226,4 +226,22 @@ class ObjectStorageTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(0, $s2->count());
         $this->assertSame(1, $s3->count());
     }
+
+    public function testFilter()
+    {
+        $s = (new ObjectStorage)
+            ->attach($o = new \stdClass, 'foo')
+            ->attach(new \stdClass);
+
+        $s2 = $s->filter(function ($object, $data) {
+            return $data !== null;
+        });
+
+        $this->assertInstanceOf(ObjectStorage::class, $s2);
+        $this->assertNotSame($s, $s2);
+        $this->assertSame(1, $s2->count());
+        $this->assertSame(2, $s->count());
+        $this->assertSame($o, $s2->current());
+        $this->assertSame($o, $s->current());
+    }
 }
