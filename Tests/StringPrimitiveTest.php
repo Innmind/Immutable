@@ -74,22 +74,14 @@ class StringPrimitiveTest extends \PHPUnit_Framework_TestCase
         $s = new S('foobarbaz');
 
         $c = $s->chunk(4);
-        $this->assertInstanceOf(CollectionInterface::class, $c);
-        $this->assertInstanceOf(TypedCollectionInterface::class, $c[0]);
-        $this->assertInstanceOf(TypedCollectionInterface::class, $c[1]);
-        $this->assertInstanceOf(TypedCollectionInterface::class, $c[2]);
-        $this->assertSame(S::class, $c[0]->getType());
-        $this->assertSame(S::class, $c[1]->getType());
-        $this->assertSame(S::class, $c[2]->getType());
-        $this->assertSame('f', $c[0][0]->toPrimitive());
-        $this->assertSame('o', $c[0][1]->toPrimitive());
-        $this->assertSame('o', $c[0][2]->toPrimitive());
-        $this->assertSame('b', $c[0][3]->toPrimitive());
-        $this->assertSame('a', $c[1][0]->toPrimitive());
-        $this->assertSame('r', $c[1][1]->toPrimitive());
-        $this->assertSame('b', $c[1][2]->toPrimitive());
-        $this->assertSame('a', $c[1][3]->toPrimitive());
-        $this->assertSame('z', $c[2][0]->toPrimitive());
+        $this->assertInstanceOf(TypedCollectionInterface::class, $c);
+        $this->assertSame(S::class, $c->getType());
+        $this->assertInstanceOf(S::class, $c[0]);
+        $this->assertInstanceOf(S::class, $c[1]);
+        $this->assertInstanceOf(S::class, $c[2]);
+        $this->assertSame('foob', (string) $c[0]);
+        $this->assertSame('arba', (string) $c[1]);
+        $this->assertSame('z', (string) $c[2]);
     }
 
     public function testPos()

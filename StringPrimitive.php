@@ -73,11 +73,17 @@ class StringPrimitive implements PrimitiveInterface, StringableInterface
      *
      * @param int $size
      *
-     * @return CollectionInterface
+     * @return TypedCollection
      */
-    public function chunk(int $size = 1): CollectionInterface
+    public function chunk(int $size = 1): TypedCollection
     {
-        return $this->split()->chunk($size);
+        $pieces = str_split($this->value, $size);
+
+        foreach ($pieces as &$piece) {
+            $piece = new self($piece);
+        }
+
+        return new TypedCollection(self::class, $pieces);
     }
 
     /**
