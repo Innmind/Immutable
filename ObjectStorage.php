@@ -1,4 +1,5 @@
 <?php
+declare(strict_types = 1);
 
 namespace Innmind\Immutable;
 
@@ -17,7 +18,7 @@ class ObjectStorage implements PrimitiveInterface, \Countable, \Iterator, \Array
     /**
      * {@inheritdoc}
      */
-    public function toPrimitive()
+    public function toPrimitive(): \SplObjectStorage
     {
         //so the inner SplObjectStorage object can't be modified
         return clone $this->objects;
@@ -30,7 +31,7 @@ class ObjectStorage implements PrimitiveInterface, \Countable, \Iterator, \Array
      *
      * @return self
      */
-    public function merge(self $storage)
+    public function merge(self $storage): self
     {
         $objects = new \SplObjectStorage;
         $objects->addAll($this->objects);
@@ -47,7 +48,7 @@ class ObjectStorage implements PrimitiveInterface, \Countable, \Iterator, \Array
      *
      * @return self
      */
-    public function attach($object, $data = null)
+    public function attach($object, $data = null): self
     {
         $objects = clone $this->objects;
         $objects->attach($object, $data);
@@ -62,7 +63,7 @@ class ObjectStorage implements PrimitiveInterface, \Countable, \Iterator, \Array
      *
      * @return bool
      */
-    public function contains($object)
+    public function contains($object): bool
     {
         return $this->objects->contains($object);
     }
@@ -74,7 +75,7 @@ class ObjectStorage implements PrimitiveInterface, \Countable, \Iterator, \Array
      *
      * @return self
      */
-    public function detach($object)
+    public function detach($object): self
     {
         $objects = clone $this->objects;
         $objects->detach($object);
@@ -89,7 +90,7 @@ class ObjectStorage implements PrimitiveInterface, \Countable, \Iterator, \Array
      *
      * @return string
      */
-    public function getHash($object)
+    public function getHash($object): string
     {
         return $this->objects->getHash($object);
     }
@@ -111,7 +112,7 @@ class ObjectStorage implements PrimitiveInterface, \Countable, \Iterator, \Array
      *
      * @return self
      */
-    public function removeAll(self $storage)
+    public function removeAll(self $storage): self
     {
         $objects = clone $this->objects;
         $objects->removeAll($storage->objects);
@@ -126,7 +127,7 @@ class ObjectStorage implements PrimitiveInterface, \Countable, \Iterator, \Array
      *
      * @return self
      */
-    public function removeAllExcept(self $storage)
+    public function removeAllExcept(self $storage): self
     {
         $objects = clone $this->objects;
         $objects->removeAllExcept($storage->objects);
@@ -141,7 +142,7 @@ class ObjectStorage implements PrimitiveInterface, \Countable, \Iterator, \Array
      *
      * @return self
      */
-    public function setInfo($data)
+    public function setInfo($data): self
     {
         $current = $this->objects->current();
         $objects = clone $this->objects;
@@ -153,7 +154,7 @@ class ObjectStorage implements PrimitiveInterface, \Countable, \Iterator, \Array
     /**
      * {@inheritdoc}
      */
-    public function count()
+    public function count(): int
     {
         return $this->objects->count();
     }
@@ -193,7 +194,7 @@ class ObjectStorage implements PrimitiveInterface, \Countable, \Iterator, \Array
     /**
      * {@inheritdoc}
      */
-    public function valid()
+    public function valid(): bool
     {
         return $this->objects->valid();
     }
@@ -201,7 +202,7 @@ class ObjectStorage implements PrimitiveInterface, \Countable, \Iterator, \Array
     /**
      * {@inheritdoc}
      */
-    public function offsetExists($object)
+    public function offsetExists($object): bool
     {
         return $this->objects->offsetExists($object);
     }
@@ -237,7 +238,7 @@ class ObjectStorage implements PrimitiveInterface, \Countable, \Iterator, \Array
     /**
      * {@inheritdoc}
      */
-    public function serialize()
+    public function serialize(): string
     {
         return $this->objects->serialize();
     }
@@ -245,7 +246,7 @@ class ObjectStorage implements PrimitiveInterface, \Countable, \Iterator, \Array
     /**
      * {@inheritdoc}
      */
-    public function unserialize($serialized)
+    public function unserialize($serialized): self
     {
         $objects = clone $this->objects;
         $objects->unserialize($serialized);
@@ -260,7 +261,7 @@ class ObjectStorage implements PrimitiveInterface, \Countable, \Iterator, \Array
      *
      * @return self
      */
-    public function filter(\Closure $filterer)
+    public function filter(\Closure $filterer): self
     {
         $objects = new \SplObjectStorage;
 
@@ -284,7 +285,7 @@ class ObjectStorage implements PrimitiveInterface, \Countable, \Iterator, \Array
      *
      * @return self
      */
-    public function each(\Closure $callback)
+    public function each(\Closure $callback): self
     {
         foreach ($this->objects as $object) {
             $callback($object, $this->objects[$object]);
@@ -302,7 +303,7 @@ class ObjectStorage implements PrimitiveInterface, \Countable, \Iterator, \Array
      *
      * @return self
      */
-    public function map(\Closure $mapper)
+    public function map(\Closure $mapper): self
     {
         $objects = new \SplObjectStorage;
 

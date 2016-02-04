@@ -1,4 +1,5 @@
 <?php
+declare(strict_types = 1);
 
 namespace Innmind\Immutable;
 
@@ -16,34 +17,34 @@ interface CollectionInterface extends PrimitiveInterface, \Iterator, \ArrayAcces
      *
      * @param callable $filter
      *
-     * @return CollectionInterface
+     * @return self
      */
-    public function filter(callable $filter = null);
+    public function filter(callable $filter = null): self;
 
     /**
      * Returns a new collection which contains the intersection of both collections
      *
-     * @param CollectionInterface $collection
+     * @param self $collection
      *
-     * @return CollectionInterface
+     * @return self
      */
-    public function intersect(CollectionInterface $collection);
+    public function intersect(self $collection): self;
 
     /**
      * Split the collection into a collection of collections of the given size
      *
      * @param int $size
      *
-     * @return CollectionInterface
+     * @return self
      */
-    public function chunk($size);
+    public function chunk(int $size): self;
 
     /**
      * Returns a new collection without the first element of the current one
      *
-     * @return CollectionInterface
+     * @return self
      */
-    public function shift();
+    public function shift(): self;
 
     /**
      * Reduce the given collection to a single value through the given reducer
@@ -65,35 +66,35 @@ interface CollectionInterface extends PrimitiveInterface, \Iterator, \ArrayAcces
      *
      * @return mixed
      */
-    public function search($needle, $strict = true);
+    public function search($needle, bool $strict = true);
 
     /**
      * Returns a new collection of the collections' intersection given the intersecter
      *
-     * @param CollectionInterface $collection
+     * @param self $collection
      * @param callable $intersecter
      *
-     * @return CollectionInterface
+     * @return self
      */
-    public function uintersect(CollectionInterface $collection, callable $intersecter);
+    public function uintersect(self $collection, callable $intersecter): self;
 
     /**
      * Returns a new collection of the collections' intersection via keys
      *
-     * @param CollectionInterface $collection
+     * @param self $collection
      *
-     * @return CollectionInterface
+     * @return self
      */
-    public function keyIntersect(CollectionInterface $collection);
+    public function keyIntersect(self $collection): self;
 
     /**
      * Return a new collection with each value transformed with the given mapper
      *
      * @param callable $mapper
      *
-     * @return CollectionInterface
+     * @return self
      */
-    public function map(callable $mapper);
+    public function map(callable $mapper): self;
 
     /**
      * Returns a new collection with each value padded to the given size
@@ -101,16 +102,16 @@ interface CollectionInterface extends PrimitiveInterface, \Iterator, \ArrayAcces
      * @param int $size
      * @param mixed $value
      *
-     * @return CollectionInterface
+     * @return self
      */
-    public function pad($size, $value);
+    public function pad(int $size, $value): self;
 
     /**
      * Returns a new collection without the last element of the current one
      *
-     * @return CollectionInterface
+     * @return self
      */
-    public function pop();
+    public function pop(): self;
 
     /**
      * Sum all the values of the collection
@@ -122,18 +123,18 @@ interface CollectionInterface extends PrimitiveInterface, \Iterator, \ArrayAcces
     /**
      * Returns a new collection containing the difference of each collections
      *
-     * @param CollectionInterface $collections
+     * @param self $collections
      *
-     * @return CollectionInterface
+     * @return self
      */
-    public function diff(CollectionInterface $collections);
+    public function diff(self $collections): self;
 
     /**
      * Return a new collection with the keys and values flipped
      *
-     * @return CollectionInterface
+     * @return self
      */
-    public function flip();
+    public function flip(): self;
 
     /**
      * Return a new collection containing the current one keys
@@ -141,18 +142,18 @@ interface CollectionInterface extends PrimitiveInterface, \Iterator, \ArrayAcces
      * @param mixed $search
      * @param boolean $strict
      *
-     * @return CollectionInterface
+     * @return self
      */
-    public function keys($search = null, $strict = true);
+    public function keys($search = null, bool $strict = true): self;
 
     /**
      * Returns a new collection with the given value added at the end
      *
      * @param mixed $value
      *
-     * @return CollectionInterface
+     * @return self
      */
-    public function push($value);
+    public function push($value): self;
 
     /**
      * Return a new collection containing one or more keys of the randomly picked values
@@ -161,18 +162,18 @@ interface CollectionInterface extends PrimitiveInterface, \Iterator, \ArrayAcces
      *
      * @throws OutOfBoundException If the num is higher than the collection length
      *
-     * @return CollectionInterface
+     * @return self
      */
-    public function rand($num = 1);
+    public function rand(int $num = 1): self;
 
     /**
      * Returns a new collection with both collections merged
      *
-     * @param CollectionInterface $collection
+     * @param self $collection
      *
-     * @return CollectionInterface
+     * @return self
      */
-    public function merge(CollectionInterface $collection);
+    public function merge(self $collection): self;
 
     /**
      * Return a collection containing the wished slice
@@ -181,19 +182,19 @@ interface CollectionInterface extends PrimitiveInterface, \Iterator, \ArrayAcces
      * @param int $length
      * @param boolean $preserveKeys
      *
-     * @return CollectionInterface
+     * @return self
      */
-    public function slice($offset, $length = null, $preserveKeys = false);
+    public function slice(int $offset, int $length = null, bool $preserveKeys = false): self;
 
     /**
      * Return a new collection with the computed diff
      *
-     * @param CollectionInterface $collection
+     * @param self $collection
      * @param callable $differ
      *
-     * @return CollectionInterface
+     * @return self
      */
-    public function udiff(CollectionInterface $collection, callable $differ);
+    public function udiff(self $collection, callable $differ): self;
 
     /**
      * Return a new collection containing the values of the given column
@@ -201,9 +202,9 @@ interface CollectionInterface extends PrimitiveInterface, \Iterator, \ArrayAcces
      * @param mixed $key
      * @param mixed $indexKey
      *
-     * @return CollectionInterface
+     * @return self
      */
-    public function column($key, $indexKey = null);
+    public function column($key, $indexKey = null): self;
 
     /**
      * Return a new collection with a slice replaced by the given replacement
@@ -212,25 +213,25 @@ interface CollectionInterface extends PrimitiveInterface, \Iterator, \ArrayAcces
      * @param int $length
      * @param array $replacement
      *
-     * @return CollectionInterface
+     * @return self
      */
-    public function splice($offset, $length = 0, $replacement = []);
+    public function splice(int $offset, int $length = 0, $replacement = []): self;
 
     /**
      * Returns a new collection with only unique values
      *
      * @param int $flags
      *
-     * @return CollectionInterface
+     * @return self
      */
-    public function unique($flags = self::SORT_REGULAR);
+    public function unique(int $flags = self::SORT_REGULAR): self;
 
     /**
      * Return a new collection with only the values
      *
-     * @return CollectionInterface
+     * @return self
      */
-    public function values();
+    public function values(): self;
 
     /**
      * Return the product of the values
@@ -242,57 +243,57 @@ interface CollectionInterface extends PrimitiveInterface, \Iterator, \ArrayAcces
     /**
      * Return a new collection with elements replaced from the given collection
      *
-     * @param CollectionInterface $collection
+     * @param self $collection
      *
-     * @return CollectionInterface
+     * @return self
      */
-    public function replace(CollectionInterface $collection);
+    public function replace(self $collection): self;
 
     /**
      * Returns a new collection with the values in reversed order
      *
      * @param boolean $preserveKeys
      *
-     * @return CollectionInterface
+     * @return self
      */
-    public function reverse($preserveKeys = false);
+    public function reverse(bool $preserveKeys = false): self;
 
     /**
      * Return a new collection with the given value at the beginning of it
      *
      * @param mixed $value
      *
-     * @return CollectionInterface
+     * @return self
      */
-    public function unshift($value);
+    public function unshift($value): self;
 
     /**
      * Return a new collection containing the diff by keys of the collections
      *
-     * @param CollectionInterface $collection
+     * @param self $collection
      *
-     * @return CollectionInterface
+     * @return self
      */
-    public function keyDiff(CollectionInterface $collection);
+    public function keyDiff(self $collection): self;
 
     /**
      * Return a new collection containing the diff generated by the differ
      *
-     * @param CollectionInterface $collection
+     * @param self $collection
      * @param callable $differ
      *
-     * @return CollectionInterface
+     * @return self
      */
-    public function ukeyDiff(CollectionInterface $collection, callable $differ);
+    public function ukeyDiff(self $collection, callable $differ): self;
 
     /**
      * Returns a new collection with diff applied to both values and keys
      *
-     * @param CollectionInterface $collection
+     * @param self $collection
      *
-     * @return CollectionInterface
+     * @return self
      */
-    public function associativeDiff(CollectionInterface $collection);
+    public function associativeDiff(self $collection): self;
 
     /**
      * Check if a key exist in the collection
@@ -302,33 +303,33 @@ interface CollectionInterface extends PrimitiveInterface, \Iterator, \ArrayAcces
      *
      * @return bool
      */
-    public function hasKey($key, $strict = true);
+    public function hasKey($key, bool $strict = true): bool;
 
     /**
      * Return a new collection with the count of each value
      *
-     * @return CollectionInterface
+     * @return self
      */
-    public function countValues();
+    public function countValues(): self;
 
     /**
      * Return a new collection intersected by key via the intersecter
      *
-     * @param CollectionInterface $collection
+     * @param self $collection
      * @param callable $intersecter
      *
-     * @return CollectionInterface
+     * @return self
      */
-    public function ukeyIntersect(CollectionInterface $collection, callable $intersecter);
+    public function ukeyIntersect(self $collection, callable $intersecter): self;
 
     /**
      * Return a new collection intersected with additional check on keys
      *
-     * @param CollectionInterface $collection
+     * @param self $collection
      *
-     * @return CollectionInterface
+     * @return self
      */
-    public function associativeIntersect(CollectionInterface $collection);
+    public function associativeIntersect(self $collection): self;
 
     /**
      * Return a new collection with the sorted values
@@ -337,9 +338,9 @@ interface CollectionInterface extends PrimitiveInterface, \Iterator, \ArrayAcces
      *
      * @throws SortException If the sort failed
      *
-     * @return CollectionInterface
+     * @return self
      */
-    public function sort($flags = self::SORT_REGULAR);
+    public function sort(int $flags = self::SORT_REGULAR): self;
 
     /**
      * Return a new collection with the sorted values and indexes preserved
@@ -348,9 +349,9 @@ interface CollectionInterface extends PrimitiveInterface, \Iterator, \ArrayAcces
      *
      * @throws SortException If the sort failed
      *
-     * @return CollectionInterface
+     * @return self
      */
-    public function associativeSort($flags = self::SORT_REGULAR);
+    public function associativeSort(int $flags = self::SORT_REGULAR): self;
 
     /**
      * Return a new collection sorted by keys
@@ -359,9 +360,9 @@ interface CollectionInterface extends PrimitiveInterface, \Iterator, \ArrayAcces
      *
      * @throws SortException If the sort failed
      *
-     * @return CollectionInterface
+     * @return self
      */
-    public function keySort($flags = self::SORT_REGULAR);
+    public function keySort(int $flags = self::SORT_REGULAR): self;
 
     /**
      * Return a new collection sorted by keys via the given sorter
@@ -370,9 +371,9 @@ interface CollectionInterface extends PrimitiveInterface, \Iterator, \ArrayAcces
      *
      * @throws SortException If the sort failed
      *
-     * @return CollectionInterface
+     * @return self
      */
-    public function ukeySort(callable $sorter);
+    public function ukeySort(callable $sorter): self;
 
     /**
      * Return a new collection sorted in the reversed order
@@ -381,9 +382,9 @@ interface CollectionInterface extends PrimitiveInterface, \Iterator, \ArrayAcces
      *
      * @throws SortException If the sort failed
      *
-     * @return CollectionInterface
+     * @return self
      */
-    public function reverseSort($flags = self::SORT_REGULAR);
+    public function reverseSort(int $flags = self::SORT_REGULAR): self;
 
     /**
      * Return a new collection sorted via the given sorter
@@ -392,9 +393,9 @@ interface CollectionInterface extends PrimitiveInterface, \Iterator, \ArrayAcces
      *
      * @throws SortException If the sort failed
      *
-     * @return CollectionInterface
+     * @return self
      */
-    public function usort(callable $sorter);
+    public function usort(callable $sorter): self;
 
     /**
      * Return a new collection sorted in the reversed order with preserved keys
@@ -403,9 +404,9 @@ interface CollectionInterface extends PrimitiveInterface, \Iterator, \ArrayAcces
      *
      * @throws SortException If the sort failed
      *
-     * @return CollectionInterface
+     * @return self
      */
-    public function associativeReverseSort($flags = self::SORT_REGULAR);
+    public function associativeReverseSort(int $flags = self::SORT_REGULAR): self;
 
     /**
      * Return a new collection sorted by keys in the reversed order
@@ -414,9 +415,9 @@ interface CollectionInterface extends PrimitiveInterface, \Iterator, \ArrayAcces
      *
      * @throws SortException If the sort failed
      *
-     * @return CollectionInterface
+     * @return self
      */
-    public function keyReverseSort($flags = self::SORT_REGULAR);
+    public function keyReverseSort(int $flags = self::SORT_REGULAR): self;
 
     /**
      * Return a new collection sorted by the given sorter with preserved keys
@@ -425,18 +426,18 @@ interface CollectionInterface extends PrimitiveInterface, \Iterator, \ArrayAcces
      *
      * @throws SortException If the sort failed
      *
-     * @return CollectionInterface
+     * @return self
      */
-    public function uassociativeSort(callable $sorter);
+    public function uassociativeSort(callable $sorter): self;
 
     /**
      * Return a new collection with a natural sort applied to it
      *
      * @throws SortException If the sort failed
      *
-     * @return CollectionInterface
+     * @return self
      */
-    public function naturalSort();
+    public function naturalSort(): self;
 
     /**
      * Return the first collection element
@@ -461,9 +462,9 @@ interface CollectionInterface extends PrimitiveInterface, \Iterator, \ArrayAcces
      *
      * @param Closure $callback
      *
-     * @return CollectionInterface self
+     * @return self
      */
-    public function each(\Closure $callback);
+    public function each(\Closure $callback): self;
 
     /**
      * Concatenate the values into a string separated by the given string
@@ -472,16 +473,16 @@ interface CollectionInterface extends PrimitiveInterface, \Iterator, \ArrayAcces
      *
      * @return string
      */
-    public function join($separator);
+    public function join(string $separator): string;
 
     /**
      * Return a new collection with the values order shuffled
      *
      * @throws RuntimeException If the operation fails
      *
-     * @return CollectionInterface
+     * @return self
      */
-    public function shuffle();
+    public function shuffle(): self;
 
     /**
      * Return a new collection with n elements took randomly
@@ -489,9 +490,9 @@ interface CollectionInterface extends PrimitiveInterface, \Iterator, \ArrayAcces
      * @param int $size
      * @param bool preserveKeys
      *
-     * @return CollectionInterface
+     * @return self
      */
-    public function take($size, $preserveKeys = false);
+    public function take(int $size, bool $preserveKeys = false): self;
 
     /**
      * Return all elements matching the given regex
@@ -499,9 +500,9 @@ interface CollectionInterface extends PrimitiveInterface, \Iterator, \ArrayAcces
      * @param string $pattern
      * @param bool $revert
      *
-     * @return CollectionInterface
+     * @return self
      */
-    public function grep($pattern, $revert = false);
+    public function grep(string $pattern, bool $revert = false): self;
 
     /**
      * Set the element at the specified key
@@ -509,9 +510,9 @@ interface CollectionInterface extends PrimitiveInterface, \Iterator, \ArrayAcces
      * @param mixed $key
      * @param mixed $value
      *
-     * @return CollectionInterface
+     * @return self
      */
-    public function set($key, $value);
+    public function set($key, $value): self;
 
     /**
      * Check if the element is in the collection
@@ -520,5 +521,5 @@ interface CollectionInterface extends PrimitiveInterface, \Iterator, \ArrayAcces
      *
      * @return bool
      */
-    public function contains($value);
+    public function contains($value): bool;
 }

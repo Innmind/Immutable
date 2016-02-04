@@ -1,4 +1,5 @@
 <?php
+declare(strict_types = 1);
 
 namespace Innmind\Immutable\Tests;
 
@@ -256,7 +257,7 @@ class StringPrimitiveTest extends \PHPUnit_Framework_TestCase
 
         try {
             foreach ($s2->split() as $char) {
-                $s->pos($char);
+                $s->pos((string) $char);
             }
         } catch (\Exception $e) {
             $this->fail('every character should be in the original string');

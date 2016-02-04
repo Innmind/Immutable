@@ -1,4 +1,5 @@
 <?php
+declare(strict_types = 1);
 
 namespace Innmind\Immutable;
 
@@ -39,7 +40,7 @@ class StringPrimitive implements PrimitiveInterface, StringableInterface
     /**
      * {@inheritdoc}
      */
-    public function __toString()
+    public function __toString(): string
     {
         return $this->value;
     }
@@ -51,9 +52,8 @@ class StringPrimitive implements PrimitiveInterface, StringableInterface
      *
      * @return TypedCollection
      */
-    public function split($delimiter = null)
+    public function split(string $delimiter = null): TypedCollection
     {
-        $delimiter = (string) $delimiter;
         $parts = empty($delimiter) ?
                 str_split($this->value) : explode($delimiter, $this->value);
         $strings = [];
@@ -73,11 +73,11 @@ class StringPrimitive implements PrimitiveInterface, StringableInterface
      *
      * @param int $size
      *
-     * @return TypedCollection
+     * @return CollectionInterface
      */
-    public function chunk($size = 1)
+    public function chunk(int $size = 1): CollectionInterface
     {
-        return $this->split()->chunk((int) $size);
+        return $this->split()->chunk($size);
     }
 
     /**
@@ -90,9 +90,9 @@ class StringPrimitive implements PrimitiveInterface, StringableInterface
      *
      * @return int
      */
-    public function pos($needle, $offset = 0)
+    public function pos(string $needle, int $offset = 0): int
     {
-        $position = mb_strpos($this->value, (string) $needle, (int) $offset);
+        $position = mb_strpos($this->value, $needle, $offset);
 
         if ($position === false) {
             throw new SubstringException(sprintf(
@@ -110,9 +110,9 @@ class StringPrimitive implements PrimitiveInterface, StringableInterface
      * @param string $search
      * @param string $replacement
      *
-     * @return StringPrimitive
+     * @return self
      */
-    public function replace($search, $replacement)
+    public function replace(string $search, string $replacement): self
     {
         return new self(str_replace(
             (string) $search,
@@ -128,11 +128,11 @@ class StringPrimitive implements PrimitiveInterface, StringableInterface
      *
      * @throws SubstringException If the string is not found
      *
-     * @return StringInterface
+     * @return self
      */
-    public function str($delimiter)
+    public function str(string $delimiter): self
     {
-        $sub = mb_strstr($this->value, (string) $delimiter);
+        $sub = mb_strstr($this->value, $delimiter);
 
         if ($sub === false) {
             throw new SubstringException(sprintf(
@@ -147,9 +147,9 @@ class StringPrimitive implements PrimitiveInterface, StringableInterface
     /**
      * Return the string in upper case
      *
-     * @return StringPrimitive
+     * @return self
      */
-    public function toUpper()
+    public function toUpper(): self
     {
         return new self(mb_strtoupper($this->value));
     }
@@ -157,9 +157,9 @@ class StringPrimitive implements PrimitiveInterface, StringableInterface
     /**
      * Return the string in lower case
      *
-     * @return StringPrimitive
+     * @return self
      */
-    public function toLower()
+    public function toLower(): self
     {
         return new self(mb_strtolower($this->value));
     }
@@ -169,7 +169,7 @@ class StringPrimitive implements PrimitiveInterface, StringableInterface
      *
      * @return int
      */
-    public function length()
+    public function length(): int
     {
         return strlen($this->value);
     }
@@ -177,9 +177,9 @@ class StringPrimitive implements PrimitiveInterface, StringableInterface
     /**
      * Reverse the string
      *
-     * @return StringPrimitive
+     * @return self
      */
-    public function reverse()
+    public function reverse(): self
     {
         return new self(strrev($this->value));
     }
@@ -191,14 +191,14 @@ class StringPrimitive implements PrimitiveInterface, StringableInterface
      * @param string $character
      * @param int $direction
      *
-     * @return StringPrimitive
+     * @return self
      */
-    public function pad($length, $character = ' ', $direction = self::PAD_RIGHT)
+    public function pad(int $length, string $character = ' ', int $direction = self::PAD_RIGHT): self
     {
         return new self(str_pad(
             $this->value,
-            (int) $length,
-            (string) $character,
+            $length,
+            $character,
             $direction
         ));
     }
@@ -209,9 +209,9 @@ class StringPrimitive implements PrimitiveInterface, StringableInterface
      * @param int $length
      * @param string $character
      *
-     * @return StringPrimitive
+     * @return self
      */
-    public function rightPad($length, $character = ' ')
+    public function rightPad(int $length, string $character = ' '): self
     {
         return $this->pad($length, $character, self::PAD_RIGHT);
     }
@@ -222,9 +222,9 @@ class StringPrimitive implements PrimitiveInterface, StringableInterface
      * @param int $length
      * @param string $character
      *
-     * @return StringPrimitive
+     * @return self
      */
-    public function leftPad($length, $character = ' ')
+    public function leftPad(int $length, string $character = ' '): self
     {
         return $this->pad($length, $character, self::PAD_LEFT);
     }
@@ -235,9 +235,9 @@ class StringPrimitive implements PrimitiveInterface, StringableInterface
      * @param int $length
      * @param string $character
      *
-     * @return StringPrimitive
+     * @return self
      */
-    public function uniPad($length, $character = ' ')
+    public function uniPad(int $length, string $character = ' '): self
     {
         return $this->pad($length, $character, self::PAD_BOTH);
     }
@@ -251,18 +251,16 @@ class StringPrimitive implements PrimitiveInterface, StringableInterface
      *
      * @return int
      */
-    public function cspn($mask, $start = 0, $length = null)
+    public function cspn(string $mask, int $start = 0, int $length = null): int
     {
-        $start = (int) $start;
-
         if ($length === null) {
-            $value = strcspn($this->value, (string) $mask, $start);
+            $value = strcspn($this->value, $mask, $start);
         } else {
             $value = strcspn(
                 $this->value,
-                (string) $mask,
+                $mask,
                 $start,
-                (int) $length
+                $length
             );
         }
 
@@ -274,19 +272,19 @@ class StringPrimitive implements PrimitiveInterface, StringableInterface
      *
      * @param int $repeat
      *
-     * @return StringPrimitive
+     * @return self
      */
-    public function repeat($repeat)
+    public function repeat(int $repeat): self
     {
-        return new self(str_repeat($this->value, (int) $repeat));
+        return new self(str_repeat($this->value, $repeat));
     }
 
     /**
      * Shuffle the string
      *
-     * @return StringPrimitive
+     * @return self
      */
-    public function shuffle()
+    public function shuffle(): self
     {
         return new self(str_shuffle($this->value));
     }
@@ -294,9 +292,9 @@ class StringPrimitive implements PrimitiveInterface, StringableInterface
     /**
      * Strip slashes
      *
-     * @return StringPrimitive
+     * @return self
      */
-    public function stripSlashes()
+    public function stripSlashes(): self
     {
         return new self(stripslashes($this->value));
     }
@@ -304,9 +302,9 @@ class StringPrimitive implements PrimitiveInterface, StringableInterface
     /**
      * Strip C-like slashes
      *
-     * @return StringPrimitive
+     * @return self
      */
-    public function stripCSlashes()
+    public function stripCSlashes(): self
     {
         return new self(stripcslashes($this->value));
     }
@@ -318,12 +316,12 @@ class StringPrimitive implements PrimitiveInterface, StringableInterface
      *
      * @return int
      */
-    public function wordCount($charlist = '')
+    public function wordCount(string $charlist = ''): int
     {
         return (int) str_word_count(
             $this->value,
             0,
-            (string) $charlist
+            $charlist
         );
     }
 
@@ -334,9 +332,9 @@ class StringPrimitive implements PrimitiveInterface, StringableInterface
      *
      * @return TypedCollection
      */
-    public function words($charlist = '')
+    public function words(string $charlist = ''): TypedCollection
     {
-        $words = str_word_count($this->value, 2, (string) $charlist);
+        $words = str_word_count($this->value, 2, $charlist);
 
         foreach ($words as &$word) {
             $word = new self($word);
@@ -357,9 +355,9 @@ class StringPrimitive implements PrimitiveInterface, StringableInterface
      *
      * @return TypedCollection
      */
-    public function pregSplit($regex, $limit = -1, $flags = self::PREG_NO_FLAGS)
+    public function pregSplit(string $regex, int $limit = -1, int $flags = self::PREG_NO_FLAGS): TypedCollection
     {
-        $strings = preg_split((string) $regex, $this->value, $limit, $flags);
+        $strings = preg_split($regex, $this->value, $limit, $flags);
 
         foreach ($strings as &$string) {
             $string = new self($string);
@@ -381,10 +379,10 @@ class StringPrimitive implements PrimitiveInterface, StringableInterface
      *
      * @return bool
      */
-    public function match($regex, $offset = 0)
+    public function match(string $regex, int $offset = 0): bool
     {
         $matches = [];
-        $value = preg_match((string) $regex, $this->value, $matches, 0, $offset);
+        $value = preg_match($regex, $this->value, $matches, 0, $offset);
 
         if ($value === false) {
             throw new RegexException('', preg_last_error());
@@ -404,11 +402,11 @@ class StringPrimitive implements PrimitiveInterface, StringableInterface
      *
      * @return TypedCollection
      */
-    public function getMatches($regex, $offset = 0, $flags = self::PREG_NO_FLAGS)
+    public function getMatches(string $regex, int $offset = 0, int $flags = self::PREG_NO_FLAGS): TypedCollection
     {
         $matches = [];
         $value = preg_match(
-            (string) $regex,
+            $regex,
             $this->value,
             $matches,
             $flags,
@@ -435,13 +433,13 @@ class StringPrimitive implements PrimitiveInterface, StringableInterface
      *
      * @throws Exception If the regex failed
      *
-     * @return StringPrimitive
+     * @return self
      */
-    public function pregReplace($regex, $replacement, $limit = -1)
+    public function pregReplace(string $regex, string $replacement, int $limit = -1): self
     {
         $value = preg_replace(
-            (string) $regex,
-            (string) $replacement,
+            $regex,
+            $replacement,
             $this->value,
             $limit
         );
@@ -459,14 +457,14 @@ class StringPrimitive implements PrimitiveInterface, StringableInterface
      * @param int $start
      * @param int $length
      *
-     * @return StringPrimitive
+     * @return self
      */
-    public function substring($start, $length = null)
+    public function substring(int $start, int $length = null): self
     {
         if ($length === null) {
-            $sub = substr($this->value, (int) $start);
+            $sub = substr($this->value, $start);
         } else {
-            $sub = substr($this->value, (int) $start, (int) $length);
+            $sub = substr($this->value, $start, $length);
         }
 
         return new self($sub);
@@ -475,9 +473,9 @@ class StringPrimitive implements PrimitiveInterface, StringableInterface
     /**
      * Return a formatted string
      *
-     * @return StringPrimitive
+     * @return self
      */
-    public function sprintf()
+    public function sprintf(): self
     {
         $params = func_get_args();
         array_unshift($params, $this->value);
@@ -489,9 +487,9 @@ class StringPrimitive implements PrimitiveInterface, StringableInterface
     /**
      * Return the string with the first letter as uppercase
      *
-     * @return StringPrimitive
+     * @return self
      */
-    public function ucfirst()
+    public function ucfirst(): self
     {
         return new self(ucfirst($this->value));
     }
@@ -499,9 +497,9 @@ class StringPrimitive implements PrimitiveInterface, StringableInterface
     /**
      * Return the string with the first letter as lowercase
      *
-     * @return StringPrimitive
+     * @return self
      */
-    public function lcfirst()
+    public function lcfirst(): self
     {
         return new self(lcfirst($this->value));
     }
@@ -509,9 +507,9 @@ class StringPrimitive implements PrimitiveInterface, StringableInterface
     /**
      * Return a CamelCase representation of the string
      *
-     * @return StringPrimitive
+     * @return self
      */
-    public function camelize()
+    public function camelize(): self
     {
         return new self(
             $this

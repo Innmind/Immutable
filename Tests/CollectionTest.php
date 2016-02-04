@@ -1,4 +1,5 @@
 <?php
+declare(strict_types = 1);
 
 namespace Innmind\Immutable\Tests;
 
@@ -55,7 +56,7 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
     {
         $c = new Collection([0, 0, 0, 0, 0]);
 
-        $c2 = $c->chunk('2');
+        $c2 = $c->chunk(2);
 
         $this->assertInstanceOf(Collection::class, $c2);
         $this->assertNotSame($c, $c2);
@@ -175,7 +176,7 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
     {
         $c = new Collection(['foo', 'bar', 'foobar']);
 
-        $c2 = $c->pad('6', null);
+        $c2 = $c->pad(6, null);
         $this->assertInstanceOf(Collection::class, $c2);
         $this->assertNotSame($c, $c2);
         $this->assertSame(
@@ -290,7 +291,7 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue(in_array($key, ['foo', 'baz'], true));
         $this->assertSame($data[$key], array_values($prim)[0]);
 
-        $c3 = $c->rand('2');
+        $c3 = $c->rand(2);
         $this->assertSame(2, count($c3));
     }
 
@@ -340,7 +341,7 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
         $this->assertNotSame($c, $c2);
         $this->assertSame([2 => 3, 3 => 4], $c2->toPrimitive());
 
-        $c2 = $c->slice(2, '1', true);
+        $c2 = $c->slice(2, 1, true);
         $this->assertInstanceOf(Collection::class, $c2);
         $this->assertNotSame($c, $c2);
         $this->assertSame([2 => 3], $c2->toPrimitive());

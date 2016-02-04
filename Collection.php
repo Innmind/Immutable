@@ -1,4 +1,5 @@
 <?php
+declare(strict_types = 1);
 
 namespace Innmind\Immutable;
 
@@ -28,7 +29,7 @@ class Collection implements CollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function filter(callable $filter = null)
+    public function filter(callable $filter = null): CollectionInterface
     {
         if ($filter === null) {
             $values = array_filter($this->values);
@@ -46,7 +47,7 @@ class Collection implements CollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function intersect(CollectionInterface $collection)
+    public function intersect(CollectionInterface $collection): CollectionInterface
     {
         return new self(array_intersect(
             $this->values,
@@ -57,9 +58,9 @@ class Collection implements CollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function chunk($size)
+    public function chunk(int $size): CollectionInterface
     {
-        $chunks = array_chunk($this->values, (int) $size);
+        $chunks = array_chunk($this->values, $size);
         $subs = [];
 
         foreach ($chunks as $chunk) {
@@ -72,7 +73,7 @@ class Collection implements CollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function shift()
+    public function shift(): CollectionInterface
     {
         $values = $this->values;
         array_shift($values);
@@ -91,7 +92,7 @@ class Collection implements CollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function search($needle, $strict = true)
+    public function search($needle, bool $strict = true)
     {
         return array_search($needle, $this->values, (bool) $strict);
     }
@@ -99,7 +100,7 @@ class Collection implements CollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function uintersect(CollectionInterface $collection, callable $intersecter)
+    public function uintersect(CollectionInterface $collection, callable $intersecter): CollectionInterface
     {
         return new self(array_uintersect(
             $this->values,
@@ -111,7 +112,7 @@ class Collection implements CollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function keyIntersect(CollectionInterface $collection)
+    public function keyIntersect(CollectionInterface $collection): CollectionInterface
     {
         return new self(array_intersect_key(
             $this->values,
@@ -122,7 +123,7 @@ class Collection implements CollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function map(callable $mapper)
+    public function map(callable $mapper): CollectionInterface
     {
         return new self(array_map($mapper, $this->values));
     }
@@ -130,15 +131,15 @@ class Collection implements CollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function pad($size, $value)
+    public function pad(int $size, $value): CollectionInterface
     {
-        return new self(array_pad($this->values, (int) $size, $value));
+        return new self(array_pad($this->values, $size, $value));
     }
 
     /**
      * {@inheritdoc}
      */
-    public function pop()
+    public function pop(): CollectionInterface
     {
         $values = $this->values;
         array_pop($values);
@@ -157,7 +158,7 @@ class Collection implements CollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function diff(CollectionInterface $collection)
+    public function diff(CollectionInterface $collection): CollectionInterface
     {
         return new self(array_diff($this->values, $collection->toPrimitive()));
     }
@@ -165,7 +166,7 @@ class Collection implements CollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function flip()
+    public function flip(): CollectionInterface
     {
         return new self(array_flip($this->values));
     }
@@ -173,7 +174,7 @@ class Collection implements CollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function keys($search = null, $strict = true)
+    public function keys($search = null, bool $strict = true): CollectionInterface
     {
         $args = func_get_args();
 
@@ -189,7 +190,7 @@ class Collection implements CollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function push($value)
+    public function push($value): CollectionInterface
     {
         $values = $this->values;
         array_push($values, $value);
@@ -200,9 +201,9 @@ class Collection implements CollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function rand($num = 1)
+    public function rand(int $num = 1): CollectionInterface
     {
-        if ((int) $num > $this->count()) {
+        if ($num > $this->count()) {
             throw new OutOfBoundException(
                 'Trying to return a wider collection than the current one'
             );
@@ -221,7 +222,7 @@ class Collection implements CollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function merge(CollectionInterface $collection)
+    public function merge(CollectionInterface $collection): CollectionInterface
     {
         return new self(array_merge(
             $this->values,
@@ -232,20 +233,20 @@ class Collection implements CollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function slice($offset, $length = null, $preserveKeys = false)
+    public function slice(int $offset, int $length = null, bool $preserveKeys = false): CollectionInterface
     {
         return new self(array_slice(
             $this->values,
-            (int) $offset,
-            $length === null ? null : (int) $length,
-            (bool) $preserveKeys
+            $offset,
+            $length === null ? null : $length,
+            $preserveKeys
         ));
     }
 
     /**
      * {@inheritdoc}
      */
-    public function udiff(CollectionInterface $collection, callable $differ)
+    public function udiff(CollectionInterface $collection, callable $differ): CollectionInterface
     {
         return new self(array_udiff(
             $this->values,
@@ -257,7 +258,7 @@ class Collection implements CollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function column($key, $indexKey = null)
+    public function column($key, $indexKey = null): CollectionInterface
     {
         return new self(array_column(
             $this->values,
@@ -269,10 +270,10 @@ class Collection implements CollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function splice($offset, $length = 0, $replacement = [])
+    public function splice(int $offset, int $length = 0, $replacement = []): CollectionInterface
     {
         $values = $this->values;
-        array_splice($values, (int) $offset, (int) $length, $replacement);
+        array_splice($values, $offset, $length, $replacement);
 
         return new self($values);
     }
@@ -280,15 +281,15 @@ class Collection implements CollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function unique($flags = self::SORT_REGULAR)
+    public function unique(int $flags = self::SORT_REGULAR): CollectionInterface
     {
-        return new self(array_unique($this->values, (int) $flags));
+        return new self(array_unique($this->values, $flags));
     }
 
     /**
      * {@inheritdoc}
      */
-    public function values()
+    public function values(): CollectionInterface
     {
         return new self(array_values($this->values));
     }
@@ -304,7 +305,7 @@ class Collection implements CollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function replace(CollectionInterface $collection)
+    public function replace(CollectionInterface $collection): CollectionInterface
     {
         return new self(array_replace(
             $this->values,
@@ -315,15 +316,15 @@ class Collection implements CollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function reverse($preserveKeys = false)
+    public function reverse(bool $preserveKeys = false): CollectionInterface
     {
-        return new self(array_reverse($this->values, (bool) $preserveKeys));
+        return new self(array_reverse($this->values, $preserveKeys));
     }
 
     /**
      * {@inheritdoc}
      */
-    public function unshift($value)
+    public function unshift($value): CollectionInterface
     {
         $values = $this->values;
         array_unshift($values, $value);
@@ -334,7 +335,7 @@ class Collection implements CollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function keyDiff(CollectionInterface $collection)
+    public function keyDiff(CollectionInterface $collection): CollectionInterface
     {
         return new self(array_diff_key(
             $this->values,
@@ -345,7 +346,7 @@ class Collection implements CollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function ukeyDiff(CollectionInterface $collection, callable $differ)
+    public function ukeyDiff(CollectionInterface $collection, callable $differ): CollectionInterface
     {
         return new self(array_diff_ukey(
             $this->values,
@@ -357,7 +358,7 @@ class Collection implements CollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function associativeDiff(CollectionInterface $collection)
+    public function associativeDiff(CollectionInterface $collection): CollectionInterface
     {
         return new self(array_diff_assoc(
             $this->values,
@@ -368,9 +369,9 @@ class Collection implements CollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function hasKey($key, $strict = true)
+    public function hasKey($key, bool $strict = true): bool
     {
-        if ((bool) $strict === true) {
+        if ($strict === true) {
             $bool = array_key_exists($key, $this->values);
         } else {
             $bool = isset($this->values[$key]);
@@ -382,7 +383,7 @@ class Collection implements CollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function countValues()
+    public function countValues(): CollectionInterface
     {
         return new self(array_count_values($this->values));
     }
@@ -390,7 +391,7 @@ class Collection implements CollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function ukeyIntersect(CollectionInterface $collection, callable $intersecter)
+    public function ukeyIntersect(CollectionInterface $collection, callable $intersecter): CollectionInterface
     {
         return new self(array_intersect_ukey(
             $this->values,
@@ -402,7 +403,7 @@ class Collection implements CollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function associativeIntersect(CollectionInterface $collection)
+    public function associativeIntersect(CollectionInterface $collection): CollectionInterface
     {
         return new self(array_intersect_assoc(
             $this->values,
@@ -413,10 +414,10 @@ class Collection implements CollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function sort($flags = self::SORT_REGULAR)
+    public function sort(int $flags = self::SORT_REGULAR): CollectionInterface
     {
         $values = $this->values;
-        $bool = sort($values, (int) $flags);
+        $bool = sort($values, $flags);
 
         if ($bool === false) {
             throw new SortException('Sort failure');
@@ -428,10 +429,10 @@ class Collection implements CollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function associativeSort($flags = self::SORT_REGULAR)
+    public function associativeSort(int $flags = self::SORT_REGULAR): CollectionInterface
     {
         $values = $this->values;
-        $bool = asort($values, (int) $flags);
+        $bool = asort($values, $flags);
 
         if ($bool === false) {
             throw new SortException('Sort failure');
@@ -443,10 +444,10 @@ class Collection implements CollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function keySort($flags = self::SORT_REGULAR)
+    public function keySort(int $flags = self::SORT_REGULAR): CollectionInterface
     {
         $values = $this->values;
-        $bool = ksort($values, (int) $flags);
+        $bool = ksort($values, $flags);
 
         if ($bool === false) {
             throw new SortException('Sort failure');
@@ -458,7 +459,7 @@ class Collection implements CollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function ukeySort(callable $sorter)
+    public function ukeySort(callable $sorter): CollectionInterface
     {
         $values = $this->values;
         $bool = uksort($values, $sorter);
@@ -473,10 +474,10 @@ class Collection implements CollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function reverseSort($flags = self::SORT_REGULAR)
+    public function reverseSort(int $flags = self::SORT_REGULAR): CollectionInterface
     {
         $values = $this->values;
-        $bool = rsort($values, (int) $flags);
+        $bool = rsort($values, $flags);
 
         if ($bool === false) {
             throw new SortException('Sort failure');
@@ -488,7 +489,7 @@ class Collection implements CollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function usort(callable $sorter)
+    public function usort(callable $sorter): CollectionInterface
     {
         $values = $this->values;
         $bool = usort($values, $sorter);
@@ -503,10 +504,10 @@ class Collection implements CollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function associativeReverseSort($flags = self::SORT_REGULAR)
+    public function associativeReverseSort(int $flags = self::SORT_REGULAR): CollectionInterface
     {
         $values = $this->values;
-        $bool = arsort($values, (int) $flags);
+        $bool = arsort($values, $flags);
 
         if ($bool === false) {
             throw new SortException('Sort failure');
@@ -518,10 +519,10 @@ class Collection implements CollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function keyReverseSort($flags = self::SORT_REGULAR)
+    public function keyReverseSort(int $flags = self::SORT_REGULAR): CollectionInterface
     {
         $values = $this->values;
-        $bool = krsort($values, (int) $flags);
+        $bool = krsort($values, $flags);
 
         if ($bool === false) {
             throw new SortException('Sort failure');
@@ -533,7 +534,7 @@ class Collection implements CollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function uassociativeSort(callable $sorter)
+    public function uassociativeSort(callable $sorter): CollectionInterface
     {
         $values = $this->values;
         $bool = uasort($values, $sorter);
@@ -548,7 +549,7 @@ class Collection implements CollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function naturalSort()
+    public function naturalSort(): CollectionInterface
     {
         $values = $this->values;
         $bool = natsort($values);
@@ -589,7 +590,7 @@ class Collection implements CollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function each(\Closure $callback)
+    public function each(\Closure $callback): CollectionInterface
     {
         foreach ($this->values as $key => $value) {
             $callback($key, $value);
@@ -601,15 +602,15 @@ class Collection implements CollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function join($separator)
+    public function join(string $separator): string
     {
-        return implode((string) $separator, $this->values);
+        return implode($separator, $this->values);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function shuffle()
+    public function shuffle(): CollectionInterface
     {
         $values = $this->values;
         $result = shuffle($values);
@@ -624,11 +625,10 @@ class Collection implements CollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function take($size, $preserveKeys = false)
+    public function take(int $size, bool $preserveKeys = false): CollectionInterface
     {
         $took = [];
         $keys = array_keys($this->values);
-        $size = (int) $size;
 
         while (count($took) < $size) {
             do {
@@ -649,10 +649,10 @@ class Collection implements CollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function grep($pattern, $revert = false)
+    public function grep(string $pattern, bool $revert = false): CollectionInterface
     {
         return new self(preg_grep(
-            (string) $pattern,
+            $pattern,
             $this->values,
             $revert === false ? 0 : PREG_GREP_INVERT
         ));
@@ -661,7 +661,7 @@ class Collection implements CollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function set($key, $value)
+    public function set($key, $value): CollectionInterface
     {
         $values = $this->values;
         $values[$key] = $value;
@@ -672,7 +672,7 @@ class Collection implements CollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function contains($value)
+    public function contains($value): bool
     {
         return in_array($value, $this->values, true);
     }
@@ -680,7 +680,7 @@ class Collection implements CollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function count()
+    public function count(): int
     {
         return count($this->values);
     }
@@ -720,7 +720,7 @@ class Collection implements CollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function valid()
+    public function valid(): bool
     {
         return $this->key() !== null;
     }
@@ -728,7 +728,7 @@ class Collection implements CollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function offsetExists($offset)
+    public function offsetExists($offset): bool
     {
         return $this->hasKey($offset);
     }
