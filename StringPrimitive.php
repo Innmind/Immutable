@@ -520,7 +520,7 @@ class StringPrimitive implements PrimitiveInterface, StringableInterface
         return new self(
             $this
                 ->pregSplit('/_| /')
-                ->map(function($part) {
+                ->map(function(self $part) {
                     return $part->ucfirst();
                 })
                 ->join('')
