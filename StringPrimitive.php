@@ -50,9 +50,9 @@ class StringPrimitive implements PrimitiveInterface, StringableInterface
      *
      * @param string $delimiter
      *
-     * @return TypedCollection
+     * @return TypedCollectionInterface
      */
-    public function split(string $delimiter = null): TypedCollection
+    public function split(string $delimiter = null): TypedCollectionInterface
     {
         $parts = empty($delimiter) ?
                 str_split($this->value) : explode($delimiter, $this->value);
@@ -73,9 +73,9 @@ class StringPrimitive implements PrimitiveInterface, StringableInterface
      *
      * @param int $size
      *
-     * @return TypedCollection
+     * @return TypedCollectionInterface
      */
-    public function chunk(int $size = 1): TypedCollection
+    public function chunk(int $size = 1): TypedCollectionInterface
     {
         $pieces = str_split($this->value, $size);
 
@@ -336,9 +336,9 @@ class StringPrimitive implements PrimitiveInterface, StringableInterface
      *
      * @param string $charlist
      *
-     * @return TypedCollection
+     * @return TypedCollectionInterface
      */
-    public function words(string $charlist = ''): TypedCollection
+    public function words(string $charlist = ''): TypedCollectionInterface
     {
         $words = str_word_count($this->value, 2, $charlist);
 
@@ -359,9 +359,9 @@ class StringPrimitive implements PrimitiveInterface, StringableInterface
      * @param int $limit
      * @param int $flags
      *
-     * @return TypedCollection
+     * @return TypedCollectionInterface
      */
-    public function pregSplit(string $regex, int $limit = -1, int $flags = self::PREG_NO_FLAGS): TypedCollection
+    public function pregSplit(string $regex, int $limit = -1, int $flags = self::PREG_NO_FLAGS): TypedCollectionInterface
     {
         $strings = preg_split($regex, $this->value, $limit, $flags);
 
@@ -406,9 +406,9 @@ class StringPrimitive implements PrimitiveInterface, StringableInterface
      *
      * @throws Exception If the regex failed
      *
-     * @return TypedCollection
+     * @return TypedCollectionInterface
      */
-    public function getMatches(string $regex, int $offset = 0, int $flags = self::PREG_NO_FLAGS): TypedCollection
+    public function getMatches(string $regex, int $offset = 0, int $flags = self::PREG_NO_FLAGS): TypedCollectionInterface
     {
         $matches = [];
         $value = preg_match(
