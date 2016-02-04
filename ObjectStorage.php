@@ -294,4 +294,26 @@ class ObjectStorage implements PrimitiveInterface, \Countable, \Iterator, \Array
 
         return $this;
     }
+
+    /**
+     * Generate a new storage based on the given mapper
+     *
+     * @param Closure $mapper
+     *
+     * @return self
+     */
+    public function map(\Closure $mapper)
+    {
+        $objects = new \SplObjectStorage;
+
+        foreach ($this->objects as $object) {
+            $objects->attach(
+                $mapper($object, $this->objects[$object])
+            );
+        }
+
+        $this->rewind();
+
+        return new self($objects);
+    }
 }
