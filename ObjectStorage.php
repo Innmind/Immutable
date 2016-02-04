@@ -276,4 +276,22 @@ class ObjectStorage implements PrimitiveInterface, \Countable, \Iterator, \Array
 
         return new self($objects);
     }
+
+    /**
+     * Run the given closure on each element
+     *
+     * @param Closure $callback
+     *
+     * @return self
+     */
+    public function each(\Closure $callback)
+    {
+        foreach ($this->objects as $object) {
+            $callback($object, $this->objects[$object]);
+        }
+
+        $this->rewind();
+
+        return $this;
+    }
 }
