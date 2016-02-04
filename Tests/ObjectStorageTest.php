@@ -1,4 +1,5 @@
 <?php
+declare(strict_types = 1);
 
 namespace Innmind\Immutable\Tests;
 
@@ -225,5 +226,66 @@ class ObjectStorageTest extends \PHPUnit_Framework_TestCase
         $this->assertNotSame($s2, $s3);
         $this->assertSame(0, $s2->count());
         $this->assertSame(1, $s3->count());
+    }
+
+    public function testFilter()
+    {
+        $s = (new ObjectStorage)
+            ->attach($o = new \stdClass, 'foo')
+            ->attach(new \stdClass);
+
+        $s2 = $s->filter(function ($object, $data) {
+            return $data !== null;
+        });
+
+        $this->assertInstanceOf(ObjectStorage::class, $s2);
+        $this->assertNotSame($s, $s2);
+        $this->assertSame(1, $s2->count());
+        $this->assertSame(2, $s->count());
+        $this->assertSame($o, $s2->current());
+        $this->assertSame($o, $s->current());
+    }
+
+    public function testEach()
+    {
+        $s = (new ObjectStorage)
+            ->attach($o = new \stdClass, 'foo')
+            ->attach(new \stdClass, 'bar');
+        $count = 0;
+
+        $s2 = $s->each(function ($object, $data) use (&$count) {
+            $this->assertInstanceOf('stdClass', $object);
+            $this->assertTrue(is_string($data));
+            ++$count;
+        });
+
+        $this->assertSame($s, $s2);
+        $this->assertSame(2, $s->count());
+        $this->assertSame($o, $s->current());
+        $this->assertSame(2, $count);
+    }
+
+    public function testMap()
+    {
+        $s = (new ObjectStorage)
+            ->attach($o = new \stdClass, 'foo')
+            ->attach($o2 = new \stdClass, 'bar');
+
+        $s2 = $s->map(function ($object, $data) {
+            $o = new \stdClass;
+            $o->$data = $object;
+
+            return $o;
+        });
+
+        $this->assertInstanceOf(ObjectStorage::class, $s2);
+        $this->assertNotSame($s, $s2);
+        $this->assertSame(2, $s2->count());
+        $this->assertInstanceOf('stdClass', $s2->current());
+        $this->assertSame($o, $s2->current()->foo);
+        $s2->next();
+        $this->assertInstanceOf('stdClass', $s2->current());
+        $this->assertSame($o2, $s2->current()->bar);
+        $this->assertSame($o, $s->current());
     }
 }

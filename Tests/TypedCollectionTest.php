@@ -1,4 +1,5 @@
 <?php
+declare(strict_types = 1);
 
 namespace Innmind\Immutable\Tests;
 
@@ -36,7 +37,7 @@ class TypedCollectionTest extends \PHPUnit_Framework_TestCase
         );
 
         $result = $c->filter(function ($value, $key) {
-            return strpos($value, 'foo') !== false;
+            return strpos((string) $value, 'foo') !== false;
         });
         $this->assertInstanceOf(TypedCollection::class, $result);
         $this->assertNotSame($c, $result);
@@ -95,7 +96,7 @@ class TypedCollectionTest extends \PHPUnit_Framework_TestCase
             $d = [$f = new I(0), $s = new I(0), $t = new I(0), $fr = new I(0), $fh = new I(0)]
         );
 
-        $c2 = $c->chunk('2');
+        $c2 = $c->chunk(2);
 
         $this->assertInstanceOf(Collection::class, $c2);
         $this->assertNotSame($c, $c2);
@@ -231,7 +232,7 @@ class TypedCollectionTest extends \PHPUnit_Framework_TestCase
             S::class,
             $d = [new S('foo'), new S('bar'), new S('foobar')]);
 
-        $c2 = $c->pad('6', new S('foo'));
+        $c2 = $c->pad(6, new S('foo'));
         $this->assertInstanceOf(TypedCollection::class, $c2);
         $this->assertNotSame($c, $c2);
         $this->assertSame($c[0], $c2[0]);
@@ -340,7 +341,7 @@ class TypedCollectionTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue(in_array($key, ['foo', 'baz'], true));
         $this->assertSame($data[$key], array_values($prim)[0]);
 
-        $c3 = $c->rand('2');
+        $c3 = $c->rand(2);
         $this->assertSame(2, count($c3));
     }
 
@@ -411,7 +412,7 @@ class TypedCollectionTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($c->getType(), $c2->getType());
         $this->assertSame([2 => $c[2], 3 => $c[3]], $c2->toPrimitive());
 
-        $c2 = $c->slice(2, '1', true);
+        $c2 = $c->slice(2, 1, true);
         $this->assertInstanceOf(TypedCollection::class, $c2);
         $this->assertNotSame($c, $c2);
         $this->assertSame($c->getType(), $c2->getType());

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types = 1);
 
 namespace Innmind\Immutable;
 
@@ -11,5 +12,5 @@ interface TypedCollectionInterface extends CollectionInterface
      *
      * @return string
      */
-    public function getType();
+    public function getType(): string;
 }

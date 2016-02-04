@@ -1,4 +1,5 @@
 <?php
+declare(strict_types = 1);
 
 namespace Innmind\Immutable;
 
@@ -9,5 +10,5 @@ interface StringableInterface
      *
      * @return string
      */
-    public function __toString();
+    public function __toString(): string;
 }

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types = 1);
 
 namespace Innmind\Immutable;
 
@@ -27,7 +28,7 @@ class TypedCollection extends Collection implements TypedCollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function getType()
+    public function getType(): string
     {
         return $this->type;
     }
@@ -35,7 +36,7 @@ class TypedCollection extends Collection implements TypedCollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function filter(callable $filter = null)
+    public function filter(callable $filter = null): CollectionInterface
     {
         return new self(
             $this->type,
@@ -46,7 +47,7 @@ class TypedCollection extends Collection implements TypedCollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function intersect(CollectionInterface $collection)
+    public function intersect(CollectionInterface $collection): CollectionInterface
     {
         $this->validateCollection($collection);
 
@@ -59,7 +60,7 @@ class TypedCollection extends Collection implements TypedCollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function chunk($size)
+    public function chunk(int $size): CollectionInterface
     {
         $chunks = parent::chunk($size);
         $subs = [];
@@ -77,7 +78,7 @@ class TypedCollection extends Collection implements TypedCollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function shift()
+    public function shift(): CollectionInterface
     {
         return new self(
             $this->type,
@@ -88,7 +89,7 @@ class TypedCollection extends Collection implements TypedCollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function uintersect(CollectionInterface $collection, callable $intersecter)
+    public function uintersect(CollectionInterface $collection, callable $intersecter): CollectionInterface
     {
         $this->validateCollection($collection);
 
@@ -101,7 +102,7 @@ class TypedCollection extends Collection implements TypedCollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function keyIntersect(CollectionInterface $collection)
+    public function keyIntersect(CollectionInterface $collection): CollectionInterface
     {
         $this->validateCollection($collection);
 
@@ -114,7 +115,7 @@ class TypedCollection extends Collection implements TypedCollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function map(callable $mapper)
+    public function map(callable $mapper): CollectionInterface
     {
         return new self(
             $this->type,
@@ -125,7 +126,7 @@ class TypedCollection extends Collection implements TypedCollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function pad($size, $value)
+    public function pad(int $size, $value): CollectionInterface
     {
         $this->validate($this->type, [$value]);
 
@@ -138,7 +139,7 @@ class TypedCollection extends Collection implements TypedCollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function pop()
+    public function pop(): CollectionInterface
     {
         return new self(
             $this->type,
@@ -149,7 +150,7 @@ class TypedCollection extends Collection implements TypedCollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function diff(CollectionInterface $collection)
+    public function diff(CollectionInterface $collection): CollectionInterface
     {
         $this->validateCollection($collection);
 
@@ -162,7 +163,7 @@ class TypedCollection extends Collection implements TypedCollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function push($value)
+    public function push($value): CollectionInterface
     {
         $this->validate($this->type, [$value]);
 
@@ -175,7 +176,7 @@ class TypedCollection extends Collection implements TypedCollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function rand($num = 1)
+    public function rand(int $num = 1): CollectionInterface
     {
         return new self(
             $this->type,
@@ -186,7 +187,7 @@ class TypedCollection extends Collection implements TypedCollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function merge(CollectionInterface $collection)
+    public function merge(CollectionInterface $collection): CollectionInterface
     {
         $this->validateCollection($collection);
 
@@ -199,7 +200,7 @@ class TypedCollection extends Collection implements TypedCollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function slice($offset, $length = null, $preserveKeys = false)
+    public function slice(int $offset, int $length = null, bool $preserveKeys = false): CollectionInterface
     {
         return new self(
             $this->type,
@@ -210,7 +211,7 @@ class TypedCollection extends Collection implements TypedCollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function udiff(CollectionInterface $collection, callable $differ)
+    public function udiff(CollectionInterface $collection, callable $differ): CollectionInterface
     {
         $this->validateCollection($collection);
 
@@ -223,7 +224,7 @@ class TypedCollection extends Collection implements TypedCollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function splice($offset, $length = 0, $replacement = [])
+    public function splice(int $offset, int $length = 0, $replacement = []): CollectionInterface
     {
         return new self(
             $this->type,
@@ -234,7 +235,7 @@ class TypedCollection extends Collection implements TypedCollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function unique($flags = self::SORT_REGULAR)
+    public function unique(int $flags = self::SORT_REGULAR): CollectionInterface
     {
         return new self(
             $this->type,
@@ -245,7 +246,7 @@ class TypedCollection extends Collection implements TypedCollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function values()
+    public function values(): CollectionInterface
     {
         return new self(
             $this->type,
@@ -256,7 +257,7 @@ class TypedCollection extends Collection implements TypedCollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function replace(CollectionInterface $collection)
+    public function replace(CollectionInterface $collection): CollectionInterface
     {
         $this->validateCollection($collection);
 
@@ -269,7 +270,7 @@ class TypedCollection extends Collection implements TypedCollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function reverse($preserveKeys = false)
+    public function reverse(bool $preserveKeys = false): CollectionInterface
     {
         return new self(
             $this->type,
@@ -280,7 +281,7 @@ class TypedCollection extends Collection implements TypedCollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function unshift($value)
+    public function unshift($value): CollectionInterface
     {
         $this->validate($this->type, [$value]);
 
@@ -293,7 +294,7 @@ class TypedCollection extends Collection implements TypedCollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function keyDiff(CollectionInterface $collection)
+    public function keyDiff(CollectionInterface $collection): CollectionInterface
     {
         $this->validateCollection($collection);
 
@@ -306,7 +307,7 @@ class TypedCollection extends Collection implements TypedCollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function ukeyDiff(CollectionInterface $collection, callable $differ)
+    public function ukeyDiff(CollectionInterface $collection, callable $differ): CollectionInterface
     {
         $this->validateCollection($collection);
 
@@ -319,7 +320,7 @@ class TypedCollection extends Collection implements TypedCollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function associativeDiff(CollectionInterface $collection)
+    public function associativeDiff(CollectionInterface $collection): CollectionInterface
     {
         $this->validateCollection($collection);
 
@@ -332,7 +333,7 @@ class TypedCollection extends Collection implements TypedCollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function ukeyIntersect(CollectionInterface $collection, callable $intersecter)
+    public function ukeyIntersect(CollectionInterface $collection, callable $intersecter): CollectionInterface
     {
         $this->validateCollection($collection);
 
@@ -345,7 +346,7 @@ class TypedCollection extends Collection implements TypedCollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function associativeIntersect(CollectionInterface $collection)
+    public function associativeIntersect(CollectionInterface $collection): CollectionInterface
     {
         $this->validateCollection($collection);
 
@@ -358,7 +359,7 @@ class TypedCollection extends Collection implements TypedCollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function sort($flags = self::SORT_REGULAR)
+    public function sort(int $flags = self::SORT_REGULAR): CollectionInterface
     {
         return new self(
             $this->type,
@@ -369,7 +370,7 @@ class TypedCollection extends Collection implements TypedCollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function associativeSort($flags = self::SORT_REGULAR)
+    public function associativeSort(int $flags = self::SORT_REGULAR): CollectionInterface
     {
         return new self(
             $this->type,
@@ -380,7 +381,7 @@ class TypedCollection extends Collection implements TypedCollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function keySort($flags = self::SORT_REGULAR)
+    public function keySort(int $flags = self::SORT_REGULAR): CollectionInterface
     {
         return new self(
             $this->type,
@@ -391,7 +392,7 @@ class TypedCollection extends Collection implements TypedCollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function ukeySort(callable $sorter)
+    public function ukeySort(callable $sorter): CollectionInterface
     {
         return new self(
             $this->type,
@@ -402,7 +403,7 @@ class TypedCollection extends Collection implements TypedCollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function reverseSort($flags = self::SORT_REGULAR)
+    public function reverseSort(int $flags = self::SORT_REGULAR): CollectionInterface
     {
         return new self(
             $this->type,
@@ -413,7 +414,7 @@ class TypedCollection extends Collection implements TypedCollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function usort(callable $sorter)
+    public function usort(callable $sorter): CollectionInterface
     {
         return new self(
             $this->type,
@@ -424,7 +425,7 @@ class TypedCollection extends Collection implements TypedCollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function associativeReverseSort($flags = self::SORT_REGULAR)
+    public function associativeReverseSort(int $flags = self::SORT_REGULAR): CollectionInterface
     {
         return new self(
             $this->type,
@@ -435,7 +436,7 @@ class TypedCollection extends Collection implements TypedCollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function keyReverseSort($flags = self::SORT_REGULAR)
+    public function keyReverseSort(int $flags = self::SORT_REGULAR): CollectionInterface
     {
         return new self(
             $this->type,
@@ -446,7 +447,7 @@ class TypedCollection extends Collection implements TypedCollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function uassociativeSort(callable $sorter)
+    public function uassociativeSort(callable $sorter): CollectionInterface
     {
         return new self(
             $this->type,
@@ -457,7 +458,7 @@ class TypedCollection extends Collection implements TypedCollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function naturalSort()
+    public function naturalSort(): CollectionInterface
     {
         return new self(
             $this->type,
@@ -468,7 +469,7 @@ class TypedCollection extends Collection implements TypedCollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function shuffle()
+    public function shuffle(): CollectionInterface
     {
         return new self(
             $this->type,
@@ -479,7 +480,7 @@ class TypedCollection extends Collection implements TypedCollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function take($size, $preserveKeys = false)
+    public function take(int $size, bool $preserveKeys = false): CollectionInterface
     {
         return new self(
             $this->type,
@@ -490,7 +491,7 @@ class TypedCollection extends Collection implements TypedCollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function grep($pattern, $revert = false)
+    public function grep(string $pattern, bool $revert = false): CollectionInterface
     {
         return new self(
             $this->type,
@@ -501,7 +502,7 @@ class TypedCollection extends Collection implements TypedCollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function set($key, $value)
+    public function set($key, $value): CollectionInterface
     {
         $this->validate($this->type, [$value]);
 
@@ -514,7 +515,7 @@ class TypedCollection extends Collection implements TypedCollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function contains($value)
+    public function contains($value): bool
     {
         //avoid searching the collection if we know it's not of the same type
         try {
@@ -536,7 +537,7 @@ class TypedCollection extends Collection implements TypedCollectionInterface
      *
      * @return void
      */
-    protected function validate($type, array $values)
+    protected function validate(string $type, array $values)
     {
         foreach ($values as $value) {
             if (!$value instanceof $type) {
