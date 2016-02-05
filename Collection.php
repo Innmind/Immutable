@@ -680,6 +680,14 @@ class Collection implements CollectionInterface
     /**
      * {@inheritdoc}
      */
+    public function get($key)
+    {
+        return $this->offsetGet($key);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function count(): int
     {
         return count($this->values);
