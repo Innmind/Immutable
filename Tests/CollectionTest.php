@@ -1011,4 +1011,22 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
         $c = new Collection([]);
         unset($c['foo']);
     }
+
+    public function testGet()
+    {
+        $c = new Collection([1]);
+
+        $this->assertSame(1, $c->get(0));
+    }
+
+    /**
+     * @expectedException Innmind\Immutable\Exception\InvalidArgumentException
+     * @expectedExceptionMessage Unknown index 0
+     */
+    public function testThrowWhenAccessingUnknownKey()
+    {
+        $c = new Collection([]);
+
+        $c->get(0);
+    }
 }

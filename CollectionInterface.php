@@ -522,4 +522,15 @@ interface CollectionInterface extends PrimitiveInterface, \Iterator, \ArrayAcces
      * @return bool
      */
     public function contains($value): bool;
+
+    /**
+     * Return the value at the given key
+     *
+     * @param mixed $key
+     *
+     * @throws InvliadArgumentException If the key is not found
+     *
+     * @return mixed
+     */
+    public function get($key);
 }
