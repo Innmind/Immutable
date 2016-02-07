@@ -20,13 +20,9 @@ class StringPrimitive implements PrimitiveInterface, StringableInterface
 
     private $value;
 
-    public function __construct($value)
+    public function __construct(string $value)
     {
-        if (!is_string($value)) {
-            throw new TypeException('Value must be a string');
-        }
-
-        $this->value = (string) $value;
+        $this->value = $value;
     }
 
     /**
