@@ -22,8 +22,8 @@ class StringPrimitiveTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Innmind\Immutable\Exception\TypeException
-     * @expectedExceptionMessage Value must be a string
+     * @expectedException TypeError
+     * @expectedExceptionMessage must be of the type string, integer given
      */
     public function testThrowWhenInvalidType()
     {
