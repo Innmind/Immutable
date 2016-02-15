@@ -3,7 +3,6 @@ declare(strict_types = 1);
 
 namespace Innmind\Immutable;
 
-use Innmind\Immutable\Exception\TypeException;
 use Innmind\Immutable\Exception\RegexException;
 use Innmind\Immutable\Exception\SubstringException;
 
@@ -521,5 +520,29 @@ class StringPrimitive implements PrimitiveInterface, StringableInterface
                 })
                 ->join('')
         );
+    }
+
+    /**
+     * Append a string at the end of the current one
+     *
+     * @param string $string
+     *
+     * @return self
+     */
+    public function append(string $string): self
+    {
+        return new self((string) $this . $string);
+    }
+
+    /**
+     * Prepend a string at the beginning of the current one
+     *
+     * @param string $string
+     *
+     * @return self
+     */
+    public function prepend(string $string): self
+    {
+        return new self($string . (string) $this);
     }
 }
