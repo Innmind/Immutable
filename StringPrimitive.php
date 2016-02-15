@@ -3,7 +3,6 @@ declare(strict_types = 1);
 
 namespace Innmind\Immutable;
 
-use Innmind\Immutable\Exception\TypeException;
 use Innmind\Immutable\Exception\RegexException;
 use Innmind\Immutable\Exception\SubstringException;
 
