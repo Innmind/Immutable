@@ -522,4 +522,28 @@ class StringPrimitive implements PrimitiveInterface, StringableInterface
                 ->join('')
         );
     }
+
+    /**
+     * Append a string at the end of the current one
+     *
+     * @param string $string
+     *
+     * @return self
+     */
+    public function append(string $string): self
+    {
+        return new self((string) $this . $string);
+    }
+
+    /**
+     * Prepend a string at the beginning of the current one
+     *
+     * @param string $string
+     *
+     * @return self
+     */
+    public function prepend(string $string): self
+    {
+        return new self($string . (string) $this);
+    }
 }
