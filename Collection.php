@@ -688,6 +688,20 @@ class Collection implements CollectionInterface
     /**
      * {@inheritdoc}
      */
+    public function walk(callable $walker): CollectionInterface
+    {
+        $values = $this->values;
+
+        if (array_walk($values, $walker) === false) {
+            throw new RuntimeException('Walk operation failed');
+        }
+
+        return new self($values);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function count(): int
     {
         return count($this->values);
