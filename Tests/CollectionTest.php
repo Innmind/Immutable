@@ -1029,4 +1029,17 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
 
         $c->get(0);
     }
+
+    public function testWalk()
+    {
+        $c = new Collection([1, 2, 3, 4]);
+
+        $c2 = $c->walk(function (&$value, $key) {
+            $value *= $key;
+        });
+        $this->assertNotSame($c, $c2);
+        $this->assertInstanceOf(Collection::class, $c2);
+        $this->assertSame([1, 2, 3, 4], $c->toPrimitive());
+        $this->assertSame([0, 2, 6, 12], $c2->toPrimitive());
+    }
 }

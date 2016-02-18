@@ -533,4 +533,15 @@ interface CollectionInterface extends PrimitiveInterface, \Iterator, \ArrayAcces
      * @return mixed
      */
     public function get($key);
+
+    /**
+     * Go through each element of the collection and apply the closure
+     *
+     * Modifications are applied on a copy of the collection
+     *
+     * @param callable $walker
+     *
+     * @return self
+     */
+    public function walk(callable $walker): self;
 }

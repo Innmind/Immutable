@@ -1113,6 +1113,26 @@ class TypedCollectionTest extends \PHPUnit_Framework_TestCase
     {
         (new TypedCollection(S::class, []))->set(0, '');
     }
+
+    public function testWalk()
+    {
+        $c = new TypedCollection(
+            S::class,
+            $d = [new S('1'), new S('2'), new S('3'), new S('4')]
+        );
+
+        $c2 = $c->walk(function (&$value, $key) {
+            $value = $value->append((string) $key);
+        });
+        $this->assertNotSame($c, $c2);
+        $this->assertInstanceOf(TypedCollection::class, $c2);
+        $this->assertSame($c->getType(), $c2->getType());
+        $this->assertSame($d, $c->toPrimitive());
+        $this->assertSame('10', (string) $c2[0]);
+        $this->assertSame('21', (string) $c2[1]);
+        $this->assertSame('32', (string) $c2[2]);
+        $this->assertSame('43', (string) $c2[3]);
+    }
 }
 
 class I implements PrimitiveInterface
