@@ -36,6 +36,14 @@ class TypedCollection extends Collection implements TypedCollectionInterface
     /**
      * {@inheritdoc}
      */
+    public function type(): string
+    {
+        return $this->type;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function filter(callable $filter = null): CollectionInterface
     {
         return new self(
@@ -535,6 +543,17 @@ class TypedCollection extends Collection implements TypedCollectionInterface
         return new self(
             $this->type,
             parent::walk($walker)->toPrimitive()
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function unset($index): CollectionInterface
+    {
+        return new self(
+            $this->type,
+            parent::unset($index)->toPrimitive()
         );
     }
 

@@ -1042,4 +1042,23 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
         $this->assertSame([1, 2, 3, 4], $c->toPrimitive());
         $this->assertSame([0, 2, 6, 12], $c2->toPrimitive());
     }
+
+    public function testUnset()
+    {
+        $c = new Collection([1, 2, 3]);
+
+        $c2 = $c->unset(1);
+        $this->assertNotSame($c, $c2);
+        $this->assertInstanceOf(Collection::class, $c2);
+        $this->assertSame([1, 2, 3], $c->toPrimitive());
+        $this->assertSame([1, 2 => 3], $c2->toPrimitive());
+    }
+
+    /**
+     * @expectedException Innmind\Immutable\Exception\InvalidArgumentException
+     */
+    public function testThrowWhenUnsettingUnknownIndex()
+    {
+        (new Collection([]))->unset(1);
+    }
 }

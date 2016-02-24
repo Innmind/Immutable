@@ -1133,6 +1133,36 @@ class TypedCollectionTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('32', (string) $c2[2]);
         $this->assertSame('43', (string) $c2[3]);
     }
+
+    public function testUnset()
+    {
+        $c = new TypedCollection(
+            S::class,
+            $d = [new S('1'), new S('2'), new S('3')]
+        );
+
+        $c2 = $c->unset(1);
+        $this->assertNotSame($c, $c2);
+        $this->assertInstanceOf(TypedCollection::class, $c2);
+        $this->assertSame($c->getType(), $c2->getType());
+        $this->assertSame($d, $c->toPrimitive());
+        $this->assertSame([$d[0], 2 => $d[2]], $c2->toPrimitive());
+    }
+
+    /**
+     * @expectedException Innmind\Immutable\Exception\InvalidArgumentException
+     */
+    public function testThrowWhenUnsettingUnknownIndex()
+    {
+        (new TypedCollection(S::class, []))->unset(1);
+    }
+
+    public function testType()
+    {
+        $c = new TypedCollection(S::class, []);
+
+        $this->assertSame($c->type(), $c->getType());
+    }
 }
 
 class I implements PrimitiveInterface

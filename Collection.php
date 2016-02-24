@@ -702,6 +702,24 @@ class Collection implements CollectionInterface
     /**
      * {@inheritdoc}
      */
+    public function unset($index): CollectionInterface
+    {
+        if (!$this->hasKey($index)) {
+            throw new InvalidArgumentException(sprintf(
+                'Unknown index %s',
+                $index
+            ));
+        }
+
+        $values = $this->values;
+        unset($values[$index]);
+
+        return new self($values);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function count(): int
     {
         return count($this->values);
