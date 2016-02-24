@@ -1156,6 +1156,13 @@ class TypedCollectionTest extends \PHPUnit_Framework_TestCase
     {
         (new TypedCollection(S::class, []))->unset(1);
     }
+
+    public function testType()
+    {
+        $c = new TypedCollection(S::class, []);
+
+        $this->assertSame($c->type(), $c->getType());
+    }
 }
 
 class I implements PrimitiveInterface

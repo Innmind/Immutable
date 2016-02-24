@@ -36,6 +36,14 @@ class TypedCollection extends Collection implements TypedCollectionInterface
     /**
      * {@inheritdoc}
      */
+    public function type(): string
+    {
+        return $this->type;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function filter(callable $filter = null): CollectionInterface
     {
         return new self(

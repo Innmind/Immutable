@@ -13,4 +13,11 @@ interface TypedCollectionInterface extends CollectionInterface
      * @return string
      */
     public function getType(): string;
+
+    /**
+     * Same as getType but without the get
+     *
+     * @return setring
+     */
+    public function type(): string;
 }
