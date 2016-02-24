@@ -544,4 +544,13 @@ interface CollectionInterface extends PrimitiveInterface, \Iterator, \ArrayAcces
      * @return self
      */
     public function walk(callable $walker): self;
+
+    /**
+     * Return a collection without the given index
+     *
+     * @param mixed $index
+     *
+     * @return self
+     */
+    public function unset($index): self;
 }

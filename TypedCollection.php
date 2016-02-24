@@ -539,6 +539,17 @@ class TypedCollection extends Collection implements TypedCollectionInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function unset($index): CollectionInterface
+    {
+        return new self(
+            $this->type,
+            parent::unset($index)->toPrimitive()
+        );
+    }
+
+    /**
      * Check if every element respect the given type
      *
      * @throws InvalidArgumentException If a value doesn't respect the type
