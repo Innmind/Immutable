@@ -4,7 +4,6 @@ declare(strict_types = 1);
 namespace Innmind\Immutable;
 
 use Innmind\Immutable\{
-    SpecificationInterface,
     Specification\PrimitiveType,
     Specification\ClassType
 };
