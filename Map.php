@@ -299,7 +299,7 @@ class Map implements MapInterface
 
             $pair = $this->pairs->get($index);
 
-            if ($map->contains($newKey)){
+            if ($map->contains($newKey)) {
                 $map = $map->put(
                     $newKey,
                     $map->get($newKey)->add($pair)

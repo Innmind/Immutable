@@ -229,7 +229,7 @@ class Sequence implements SequenceInterface
                 );
             }
 
-            if ($map->contains($key)){
+            if ($map->contains($key)) {
                 $map = $map->put(
                     $key,
                     $map->get($key)->add($value)

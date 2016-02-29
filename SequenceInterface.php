@@ -62,7 +62,7 @@ interface SequenceInterface extends SizeableInterface, PrimitiveInterface, \Coun
     /**
      * Return all elements that satisfy the given predicate
      *
-     * @param Closure $predicate
+     * @param \Closure $predicate
      *
      * @return self
      */
@@ -71,7 +71,7 @@ interface SequenceInterface extends SizeableInterface, PrimitiveInterface, \Coun
     /**
      * Apply the given function to all elements of the sequence
      *
-     * @param Closure $function
+     * @param \Closure $function
      *
      * @return self
      */
@@ -81,7 +81,7 @@ interface SequenceInterface extends SizeableInterface, PrimitiveInterface, \Coun
      * Return a new map of pairs grouped by keys determined with the given
      * discriminator function
      *
-     * @param Closure $discriminator
+     * @param \Closure $discriminator
      *
      * @return MapInterface
      */
@@ -131,7 +131,7 @@ interface SequenceInterface extends SizeableInterface, PrimitiveInterface, \Coun
     /**
      * Return a new sequence by applying the given function to all elements
      *
-     * @param Closure $function
+     * @param \Closure $function
      *
      * @return self
      */
@@ -150,7 +150,7 @@ interface SequenceInterface extends SizeableInterface, PrimitiveInterface, \Coun
     /**
      * Return a sequence of 2 sequences partitioned according to the given predicate
      *
-     * @param Closure $predicate
+     * @param \Closure $predicate
      *
      * @return self[self]
      */
