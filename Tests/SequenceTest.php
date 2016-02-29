@@ -189,6 +189,14 @@ class SequenceTest extends \PHPUnit_Framework_TestCase
         $this->assertSame([2, 4], $m->get(0)->toPrimitive());
     }
 
+    /**
+     * @expectedException Innmind\Immutable\Exception\GroupEmptySequenceException
+     */
+    public function testThrowWhenGroupingAnEmptySequence()
+    {
+        (new Sequence)->groupBy(function() {});
+    }
+
     public function testFirst()
     {
         $s = new Sequence(1, 2, 3);

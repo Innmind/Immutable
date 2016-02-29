@@ -6,7 +6,8 @@ namespace Innmind\Immutable;
 use Innmind\Immutable\{
     Exception\OutOfBoundException,
     Exception\LogicException,
-    Exception\ElementNotFoundException
+    Exception\ElementNotFoundException,
+    Exception\GroupEmptySequenceException
 };
 
 /**
