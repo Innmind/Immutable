@@ -235,7 +235,7 @@ class Sequence implements SequenceInterface
                     $map->get($key)->add($value)
                 );
             } else {
-                $map = $map->put($key, new Sequence($value));
+                $map = $map->put($key, new self($value));
             }
         }
 
