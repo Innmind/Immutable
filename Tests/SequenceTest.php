@@ -376,8 +376,21 @@ class SequenceTest extends \PHPUnit_Framework_TestCase
 
         $s2 = $s->add(-1);
         $this->assertNotSame($s, $s2);
-        $this->assertInstanceOf(SequenceInterface::class, $s2);
+        $this->assertInstanceOf(Sequence::class, $s2);
         $this->assertSame([1], $s->toPrimitive());
         $this->assertSame([1, -1], $s2->toPrimitive());
+    }
+
+    public function testSort()
+    {
+        $s = new Sequence(4, 3, 2, 1);
+
+        $s2 = $s->sort(function(int $a, int $b) {
+            return $a > $b;
+        });
+        $this->assertNotSame($s, $s2);
+        $this->assertInstanceOf(Sequence::class, $s2);
+        $this->assertSame([4, 3, 2, 1], $s->toPrimitive());
+        $this->assertSame([1, 2, 3, 4], $s2->toPrimitive());
     }
 }

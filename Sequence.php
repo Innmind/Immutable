@@ -399,4 +399,15 @@ class Sequence implements SequenceInterface
 
         return new self(...$values);
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function sort(\Closure $function): SequenceInterface
+    {
+        $values = $this->values;
+        usort($values, $function);
+
+        return new self(...$values);
+    }
 }

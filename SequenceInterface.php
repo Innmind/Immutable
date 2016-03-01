@@ -231,4 +231,13 @@ interface SequenceInterface extends SizeableInterface, PrimitiveInterface, \Coun
      * @return self
      */
     public function add($element): self;
+
+    /**
+     * Sort the sequence in a different order
+     *
+     * @param \Closure $function
+     *
+     * @return self
+     */
+    public function sort(\Closure $function): self;
 }
