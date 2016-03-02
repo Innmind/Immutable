@@ -119,7 +119,7 @@ interface SetInterface extends SizeableInterface, PrimitiveInterface, \Countable
      */
     public function partition(\Closure $predicate): SequenceInterface;
 
-     /**
+    /**
      * Concatenate all elements with the given separator
      *
      * @param string $separator
