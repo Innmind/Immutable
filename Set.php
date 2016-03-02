@@ -100,7 +100,9 @@ class Set implements SetInterface
         $this->validate($set);
 
         $newSet = clone $this;
-        $newSet->values = $this->values->intersect($set->values);
+        $newSet->values = $this->values->intersect(
+            new Sequence(...$set->toPrimitive())
+        );
 
         return $newSet;
     }
@@ -156,7 +158,9 @@ class Set implements SetInterface
         $this->validate($set);
 
         $newSet = clone $this;
-        $newSet->values = $this->values->diff($set->values);
+        $newSet->values = $this->values->diff(
+            new Sequence(...$set->toPrimitive())
+        );
 
         return $newSet;
     }
@@ -168,7 +172,9 @@ class Set implements SetInterface
     {
         $this->validate($set);
 
-        return $this->values->equals($set->values);
+        return $this->values->equals(
+            new Sequence(...$set->toPrimitive())
+        );
     }
 
     /**
