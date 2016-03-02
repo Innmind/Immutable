@@ -177,6 +177,8 @@ class MapTest extends \PHPUnit_Framework_TestCase
         $m2 = $m->drop(2);
         $this->assertNotSame($m, $m2);
         $this->assertInstanceOf(Map::class, $m2);
+        $this->assertSame($m->keyType(), $m2->keyType());
+        $this->assertSame($m->valueType(), $m2->valueType());
         $this->assertSame(3, $m->size());
         $this->assertSame(1, $m2->size());
         $this->assertFalse($m2->contains(23));
@@ -195,6 +197,8 @@ class MapTest extends \PHPUnit_Framework_TestCase
         $m2 = $m->dropEnd(2);
         $this->assertNotSame($m, $m2);
         $this->assertInstanceOf(Map::class, $m2);
+        $this->assertSame($m->keyType(), $m2->keyType());
+        $this->assertSame($m->valueType(), $m2->valueType());
         $this->assertSame(3, $m->size());
         $this->assertSame(1, $m2->size());
         $this->assertTrue($m2->contains(23));
@@ -239,6 +243,8 @@ class MapTest extends \PHPUnit_Framework_TestCase
 
         $this->assertNotSame($m, $m2);
         $this->assertInstanceOf(Map::class, $m2);
+        $this->assertSame($m->keyType(), $m2->keyType());
+        $this->assertSame($m->valueType(), $m2->valueType());
         $this->assertSame(4, $m->size());
         $this->assertSame(2, $m2->size());
         $this->assertTrue($m2->contains(1));
@@ -382,6 +388,8 @@ class MapTest extends \PHPUnit_Framework_TestCase
         });
         $this->assertNotSame($m, $m2);
         $this->assertInstanceOf(Map::class, $m2);
+        $this->assertSame($m->keyType(), $m2->keyType());
+        $this->assertSame($m->valueType(), $m2->valueType());
         $this->assertSame([0, 1, 2, 4], $m->keys()->toPrimitive());
         $this->assertSame([1, 2, 3, 5], $m->values()->toPrimitive());
         $this->assertSame([10, 1, 12, 14], $m2->keys()->toPrimitive());
@@ -399,6 +407,8 @@ class MapTest extends \PHPUnit_Framework_TestCase
         $m2 = $m->take(2);
         $this->assertNotSame($m, $m2);
         $this->assertInstanceOf(Map::class, $m2);
+        $this->assertSame($m->keyType(), $m2->keyType());
+        $this->assertSame($m->valueType(), $m2->valueType());
         $this->assertSame(4, $m->size());
         $this->assertSame(2, $m2->size());
         $this->assertTrue($m2->contains(0));
@@ -420,6 +430,8 @@ class MapTest extends \PHPUnit_Framework_TestCase
         $m2 = $m->takeEnd(2);
         $this->assertNotSame($m, $m2);
         $this->assertInstanceOf(Map::class, $m2);
+        $this->assertSame($m->keyType(), $m2->keyType());
+        $this->assertSame($m->valueType(), $m2->valueType());
         $this->assertSame(4, $m->size());
         $this->assertSame(2, $m2->size());
         $this->assertFalse($m2->contains(0));
