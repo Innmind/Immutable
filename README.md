@@ -41,7 +41,7 @@ $set->equals((new Set('int'))->add(24)->add(42)); // true
 $set->add(42.0); // will throw as it's a float and not an integer
 ```
 
-The type passed in the constructor can be any primitive type (`int`, `float`, `bool` or `string`) or any class name.
+The type passed in the constructor can be any primitive type (more precisely any type having a `is_{type}` function) or any class name.
 
 For a complete list of methods check [`SetInterface`](SetInterface.php).
 
@@ -64,7 +64,7 @@ $map->size(); // 2
 $map->values()->toPrimitive(); // [42, 66]
 ```
 
-The types passed in the constructor can be any primitive type (`int`, `float`, `bool` or `string`) or any class name.
+The types passed in the constructor can be any primitive type (more precisely any type having a `is_{type}` function) or any class name.
 
 For a complete list of methods check [`MapInterface`](MapInterface.php).
 
