@@ -454,4 +454,43 @@ class MapTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf(StringPrimitive::class, $s);
         $this->assertSame('1, 2, 3, 5', (string) $s);
     }
+
+    public function testRemove()
+    {
+        $m = (new Map('int', 'int'))
+            ->put(0, 1)
+            ->put(1, 2)
+            ->put(2, 3)
+            ->put(3, 4)
+            ->put(4, 5);
+
+        $m2 = $m->remove(12);
+        $this->assertSame($m, $m2);
+        $this->assertSame([0, 1, 2, 3, 4], $m->keys()->toPrimitive());
+        $this->assertSame([1, 2, 3, 4, 5], $m->values()->toPrimitive());
+
+        $m2 = $m->remove(3);
+        $this->assertNotSame($m, $m2);
+        $this->assertInstanceOf(Map::class, $m2);
+        $this->assertSame([0, 1, 2, 3, 4], $m->keys()->toPrimitive());
+        $this->assertSame([1, 2, 3, 4, 5], $m->values()->toPrimitive());
+        $this->assertSame([0, 1, 2, 4], $m2->keys()->toPrimitive());
+        $this->assertSame([1, 2, 3, 5], $m2->values()->toPrimitive());
+
+        $m2 = $m->remove(4);
+        $this->assertNotSame($m, $m2);
+        $this->assertInstanceOf(Map::class, $m2);
+        $this->assertSame([0, 1, 2, 3, 4], $m->keys()->toPrimitive());
+        $this->assertSame([1, 2, 3, 4, 5], $m->values()->toPrimitive());
+        $this->assertSame([0, 1, 2, 3], $m2->keys()->toPrimitive());
+        $this->assertSame([1, 2, 3, 4], $m2->values()->toPrimitive());
+
+        $m2 = $m->remove(0);
+        $this->assertNotSame($m, $m2);
+        $this->assertInstanceOf(Map::class, $m2);
+        $this->assertSame([0, 1, 2, 3, 4], $m->keys()->toPrimitive());
+        $this->assertSame([1, 2, 3, 4, 5], $m->values()->toPrimitive());
+        $this->assertSame([1, 2, 3, 4], $m2->keys()->toPrimitive());
+        $this->assertSame([2, 3, 4, 5], $m2->values()->toPrimitive());
+    }
 }

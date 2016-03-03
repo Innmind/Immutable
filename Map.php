@@ -403,4 +403,31 @@ class Map implements MapInterface
     {
         return $this->values->join($separator);
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function remove($key): MapInterface
+    {
+        if (!$this->contains($key)) {
+            return $this;
+        }
+
+        $index = $this->keys->indexOf($key);
+        $map = clone $this;
+        $map->keys = $this
+            ->keys
+            ->slice(0, $index)
+            ->append($this->keys->slice($index + 1, $this->keys->size()));
+        $map->values = $this
+            ->values
+            ->slice(0, $index)
+            ->append($this->values->slice($index + 1, $this->values->size()));
+        $map->pairs = $this
+            ->pairs
+            ->slice(0, $index)
+            ->append($this->pairs->slice($index + 1, $this->pairs->size()));
+
+        return $map;
+    }
 }

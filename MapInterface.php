@@ -178,4 +178,13 @@ interface MapInterface extends SizeableInterface, \Countable, \Iterator, \ArrayA
      * @return StringPrimitive
      */
     public function join(string $separator): StringPrimitive;
+
+    /**
+     * Remove the element with the given key
+     *
+     * @param mixed $key
+     *
+     * @return self
+     */
+    public function remove($key): self;
 }
