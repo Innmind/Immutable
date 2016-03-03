@@ -10,6 +10,66 @@ A set of classes to wrap PHP primitives to build immutable data.
 
 Here are some examples of what you can do:
 
+## Sequence
+
+To be used to wrap an ordered list of elements (elements can be of mixed types).
+
+```php
+use Innmind\Immutable\Sequence;
+
+$seq = new Sequence(24, 42, 'Hitchhiker', 'Magrathea');
+$seq->get(2); // Hitchhiker
+$another = $seq->drop(2);
+$another->toPrimitive(); // [Hitchhiker, Magrathea]
+$seq->toPrimitive(); // [24, 42, Hitchhiker, Magrathea]
+```
+
+For a complete list of methods check [`SequenceInterface`](SequenceInterface.php).
+
+## Set
+
+To be used as a collection of unordered elements (elements must be of the same type).
+
+```php
+use Innmind\Immutable\Set;
+
+$set = new Set('int');
+$set = $set
+    ->add(24)
+    ->add(42);
+$set->equals((new Set('int'))->add(24)->add(42)); // true
+$set->add(42.0); // will throw as it's a float and not an integer
+```
+
+The type passed in the constructor can be any primitive type (`int`, `float`, `bool` or `string`) or any class name.
+
+For a complete list of methods check [`SetInterface`](SetInterface.php).
+
+## Map
+
+To be used as a collection of key/value pairs (both keys and values must be of the same type).
+
+```php
+use Innmind\Immutable\Map;
+use Innmind\Immutable\Symbol;
+
+$map = new Map(Symbol::class, 'int');
+$map = $map
+    ->put(new Symbol('foo'), 42)
+    ->put($symbol = new Symbol('foo'), 24);
+$map->size(); // 2, because even if the symbols represent the same string it's 2 different instances
+$map->values()->toPrimitive(); // [42, 24]
+$map = $map->put($symbol, 66);
+$map->size(); // 2
+$map->values()->toPrimitive(); // [42, 66]
+```
+
+The types passed in the constructor can be any primitive type (`int`, `float`, `bool` or `string`) or any class name.
+
+For a complete list of methods check [`MapInterface`](MapInterface.php).
+
+**Note**: As a map is not a simple associative array, when you call `map` the return value can be an instance of [`Pair`](Pair.php). If this this the case, the key used to reference the original value will be replaced by the key from the `Pair` instance in the new `Map` instance.
+
 ## Strings
 
 ```php
