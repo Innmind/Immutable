@@ -1,8 +1,8 @@
 # Immutable
 
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/Innmind/Immutable/badges/quality-score.png?b=develop)](https://scrutinizer-ci.com/g/Innmind/Immutable/?branch=develop)
-[![Code Coverage](https://scrutinizer-ci.com/g/Innmind/Immutable/badges/coverage.png?b=develop)](https://scrutinizer-ci.com/g/Innmind/Immutable/?branch=develop)
-[![Build Status](https://scrutinizer-ci.com/g/Innmind/Immutable/badges/build.png?b=develop)](https://scrutinizer-ci.com/g/Innmind/Immutable/build-status/develop)
+| `master` | `develop` |
+|----------|-----------|
+|[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/Innmind/Immutable/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/Innmind/Immutable/?branch=master) [![Code Coverage](https://scrutinizer-ci.com/g/Innmind/Immutable/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/Innmind/Immutable/?branch=master) [![Build Status](https://scrutinizer-ci.com/g/Innmind/Immutable/badges/build.png?b=master)](https://scrutinizer-ci.com/g/Innmind/Immutable/build-status/master)|[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/Innmind/Immutable/badges/quality-score.png?b=develop)](https://scrutinizer-ci.com/g/Innmind/Immutable/?branch=develop) [![Code Coverage](https://scrutinizer-ci.com/g/Innmind/Immutable/badges/coverage.png?b=develop)](https://scrutinizer-ci.com/g/Innmind/Immutable/?branch=develop) [![Build Status](https://scrutinizer-ci.com/g/Innmind/Immutable/badges/build.png?b=develop)](https://scrutinizer-ci.com/g/Innmind/Immutable/build-status/develop)|
 
 [![SensioLabsInsight](https://insight.sensiolabs.com/projects/733063fc-bb9a-4329-9412-c805299fc62b/big.png)](https://insight.sensiolabs.com/projects/733063fc-bb9a-4329-9412-c805299fc62b)
 
