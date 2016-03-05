@@ -136,4 +136,13 @@ interface SetInterface extends SizeableInterface, PrimitiveInterface, \Countable
      * @return SequenceInterface
      */
     public function sort(\Closure $function): SequenceInterface;
+
+    /**
+     * Create a new set with elements of both sets
+     *
+     * @param self $set
+     *
+     * @return self
+     */
+    public function merge(self $set): self;
 }

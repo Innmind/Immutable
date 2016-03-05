@@ -307,4 +307,44 @@ class SetTest extends \PHPUnit_Framework_TestCase
         $this->assertSame([1, 2, 3, 4], $s->toPrimitive());
         $this->assertSame([4, 3, 2, 1], $s2->toPrimitive());
     }
+
+    public function testMerge()
+    {
+        $s = (new Set('int'))
+            ->add(24)
+            ->add(42)
+            ->add(66);
+
+        $this->assertTrue(
+            $s
+                ->merge(
+                    (new Set('int'))
+                        ->add(24)
+                        ->add(42)
+                        ->add(66)
+                )
+                ->equals($s)
+        );
+        $this->assertSame(
+            [24, 42, 66, 90, 114],
+            $s
+                ->merge(
+                    (new Set('int'))
+                        ->add(90)
+                        ->add(114)
+                )
+                ->toPrimitive()
+        );
+        $this->assertSame([24, 42, 66], $s->toPrimitive());
+        $this->assertSame($s->type(), $s->merge(new Set('int'))->type());
+    }
+
+    /**
+     * @expectedException Innmind\Immutable\Exception\InvalidArgumentException
+     * @expectedExceptionMessage The 2 sets does not reference the same type
+     */
+    public function testThrowWhenMergingSetsOfDifferentType()
+    {
+        (new Set('int'))->merge(new Set('float'));
+    }
 }

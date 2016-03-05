@@ -248,6 +248,21 @@ class Set implements SetInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function merge(SetInterface $set): SetInterface
+    {
+        $this->validate($set);
+        $newSet = clone $this;
+
+        $set->foreach(function ($value) use (&$newSet) {
+            $newSet = $newSet->add($value);
+        });
+
+        return $newSet;
+    }
+
+    /**
      * Make sure the set is compatible with the current one
      *
      * @param SetInterface $set
