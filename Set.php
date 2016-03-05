@@ -255,7 +255,7 @@ class Set implements SetInterface
         $this->validate($set);
         $newSet = clone $this;
 
-        $set->foreach(function ($value) use (&$newSet) {
+        $set->foreach(function($value) use (&$newSet) {
             $newSet = $newSet->add($value);
         });
 
