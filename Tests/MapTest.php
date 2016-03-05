@@ -24,8 +24,8 @@ class MapTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf(\Countable::class, $m);
         $this->assertInstanceOf(\Iterator::class, $m);
         $this->assertInstanceOf(\ArrayAccess::class, $m);
-        $this->assertSame('int', $m->keyType());
-        $this->assertSame('float', $m->valueType());
+        $this->assertSame('int', (string) $m->keyType());
+        $this->assertSame('float', (string) $m->valueType());
     }
 
     public function testPut()
@@ -217,8 +217,8 @@ class MapTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf(Map::class, $m2);
         $this->assertSame(1, $m->size());
         $this->assertSame(0, $m2->size());
-        $this->assertSame('int', $m2->keyType());
-        $this->assertSame('float', $m2->valueType());
+        $this->assertSame('int', (string) $m2->keyType());
+        $this->assertSame('float', (string) $m2->valueType());
     }
 
     public function testEquals()
@@ -292,8 +292,8 @@ class MapTest extends \PHPUnit_Framework_TestCase
         });
         $this->assertNotSame($m, $m2);
         $this->assertInstanceOf(Map::class, $m2);
-        $this->assertSame('integer', $m2->keyType());
-        $this->assertSame(SequenceInterface::class, $m2->valueType());
+        $this->assertSame('integer', (string) $m2->keyType());
+        $this->assertSame(SequenceInterface::class, (string) $m2->valueType());
         $this->assertTrue($m2->contains(0));
         $this->assertTrue($m2->contains(1));
         $this->assertTrue($m2->contains(2));

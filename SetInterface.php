@@ -13,9 +13,9 @@ interface SetInterface extends SizeableInterface, PrimitiveInterface, \Countable
     /**
      * Return the type of this set
      *
-     * @return string
+     * @return StringPrimitive
      */
-    public function type(): string;
+    public function type(): StringPrimitive;
 
     /**
      * Intersect this set with the given one

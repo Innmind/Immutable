@@ -24,7 +24,7 @@ class SetTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf(PrimitiveInterface::class, $s);
         $this->assertInstanceOf(\Countable::class, $s);
         $this->assertInstanceOf(\Iterator::class, $s);
-        $this->assertSame('int', $s->type());
+        $this->assertSame('int', (string) $s->type());
     }
 
     public function testAdd()
@@ -231,8 +231,8 @@ class SetTest extends \PHPUnit_Framework_TestCase
             return $v % 2;
         });
         $this->assertInstanceOf(MapInterface::class, $m);
-        $this->assertSame('integer', $m->keyType());
-        $this->assertSame(SequenceInterface::class, $m->valueType());
+        $this->assertSame('integer', (string) $m->keyType());
+        $this->assertSame(SequenceInterface::class, (string) $m->valueType());
         $this->assertSame([1, 0], $m->keys()->toPrimitive());
         $this->assertSame([1, 3], $m->get(1)->toPrimitive());
         $this->assertSame([2, 4], $m->get(0)->toPrimitive());

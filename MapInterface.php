@@ -10,16 +10,16 @@ interface MapInterface extends SizeableInterface, \Countable, \Iterator, \ArrayA
     /**
      * Return the key type for this map
      *
-     * @return string
+     * @return StringPrimitive
      */
-    public function keyType(): string;
+    public function keyType(): StringPrimitive;
 
     /**
      * Return the value type for this map
      *
-     * @return string
+     * @return StringPrimitive
      */
-    public function valueType(): string;
+    public function valueType(): StringPrimitive;
 
     /**
      * Set a new key/value pair

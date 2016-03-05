@@ -24,10 +24,10 @@ class Map implements MapInterface
 
     public function __construct(string $keyType, string $valueType)
     {
-        $this->keyType = $keyType;
-        $this->valueType = $valueType;
         $this->keySpec = $this->getSpecFor($keyType);
         $this->valueSpec = $this->getSpecFor($valueType);
+        $this->keyType = new StringPrimitive($keyType);
+        $this->valueType = new StringPrimitive($valueType);
         $this->keys = new Sequence;
         $this->values = new Sequence;
         $this->pairs = new Sequence;
@@ -36,7 +36,7 @@ class Map implements MapInterface
     /**
      * {@inheritdoc}
      */
-    public function keyType(): string
+    public function keyType(): StringPrimitive
     {
         return $this->keyType;
     }
@@ -44,7 +44,7 @@ class Map implements MapInterface
     /**
      * {@inheritdoc}
      */
-    public function valueType(): string
+    public function valueType(): StringPrimitive
     {
         return $this->valueType;
     }
@@ -437,8 +437,8 @@ class Map implements MapInterface
     public function merge(MapInterface $map): MapInterface
     {
         if (
-            $this->keyType() !== $map->keyType() ||
-            $this->valueType() !== $map->valueType()
+            !$this->keyType()->equals($map->keyType()) ||
+            !$this->valueType()->equals($map->valueType())
         ) {
             throw new InvalidArgumentException(
                 'The 2 maps does not reference the same types'

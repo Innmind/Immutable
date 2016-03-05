@@ -15,7 +15,7 @@ class Set implements SetInterface
 
     public function __construct(string $type)
     {
-        $this->type = $type;
+        $this->type = new StringPrimitive($type);
         $this->spec = $this->getSpecFor($type);
         $this->values = new Sequence;
     }
@@ -23,7 +23,7 @@ class Set implements SetInterface
     /**
      * {@inheritdoc}
      */
-    public function type(): string
+    public function type(): StringPrimitive
     {
         return $this->type;
     }
@@ -273,7 +273,7 @@ class Set implements SetInterface
      */
     private function validate(SetInterface $set)
     {
-        if ($set->type() !== $this->type) {
+        if (!$set->type()->equals($this->type)) {
             throw new InvalidArgumentException(
                 'The 2 sets does not reference the same type'
             );
