@@ -9,7 +9,8 @@ use Innmind\Immutable\{
     SizeableInterface,
     SequenceInterface,
     Pair,
-    StringPrimitive
+    StringPrimitive,
+    Symbol
 };
 
 class MapTest extends \PHPUnit_Framework_TestCase
@@ -492,5 +493,40 @@ class MapTest extends \PHPUnit_Framework_TestCase
         $this->assertSame([1, 2, 3, 4, 5], $m->values()->toPrimitive());
         $this->assertSame([1, 2, 3, 4], $m2->keys()->toPrimitive());
         $this->assertSame([2, 3, 4, 5], $m2->values()->toPrimitive());
+    }
+
+    public function testMerge()
+    {
+        $m = (new Map(Symbol::class, 'int'))
+            ->put($s = new Symbol('foo'), 24)
+            ->put($s2 = new Symbol('foo'), 42);
+        $m2 = (new Map(Symbol::class, 'int'))
+            ->put($s3 = new Symbol('foo'), 24)
+            ->put($s2, 66)
+            ->put($s4 = new Symbol('bar'), 42);
+
+        $m3 = $m->merge($m2);
+        $this->assertNotSame($m, $m3);
+        $this->assertNotSame($m2, $m3);
+        $this->assertInstanceOf(Map::class, $m3);
+        $this->assertSame($m->keyType(), $m3->keyType());
+        $this->assertSame($m->valueType(), $m3->valueType());
+        $this->assertSame(4, $m3->size());
+        $this->assertSame([$s, $s2], $m->keys()->toPrimitive());
+        $this->assertSame([24, 42], $m->values()->toPrimitive());
+        $this->assertSame([$s3, $s2, $s4], $m2->keys()->toPrimitive());
+        $this->assertSame([24, 66, 42], $m2->values()->toPrimitive());
+        $this->assertSame([$s, $s2, $s3, $s4], $m3->keys()->toPrimitive());
+        $this->assertSame([24, 66, 24, 42], $m3->values()->toPrimitive());
+        $this->assertFalse($m3->equals($m2->merge($m)));
+    }
+
+    /**
+     * @expectedException Innmind\Immutable\Exception\InvalidArgumentException
+     * @expectedExceptionMessage The 2 maps does not reference the same types
+     */
+    public function testThrowWhenMergingSetsOfDifferentType()
+    {
+        (new Map('int', 'int'))->merge(new Map('float', 'int'));
     }
 }

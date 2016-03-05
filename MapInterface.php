@@ -187,4 +187,13 @@ interface MapInterface extends SizeableInterface, \Countable, \Iterator, \ArrayA
      * @return self
      */
     public function remove($key): self;
+
+    /**
+     * Create a new map by combining both maps
+     *
+     * @param self $map
+     *
+     * @return self
+     */
+    public function merge(self $map): self;
 }

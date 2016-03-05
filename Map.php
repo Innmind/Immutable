@@ -430,4 +430,27 @@ class Map implements MapInterface
 
         return $map;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function merge(MapInterface $map): MapInterface
+    {
+        if (
+            $this->keyType() !== $map->keyType() ||
+            $this->valueType() !== $map->valueType()
+        ) {
+            throw new InvalidArgumentException(
+                'The 2 maps does not reference the same types'
+            );
+        }
+
+        $newMap = clone $this;
+
+        $map->foreach(function($key, $value) use (&$newMap) {
+            $newMap = $newMap->put($key, $value);
+        });
+
+        return $newMap;
+    }
 }
