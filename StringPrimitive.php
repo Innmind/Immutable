@@ -545,4 +545,16 @@ class StringPrimitive implements PrimitiveInterface, StringableInterface
     {
         return new self($string . (string) $this);
     }
+
+    /**
+     * Check if the 2 strings are equal
+     *
+     * @param self $string
+     *
+     * @return bool
+     */
+    public function equals(self $string): bool
+    {
+        return (string) $this === (string) $string;
+    }
 }
