@@ -271,7 +271,7 @@ class Sequence implements SequenceInterface
      */
     public function indexOf($element): int
     {
-        $index = array_search($element, $this->values);
+        $index = array_search($element, $this->values, true);
 
         if ($index === false) {
             throw new ElementNotFoundException;

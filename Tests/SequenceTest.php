@@ -227,11 +227,12 @@ class SequenceTest extends \PHPUnit_Framework_TestCase
 
     public function testIndexOf()
     {
-        $s = new Sequence(1, 2, 3);
+        $s = new Sequence(1, 2, 3, new \stdClass, $o = new \stdClass);
 
         $this->assertSame(0, $s->indexOf(1));
         $this->assertSame(1, $s->indexOf(2));
         $this->assertSame(2, $s->indexOf(3));
+        $this->assertSame(4, $s->indexOf($o));
     }
 
     /**
