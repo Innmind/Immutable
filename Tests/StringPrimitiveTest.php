@@ -469,4 +469,10 @@ class StringPrimitiveTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('foo', (string) $s);
         $this->assertSame('baz foo', (string) $s2);
     }
+
+    public function testEquals()
+    {
+        $this->assertTrue((new S('foo'))->equals(new S('foo')));
+        $this->assertFalse((new S('foo'))->equals(new S('fo')));
+    }
 }
