@@ -115,9 +115,9 @@ interface SetInterface extends SizeableInterface, PrimitiveInterface, \Countable
      *
      * @param \Closure $predicate
      *
-     * @return SequenceInterface
+     * @return MapInterface<bool, self>
      */
-    public function partition(\Closure $predicate): SequenceInterface;
+    public function partition(\Closure $predicate): MapInterface;
 
     /**
      * Concatenate all elements with the given separator

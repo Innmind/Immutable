@@ -529,4 +529,47 @@ class MapTest extends \PHPUnit_Framework_TestCase
     {
         (new Map('int', 'int'))->merge(new Map('float', 'int'));
     }
+
+    public function testPartition()
+    {
+        $m = (new Map('int', 'int'))
+            ->put(0, 1)
+            ->put(1, 2)
+            ->put(2, 3)
+            ->put(3, 4)
+            ->put(4, 5);
+
+        $p = $m->partition(function(int $i, int $v) {
+            return ($i + $v) % 3 === 0;
+        });
+
+        $this->assertInstanceOf(Map::class, $p);
+        $this->assertNotSame($p, $m);
+        $this->assertSame('bool', (string) $p->keyType());
+        $this->assertSame(MapInterface::class, (string) $p->valueType());
+        $this->assertSame(
+            [true, false],
+            $p->keys()->toPrimitive()
+        );
+        $this->assertSame('int', (string) $p->get(true)->keyType());
+        $this->assertSame('int', (string) $p->get(true)->valueType());
+        $this->assertSame('int', (string) $p->get(false)->keyType());
+        $this->assertSame('int', (string) $p->get(false)->valueType());
+        $this->assertSame(
+            [1, 4],
+            $p->get(true)->keys()->toPrimitive()
+        );
+        $this->assertSame(
+            [2, 5],
+            $p->get(true)->values()->toPrimitive()
+        );
+        $this->assertSame(
+            [0, 2, 3],
+            $p->get(false)->keys()->toPrimitive()
+        );
+        $this->assertSame(
+            [1, 3, 4],
+            $p->get(false)->values()->toPrimitive()
+        );
+    }
 }
