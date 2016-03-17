@@ -88,7 +88,7 @@ interface MapInterface extends SizeableInterface, \Countable, \Iterator, \ArrayA
     /**
      * Filter the map based on the given predicate
      *
-     * @param Closure $predicate
+     * @param \Closure $predicate
      *
      * @return self
      */
@@ -97,7 +97,7 @@ interface MapInterface extends SizeableInterface, \Countable, \Iterator, \ArrayA
     /**
      * Run the given function for each element of the map
      *
-     * @param Closure $function
+     * @param \Closure $function
      *
      * @return self
      */
@@ -107,7 +107,7 @@ interface MapInterface extends SizeableInterface, \Countable, \Iterator, \ArrayA
      * Return a new map of pairs' sequences grouped by keys determined with the given
      * discriminator function
      *
-     * @param Closure $discriminator
+     * @param \Closure $discriminator
      *
      * @return self
      */
@@ -146,7 +146,7 @@ interface MapInterface extends SizeableInterface, \Countable, \Iterator, \ArrayA
      *
      * Keys can't be modified
      *
-     * @param Closure $function
+     * @param \Closure $function
      *
      * @return self
      */
