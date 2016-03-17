@@ -453,4 +453,30 @@ class Map implements MapInterface
 
         return $newMap;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function partition(\Closure $predicate): MapInterface
+    {
+        $truthy = $this->clear();
+        $falsy = $this->clear();
+
+        foreach ($this->keys as $index => $key) {
+            $return = $predicate(
+                $key,
+                $value = $this->values->get($index)
+            );
+
+            if ($return === true) {
+                $truthy = $truthy->put($key, $value);
+            } else {
+                $falsy = $falsy->put($key, $value);
+            }
+        }
+
+        return (new self('bool', MapInterface::class))
+            ->put(true, $truthy)
+            ->put(false, $falsy);
+    }
 }

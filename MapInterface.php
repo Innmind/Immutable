@@ -196,4 +196,13 @@ interface MapInterface extends SizeableInterface, \Countable, \Iterator, \ArrayA
      * @return self
      */
     public function merge(self $map): self;
+
+    /**
+     * Return a map of 2 maps partitioned according to the given predicate
+     *
+     * @param \Closure $predicate
+     *
+     * @return self<bool, self>
+     */
+    public function partition(\Closure $predicate): self;
 }
