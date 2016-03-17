@@ -268,14 +268,16 @@ class SetTest extends \PHPUnit_Framework_TestCase
             return $v % 2 === 0;
         });
         $this->assertNotSame($s, $s2);
-        $this->assertInstanceOf(SequenceInterface::class, $s2);
+        $this->assertInstanceOf(MapInterface::class, $s2);
+        $this->assertSame('bool', (string) $s2->keyType());
+        $this->assertSame(SetInterface::class, (string) $s2->valueType());
         $this->assertSame([1, 2, 3, 4], $s->toPrimitive());
-        $this->assertInstanceOf(Set::class, $s2->get(0));
-        $this->assertInstanceOf(Set::class, $s2->get(1));
-        $this->assertSame($s->type(), $s2->get(0)->type());
-        $this->assertSame($s->type(), $s2->get(1)->type());
-        $this->assertSame([2, 4], $s2->get(0)->toPrimitive());
-        $this->assertSame([1, 3], $s2->get(1)->toPrimitive());
+        $this->assertInstanceOf(Set::class, $s2->get(true));
+        $this->assertInstanceOf(Set::class, $s2->get(false));
+        $this->assertSame($s->type(), $s2->get(true)->type());
+        $this->assertSame($s->type(), $s2->get(false)->type());
+        $this->assertSame([2, 4], $s2->get(true)->toPrimitive());
+        $this->assertSame([1, 3], $s2->get(false)->toPrimitive());
     }
 
     public function testJoin()

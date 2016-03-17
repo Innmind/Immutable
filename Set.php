@@ -220,7 +220,7 @@ class Set implements SetInterface
     /**
      * {@inheritdoc}
      */
-    public function partition(\Closure $predicate): SequenceInterface
+    public function partition(\Closure $predicate): MapInterface
     {
         $truthy = clone $this;
         $falsy = clone $this;
@@ -228,7 +228,9 @@ class Set implements SetInterface
         $truthy->values = $partitions->get(0);
         $falsy->values = $partitions->get(1);
 
-        return new Sequence($truthy, $falsy);
+        return (new Map('bool', SetInterface::class))
+            ->put(true, $truthy)
+            ->put(false, $falsy);
     }
 
     /**
