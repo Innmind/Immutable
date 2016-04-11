@@ -236,8 +236,8 @@ class Map implements MapInterface
      */
     public function equals(MapInterface $map): bool
     {
-        if ($map->keys()->equals($this->keys())) {
-            return true;
+        if (!$map->keys()->equals($this->keys())) {
+            return false;
         }
 
         return $map->values()->equals($this->values());
