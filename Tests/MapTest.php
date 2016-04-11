@@ -228,6 +228,17 @@ class MapTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue($m->equals($m2));
         $this->assertFalse($m->equals($m2->put(65, 66)));
+        $this->assertFalse($m->equals($m2->put(24, 24)));
+        $this->assertFalse(
+            (new Map('string', 'string'))
+                ->put('foo_res', 'res')
+                ->put('foo_bar_res', 'res')
+                ->equals(
+                    (new Map('string', 'string'))
+                        ->put('foo_res', 'res')
+                        ->put('bar_res', 'res')
+                )
+        );
     }
 
     public function testFilter()
