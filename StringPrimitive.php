@@ -531,7 +531,7 @@ class StringPrimitive implements PrimitiveInterface, StringableInterface
      */
     public function append(string $string): self
     {
-        return new self((string) $this . $string);
+        return new self((string) $this.$string);
     }
 
     /**
@@ -543,7 +543,7 @@ class StringPrimitive implements PrimitiveInterface, StringableInterface
      */
     public function prepend(string $string): self
     {
-        return new self($string . (string) $this);
+        return new self($string.(string) $this);
     }
 
     /**
