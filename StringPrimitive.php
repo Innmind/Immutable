@@ -531,7 +531,7 @@ class StringPrimitive implements PrimitiveInterface, StringableInterface
      */
     public function append(string $string): self
     {
-        return new self((string) $this . $string);
+        return new self((string) $this.$string);
     }
 
     /**
@@ -543,7 +543,7 @@ class StringPrimitive implements PrimitiveInterface, StringableInterface
      */
     public function prepend(string $string): self
     {
-        return new self($string . (string) $this);
+        return new self($string.(string) $this);
     }
 
     /**
@@ -556,5 +556,41 @@ class StringPrimitive implements PrimitiveInterface, StringableInterface
     public function equals(self $string): bool
     {
         return (string) $this === (string) $string;
+    }
+
+    /**
+     * Trim the string
+     *
+     * @param string $mask
+     *
+     * @return self
+     */
+    public function trim(string $mask = null): self
+    {
+        return new self($mask === null ? trim((string) $this) : trim((string) $this, $mask));
+    }
+
+    /**
+     * Trim the right side of the string
+     *
+     * @param string $mask
+     *
+     * @return self
+     */
+    public function rightTrim(string $mask = null): self
+    {
+        return new self($mask === null ? rtrim((string) $this) : rtrim((string) $this, $mask));
+    }
+
+    /**
+     * Trim the left side of the string
+     *
+     * @param string $mask
+     *
+     * @return self
+     */
+    public function leftTrim(string $mask = null): self
+    {
+        return new self($mask === null ? ltrim((string) $this) : ltrim((string) $this, $mask));
     }
 }
