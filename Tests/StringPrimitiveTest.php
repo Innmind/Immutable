@@ -475,4 +475,40 @@ class StringPrimitiveTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue((new S('foo'))->equals(new S('foo')));
         $this->assertFalse((new S('foo'))->equals(new S('fo')));
     }
+
+    public function testTrim()
+    {
+        $s = new S(' foo ');
+        $s2 = $s->trim();
+
+        $this->assertInstanceOf(S::class, $s2);
+        $this->assertNotSame($s, $s2);
+        $this->assertSame(' foo ', (string) $s);
+        $this->assertSame('foo', (string) $s2);
+        $this->assertSame('f', (string) $s2->trim('o'));
+    }
+
+    public function testRightTrim()
+    {
+        $s = new S(' foo ');
+        $s2 = $s->rightTrim();
+
+        $this->assertInstanceOf(S::class, $s2);
+        $this->assertNotSame($s, $s2);
+        $this->assertSame(' foo ', (string) $s);
+        $this->assertSame(' foo', (string) $s2);
+        $this->assertSame(' f', (string) $s2->rightTrim('o'));
+    }
+
+    public function testLeftTrim()
+    {
+        $s = new S(' foo ');
+        $s2 = $s->leftTrim();
+
+        $this->assertInstanceOf(S::class, $s2);
+        $this->assertNotSame($s, $s2);
+        $this->assertSame(' foo ', (string) $s);
+        $this->assertSame('foo ', (string) $s2);
+        $this->assertSame('oo ', (string) $s2->leftTrim('f'));
+    }
 }
