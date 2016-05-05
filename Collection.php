@@ -590,7 +590,7 @@ class Collection implements CollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function each(\Closure $callback): CollectionInterface
+    public function each(callable $callback): CollectionInterface
     {
         foreach ($this->values as $key => $value) {
             $callback($key, $value);

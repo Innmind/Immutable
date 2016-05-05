@@ -88,30 +88,30 @@ interface MapInterface extends SizeableInterface, \Countable, \Iterator, \ArrayA
     /**
      * Filter the map based on the given predicate
      *
-     * @param \Closure $predicate
+     * @param callable $predicate
      *
      * @return self
      */
-    public function filter(\Closure $predicate): self;
+    public function filter(callable $predicate): self;
 
     /**
      * Run the given function for each element of the map
      *
-     * @param \Closure $function
+     * @param callable $function
      *
      * @return self
      */
-    public function foreach(\Closure $function): self;
+    public function foreach(callable $function): self;
 
     /**
      * Return a new map of pairs' sequences grouped by keys determined with the given
      * discriminator function
      *
-     * @param \Closure $discriminator
+     * @param callable $discriminator
      *
      * @return self
      */
-    public function groupBy(\Closure $discriminator): self;
+    public function groupBy(callable $discriminator): self;
 
     /**
      * Return the first element
@@ -146,11 +146,11 @@ interface MapInterface extends SizeableInterface, \Countable, \Iterator, \ArrayA
      *
      * Keys can't be modified
      *
-     * @param \Closure $function
+     * @param callable $function
      *
      * @return self
      */
-    public function map(\Closure $function): self;
+    public function map(callable $function): self;
 
     /**
      * Return a sequence with the n first elements
@@ -200,19 +200,19 @@ interface MapInterface extends SizeableInterface, \Countable, \Iterator, \ArrayA
     /**
      * Return a map of 2 maps partitioned according to the given predicate
      *
-     * @param \Closure $predicate
+     * @param callable $predicate
      *
      * @return self<bool, self>
      */
-    public function partition(\Closure $predicate): self;
+    public function partition(callable $predicate): self;
 
     /**
      * Reduce the map to a single value
      *
      * @param mixed $carry
-     * @param \Closure $reducer
+     * @param callable $reducer
      *
      * @return mixed
      */
-    public function reduce($carry, \Closure $reducer);
+    public function reduce($carry, callable $reducer);
 }

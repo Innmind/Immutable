@@ -257,11 +257,11 @@ class ObjectStorage implements PrimitiveInterface, \Countable, \Iterator, \Array
     /**
      * Apply the given filter on the collection
      *
-     * @param Closure $filterer
+     * @param callable $filterer
      *
      * @return self
      */
-    public function filter(\Closure $filterer): self
+    public function filter(callable $filterer): self
     {
         $objects = new \SplObjectStorage;
 
@@ -281,11 +281,11 @@ class ObjectStorage implements PrimitiveInterface, \Countable, \Iterator, \Array
     /**
      * Run the given closure on each element
      *
-     * @param Closure $callback
+     * @param callable $callback
      *
      * @return self
      */
-    public function each(\Closure $callback): self
+    public function each(callable $callback): self
     {
         foreach ($this->objects as $object) {
             $callback($object, $this->objects[$object]);
@@ -299,11 +299,11 @@ class ObjectStorage implements PrimitiveInterface, \Countable, \Iterator, \Array
     /**
      * Generate a new storage based on the given mapper
      *
-     * @param Closure $mapper
+     * @param callable $mapper
      *
      * @return self
      */
-    public function map(\Closure $mapper): self
+    public function map(callable $mapper): self
     {
         $objects = new \SplObjectStorage;
 

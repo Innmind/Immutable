@@ -180,7 +180,7 @@ class Set implements SetInterface
     /**
      * {@inheritdoc}
      */
-    public function filter(\Closure $predicate): SetInterface
+    public function filter(callable $predicate): SetInterface
     {
         $set = clone $this;
         $set->values = $this->values->filter($predicate);
@@ -191,7 +191,7 @@ class Set implements SetInterface
     /**
      * {@inheritdoc}
      */
-    public function foreach(\Closure $function): SetInterface
+    public function foreach(callable $function): SetInterface
     {
         $this->values->foreach($function);
 
@@ -201,7 +201,7 @@ class Set implements SetInterface
     /**
      * {@inheritdoc}
      */
-    public function groupBy(\Closure $discriminator): MapInterface
+    public function groupBy(callable $discriminator): MapInterface
     {
         return $this->values->groupBy($discriminator);
     }
@@ -209,7 +209,7 @@ class Set implements SetInterface
     /**
      * {@inheritdoc}
      */
-    public function map(\Closure $function): SetInterface
+    public function map(callable $function): SetInterface
     {
         $set = clone $this;
         $set->values = $this->values->map($function);
@@ -220,7 +220,7 @@ class Set implements SetInterface
     /**
      * {@inheritdoc}
      */
-    public function partition(\Closure $predicate): MapInterface
+    public function partition(callable $predicate): MapInterface
     {
         $truthy = clone $this;
         $falsy = clone $this;
@@ -244,7 +244,7 @@ class Set implements SetInterface
     /**
      * {@inheritdoc}
      */
-    public function sort(\Closure $function): SequenceInterface
+    public function sort(callable $function): SequenceInterface
     {
         return $this->values->sort($function);
     }
@@ -267,7 +267,7 @@ class Set implements SetInterface
     /**
      * {@inheritdoc}
      */
-    public function reduce($carry, \Closure $reducer)
+    public function reduce($carry, callable $reducer)
     {
         return $this->values->reduce($carry, $reducer);
     }
