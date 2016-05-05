@@ -19,7 +19,7 @@ trait Type
      */
     private function getSpecFor(string $type): SpecificationInterface
     {
-        if (function_exists('is_' . $type)) {
+        if (function_exists('is_'.$type)) {
             return new PrimitiveType($type);
         }
 

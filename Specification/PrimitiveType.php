@@ -14,7 +14,7 @@ class PrimitiveType implements SpecificationInterface
 
     public function __construct(string $type)
     {
-        $this->function = 'is_' . $type;
+        $this->function = 'is_'.$type;
     }
 
     /**
