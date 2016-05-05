@@ -349,4 +349,22 @@ class SetTest extends \PHPUnit_Framework_TestCase
     {
         (new Set('int'))->merge(new Set('float'));
     }
+
+    public function testReduce()
+    {
+        $s = (new Set('int'))
+            ->add(4)
+            ->add(3)
+            ->add(2);
+
+        $v = $s->reduce(
+            42,
+            function (float $carry, int $value): float {
+                return $carry / $value;
+            }
+        );
+
+        $this->assertSame(1.75, $v);
+        $this->assertSame([4, 3, 2], $s->toPrimitive());
+    }
 }

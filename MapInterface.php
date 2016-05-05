@@ -205,4 +205,14 @@ interface MapInterface extends SizeableInterface, \Countable, \Iterator, \ArrayA
      * @return self<bool, self>
      */
     public function partition(\Closure $predicate): self;
+
+    /**
+     * Reduce the map to a single value
+     *
+     * @param mixed $carry
+     * @param \Closure $reducer
+     *
+     * @return mixed
+     */
+    public function reduce($carry, \Closure $reducer);
 }

@@ -583,4 +583,21 @@ class MapTest extends \PHPUnit_Framework_TestCase
             $p->get(false)->values()->toPrimitive()
         );
     }
+
+    public function testReduce()
+    {
+        $m = (new Map('int', 'int'))
+            ->put(4, 4);
+
+        $v = $m->reduce(
+            42,
+            function (float $carry, int $key, int $value): float {
+                return $carry / ($key * $value);
+            }
+        );
+
+        $this->assertSame(2.625, $v);
+        $this->assertSame([4], $m->keys()->toPrimitive());
+        $this->assertSame([4], $m->values()->toPrimitive());
+    }
 }

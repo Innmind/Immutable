@@ -394,4 +394,19 @@ class SequenceTest extends \PHPUnit_Framework_TestCase
         $this->assertSame([4, 3, 2, 1], $s->toPrimitive());
         $this->assertSame([1, 2, 3, 4], $s2->toPrimitive());
     }
+
+    public function testReduce()
+    {
+        $s = new Sequence(4, 3, 2, 1);
+
+        $v = $s->reduce(
+            42,
+            function (float $carry, int $value): float {
+                return $carry / $value;
+            }
+        );
+
+        $this->assertSame(1.75, $v);
+        $this->assertSame([4, 3, 2, 1], $s->toPrimitive());
+    }
 }

@@ -145,4 +145,14 @@ interface SetInterface extends SizeableInterface, PrimitiveInterface, \Countable
      * @return self
      */
     public function merge(self $set): self;
+
+    /**
+     * Reduce the set to a single value
+     *
+     * @param mixed $carry
+     * @param \Closure $reducer
+     *
+     * @return mixed
+     */
+    public function reduce($carry, \Closure $reducer);
 }

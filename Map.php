@@ -250,13 +250,11 @@ class Map implements MapInterface
     {
         $map = $this->clear();
 
-        foreach ($this->keys as $index => $key) {
-            $value = $this->values->get($index);
-
-            if ($predicate($key, $value) === true) {
-                $map->keys = $map->keys->add($key);
-                $map->values = $map->values->add($value);
-                $map->pairs = $map->pairs->add($this->pairs->get($index));
+        foreach ($this->pairs as $pair) {
+            if ($predicate($pair->key(), $pair->value()) === true) {
+                $map->keys = $map->keys->add($pair->key());
+                $map->values = $map->values->add($pair->value());
+                $map->pairs = $map->pairs->add($pair);
             }
         }
 
@@ -268,8 +266,8 @@ class Map implements MapInterface
      */
     public function foreach(\Closure $function): MapInterface
     {
-        foreach ($this->keys as $index => $key) {
-            $function($key, $this->values->get($index));
+        foreach ($this->pairs as $pair) {
+            $function($pair->key(), $pair->value());
         }
 
         return $this;
@@ -286,26 +284,24 @@ class Map implements MapInterface
 
         $map = null;
 
-        foreach ($this->keys as $index => $key) {
-            $newKey = $discriminator($key, $this->values->get($index));
+        foreach ($this->pairs as $pair) {
+            $key = $discriminator($pair->key(), $pair->value());
 
             if ($map === null) {
-                $type = gettype($newKey);
+                $type = gettype($key);
                 $map = new self(
-                    $type === 'object' ? get_class($newKey) : $type,
+                    $type === 'object' ? get_class($key) : $type,
                     SequenceInterface::class
                 );
             }
 
-            $pair = $this->pairs->get($index);
-
-            if ($map->contains($newKey)) {
+            if ($map->contains($key)) {
                 $map = $map->put(
-                    $newKey,
-                    $map->get($newKey)->add($pair)
+                    $key,
+                    $map->get($key)->add($pair)
                 );
             } else {
-                $map = $map->put($newKey, new Sequence($pair));
+                $map = $map->put($key, new Sequence($pair));
             }
         }
 
@@ -351,16 +347,17 @@ class Map implements MapInterface
     {
         $map = $this->clear();
 
-        foreach ($this->keys as $index => $key) {
+        foreach ($this->pairs as $pair) {
             $return = $function(
-                $key,
-                $this->values->get($index)
+                $pair->key(),
+                $pair->value()
             );
 
             if ($return instanceof Pair) {
                 $key = $return->key();
                 $value = $return->value();
             } else {
+                $key = $pair->key();
                 $value = $return;
             }
 
@@ -462,21 +459,33 @@ class Map implements MapInterface
         $truthy = $this->clear();
         $falsy = $this->clear();
 
-        foreach ($this->keys as $index => $key) {
+        foreach ($this->pairs as $pair) {
             $return = $predicate(
-                $key,
-                $value = $this->values->get($index)
+                $pair->key(),
+                $pair->value()
             );
 
             if ($return === true) {
-                $truthy = $truthy->put($key, $value);
+                $truthy = $truthy->put($pair->key(), $pair->value());
             } else {
-                $falsy = $falsy->put($key, $value);
+                $falsy = $falsy->put($pair->key(), $pair->value());
             }
         }
 
         return (new self('bool', MapInterface::class))
             ->put(true, $truthy)
             ->put(false, $falsy);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function reduce($carry, \Closure $reducer)
+    {
+        foreach ($this->pairs as $pair) {
+            $carry = $reducer($carry, $pair->key(), $pair->value());
+        }
+
+        return $carry;
     }
 }
