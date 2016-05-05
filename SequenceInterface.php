@@ -243,4 +243,14 @@ interface SequenceInterface extends SizeableInterface, PrimitiveInterface, \Coun
      * @return self
      */
     public function sort(\Closure $function): self;
+
+    /**
+     * Reduce the sequence to a single value
+     *
+     * @param mixed $carry
+     * @param \Closure $reducer
+     *
+     * @return mixed
+     */
+    public function reduce($carry, \Closure $reducer);
 }

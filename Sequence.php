@@ -410,4 +410,12 @@ class Sequence implements SequenceInterface
 
         return new self(...$values);
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function reduce($carry, \Closure $reducer)
+    {
+        return array_reduce($this->values, $reducer, $carry);
+    }
 }
