@@ -479,4 +479,16 @@ class Map implements MapInterface
             ->put(true, $truthy)
             ->put(false, $falsy);
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function reduce($carry, \Closure $reducer)
+    {
+        foreach ($this->pairs as $pair) {
+            $carry = $reducer($carry, $pair->key(), $pair->value());
+        }
+
+        return $carry;
+    }
 }
