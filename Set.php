@@ -265,6 +265,14 @@ class Set implements SetInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function reduce($carry, \Closure $reducer)
+    {
+        return $this->values->reduce($carry, $reducer);
+    }
+
+    /**
      * Make sure the set is compatible with the current one
      *
      * @param SetInterface $set
