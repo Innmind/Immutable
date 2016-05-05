@@ -246,7 +246,7 @@ class Map implements MapInterface
     /**
      * {@inheritdoc}
      */
-    public function filter(\Closure $predicate): MapInterface
+    public function filter(callable $predicate): MapInterface
     {
         $map = $this->clear();
 
@@ -264,7 +264,7 @@ class Map implements MapInterface
     /**
      * {@inheritdoc}
      */
-    public function foreach(\Closure $function): MapInterface
+    public function foreach(callable $function): MapInterface
     {
         foreach ($this->pairs as $pair) {
             $function($pair->key(), $pair->value());
@@ -276,7 +276,7 @@ class Map implements MapInterface
     /**
      * {@inheritdoc}
      */
-    public function groupBy(\Closure $discriminator): MapInterface
+    public function groupBy(callable $discriminator): MapInterface
     {
         if ($this->size() === 0) {
             throw new GroupEmptyMapException;
@@ -343,7 +343,7 @@ class Map implements MapInterface
     /**
      * {@inheritdoc}
      */
-    public function map(\Closure $function): MapInterface
+    public function map(callable $function): MapInterface
     {
         $map = $this->clear();
 
@@ -454,7 +454,7 @@ class Map implements MapInterface
     /**
      * {@inheritdoc}
      */
-    public function partition(\Closure $predicate): MapInterface
+    public function partition(callable $predicate): MapInterface
     {
         $truthy = $this->clear();
         $falsy = $this->clear();
@@ -480,7 +480,7 @@ class Map implements MapInterface
     /**
      * {@inheritdoc}
      */
-    public function reduce($carry, \Closure $reducer)
+    public function reduce($carry, callable $reducer)
     {
         foreach ($this->pairs as $pair) {
             $carry = $reducer($carry, $pair->key(), $pair->value());

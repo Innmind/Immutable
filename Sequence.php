@@ -187,7 +187,7 @@ class Sequence implements SequenceInterface
     /**
      * {@inheritdoc}
      */
-    public function filter(\Closure $predicate): SequenceInterface
+    public function filter(callable $predicate): SequenceInterface
     {
         return new self(...array_filter(
             $this->values,
@@ -198,7 +198,7 @@ class Sequence implements SequenceInterface
     /**
      * {@inheritdoc}
      */
-    public function foreach(\Closure $function): SequenceInterface
+    public function foreach(callable $function): SequenceInterface
     {
         foreach ($this->values as $value) {
             $function($value);
@@ -210,7 +210,7 @@ class Sequence implements SequenceInterface
     /**
      * {@inheritdoc}
      */
-    public function groupBy(\Closure $discriminator): MapInterface
+    public function groupBy(callable $discriminator): MapInterface
     {
         if ($this->size() === 0) {
             throw new GroupEmptySequenceException;
@@ -291,7 +291,7 @@ class Sequence implements SequenceInterface
     /**
      * {@inheritdoc}
      */
-    public function map(\Closure $function): SequenceInterface
+    public function map(callable $function): SequenceInterface
     {
         return new self(...array_map($function, $this->values));
     }
@@ -307,7 +307,7 @@ class Sequence implements SequenceInterface
     /**
      * {@inheritdoc}
      */
-    public function partition(\Closure $predicate): SequenceInterface
+    public function partition(callable $predicate): SequenceInterface
     {
         $truthy = [];
         $falsy = [];
@@ -403,7 +403,7 @@ class Sequence implements SequenceInterface
     /**
      * {@inheritdoc}
      */
-    public function sort(\Closure $function): SequenceInterface
+    public function sort(callable $function): SequenceInterface
     {
         $values = $this->values;
         usort($values, $function);
@@ -414,7 +414,7 @@ class Sequence implements SequenceInterface
     /**
      * {@inheritdoc}
      */
-    public function reduce($carry, \Closure $reducer)
+    public function reduce($carry, callable $reducer)
     {
         return array_reduce($this->values, $reducer, $carry);
     }

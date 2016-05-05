@@ -460,11 +460,11 @@ interface CollectionInterface extends PrimitiveInterface, \Iterator, \ArrayAcces
     /**
      * Run the given callable on each element (no mutation possible)
      *
-     * @param Closure $callback
+     * @param callable $callback
      *
      * @return self
      */
-    public function each(\Closure $callback): self;
+    public function each(callable $callback): self;
 
     /**
      * Concatenate the values into a string separated by the given string

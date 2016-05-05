@@ -76,48 +76,48 @@ interface SetInterface extends SizeableInterface, PrimitiveInterface, \Countable
     /**
      * Return all elements that satisfy the given predicate
      *
-     * @param \Closure $predicate
+     * @param callable $predicate
      *
      * @return self
      */
-    public function filter(\Closure $predicate): self;
+    public function filter(callable $predicate): self;
 
     /**
      * Apply the given function to all elements of the set
      *
-     * @param \Closure $function
+     * @param callable $function
      *
      * @return self
      */
-    public function foreach(\Closure $function): self;
+    public function foreach(callable $function): self;
 
     /**
      * Return a new map of pairs grouped by keys determined with the given
      * discriminator function
      *
-     * @param \Closure $discriminator
+     * @param callable $discriminator
      *
      * @return MapInterface
      */
-    public function groupBy(\Closure $discriminator): MapInterface;
+    public function groupBy(callable $discriminator): MapInterface;
 
     /**
      * Return a new set by applying the given function to all elements
      *
-     * @param \Closure $function
+     * @param callable $function
      *
      * @return self
      */
-    public function map(\Closure $function): self;
+    public function map(callable $function): self;
 
     /**
      * Return a sequence of 2 sets partitioned according to the given predicate
      *
-     * @param \Closure $predicate
+     * @param callable $predicate
      *
      * @return MapInterface<bool, self>
      */
-    public function partition(\Closure $predicate): MapInterface;
+    public function partition(callable $predicate): MapInterface;
 
     /**
      * Concatenate all elements with the given separator
@@ -131,11 +131,11 @@ interface SetInterface extends SizeableInterface, PrimitiveInterface, \Countable
     /**
      * Return a sequence sorted with the given function
      *
-     * @param \Closure $function
+     * @param callable $function
      *
      * @return SequenceInterface
      */
-    public function sort(\Closure $function): SequenceInterface;
+    public function sort(callable $function): SequenceInterface;
 
     /**
      * Create a new set with elements of both sets
@@ -150,9 +150,9 @@ interface SetInterface extends SizeableInterface, PrimitiveInterface, \Countable
      * Reduce the set to a single value
      *
      * @param mixed $carry
-     * @param \Closure $reducer
+     * @param callable $reducer
      *
      * @return mixed
      */
-    public function reduce($carry, \Closure $reducer);
+    public function reduce($carry, callable $reducer);
 }

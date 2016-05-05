@@ -65,30 +65,30 @@ interface SequenceInterface extends SizeableInterface, PrimitiveInterface, \Coun
     /**
      * Return all elements that satisfy the given predicate
      *
-     * @param \Closure $predicate
+     * @param callable $predicate
      *
      * @return self
      */
-    public function filter(\Closure $predicate): self;
+    public function filter(callable $predicate): self;
 
     /**
      * Apply the given function to all elements of the sequence
      *
-     * @param \Closure $function
+     * @param callable $function
      *
      * @return self
      */
-    public function foreach(\Closure $function): self;
+    public function foreach(callable $function): self;
 
     /**
      * Return a new map of pairs grouped by keys determined with the given
      * discriminator function
      *
-     * @param \Closure $discriminator
+     * @param callable $discriminator
      *
      * @return MapInterface
      */
-    public function groupBy(\Closure $discriminator): MapInterface;
+    public function groupBy(callable $discriminator): MapInterface;
 
     /**
      * Return the first element
@@ -134,11 +134,11 @@ interface SequenceInterface extends SizeableInterface, PrimitiveInterface, \Coun
     /**
      * Return a new sequence by applying the given function to all elements
      *
-     * @param \Closure $function
+     * @param callable $function
      *
      * @return self
      */
-    public function map(\Closure $function): self;
+    public function map(callable $function): self;
 
     /**
      * Pad the sequence to a defined size with the given element
@@ -153,11 +153,11 @@ interface SequenceInterface extends SizeableInterface, PrimitiveInterface, \Coun
     /**
      * Return a sequence of 2 sequences partitioned according to the given predicate
      *
-     * @param \Closure $predicate
+     * @param callable $predicate
      *
      * @return self[self]
      */
-    public function partition(\Closure $predicate): self;
+    public function partition(callable $predicate): self;
 
     /**
      * Slice the sequence
@@ -238,19 +238,19 @@ interface SequenceInterface extends SizeableInterface, PrimitiveInterface, \Coun
     /**
      * Sort the sequence in a different order
      *
-     * @param \Closure $function
+     * @param callable $function
      *
      * @return self
      */
-    public function sort(\Closure $function): self;
+    public function sort(callable $function): self;
 
     /**
      * Reduce the sequence to a single value
      *
      * @param mixed $carry
-     * @param \Closure $reducer
+     * @param callable $reducer
      *
      * @return mixed
      */
-    public function reduce($carry, \Closure $reducer);
+    public function reduce($carry, callable $reducer);
 }
