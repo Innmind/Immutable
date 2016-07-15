@@ -5,7 +5,8 @@ namespace Innmind\Immutable;
 
 use Innmind\Immutable\{
     Specification\PrimitiveType,
-    Specification\ClassType
+    Specification\ClassType,
+    Specification\VariableType
 };
 
 trait Type
@@ -21,6 +22,10 @@ trait Type
     {
         if (function_exists('is_'.$type)) {
             return new PrimitiveType($type);
+        }
+
+        if ($type === 'variable') {
+            return new VariableType;
         }
 
         return new ClassType($type);
