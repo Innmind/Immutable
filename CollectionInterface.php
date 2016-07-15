@@ -3,6 +3,9 @@ declare(strict_types = 1);
 
 namespace Innmind\Immutable;
 
+/**
+ * @deprecated To be removed in 2.0
+ */
 interface CollectionInterface extends PrimitiveInterface, \Iterator, \ArrayAccess, \Countable
 {
     const SORT_REGULAR = 0;

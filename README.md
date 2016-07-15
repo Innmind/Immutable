@@ -96,6 +96,8 @@ $range->toPrimitive(); //[0, 1, 2, 3? 4, 5, 6, 7, 8, 9, 10]
 
 ## Collections
 
+**DEPRECATED**: use `Set` or `Map` instead
+
 ```php
 use Innmind\Immutable\Collection;
 
@@ -111,6 +113,8 @@ var_dump($coll->toPrimitive()); // [4, 2, 1, 3]
 ```
 
 ## Typed collections
+
+**DEPRECATED**: use `Set` or `Map` instead
 
 This is the same as the collections excepts the first parameter of the constructor tells the class each element must be of.
 
@@ -130,6 +134,8 @@ $coll2 = $coll->merge(new TypedCollection('stdClass', [])); // will throw `BadMe
 ```
 
 ## Object storages
+
+**DEPRECATED**: use `Set` or `Map` instead
 
 ```php
 use Innmind\Immutable\ObjectStorage;

@@ -6,6 +6,9 @@ namespace Innmind\Immutable;
 use Innmind\Immutable\Exception\InvalidArgumentException;
 use Innmind\Immutable\Exception\BadMethodCallException;
 
+/**
+ * @deprecated To be removed in 2.0
+ */
 class TypedCollection extends Collection implements TypedCollectionInterface
 {
     private $type;
