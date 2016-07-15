@@ -83,6 +83,17 @@ echo $var
 echo $var; // outputs: the hitchhiker\'s guide to the galaxy
 ```
 
+## Range
+
+```php
+use Innmind\Immutable\NumericRange;
+
+$range = new NumericRange(0, 10, 1);
+$range->toPrimitive(); //[0, 1, 2, 3? 4, 5, 6, 7, 8, 9, 10]
+```
+
+`NumericRange` implements the `Iterator` interface and don't call the `range` function so you can build huge ranges as there's only the current range pointer being kept in the object.
+
 ## Collections
 
 ```php
