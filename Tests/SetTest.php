@@ -367,4 +367,18 @@ class SetTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(1.75, $v);
         $this->assertSame([4, 3, 2], $s->toPrimitive());
     }
+
+    public function testVariableSet()
+    {
+        $this->assertSame(
+            ['foo', 42, 42.1, true, []],
+            (new Set('variable'))
+                ->add('foo')
+                ->add(42)
+                ->add(42.1)
+                ->add(true)
+                ->add([])
+                ->toPrimitive()
+        );
+    }
 }

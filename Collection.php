@@ -9,6 +9,9 @@ use Innmind\Immutable\Exception\RuntimeException;
 use Innmind\Immutable\Exception\InvalidArgumentException;
 use Innmind\Immutable\Exception\LogicException;
 
+/**
+ * @deprecated To be removed in 2.0
+ */
 class Collection implements CollectionInterface
 {
     private $values;

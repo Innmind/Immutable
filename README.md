@@ -83,7 +83,20 @@ echo $var
 echo $var; // outputs: the hitchhiker\'s guide to the galaxy
 ```
 
+## Range
+
+```php
+use Innmind\Immutable\NumericRange;
+
+$range = new NumericRange(0, 10, 1);
+$range->toPrimitive(); //[0, 1, 2, 3? 4, 5, 6, 7, 8, 9, 10]
+```
+
+`NumericRange` implements the `Iterator` interface and don't call the `range` function so you can build huge ranges as there's only the current range pointer being kept in the object.
+
 ## Collections
+
+**DEPRECATED**: use `Set` or `Map` instead
 
 ```php
 use Innmind\Immutable\Collection;
@@ -100,6 +113,8 @@ var_dump($coll->toPrimitive()); // [4, 2, 1, 3]
 ```
 
 ## Typed collections
+
+**DEPRECATED**: use `Set` or `Map` instead
 
 This is the same as the collections excepts the first parameter of the constructor tells the class each element must be of.
 
@@ -119,6 +134,8 @@ $coll2 = $coll->merge(new TypedCollection('stdClass', [])); // will throw `BadMe
 ```
 
 ## Object storages
+
+**DEPRECATED**: use `Set` or `Map` instead
 
 ```php
 use Innmind\Immutable\ObjectStorage;

@@ -5,6 +5,9 @@ namespace Innmind\Immutable;
 
 use Innmind\Immutable\Exception\LogicException;
 
+/**
+ * @deprecated To be removed in 2.0
+ */
 class ObjectStorage implements PrimitiveInterface, \Countable, \Iterator, \ArrayAccess, \Serializable
 {
     private $objects;
