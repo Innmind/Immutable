@@ -6,6 +6,9 @@ namespace Innmind\Immutable;
 use Innmind\Immutable\Exception\RegexException;
 use Innmind\Immutable\Exception\SubstringException;
 
+/**
+ * @deprecated To be removed in 2.0
+ */
 class StringPrimitive implements PrimitiveInterface, StringableInterface
 {
     const PAD_RIGHT = STR_PAD_RIGHT;
@@ -22,6 +25,11 @@ class StringPrimitive implements PrimitiveInterface, StringableInterface
     public function __construct(string $value)
     {
         $this->value = $value;
+
+        @trigger_error(
+            'Use Str class instead',
+            E_USER_DEPRECATED
+        );
     }
 
     /**
