@@ -499,4 +499,13 @@ class StrTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('foo ', (string) $str2);
         $this->assertSame('oo ', (string) $str2->leftTrim('f'));
     }
+
+    public function testContains()
+    {
+        $str = new S('foobar');
+
+        $this->assertTrue($str->contains('foo'));
+        $this->assertTrue($str->contains('bar'));
+        $this->assertFalse($str->contains('baz'));
+    }
 }
