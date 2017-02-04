@@ -4,7 +4,7 @@ declare(strict_types = 1);
 namespace Innmind\Immutable;
 
 /**
- * Collection of elements is a determined order (maybe with duplicates)
+ * Collection of elements in a determined order (maybe with duplicates)
  */
 interface SequenceInterface extends SizeableInterface, PrimitiveInterface, \Countable, \Iterator, \ArrayAccess
 {
