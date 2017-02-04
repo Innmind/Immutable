@@ -256,6 +256,18 @@ class SetTest extends \PHPUnit_Framework_TestCase
         $this->assertSame([1, 4, 9, 16], $s2->toPrimitive());
     }
 
+    /**
+     * @expectedException Innmind\Immutable\Exception\InvalidArgumentException
+     */
+    public function testThrowWhenTryingToModifyValueTypeInMap()
+    {
+        (new Set('int'))
+            ->add(1)
+            ->map(function(int $value) {
+                return (string) $value;
+            });
+    }
+
     public function testPartition()
     {
         $s = (new Set('int'))

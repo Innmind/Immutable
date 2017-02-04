@@ -212,9 +212,14 @@ class Set implements SetInterface
     public function map(callable $function): SetInterface
     {
         $set = clone $this;
-        $set->values = $this->values->map($function);
+        $set->values = new Sequence;
 
-        return $set;
+        return $this->reduce(
+            $set,
+            function(self $carry, $value) use ($function): self {
+                return $carry->add($function($value));
+            }
+        );
     }
 
     /**
