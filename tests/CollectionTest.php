@@ -1,7 +1,7 @@
 <?php
 declare(strict_types = 1);
 
-namespace Innmind\Immutable\Tests;
+namespace Tests\Innmind\Immutable;
 
 use Innmind\Immutable\Collection;
 use Innmind\Immutable\CollectionInterface;

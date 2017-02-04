@@ -442,13 +442,12 @@ class Map implements MapInterface
             );
         }
 
-        $newMap = clone $this;
-
-        $map->foreach(function($key, $value) use (&$newMap) {
-            $newMap = $newMap->put($key, $value);
-        });
-
-        return $newMap;
+        return $map->reduce(
+            clone $this,
+            function(self $carry, $key, $value): self {
+                return $carry->put($key, $value);
+            }
+        );
     }
 
     /**

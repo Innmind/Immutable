@@ -1,7 +1,7 @@
 <?php
 declare(strict_types = 1);
 
-namespace Innmind\Immutable\Tests;
+namespace Tests\Innmind\Immutable;
 
 use Innmind\Immutable\{
     Set,
@@ -254,6 +254,18 @@ class SetTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($s->type(), $s2->type());
         $this->assertSame([1, 2, 3, 4], $s->toPrimitive());
         $this->assertSame([1, 4, 9, 16], $s2->toPrimitive());
+    }
+
+    /**
+     * @expectedException Innmind\Immutable\Exception\InvalidArgumentException
+     */
+    public function testThrowWhenTryingToModifyValueTypeInMap()
+    {
+        (new Set('int'))
+            ->add(1)
+            ->map(function(int $value) {
+                return (string) $value;
+            });
     }
 
     public function testPartition()

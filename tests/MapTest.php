@@ -1,7 +1,7 @@
 <?php
 declare(strict_types = 1);
 
-namespace Innmind\Immutable\Tests;
+namespace Tests\Innmind\Immutable;
 
 use Innmind\Immutable\{
     Map,
@@ -406,6 +406,30 @@ class MapTest extends \PHPUnit_Framework_TestCase
         $this->assertSame([1, 2, 3, 5], $m->values()->toPrimitive());
         $this->assertSame([10, 1, 12, 14], $m2->keys()->toPrimitive());
         $this->assertSame([1, 4, 3, 5], $m2->values()->toPrimitive());
+    }
+
+    /**
+     * @expectedException Innmind\Immutable\Exception\InvalidArgumentException
+     */
+    public function testTrhowWhenTryingToModifyValueTypeInTheMap()
+    {
+        (new Map('int', 'int'))
+            ->put(1, 2)
+            ->map(function(int $key, int $value) {
+                return (string) $value;
+            });
+    }
+
+    /**
+     * @expectedException Innmind\Immutable\Exception\InvalidArgumentException
+     */
+    public function testTrhowWhenTryingToModifyKeyTypeInTheMap()
+    {
+        (new Map('int', 'int'))
+            ->put(1, 2)
+            ->map(function(int $key, int $value) {
+                return new Pair((string) $key, $value);
+            });
     }
 
     public function testTake()

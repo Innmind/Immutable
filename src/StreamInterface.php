@@ -4,10 +4,17 @@ declare(strict_types = 1);
 namespace Innmind\Immutable;
 
 /**
- * Collection of elements is a determined order (maybe with duplicates)
+ * Sequence of elements of the same type
  */
-interface SequenceInterface extends SizeableInterface, PrimitiveInterface, \Countable, \Iterator, \ArrayAccess
+interface StreamInterface extends SizeableInterface, PrimitiveInterface, \Countable, \Iterator, \ArrayAccess
 {
+    /**
+     * Type of the elements
+     *
+     * @return Str
+     */
+    public function type(): Str;
+
     /**
      * Return the element at the given index
      *
@@ -20,18 +27,18 @@ interface SequenceInterface extends SizeableInterface, PrimitiveInterface, \Coun
     public function get(int $index);
 
     /**
-     * Return the diff between this sequence and another
+     * Return the diff between this stream and another
      *
-     * @param self $seq
+     * @param self<T> $stream
      *
-     * @return self
+     * @return self<T>
      */
-    public function diff(self $seq): self;
+    public function diff(self $stream): self;
 
     /**
-     * Remove all duplicates from the sequence
+     * Remove all duplicates from the stream
      *
-     * @return self
+     * @return self<T>
      */
     public function distinct(): self;
 
@@ -40,7 +47,7 @@ interface SequenceInterface extends SizeableInterface, PrimitiveInterface, \Coun
      *
      * @param int $size
      *
-     * @return self
+     * @return self<T>
      */
     public function drop(int $size): self;
 
@@ -49,34 +56,34 @@ interface SequenceInterface extends SizeableInterface, PrimitiveInterface, \Coun
      *
      * @param int $size
      *
-     * @return self
+     * @return self<T>
      */
     public function dropEnd(int $size): self;
 
     /**
-     * Check if the two sequences are equal
+     * Check if the two streams are equal
      *
-     * @param self $seq
+     * @param self<T> $stream
      *
      * @return bool
      */
-    public function equals(self $seq): bool;
+    public function equals(self $stream): bool;
 
     /**
      * Return all elements that satisfy the given predicate
      *
      * @param callable $predicate
      *
-     * @return self
+     * @return self<T>
      */
     public function filter(callable $predicate): self;
 
     /**
-     * Apply the given function to all elements of the sequence
+     * Apply the given function to all elements of the stream
      *
      * @param callable $function
      *
-     * @return self
+     * @return self<T>
      */
     public function foreach(callable $function): self;
 
@@ -86,28 +93,30 @@ interface SequenceInterface extends SizeableInterface, PrimitiveInterface, \Coun
      *
      * @param callable $discriminator
      *
-     * @return MapInterface
+     * @throws GroupEmptySequenceException
+     *
+     * @return MapInterface<mixed, StreamInterface<T>>
      */
     public function groupBy(callable $discriminator): MapInterface;
 
     /**
      * Return the first element
      *
-     * @return mixed
+     * @return T
      */
     public function first();
 
     /**
      * Return the last element
      *
-     * @return mixed
+     * @return T
      */
     public function last();
 
     /**
-     * Check if the sequence contains the given element
+     * Check if the stream contains the given element
      *
-     * @param mixed $element
+     * @param T $element
      *
      * @return bool
      */
@@ -116,7 +125,7 @@ interface SequenceInterface extends SizeableInterface, PrimitiveInterface, \Coun
     /**
      * Return the index for the given element
      *
-     * @param mixed $element
+     * @param T $element
      *
      * @throws ElementNotFoundException
      *
@@ -127,125 +136,125 @@ interface SequenceInterface extends SizeableInterface, PrimitiveInterface, \Coun
     /**
      * Return the list of indices
      *
-     * @return self
+     * @return self<int>
      */
     public function indices(): self;
 
     /**
-     * Return a new sequence by applying the given function to all elements
+     * Return a new stream by applying the given function to all elements
      *
      * @param callable $function
      *
-     * @return self
+     * @return self<T>
      */
     public function map(callable $function): self;
 
     /**
-     * Pad the sequence to a defined size with the given element
+     * Pad the stream to a defined size with the given element
      *
      * @param int $size
-     * @param mixed $element
+     * @param T $element
      *
-     * @return self
+     * @return self<T>
      */
     public function pad(int $size, $element): self;
 
     /**
-     * Return a sequence of 2 sequences partitioned according to the given predicate
+     * Return a stream of 2 streams partitioned according to the given predicate
      *
      * @param callable $predicate
      *
-     * @return self[self]
+     * @return MapInterface<bool, self<T>>
      */
-    public function partition(callable $predicate): self;
+    public function partition(callable $predicate): MapInterface;
 
     /**
-     * Slice the sequence
+     * Slice the stream
      *
      * @param int $from
      * @param int $until
      *
-     * @return self
+     * @return self<T>
      */
     public function slice(int $from, int $until): self;
 
     /**
-     * Split the sequence in a sequence of 2 sequences splitted at the given position
+     * Split the stream in a stream of 2 streams splitted at the given position
      *
      * @param int $position
      *
      * @throws OutOfBoundException
      *
-     * @return self[self]
+     * @return self<self<T>>
      */
     public function splitAt(int $position): self;
 
     /**
-     * Return a sequence with the n first elements
+     * Return a stream with the n first elements
      *
      * @param int $size
      *
-     * @return self
+     * @return self<T>
      */
     public function take(int $size): self;
 
     /**
-     * Return a sequence with the n last elements
+     * Return a stream with the n last elements
      *
      * @param int $size
      *
-     * @return self
+     * @return self<T>
      */
     public function takeEnd(int $size): self;
 
     /**
-     * Append the given sequence to the current one
+     * Append the given stream to the current one
      *
-     * @param self $seq
+     * @param self $stream
      *
-     * @return self
+     * @return self<T>
      */
-    public function append(self $seq): self;
+    public function append(self $stream): self;
 
     /**
-     * Return a sequence with all elements from the current one that exist
+     * Return a stream with all elements from the current one that exist
      * in the given one
      *
-     * @param self $seq
+     * @param self<T> $stream
      *
-     * @return self
+     * @return self<T>
      */
-    public function intersect(self $seq): self;
+    public function intersect(self $stream): self;
 
     /**
      * Concatenate all elements with the given separator
      *
      * @param string $separator
      *
-     * @return StringPrimitive
+     * @return Str
      */
-    public function join(string $separator): StringPrimitive;
+    public function join(string $separator): Str;
 
     /**
-     * Add the given element at the end of the sequence
+     * Add the given element at the end of the stream
      *
-     * @param mixed $element
+     * @param T $element
      *
-     * @return self
+     * @return self<T>
      */
     public function add($element): self;
 
     /**
-     * Sort the sequence in a different order
+     * Sort the stream in a different order
      *
      * @param callable $function
      *
-     * @return self
+     * @return self<T>
      */
     public function sort(callable $function): self;
 
     /**
-     * Reduce the sequence to a single value
+     * Reduce the stream to a single value
      *
      * @param mixed $carry
      * @param callable $reducer

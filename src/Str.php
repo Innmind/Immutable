@@ -6,7 +6,7 @@ namespace Innmind\Immutable;
 use Innmind\Immutable\Exception\RegexException;
 use Innmind\Immutable\Exception\SubstringException;
 
-class StringPrimitive implements PrimitiveInterface, StringableInterface
+class Str implements PrimitiveInterface, StringableInterface
 {
     const PAD_RIGHT = STR_PAD_RIGHT;
     const PAD_LEFT = STR_PAD_LEFT;
@@ -45,22 +45,19 @@ class StringPrimitive implements PrimitiveInterface, StringableInterface
      *
      * @param string $delimiter
      *
-     * @return TypedCollectionInterface
+     * @return StreamInterface<self>
      */
-    public function split(string $delimiter = null): TypedCollectionInterface
+    public function split(string $delimiter = null): StreamInterface
     {
         $parts = empty($delimiter) ?
                 str_split($this->value) : explode($delimiter, $this->value);
-        $strings = [];
+        $stream = new Stream(self::class);
 
         foreach ($parts as $part) {
-            $strings[] = new self($part);
+            $stream = $stream->add(new self($part));
         }
 
-        return new TypedCollection(
-            self::class,
-            $strings
-        );
+        return $stream;
     }
 
     /**
@@ -68,17 +65,18 @@ class StringPrimitive implements PrimitiveInterface, StringableInterface
      *
      * @param int $size
      *
-     * @return TypedCollectionInterface
+     * @return StreamInterface<self>
      */
-    public function chunk(int $size = 1): TypedCollectionInterface
+    public function chunk(int $size = 1): StreamInterface
     {
         $pieces = str_split($this->value, $size);
+        $stream = new Stream(self::class);
 
-        foreach ($pieces as &$piece) {
-            $piece = new self($piece);
+        foreach ($pieces as $piece) {
+            $stream = $stream->add(new self($piece));
         }
 
-        return new TypedCollection(self::class, $pieces);
+        return $stream;
     }
 
     /**
@@ -91,7 +89,7 @@ class StringPrimitive implements PrimitiveInterface, StringableInterface
      *
      * @return int
      */
-    public function pos(string $needle, int $offset = 0): int
+    public function position(string $needle, int $offset = 0): int
     {
         $position = mb_strpos($this->value, $needle, $offset);
 
@@ -183,25 +181,6 @@ class StringPrimitive implements PrimitiveInterface, StringableInterface
     public function reverse(): self
     {
         return new self(strrev($this->value));
-    }
-
-    /**
-     * Pad the string
-     *
-     * @param int $length
-     * @param string $character
-     * @param int $direction
-     *
-     * @return self
-     */
-    public function pad(int $length, string $character = ' ', int $direction = self::PAD_RIGHT): self
-    {
-        return new self(str_pad(
-            $this->value,
-            $length,
-            $character,
-            $direction
-        ));
     }
 
     /**
@@ -331,20 +310,18 @@ class StringPrimitive implements PrimitiveInterface, StringableInterface
      *
      * @param string $charlist
      *
-     * @return TypedCollectionInterface
+     * @return MapInterface<int, self>
      */
-    public function words(string $charlist = ''): TypedCollectionInterface
+    public function words(string $charlist = ''): MapInterface
     {
         $words = str_word_count($this->value, 2, $charlist);
+        $map = new Map('int', self::class);
 
-        foreach ($words as &$word) {
-            $word = new self($word);
+        foreach ($words as $position => $word) {
+            $map = $map->put($position, new self($word));
         }
 
-        return new TypedCollection(
-            self::class,
-            $words
-        );
+        return $map;
     }
 
     /**
@@ -352,22 +329,19 @@ class StringPrimitive implements PrimitiveInterface, StringableInterface
      *
      * @param string $regex
      * @param int $limit
-     * @param int $flags
      *
-     * @return TypedCollectionInterface
+     * @return StreamInterface<self>
      */
-    public function pregSplit(string $regex, int $limit = -1, int $flags = self::PREG_NO_FLAGS): TypedCollectionInterface
+    public function pregSplit(string $regex, int $limit = -1): StreamInterface
     {
-        $strings = preg_split($regex, $this->value, $limit, $flags);
+        $strings = preg_split($regex, $this->value, $limit);
+        $stream = new Stream(self::class);
 
-        foreach ($strings as &$string) {
-            $string = new self($string);
+        foreach ($strings as $string) {
+            $stream = $stream->add(new self($string));
         }
 
-        return new TypedCollection(
-            self::class,
-            $strings
-        );
+        return $stream;
     }
 
     /**
@@ -380,7 +354,7 @@ class StringPrimitive implements PrimitiveInterface, StringableInterface
      *
      * @return bool
      */
-    public function match(string $regex, int $offset = 0): bool
+    public function matches(string $regex, int $offset = 0): bool
     {
         $matches = [];
         $value = preg_match($regex, $this->value, $matches, 0, $offset);
@@ -401,10 +375,13 @@ class StringPrimitive implements PrimitiveInterface, StringableInterface
      *
      * @throws Exception If the regex failed
      *
-     * @return TypedCollectionInterface
+     * @return MapInterface<scalar, self>
      */
-    public function getMatches(string $regex, int $offset = 0, int $flags = self::PREG_NO_FLAGS): TypedCollectionInterface
-    {
+    public function getMatches(
+        string $regex,
+        int $offset = 0,
+        int $flags = self::PREG_NO_FLAGS
+    ): MapInterface {
         $matches = [];
         $value = preg_match(
             $regex,
@@ -413,16 +390,17 @@ class StringPrimitive implements PrimitiveInterface, StringableInterface
             $flags,
             $offset
         );
+        $map = new Map('scalar', self::class);
 
-        foreach ($matches as &$match) {
-            $match = new self($match);
+        foreach ($matches as $key => $match) {
+            $map = $map->put($key, new self($match));
         }
 
         if ($value === false) {
             throw new RegexException('', preg_last_error());
         }
 
-        return new TypedCollection(self::class, $matches);
+        return $map;
     }
 
     /**
@@ -436,8 +414,11 @@ class StringPrimitive implements PrimitiveInterface, StringableInterface
      *
      * @return self
      */
-    public function pregReplace(string $regex, string $replacement, int $limit = -1): self
-    {
+    public function pregReplace(
+        string $regex,
+        string $replacement,
+        int $limit = -1
+    ): self {
         $value = preg_replace(
             $regex,
             $replacement,
@@ -476,11 +457,10 @@ class StringPrimitive implements PrimitiveInterface, StringableInterface
      *
      * @return self
      */
-    public function sprintf(): self
+    public function sprintf(...$values): self
     {
-        $params = func_get_args();
-        array_unshift($params, $this->value);
-        $formatted = call_user_func_array('sprintf', $params);
+        array_unshift($values, $this->value);
+        $formatted = call_user_func_array('sprintf', $values);
 
         return new self($formatted);
     }
@@ -513,7 +493,7 @@ class StringPrimitive implements PrimitiveInterface, StringableInterface
     public function camelize(): self
     {
         return new self(
-            $this
+            (string) $this
                 ->pregSplit('/_| /')
                 ->map(function(self $part) {
                     return $part->ucfirst();
@@ -567,7 +547,9 @@ class StringPrimitive implements PrimitiveInterface, StringableInterface
      */
     public function trim(string $mask = null): self
     {
-        return new self($mask === null ? trim((string) $this) : trim((string) $this, $mask));
+        return new self(
+            $mask === null ? trim((string) $this) : trim((string) $this, $mask)
+        );
     }
 
     /**
@@ -579,7 +561,9 @@ class StringPrimitive implements PrimitiveInterface, StringableInterface
      */
     public function rightTrim(string $mask = null): self
     {
-        return new self($mask === null ? rtrim((string) $this) : rtrim((string) $this, $mask));
+        return new self(
+            $mask === null ? rtrim((string) $this) : rtrim((string) $this, $mask)
+        );
     }
 
     /**
@@ -591,6 +575,30 @@ class StringPrimitive implements PrimitiveInterface, StringableInterface
      */
     public function leftTrim(string $mask = null): self
     {
-        return new self($mask === null ? ltrim((string) $this) : ltrim((string) $this, $mask));
+        return new self(
+            $mask === null ? ltrim((string) $this) : ltrim((string) $this, $mask)
+        );
+    }
+
+    /**
+     * Pad the string
+     *
+     * @param int $length
+     * @param string $character
+     * @param int $direction
+     *
+     * @return self
+     */
+    private function pad(
+        int $length,
+        string $character = ' ',
+        int $direction = self::PAD_RIGHT
+    ): self {
+        return new self(str_pad(
+            $this->value,
+            $length,
+            $character,
+            $direction
+        ));
     }
 }

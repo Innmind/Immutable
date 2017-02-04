@@ -19,6 +19,11 @@ class Collection implements CollectionInterface
     public function __construct(array $values)
     {
         $this->values = $values;
+
+        @trigger_error(
+            'Uset Set, Map or Stream instead',
+            E_USER_DEPRECATED
+        );
     }
 
     /**
