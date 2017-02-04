@@ -16,6 +16,11 @@ class ObjectStorage implements PrimitiveInterface, \Countable, \Iterator, \Array
     {
         $this->objects = $objects ? clone $objects : new \SplObjectStorage;
         $this->objects->rewind();
+
+        @trigger_error(
+            'Uset Set, Map or Stream instead',
+            E_USER_DEPRECATED
+        );
     }
 
     /**
