@@ -581,6 +581,24 @@ class Str implements PrimitiveInterface, StringableInterface
     }
 
     /**
+     * Check if the given string is present in the current one
+     *
+     * @param string $value
+     *
+     * @return bool
+     */
+    public function contains(string $value): bool
+    {
+        try {
+            $this->position($value);
+
+            return true;
+        } catch (SubstringException $e) {
+            return false;
+        }
+    }
+
+    /**
      * Pad the string
      *
      * @param int $length
