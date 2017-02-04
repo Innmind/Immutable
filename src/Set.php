@@ -260,13 +260,13 @@ class Set implements SetInterface
     public function merge(SetInterface $set): SetInterface
     {
         $this->validate($set);
-        $newSet = clone $this;
 
-        $set->foreach(function($value) use (&$newSet) {
-            $newSet = $newSet->add($value);
-        });
-
-        return $newSet;
+        return $set->reduce(
+            clone $this,
+            function(self $carry, $value): self {
+                return $carry->add($value);
+            }
+        );
     }
 
     /**
