@@ -18,9 +18,13 @@
         "php": "~7.0"
     },
     "autoload": {
-        "psr-0": {
-            "Innmind\\Immutable": ""
+        "psr-4": {
+            "Innmind\\Immutable\\": "src/"
         }
     },
-    "target-dir": "Innmind/Immutable"
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\Innmind\\Immutable\\": "tests/"
+        }
+    }
 }

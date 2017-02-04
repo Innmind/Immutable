@@ -1,7 +1,7 @@
 <?php
 declare(strict_types = 1);
 
-namespace Innmind\Immutable\Tests\Specification;
+namespace Tests\Innmind\Immutable\Specification;
 
 use Innmind\Immutable\{
     Specification\PrimitiveType,
