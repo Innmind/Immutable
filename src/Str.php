@@ -329,7 +329,6 @@ class Str implements PrimitiveInterface, StringableInterface
      *
      * @param string $regex
      * @param int $limit
-     * @param int $flags
      *
      * @return StreamInterface<self>
      */
