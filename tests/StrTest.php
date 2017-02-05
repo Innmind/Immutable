@@ -508,4 +508,17 @@ class StrTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($str->contains('bar'));
         $this->assertFalse($str->contains('baz'));
     }
+
+    public function testPregQuote()
+    {
+        $a = new S('foo#bar.*');
+        $b = $a->pregQuote();
+        $c = $a->pregQuote('#');
+
+        $this->assertInstanceOf(S::class, $b);
+        $this->assertInstanceOf(S::class, $c);
+        $this->assertSame('foo#bar.*', (string) $a);
+        $this->assertSame('foo#bar\.\*', (string) $b);
+        $this->assertSame('foo\#bar\.\*', (string) $c);
+    }
 }
