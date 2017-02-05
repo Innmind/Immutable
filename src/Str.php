@@ -601,7 +601,7 @@ class Str implements PrimitiveInterface, StringableInterface
     /**
      * Quote regular expression characters
      *
-     * @param string $delimitier
+     * @param string $delimiter
      *
      * @return self
      */
