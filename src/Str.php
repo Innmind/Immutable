@@ -599,6 +599,18 @@ class Str implements PrimitiveInterface, StringableInterface
     }
 
     /**
+     * Quote regular expression characters
+     *
+     * @param string $delimiter
+     *
+     * @return self
+     */
+    public function pregQuote(string $delimiter = ''): self
+    {
+        return new self(preg_quote((string) $this, $delimiter));
+    }
+
+    /**
      * Pad the string
      *
      * @param int $length
