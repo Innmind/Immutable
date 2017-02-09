@@ -167,46 +167,6 @@ class MapTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($m->contains(23));
     }
 
-    public function testDrop()
-    {
-        $m = new Map('int', 'int');
-        $m = $m
-            ->put(23, 24)
-            ->put(41, 42)
-            ->put(65, 66);
-
-        $m2 = $m->drop(2);
-        $this->assertNotSame($m, $m2);
-        $this->assertInstanceOf(Map::class, $m2);
-        $this->assertSame($m->keyType(), $m2->keyType());
-        $this->assertSame($m->valueType(), $m2->valueType());
-        $this->assertSame(3, $m->size());
-        $this->assertSame(1, $m2->size());
-        $this->assertFalse($m2->contains(23));
-        $this->assertFalse($m2->contains(41));
-        $this->assertTrue($m2->contains(65));
-    }
-
-    public function testDropEnd()
-    {
-        $m = new Map('int', 'int');
-        $m = $m
-            ->put(23, 24)
-            ->put(41, 42)
-            ->put(65, 66);
-
-        $m2 = $m->dropEnd(2);
-        $this->assertNotSame($m, $m2);
-        $this->assertInstanceOf(Map::class, $m2);
-        $this->assertSame($m->keyType(), $m2->keyType());
-        $this->assertSame($m->valueType(), $m2->valueType());
-        $this->assertSame(3, $m->size());
-        $this->assertSame(1, $m2->size());
-        $this->assertTrue($m2->contains(23));
-        $this->assertFalse($m2->contains(41));
-        $this->assertFalse($m2->contains(65));
-    }
-
     public function testClear()
     {
         $m = new Map('int', 'float');
@@ -324,37 +284,6 @@ class MapTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(4, $m2->get(0)->get(1)->key());
         $this->assertSame(5, $m2->get(0)->get(1)->value());
     }
-
-    public function testFirst()
-    {
-        $m = (new Map('int', 'int'))
-            ->put(0, 1)
-            ->put(1, 2)
-            ->put(2, 3)
-            ->put(4, 5);
-
-        $p = $m->first();
-        $this->assertInstanceOf(Pair::class, $p);
-        $this->assertSame(0, $p->key());
-        $this->assertSame(1, $p->value());
-        $this->assertSame($p, $m->first());
-    }
-
-    public function testLast()
-    {
-        $m = (new Map('int', 'int'))
-            ->put(0, 1)
-            ->put(1, 2)
-            ->put(2, 3)
-            ->put(4, 5);
-
-        $p = $m->last();
-        $this->assertInstanceOf(Pair::class, $p);
-        $this->assertSame(4, $p->key());
-        $this->assertSame(5, $p->value());
-        $this->assertSame($p, $m->last());
-    }
-
     public function testKeys()
     {
         $m = (new Map('int', 'int'))
@@ -430,52 +359,6 @@ class MapTest extends \PHPUnit_Framework_TestCase
             ->map(function(int $key, int $value) {
                 return new Pair((string) $key, $value);
             });
-    }
-
-    public function testTake()
-    {
-        $m = (new Map('int', 'int'))
-            ->put(0, 1)
-            ->put(1, 2)
-            ->put(2, 3)
-            ->put(4, 5);
-
-        $m2 = $m->take(2);
-        $this->assertNotSame($m, $m2);
-        $this->assertInstanceOf(Map::class, $m2);
-        $this->assertSame($m->keyType(), $m2->keyType());
-        $this->assertSame($m->valueType(), $m2->valueType());
-        $this->assertSame(4, $m->size());
-        $this->assertSame(2, $m2->size());
-        $this->assertTrue($m2->contains(0));
-        $this->assertTrue($m2->contains(1));
-        $this->assertFalse($m2->contains(2));
-        $this->assertFalse($m2->contains(4));
-        $this->assertSame(1, $m2->get(0));
-        $this->assertSame(2, $m2->get(1));
-    }
-
-    public function testTakeEnd()
-    {
-        $m = (new Map('int', 'int'))
-            ->put(0, 1)
-            ->put(1, 2)
-            ->put(2, 3)
-            ->put(4, 5);
-
-        $m2 = $m->takeEnd(2);
-        $this->assertNotSame($m, $m2);
-        $this->assertInstanceOf(Map::class, $m2);
-        $this->assertSame($m->keyType(), $m2->keyType());
-        $this->assertSame($m->valueType(), $m2->valueType());
-        $this->assertSame(4, $m->size());
-        $this->assertSame(2, $m2->size());
-        $this->assertFalse($m2->contains(0));
-        $this->assertFalse($m2->contains(1));
-        $this->assertTrue($m2->contains(2));
-        $this->assertTrue($m2->contains(4));
-        $this->assertSame(3, $m2->get(2));
-        $this->assertSame(5, $m2->get(4));
     }
 
     public function testJoin()

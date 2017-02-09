@@ -195,32 +195,6 @@ class Map implements MapInterface
     /**
      * {@inheritdoc}
      */
-    public function drop(int $size): MapInterface
-    {
-        $map = clone $this;
-        $map->keys = $this->keys->drop($size);
-        $map->values = $this->values->drop($size);
-        $map->pairs = $this->pairs->drop($size);
-
-        return $map;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function dropEnd(int $size): MapInterface
-    {
-        $map = clone $this;
-        $map->keys = $this->keys->dropEnd($size);
-        $map->values = $this->values->dropEnd($size);
-        $map->pairs = $this->pairs->dropEnd($size);
-
-        return $map;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function clear(): MapInterface
     {
         $map = clone $this;
@@ -311,22 +285,6 @@ class Map implements MapInterface
     /**
      * {@inheritdoc}
      */
-    public function first(): Pair
-    {
-        return $this->pairs->first();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function last(): Pair
-    {
-        return $this->pairs->last();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function keys(): SequenceInterface
     {
         return $this->keys;
@@ -363,32 +321,6 @@ class Map implements MapInterface
 
             $map = $map->put($key, $value);
         }
-
-        return $map;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function take(int $size): MapInterface
-    {
-        $map = clone $this;
-        $map->keys = $this->keys->take($size);
-        $map->values = $this->values->take($size);
-        $map->pairs = $this->pairs->take($size);
-
-        return $map;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function takeEnd(int $size): MapInterface
-    {
-        $map = clone $this;
-        $map->keys = $this->keys->takeEnd($size);
-        $map->values = $this->values->takeEnd($size);
-        $map->pairs = $this->pairs->takeEnd($size);
 
         return $map;
     }

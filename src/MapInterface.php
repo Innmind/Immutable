@@ -52,24 +52,6 @@ interface MapInterface extends SizeableInterface, \Countable, \Iterator, \ArrayA
     public function contains($key): bool;
 
     /**
-     * Remove the n first elements
-     *
-     * @param int $size
-     *
-     * @return self
-     */
-    public function drop(int $size): self;
-
-    /**
-     * Remove the n last elements
-     *
-     * @param int $size
-     *
-     * @return self
-     */
-    public function dropEnd(int $size): self;
-
-    /**
      * Return an empty map given the same given type
      *
      * @return self
@@ -114,20 +96,6 @@ interface MapInterface extends SizeableInterface, \Countable, \Iterator, \ArrayA
     public function groupBy(callable $discriminator): self;
 
     /**
-     * Return the first element
-     *
-     * @return Pair
-     */
-    public function first(): Pair;
-
-    /**
-     * Return the last element
-     *
-     * @return Pair
-     */
-    public function last(): Pair;
-
-    /**
      * Return all keys
      *
      * @return SequenceInterface
@@ -151,24 +119,6 @@ interface MapInterface extends SizeableInterface, \Countable, \Iterator, \ArrayA
      * @return self
      */
     public function map(callable $function): self;
-
-    /**
-     * Return a sequence with the n first elements
-     *
-     * @param int $size
-     *
-     * @return self
-     */
-    public function take(int $size): self;
-
-    /**
-     * Return a sequence with the n last elements
-     *
-     * @param int $size
-     *
-     * @return self
-     */
-    public function takeEnd(int $size): self;
 
     /**
      * Concatenate all elements with the given separator
