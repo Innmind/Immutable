@@ -320,7 +320,7 @@ final class Map implements MapInterface
                 function(Stream $carry, $value): Stream {
                     return $carry->add($value);
                 }
-            );;
+            );
     }
 
     /**
