@@ -35,17 +35,17 @@ class NumericRange implements PrimitiveInterface, \Iterator
         return $this->step;
     }
 
-    public function toPrimitive()
+    public function toPrimitive(): array
     {
         return range($this->start, $this->end, $this->step);
     }
 
-    public function current()
+    public function current(): float
     {
         return $this->current;
     }
 
-    public function key()
+    public function key(): int
     {
         return $this->key;
     }
@@ -62,7 +62,7 @@ class NumericRange implements PrimitiveInterface, \Iterator
         $this->current = $this->start;
     }
 
-    public function valid()
+    public function valid(): bool
     {
         return $this->current < $this->end;
     }
