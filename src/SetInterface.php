@@ -8,39 +8,42 @@ namespace Innmind\Immutable;
  */
 interface SetInterface extends SizeableInterface, PrimitiveInterface, \Countable, \Iterator
 {
+    /**
+     * @param string $type Type T
+     */
     public function __construct(string $type);
 
     /**
      * Return the type of this set
      *
-     * @return StringPrimitive
+     * @return Str
      */
-    public function type(): StringPrimitive;
+    public function type(): Str;
 
     /**
      * Intersect this set with the given one
      *
-     * @param self $set
+     * @param self<T> $set
      *
      * @throws InvalidArgumentException If the sets are not of the same type
      *
-     * @return self
+     * @return self<T>
      */
     public function intersect(self $set): self;
 
     /**
      * Add a element to the set
      *
-     * @param mixed $element
+     * @param T $element
      *
-     * @return self
+     * @return self<T>
      */
     public function add($element): self;
 
     /**
      * Check if the set contains the given element
      *
-     * @param mixed $element
+     * @param T $element
      *
      * @return bool
      */
@@ -49,25 +52,25 @@ interface SetInterface extends SizeableInterface, PrimitiveInterface, \Countable
     /**
      * Remove the element from the set
      *
-     * @param mixed $element
+     * @param T $element
      *
-     * @return self
+     * @return self<T>
      */
     public function remove($element): self;
 
     /**
      * Return the diff between this set and the given one
      *
-     * @param self $set
+     * @param self<T> $set
      *
-     * @return self
+     * @return self<T>
      */
     public function diff(self $set): self;
 
     /**
      * Check if the given set is identical to this one
      *
-     * @param self $set
+     * @param self<T> $set
      *
      * @return bool
      */
@@ -78,7 +81,7 @@ interface SetInterface extends SizeableInterface, PrimitiveInterface, \Countable
      *
      * @param callable $predicate
      *
-     * @return self
+     * @return self<T>
      */
     public function filter(callable $predicate): self;
 
@@ -87,7 +90,7 @@ interface SetInterface extends SizeableInterface, PrimitiveInterface, \Countable
      *
      * @param callable $function
      *
-     * @return self
+     * @return self<T>
      */
     public function foreach(callable $function): self;
 
@@ -97,7 +100,7 @@ interface SetInterface extends SizeableInterface, PrimitiveInterface, \Countable
      *
      * @param callable $discriminator
      *
-     * @return MapInterface
+     * @return MapInterface<mixed, self<T>>
      */
     public function groupBy(callable $discriminator): MapInterface;
 
@@ -106,7 +109,7 @@ interface SetInterface extends SizeableInterface, PrimitiveInterface, \Countable
      *
      * @param callable $function
      *
-     * @return self
+     * @return self<T>
      */
     public function map(callable $function): self;
 
@@ -115,7 +118,7 @@ interface SetInterface extends SizeableInterface, PrimitiveInterface, \Countable
      *
      * @param callable $predicate
      *
-     * @return MapInterface<bool, self>
+     * @return MapInterface<bool, self<T>>
      */
     public function partition(callable $predicate): MapInterface;
 
@@ -124,25 +127,25 @@ interface SetInterface extends SizeableInterface, PrimitiveInterface, \Countable
      *
      * @param string $separator
      *
-     * @return StringPrimitive
+     * @return Str
      */
-    public function join(string $separator): StringPrimitive;
+    public function join(string $separator): Str;
 
     /**
      * Return a sequence sorted with the given function
      *
      * @param callable $function
      *
-     * @return SequenceInterface
+     * @return StreamInterface<T>
      */
-    public function sort(callable $function): SequenceInterface;
+    public function sort(callable $function): StreamInterface;
 
     /**
      * Create a new set with elements of both sets
      *
-     * @param self $set
+     * @param self<T> $set
      *
-     * @return self
+     * @return self<T>
      */
     public function merge(self $set): self;
 
@@ -155,4 +158,11 @@ interface SetInterface extends SizeableInterface, PrimitiveInterface, \Countable
      * @return mixed
      */
     public function reduce($carry, callable $reducer);
+
+    /**
+     * Return a set of the same type but without any value
+     *
+     * @return self<T>
+     */
+    public function clear(): self;
 }

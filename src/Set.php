@@ -13,17 +13,20 @@ class Set implements SetInterface
     private $spec;
     private $values;
 
+    /**
+     * {@inheritdoc}
+     */
     public function __construct(string $type)
     {
-        $this->type = new StringPrimitive($type);
+        $this->type = new Str($type);
         $this->spec = $this->getSpecFor($type);
-        $this->values = new Sequence;
+        $this->values = new Stream($type);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function type(): StringPrimitive
+    public function type(): Str
     {
         return $this->type;
     }
@@ -101,7 +104,12 @@ class Set implements SetInterface
 
         $newSet = clone $this;
         $newSet->values = $this->values->intersect(
-            new Sequence(...$set->toPrimitive())
+            $set->reduce(
+                $this->values->clear(),
+                function(Stream $carry, $value): Stream {
+                    return $carry->add($value);
+                }
+            )
         );
 
         return $newSet;
@@ -143,7 +151,9 @@ class Set implements SetInterface
 
         $index = $this->values->indexOf($element);
         $set = clone $this;
-        $set->values = (new Sequence)
+        $set->values = $this
+            ->values
+            ->clear()
             ->append($this->values->slice(0, $index))
             ->append($this->values->slice($index + 1, $this->size()));
 
@@ -159,7 +169,12 @@ class Set implements SetInterface
 
         $newSet = clone $this;
         $newSet->values = $this->values->diff(
-            new Sequence(...$set->toPrimitive())
+            $set->reduce(
+                $this->values->clear(),
+                function(Stream $carry, $value): Stream {
+                    return $carry->add($value);
+                }
+            )
         );
 
         return $newSet;
@@ -173,7 +188,12 @@ class Set implements SetInterface
         $this->validate($set);
 
         return $this->values->equals(
-            new Sequence(...$set->toPrimitive())
+            $set->reduce(
+                $this->values->clear(),
+                function(Stream $carry, $value): Stream {
+                    return $carry->add($value);
+                }
+            )
         );
     }
 
@@ -203,7 +223,22 @@ class Set implements SetInterface
      */
     public function groupBy(callable $discriminator): MapInterface
     {
-        return $this->values->groupBy($discriminator);
+        $map = $this->values->groupBy($discriminator);
+
+        return $map->reduce(
+            new Map((string) $map->keyType(), SetInterface::class),
+            function(Map $carry, $key, StreamInterface $values): Map {
+                return $carry->put(
+                    $key,
+                    $values->reduce(
+                        $this->clear(),
+                        function(Set $carry, $value): Set {
+                            return $carry->add($value);
+                        }
+                    )
+                );
+            }
+        );
     }
 
     /**
@@ -211,11 +246,8 @@ class Set implements SetInterface
      */
     public function map(callable $function): SetInterface
     {
-        $set = clone $this;
-        $set->values = new Sequence;
-
         return $this->reduce(
-            $set,
+            $this->clear(),
             function(self $carry, $value) use ($function): self {
                 return $carry->add($function($value));
             }
@@ -227,11 +259,11 @@ class Set implements SetInterface
      */
     public function partition(callable $predicate): MapInterface
     {
-        $truthy = clone $this;
-        $falsy = clone $this;
+        $truthy = $this->clear();
+        $falsy = $this->clear();
         $partitions = $this->values->partition($predicate);
-        $truthy->values = $partitions->get(0);
-        $falsy->values = $partitions->get(1);
+        $truthy->values = $partitions->get(true);
+        $falsy->values = $partitions->get(false);
 
         return (new Map('bool', SetInterface::class))
             ->put(true, $truthy)
@@ -241,7 +273,7 @@ class Set implements SetInterface
     /**
      * {@inheritdoc}
      */
-    public function join(string $separator): StringPrimitive
+    public function join(string $separator): Str
     {
         return $this->values->join($separator);
     }
@@ -249,7 +281,7 @@ class Set implements SetInterface
     /**
      * {@inheritdoc}
      */
-    public function sort(callable $function): SequenceInterface
+    public function sort(callable $function): StreamInterface
     {
         return $this->values->sort($function);
     }
@@ -262,7 +294,7 @@ class Set implements SetInterface
         $this->validate($set);
 
         return $set->reduce(
-            clone $this,
+            $this,
             function(self $carry, $value): self {
                 return $carry->add($value);
             }
@@ -275,6 +307,17 @@ class Set implements SetInterface
     public function reduce($carry, callable $reducer)
     {
         return $this->values->reduce($carry, $reducer);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function clear(): SetInterface
+    {
+        $self = clone $this;
+        $self->values = $this->values->clear();
+
+        return $self;
     }
 
     /**
