@@ -7,10 +7,11 @@ use Innmind\Immutable\{
     Map,
     MapInterface,
     SizeableInterface,
-    SequenceInterface,
     Pair,
-    StringPrimitive,
-    Symbol
+    Str,
+    Symbol,
+    SetInterface,
+    StreamInterface
 };
 
 class MapTest extends \PHPUnit_Framework_TestCase
@@ -24,6 +25,8 @@ class MapTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf(\Countable::class, $m);
         $this->assertInstanceOf(\Iterator::class, $m);
         $this->assertInstanceOf(\ArrayAccess::class, $m);
+        $this->assertInstanceOf(Str::class, $m->keyType());
+        $this->assertInstanceOf(Str::class, $m->valueType());
         $this->assertSame('int', (string) $m->keyType());
         $this->assertSame('float', (string) $m->valueType());
     }
@@ -264,25 +267,23 @@ class MapTest extends \PHPUnit_Framework_TestCase
         $this->assertNotSame($m, $m2);
         $this->assertInstanceOf(Map::class, $m2);
         $this->assertSame('integer', (string) $m2->keyType());
-        $this->assertSame(SequenceInterface::class, (string) $m2->valueType());
+        $this->assertSame(MapInterface::class, (string) $m2->valueType());
         $this->assertTrue($m2->contains(0));
         $this->assertTrue($m2->contains(1));
         $this->assertTrue($m2->contains(2));
         $this->assertSame(2, $m2->get(0)->size());
         $this->assertSame(1, $m2->get(1)->size());
         $this->assertSame(1, $m2->get(2)->size());
-        $this->assertInstanceOf(Pair::class, $m2->get(0)->get(0));
-        $this->assertInstanceOf(Pair::class, $m2->get(0)->get(1));
-        $this->assertInstanceOf(Pair::class, $m2->get(1)->get(0));
-        $this->assertInstanceOf(Pair::class, $m2->get(2)->get(0));
-        $this->assertSame(0, $m2->get(1)->get(0)->key());
-        $this->assertSame(1, $m2->get(1)->get(0)->value());
-        $this->assertSame(1, $m2->get(0)->get(0)->key());
-        $this->assertSame(2, $m2->get(0)->get(0)->value());
-        $this->assertSame(2, $m2->get(2)->get(0)->key());
-        $this->assertSame(3, $m2->get(2)->get(0)->value());
-        $this->assertSame(4, $m2->get(0)->get(1)->key());
-        $this->assertSame(5, $m2->get(0)->get(1)->value());
+        $this->assertSame('int', (string) $m2->get(0)->keyType());
+        $this->assertSame('int', (string) $m2->get(0)->valueType());
+        $this->assertSame('int', (string) $m2->get(1)->keyType());
+        $this->assertSame('int', (string) $m2->get(1)->valueType());
+        $this->assertSame('int', (string) $m2->get(2)->keyType());
+        $this->assertSame('int', (string) $m2->get(2)->valueType());
+        $this->assertSame(1, $m2->get(1)->get(0));
+        $this->assertSame(2, $m2->get(0)->get(1));
+        $this->assertSame(3, $m2->get(2)->get(2));
+        $this->assertSame(5, $m2->get(0)->get(4));
     }
     public function testKeys()
     {
@@ -293,9 +294,10 @@ class MapTest extends \PHPUnit_Framework_TestCase
             ->put(4, 5);
 
         $k = $m->keys();
-        $this->assertInstanceOf(SequenceInterface::class, $k);
+        $this->assertInstanceOf(SetInterface::class, $k);
+        $this->assertSame('int', (string) $k->type());
         $this->assertSame([0, 1, 2, 4], $k->toPrimitive());
-        $this->assertSame($k, $m->keys());
+        $this->assertTrue($k->equals($m->keys()));
     }
 
     public function testValues()
@@ -304,12 +306,14 @@ class MapTest extends \PHPUnit_Framework_TestCase
             ->put(0, 1)
             ->put(1, 2)
             ->put(2, 3)
-            ->put(4, 5);
+            ->put(4, 5)
+            ->put(5, 5);
 
         $v = $m->values();
-        $this->assertInstanceOf(SequenceInterface::class, $v);
-        $this->assertSame([1, 2, 3, 5], $v->toPrimitive());
-        $this->assertSame($v, $m->values());
+        $this->assertInstanceOf(StreamInterface::class, $v);
+        $this->assertSame('int', (string) $v->type());
+        $this->assertSame([1, 2, 3, 5, 5], $v->toPrimitive());
+        $this->assertTrue($v->equals($m->values()));
     }
 
     public function testMap()
@@ -370,7 +374,7 @@ class MapTest extends \PHPUnit_Framework_TestCase
             ->put(4, 5);
 
         $s = $m->join(', ');
-        $this->assertInstanceOf(StringPrimitive::class, $s);
+        $this->assertInstanceOf(Str::class, $s);
         $this->assertSame('1, 2, 3, 5', (string) $s);
     }
 

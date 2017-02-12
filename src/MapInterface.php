@@ -5,47 +5,51 @@ namespace Innmind\Immutable;
 
 interface MapInterface extends SizeableInterface, \Countable, \Iterator, \ArrayAccess
 {
+    /**
+     * @param string $keyType Type T
+     * @param string $valueType Type S
+     */
     public function __construct(string $keyType, string $valueType);
 
     /**
      * Return the key type for this map
      *
-     * @return StringPrimitive
+     * @return Str
      */
-    public function keyType(): StringPrimitive;
+    public function keyType(): Str;
 
     /**
      * Return the value type for this map
      *
-     * @return StringPrimitive
+     * @return Str
      */
-    public function valueType(): StringPrimitive;
+    public function valueType(): Str;
 
     /**
      * Set a new key/value pair
      *
-     * @param mixed $key
-     * @param mixed $value
+     * @param T $key
+     * @param S $value
      *
-     * @return self
+     * @return self<T, S>
      */
     public function put($key, $value): self;
 
     /**
      * Return the element with the given key
      *
-     * @param mixed $key
+     * @param T $key
      *
      * @throws ElementNotFoundException
      *
-     * @return mixed
+     * @return S
      */
     public function get($key);
 
     /**
      * Check if there is an element for the given key
      *
-     * @param mixed $key
+     * @param T $key
      *
      * @return bool
      */
@@ -54,14 +58,14 @@ interface MapInterface extends SizeableInterface, \Countable, \Iterator, \ArrayA
     /**
      * Return an empty map given the same given type
      *
-     * @return self
+     * @return self<T, S>
      */
     public function clear(): self;
 
     /**
      * Check if the two maps are equal
      *
-     * @param self $map
+     * @param self<T, S> $map
      *
      * @return bool
      */
@@ -72,7 +76,7 @@ interface MapInterface extends SizeableInterface, \Countable, \Iterator, \ArrayA
      *
      * @param callable $predicate
      *
-     * @return self
+     * @return self<T, S>
      */
     public function filter(callable $predicate): self;
 
@@ -81,7 +85,7 @@ interface MapInterface extends SizeableInterface, \Countable, \Iterator, \ArrayA
      *
      * @param callable $function
      *
-     * @return self
+     * @return self<T, S>
      */
     public function foreach(callable $function): self;
 
@@ -91,23 +95,23 @@ interface MapInterface extends SizeableInterface, \Countable, \Iterator, \ArrayA
      *
      * @param callable $discriminator
      *
-     * @return self
+     * @return self<mixed, self<T, S>>
      */
     public function groupBy(callable $discriminator): self;
 
     /**
      * Return all keys
      *
-     * @return SequenceInterface
+     * @return SetInterface<T>
      */
-    public function keys(): SequenceInterface;
+    public function keys(): SetInterface;
 
     /**
      * Return all values
      *
-     * @return SequenceInterface
+     * @return StreamInterface<S>
      */
-    public function values(): SequenceInterface;
+    public function values(): StreamInterface;
 
     /**
      * Apply the given function on all elements and return a new map
@@ -116,7 +120,7 @@ interface MapInterface extends SizeableInterface, \Countable, \Iterator, \ArrayA
      *
      * @param callable $function
      *
-     * @return self
+     * @return self<T, S>
      */
     public function map(callable $function): self;
 
@@ -125,25 +129,25 @@ interface MapInterface extends SizeableInterface, \Countable, \Iterator, \ArrayA
      *
      * @param string $separator
      *
-     * @return StringPrimitive
+     * @return Str
      */
-    public function join(string $separator): StringPrimitive;
+    public function join(string $separator): Str;
 
     /**
      * Remove the element with the given key
      *
-     * @param mixed $key
+     * @param T $key
      *
-     * @return self
+     * @return self<T, S>
      */
     public function remove($key): self;
 
     /**
      * Create a new map by combining both maps
      *
-     * @param self $map
+     * @param self<T, S> $map
      *
-     * @return self
+     * @return self<T, S>
      */
     public function merge(self $map): self;
 
@@ -152,7 +156,7 @@ interface MapInterface extends SizeableInterface, \Countable, \Iterator, \ArrayA
      *
      * @param callable $predicate
      *
-     * @return self<bool, self>
+     * @return self<bool, self<T, S>>
      */
     public function partition(callable $predicate): self;
 
