@@ -469,6 +469,17 @@ class Stream implements StreamInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function clear(): StreamInterface
+    {
+        $self = clone $this;
+        $self->values = new Sequence;
+
+        return $self;
+    }
+
+    /**
      * Make sure the stream is compatible with the current one
      *
      * @param StreamInterface $stream

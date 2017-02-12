@@ -262,4 +262,11 @@ interface StreamInterface extends SizeableInterface, PrimitiveInterface, \Counta
      * @return mixed
      */
     public function reduce($carry, callable $reducer);
+
+    /**
+     * Return a set of the same type but without any value
+     *
+     * @return self<T>
+     */
+    public function clear(): self;
 }
