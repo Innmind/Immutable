@@ -266,7 +266,7 @@ class MapTest extends \PHPUnit_Framework_TestCase
         });
         $this->assertNotSame($m, $m2);
         $this->assertInstanceOf(Map::class, $m2);
-        $this->assertSame('integer', (string) $m2->keyType());
+        $this->assertSame('int', (string) $m2->keyType());
         $this->assertSame(MapInterface::class, (string) $m2->valueType());
         $this->assertTrue($m2->contains(0));
         $this->assertTrue($m2->contains(1));

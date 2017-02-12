@@ -15,6 +15,8 @@ use Innmind\Immutable\{
  */
 class Sequence implements SequenceInterface
 {
+    use Type;
+
     private $values;
     private $size;
 
@@ -223,9 +225,8 @@ class Sequence implements SequenceInterface
             $key = $discriminator($value);
 
             if ($map === null) {
-                $type = gettype($key);
                 $map = new Map(
-                    $type === 'object' ? get_class($key) : $type,
+                    $this->determineType($key),
                     SequenceInterface::class
                 );
             }

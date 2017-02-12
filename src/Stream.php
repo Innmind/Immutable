@@ -235,9 +235,8 @@ class Stream implements StreamInterface
             $key = $discriminator($value);
 
             if ($map === null) {
-                $type = gettype($key);
                 $map = new Map(
-                    $type === 'object' ? get_class($key) : $type,
+                    $this->determineType($key),
                     StreamInterface::class
                 );
             }

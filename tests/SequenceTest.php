@@ -188,7 +188,7 @@ class SequenceTest extends \PHPUnit_Framework_TestCase
             return $v % 2;
         });
         $this->assertInstanceOf(MapInterface::class, $m);
-        $this->assertSame('integer', (string) $m->keyType());
+        $this->assertSame('int', (string) $m->keyType());
         $this->assertSame(SequenceInterface::class, (string) $m->valueType());
         $this->assertSame(2, $m->size());
         $this->assertSame([1, 0], $m->keys()->toPrimitive());

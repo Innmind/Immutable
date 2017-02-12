@@ -265,9 +265,8 @@ final class Map implements MapInterface
             $key = $discriminator($pair->key(), $pair->value());
 
             if ($map === null) {
-                $type = gettype($key);
                 $map = new self(
-                    $type === 'object' ? get_class($key) : $type,
+                    $this->determineType($key),
                     MapInterface::class
                 );
             }

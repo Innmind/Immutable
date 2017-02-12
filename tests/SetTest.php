@@ -233,7 +233,7 @@ class SetTest extends \PHPUnit_Framework_TestCase
             return $v % 2;
         });
         $this->assertInstanceOf(MapInterface::class, $m);
-        $this->assertSame('integer', (string) $m->keyType());
+        $this->assertSame('int', (string) $m->keyType());
         $this->assertSame(SetInterface::class, (string) $m->valueType());
         $this->assertSame('int', (string) $m->get(0)->type());
         $this->assertSame('int', (string) $m->get(1)->type());

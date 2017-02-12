@@ -283,7 +283,7 @@ class StreamTest extends \PHPUnit_Framework_TestCase
         });
 
         $this->assertInstanceOf(MapInterface::class, $map);
-        $this->assertSame('integer', (string) $map->keyType());
+        $this->assertSame('int', (string) $map->keyType());
         $this->assertSame(StreamInterface::class, (string) $map->valueType());
         $this->assertCount(3, $map);
         $this->assertSame('int', (string) $map->get(0)->type());
