@@ -15,6 +15,8 @@ use Innmind\Immutable\{
  */
 class Sequence implements SequenceInterface
 {
+    use Type;
+
     private $values;
     private $size;
 
@@ -85,7 +87,7 @@ class Sequence implements SequenceInterface
      */
     public function offsetExists($offset): bool
     {
-        return array_key_exists($offset, $this->values);
+        return $this->has($offset);
     }
 
     /**
@@ -93,14 +95,7 @@ class Sequence implements SequenceInterface
      */
     public function offsetGet($offset)
     {
-        if (!$this->offsetExists($offset)) {
-            throw new OutOfBoundException(sprintf(
-                'Unknown index %s',
-                $offset
-            ));
-        }
-
-        return $this->values[$offset];
+        return $this->get($offset);
     }
 
     /**
@@ -132,11 +127,19 @@ class Sequence implements SequenceInterface
      */
     public function get(int $index)
     {
-        if ($index >= $this->size()) {
+        if (!$this->has($index)) {
             throw new OutOfBoundException;
         }
 
         return $this->values[$index];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function has(int $index): bool
+    {
+        return array_key_exists($index, $this->values);
     }
 
     /**
@@ -222,9 +225,8 @@ class Sequence implements SequenceInterface
             $key = $discriminator($value);
 
             if ($map === null) {
-                $type = gettype($key);
                 $map = new Map(
-                    $type === 'object' ? get_class($key) : $type,
+                    $this->determineType($key),
                     SequenceInterface::class
                 );
             }
@@ -283,9 +285,15 @@ class Sequence implements SequenceInterface
     /**
      * {@inheritdoc}
      */
-    public function indices(): SequenceInterface
+    public function indices(): StreamInterface
     {
-        return new self(...array_keys($this->values));
+        $indices = new Stream('int');
+
+        foreach ($this->values as $index => $value) {
+            $indices = $indices->add($index);
+        }
+
+        return $indices;
     }
 
     /**
@@ -307,7 +315,7 @@ class Sequence implements SequenceInterface
     /**
      * {@inheritdoc}
      */
-    public function partition(callable $predicate): SequenceInterface
+    public function partition(callable $predicate): MapInterface
     {
         $truthy = [];
         $falsy = [];
@@ -320,10 +328,9 @@ class Sequence implements SequenceInterface
             }
         }
 
-        return new self(
-            new self(...$truthy),
-            new self(...$falsy)
-        );
+        return (new Map('bool', SequenceInterface::class))
+            ->put(true, new self(...$truthy))
+            ->put(false, new self(...$falsy));
     }
 
     /**
@@ -341,12 +348,11 @@ class Sequence implements SequenceInterface
     /**
      * {@inheritdoc}
      */
-    public function splitAt(int $index): SequenceInterface
+    public function splitAt(int $index): StreamInterface
     {
-        return new self(
-            $this->slice(0, $index),
-            $this->slice($index, $this->size())
-        );
+        return (new Stream(SequenceInterface::class))
+            ->add($this->slice(0, $index))
+            ->add($this->slice($index, $this->size()));
     }
 
     /**
@@ -384,9 +390,9 @@ class Sequence implements SequenceInterface
     /**
      * {@inheritdoc}
      */
-    public function join(string $separator): StringPrimitive
+    public function join(string $separator): Str
     {
-        return new StringPrimitive(implode($separator, $this->values));
+        return new Str(implode($separator, $this->values));
     }
 
     /**

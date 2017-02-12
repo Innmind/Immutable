@@ -10,7 +10,8 @@ use Innmind\Immutable\{
     PrimitiveInterface,
     MapInterface,
     SequenceInterface,
-    StringPrimitive
+    Str,
+    StreamInterface
 };
 
 class SetTest extends \PHPUnit_Framework_TestCase
@@ -24,6 +25,7 @@ class SetTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf(PrimitiveInterface::class, $s);
         $this->assertInstanceOf(\Countable::class, $s);
         $this->assertInstanceOf(\Iterator::class, $s);
+        $this->assertInstanceOf(Str::class, $s->type());
         $this->assertSame('int', (string) $s->type());
     }
 
@@ -231,8 +233,10 @@ class SetTest extends \PHPUnit_Framework_TestCase
             return $v % 2;
         });
         $this->assertInstanceOf(MapInterface::class, $m);
-        $this->assertSame('integer', (string) $m->keyType());
-        $this->assertSame(SequenceInterface::class, (string) $m->valueType());
+        $this->assertSame('int', (string) $m->keyType());
+        $this->assertSame(SetInterface::class, (string) $m->valueType());
+        $this->assertSame('int', (string) $m->get(0)->type());
+        $this->assertSame('int', (string) $m->get(1)->type());
         $this->assertSame([1, 0], $m->keys()->toPrimitive());
         $this->assertSame([1, 3], $m->get(1)->toPrimitive());
         $this->assertSame([2, 4], $m->get(0)->toPrimitive());
@@ -301,7 +305,7 @@ class SetTest extends \PHPUnit_Framework_TestCase
             ->add(4);
 
         $s2 = $s->join(', ');
-        $this->assertInstanceOf(StringPrimitive::class, $s2);
+        $this->assertInstanceOf(Str::class, $s2);
         $this->assertSame([1, 2, 3, 4], $s->toPrimitive());
         $this->assertSame('1, 2, 3, 4', (string) $s2);
     }
@@ -317,7 +321,8 @@ class SetTest extends \PHPUnit_Framework_TestCase
         $s2 = $s->sort(function(int $a, int $b) {
             return $a < $b;
         });
-        $this->assertInstanceOf(SequenceInterface::class, $s2);
+        $this->assertInstanceOf(StreamInterface::class, $s2);
+        $this->assertSame('int', (string) $s2->type());
         $this->assertSame([1, 2, 3, 4], $s->toPrimitive());
         $this->assertSame([4, 3, 2, 1], $s2->toPrimitive());
     }

@@ -23,7 +23,7 @@ class Stream implements StreamInterface
     public function __construct(string $type)
     {
         $this->type = new Str($type);
-        $this->spec = $this->getSpecFor($type);
+        $this->spec = $this->getSpecificationFor($type);
         $this->values = new Sequence;
     }
 
@@ -235,9 +235,8 @@ class Stream implements StreamInterface
             $key = $discriminator($value);
 
             if ($map === null) {
-                $type = gettype($key);
                 $map = new Map(
-                    $type === 'object' ? get_class($key) : $type,
+                    $this->determineType($key),
                     StreamInterface::class
                 );
             }
@@ -466,6 +465,17 @@ class Stream implements StreamInterface
     public function reduce($carry, callable $reducer)
     {
         return $this->values->reduce($carry, $reducer);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function clear(): StreamInterface
+    {
+        $self = clone $this;
+        $self->values = new Sequence;
+
+        return $self;
     }
 
     /**

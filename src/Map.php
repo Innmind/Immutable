@@ -10,33 +10,36 @@ use Innmind\Immutable\{
     Exception\GroupEmptyMapException
 };
 
-class Map implements MapInterface
+final class Map implements MapInterface
 {
     use Type;
 
     private $keyType;
     private $valueType;
-    private $keySpec;
-    private $valueSpec;
+    private $keySpecification;
+    private $valueSpecification;
     private $keys;
     private $values;
     private $pairs;
 
+    /**
+     * {@inheritdoc}
+     */
     public function __construct(string $keyType, string $valueType)
     {
-        $this->keySpec = $this->getSpecFor($keyType);
-        $this->valueSpec = $this->getSpecFor($valueType);
-        $this->keyType = new StringPrimitive($keyType);
-        $this->valueType = new StringPrimitive($valueType);
-        $this->keys = new Sequence;
-        $this->values = new Sequence;
-        $this->pairs = new Sequence;
+        $this->keySpecification = $this->getSpecificationFor($keyType);
+        $this->valueSpecification = $this->getSpecificationFor($valueType);
+        $this->keyType = new Str($keyType);
+        $this->valueType = new Str($valueType);
+        $this->keys = new Stream($keyType);
+        $this->values = new Stream($valueType);
+        $this->pairs = new Stream(Pair::class);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function keyType(): StringPrimitive
+    public function keyType(): Str
     {
         return $this->keyType;
     }
@@ -44,7 +47,7 @@ class Map implements MapInterface
     /**
      * {@inheritdoc}
      */
-    public function valueType(): StringPrimitive
+    public function valueType(): Str
     {
         return $this->valueType;
     }
@@ -146,18 +149,18 @@ class Map implements MapInterface
      */
     public function put($key, $value): MapInterface
     {
-        $this->keySpec->validate($key);
-        $this->valueSpec->validate($value);
+        $this->keySpecification->validate($key);
+        $this->valueSpecification->validate($value);
 
         $map = clone $this;
 
         if ($this->keys->contains($key)) {
             $index = $this->keys->indexOf($key);
-            $map->values = (new Sequence)
+            $map->values = (new Stream((string) $this->valueType))
                 ->append($this->values->take($index))
                 ->add($value)
                 ->append($this->values->drop($index + 1));
-            $map->pairs = (new Sequence)
+            $map->pairs = (new Stream(Pair::class))
                 ->append($this->pairs->take($index))
                 ->add(new Pair($key, $value))
                 ->append($this->pairs->drop($index + 1));
@@ -195,38 +198,12 @@ class Map implements MapInterface
     /**
      * {@inheritdoc}
      */
-    public function drop(int $size): MapInterface
-    {
-        $map = clone $this;
-        $map->keys = $this->keys->drop($size);
-        $map->values = $this->values->drop($size);
-        $map->pairs = $this->pairs->drop($size);
-
-        return $map;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function dropEnd(int $size): MapInterface
-    {
-        $map = clone $this;
-        $map->keys = $this->keys->dropEnd($size);
-        $map->values = $this->values->dropEnd($size);
-        $map->pairs = $this->pairs->dropEnd($size);
-
-        return $map;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function clear(): MapInterface
     {
         $map = clone $this;
-        $map->keys = new Sequence;
-        $map->values = new Sequence;
-        $map->pairs = new Sequence;
+        $map->keys = new Stream((string) $this->keyType);
+        $map->values = new Stream((string) $this->valueType);
+        $map->pairs = new Stream(Pair::class);
 
         return $map;
     }
@@ -288,20 +265,28 @@ class Map implements MapInterface
             $key = $discriminator($pair->key(), $pair->value());
 
             if ($map === null) {
-                $type = gettype($key);
                 $map = new self(
-                    $type === 'object' ? get_class($key) : $type,
-                    SequenceInterface::class
+                    $this->determineType($key),
+                    MapInterface::class
                 );
             }
 
             if ($map->contains($key)) {
                 $map = $map->put(
                     $key,
-                    $map->get($key)->add($pair)
+                    $map->get($key)->put(
+                        $pair->key(),
+                        $pair->value()
+                    )
                 );
             } else {
-                $map = $map->put($key, new Sequence($pair));
+                $map = $map->put(
+                    $key,
+                    $this->clear()->put(
+                        $pair->key(),
+                        $pair->value()
+                    )
+                );
             }
         }
 
@@ -311,33 +296,31 @@ class Map implements MapInterface
     /**
      * {@inheritdoc}
      */
-    public function first(): Pair
+    public function keys(): SetInterface
     {
-        return $this->pairs->first();
+        return $this
+            ->keys
+            ->reduce(
+                new Set((string) $this->keyType),
+                function(Set $carry, $key): Set {
+                    return $carry->add($key);
+                }
+            );
     }
 
     /**
      * {@inheritdoc}
      */
-    public function last(): Pair
+    public function values(): StreamInterface
     {
-        return $this->pairs->last();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function keys(): SequenceInterface
-    {
-        return $this->keys;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function values(): SequenceInterface
-    {
-        return $this->values;
+        return $this
+            ->values
+            ->reduce(
+                new Stream((string) $this->valueType),
+                function(Stream $carry, $value): Stream {
+                    return $carry->add($value);
+                }
+            );
     }
 
     /**
@@ -370,33 +353,7 @@ class Map implements MapInterface
     /**
      * {@inheritdoc}
      */
-    public function take(int $size): MapInterface
-    {
-        $map = clone $this;
-        $map->keys = $this->keys->take($size);
-        $map->values = $this->values->take($size);
-        $map->pairs = $this->pairs->take($size);
-
-        return $map;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function takeEnd(int $size): MapInterface
-    {
-        $map = clone $this;
-        $map->keys = $this->keys->takeEnd($size);
-        $map->values = $this->values->takeEnd($size);
-        $map->pairs = $this->pairs->takeEnd($size);
-
-        return $map;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function join(string $separator): StringPrimitive
+    public function join(string $separator): Str
     {
         return $this->values->join($separator);
     }
@@ -443,7 +400,7 @@ class Map implements MapInterface
         }
 
         return $map->reduce(
-            clone $this,
+            $this,
             function(self $carry, $key, $value): self {
                 return $carry->put($key, $value);
             }

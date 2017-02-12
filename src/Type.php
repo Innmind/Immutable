@@ -18,7 +18,7 @@ trait Type
      *
      * @return SpecificationInterface
      */
-    private function getSpecFor(string $type): SpecificationInterface
+    private function getSpecificationFor(string $type): SpecificationInterface
     {
         if (function_exists('is_'.$type)) {
             return new PrimitiveType($type);
@@ -29,5 +29,31 @@ trait Type
         }
 
         return new ClassType($type);
+    }
+
+    /**
+     * Return the type of the given value
+     *
+     * @param mixed $value
+     *
+     * @return string
+     */
+    private function determineType($value): string
+    {
+        $type = gettype($value);
+
+        switch ($type) {
+            case 'object':
+                return get_class($value);
+
+            case 'integer':
+                return 'int';
+
+            case 'boolean':
+                return 'bool';
+
+            default:
+                return $type;
+        }
     }
 }

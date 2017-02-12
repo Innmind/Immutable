@@ -20,6 +20,15 @@ interface SequenceInterface extends SizeableInterface, PrimitiveInterface, \Coun
     public function get(int $index);
 
     /**
+     * Check the index exist
+     *
+     * @param int $index
+     *
+     * @return bool
+     */
+    public function has(int $index): bool;
+
+    /**
      * Return the diff between this sequence and another
      *
      * @param self $seq
@@ -86,7 +95,7 @@ interface SequenceInterface extends SizeableInterface, PrimitiveInterface, \Coun
      *
      * @param callable $discriminator
      *
-     * @return MapInterface
+     * @return MapInterface<mixed, self>
      */
     public function groupBy(callable $discriminator): MapInterface;
 
@@ -127,9 +136,9 @@ interface SequenceInterface extends SizeableInterface, PrimitiveInterface, \Coun
     /**
      * Return the list of indices
      *
-     * @return self
+     * @return SteamInterface<int>
      */
-    public function indices(): self;
+    public function indices(): StreamInterface;
 
     /**
      * Return a new sequence by applying the given function to all elements
@@ -155,9 +164,9 @@ interface SequenceInterface extends SizeableInterface, PrimitiveInterface, \Coun
      *
      * @param callable $predicate
      *
-     * @return self[self]
+     * @return MapInterface<bool, self>
      */
-    public function partition(callable $predicate): self;
+    public function partition(callable $predicate): MapInterface;
 
     /**
      * Slice the sequence
@@ -176,9 +185,9 @@ interface SequenceInterface extends SizeableInterface, PrimitiveInterface, \Coun
      *
      * @throws OutOfBoundException
      *
-     * @return self[self]
+     * @return StreamInterface<self>
      */
-    public function splitAt(int $position): self;
+    public function splitAt(int $position): StreamInterface;
 
     /**
      * Return a sequence with the n first elements
@@ -222,9 +231,9 @@ interface SequenceInterface extends SizeableInterface, PrimitiveInterface, \Coun
      *
      * @param string $separator
      *
-     * @return StringPrimitive
+     * @return Str
      */
-    public function join(string $separator): StringPrimitive;
+    public function join(string $separator): Str;
 
     /**
      * Add the given element at the end of the sequence

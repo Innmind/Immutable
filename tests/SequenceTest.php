@@ -8,8 +8,9 @@ use Innmind\Immutable\{
     SequenceInterface,
     SizeableInterface,
     PrimitiveInterface,
-    StringPrimitive,
-    MapInterface
+    Str,
+    MapInterface,
+    StreamInterface
 };
 
 class SequenceTest extends \PHPUnit_Framework_TestCase
@@ -90,6 +91,12 @@ class SequenceTest extends \PHPUnit_Framework_TestCase
     public function testThrowWhenAccessingUnknownIndex()
     {
         (new Sequence)->get(0);
+    }
+
+    public function testHas()
+    {
+        $this->assertFalse((new Sequence)->has(0));
+        $this->assertTrue((new Sequence(1))->has(0));
     }
 
     public function testDiff()
@@ -181,10 +188,10 @@ class SequenceTest extends \PHPUnit_Framework_TestCase
             return $v % 2;
         });
         $this->assertInstanceOf(MapInterface::class, $m);
+        $this->assertSame('int', (string) $m->keyType());
+        $this->assertSame(SequenceInterface::class, (string) $m->valueType());
         $this->assertSame(2, $m->size());
         $this->assertSame([1, 0], $m->keys()->toPrimitive());
-        $this->assertInstanceOf(SequenceInterface::class, $m->get(1));
-        $this->assertInstanceOf(SequenceInterface::class, $m->get(0));
         $this->assertSame([1, 3], $m->get(1)->toPrimitive());
         $this->assertSame([2, 4], $m->get(0)->toPrimitive());
     }
@@ -247,8 +254,9 @@ class SequenceTest extends \PHPUnit_Framework_TestCase
     {
         $indices = (new Sequence(1, 2, 3))->indices();
 
-        $this->assertInstanceOf(Sequence::class, $indices);
-        $this->assertTrue($indices->equals(new Sequence(0, 1, 2)));
+        $this->assertInstanceOf(StreamInterface::class, $indices);
+        $this->assertSame('int', (string) $indices->type());
+        $this->assertSame([0, 1, 2], $indices->toPrimitive());
     }
 
     public function testMap()
@@ -283,13 +291,13 @@ class SequenceTest extends \PHPUnit_Framework_TestCase
             return $v % 2 === 0;
         });
         $this->assertNotSame($s, $s2);
-        $this->assertInstanceOf(Sequence::class, $s2);
+        $this->assertInstanceOf(MapInterface::class, $s2);
+        $this->assertSame('bool', (string) $s2->keyType());
+        $this->assertSame(SequenceInterface::class, (string) $s2->valueType());
         $this->assertSame([1, 2, 3, 4], $s->toPrimitive());
         $this->assertSame(2, $s2->size());
-        $this->assertInstanceOf(Sequence::class, $s2->get(0));
-        $this->assertInstanceOf(Sequence::class, $s2->get(1));
-        $this->assertSame([2, 4], $s2->get(0)->toPrimitive());
-        $this->assertSame([1, 3], $s2->get(1)->toPrimitive());
+        $this->assertSame([2, 4], $s2->get(true)->toPrimitive());
+        $this->assertSame([1, 3], $s2->get(false)->toPrimitive());
     }
 
     public function testSlice()
@@ -309,11 +317,10 @@ class SequenceTest extends \PHPUnit_Framework_TestCase
 
         $s2 = $s->splitAt(3);
         $this->assertNotSame($s, $s2);
-        $this->assertInstanceOf(Sequence::class, $s2);
+        $this->assertInstanceOf(StreamInterface::class, $s2);
+        $this->assertSame(SequenceInterface::class, (string) $s2->type());
         $this->assertSame([3, 1, 2, 4, 5, 6, 7], $s->toPrimitive());
         $this->assertSame(2, $s2->size());
-        $this->assertInstanceOf(Sequence::class, $s2->get(0));
-        $this->assertInstanceOf(Sequence::class, $s2->get(1));
         $this->assertSame([3, 1, 2], $s2->get(0)->toPrimitive());
         $this->assertSame([4, 5, 6, 7], $s2->get(1)->toPrimitive());
     }
@@ -367,7 +374,7 @@ class SequenceTest extends \PHPUnit_Framework_TestCase
         $s = new Sequence(1, 2, 3);
 
         $s2 = $s->join(', ');
-        $this->assertInstanceOf(StringPrimitive::class, $s2);
+        $this->assertInstanceOf(Str::class, $s2);
         $this->assertSame('1, 2, 3', (string) $s2);
     }
 
