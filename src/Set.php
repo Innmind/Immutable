@@ -19,7 +19,7 @@ class Set implements SetInterface
     public function __construct(string $type)
     {
         $this->type = new Str($type);
-        $this->spec = $this->getSpecFor($type);
+        $this->spec = $this->getSpecificationFor($type);
         $this->values = new Stream($type);
     }
 

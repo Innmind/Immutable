@@ -27,8 +27,8 @@ final class Map implements MapInterface
      */
     public function __construct(string $keyType, string $valueType)
     {
-        $this->keySpecification = $this->getSpecFor($keyType);
-        $this->valueSpecification = $this->getSpecFor($valueType);
+        $this->keySpecification = $this->getSpecificationFor($keyType);
+        $this->valueSpecification = $this->getSpecificationFor($valueType);
         $this->keyType = new Str($keyType);
         $this->valueType = new Str($valueType);
         $this->keys = new Stream($keyType);
