@@ -369,6 +369,8 @@ class Str implements PrimitiveInterface, StringableInterface
     /**
      * Return a collection of the elements matching the regex
      *
+     * @deprecated replaced by self::capture, to be removed in 3.0
+     *
      * @param string $regex
      * @param int $offset
      * @param int $flags
@@ -378,6 +380,25 @@ class Str implements PrimitiveInterface, StringableInterface
      * @return MapInterface<scalar, self>
      */
     public function getMatches(
+        string $regex,
+        int $offset = 0,
+        int $flags = self::PREG_NO_FLAGS
+    ): MapInterface {
+        return $this->capture($regex, $offset, $flags);
+    }
+
+    /**
+     * Return a collection of the elements matching the regex
+     *
+     * @param string $regex
+     * @param int $offset
+     * @param int $flags
+     *
+     * @throws Exception If the regex failed
+     *
+     * @return MapInterface<scalar, self>
+     */
+    public function capture(
         string $regex,
         int $offset = 0,
         int $flags = self::PREG_NO_FLAGS
