@@ -343,11 +343,11 @@ class StrTest extends \PHPUnit_Framework_TestCase
         (new S(''))->matches('/foo/', 4);
     }
 
-    public function testGetMatches()
+    public function testCapture()
     {
         $str = new S('http://www.php.net/index.html');
 
-        $map = $str->getMatches('@^(?:http://)?(?P<host>[^/]+)@i');
+        $map = $str->capture('@^(?:http://)?(?P<host>[^/]+)@i');
         $this->assertInstanceOf(MapInterface::class, $map);
         $this->assertSame('scalar', (string) $map->keyType());
         $this->assertSame(S::class, (string) $map->valueType());
@@ -357,11 +357,11 @@ class StrTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('www.php.net', (string) $map['host']);
     }
 
-    public function testCastNullValuesWhenGettingMatches()
+    public function testCastNullValuesWhenCapturing()
     {
         $str = new S('en;q=0.7');
 
-        $matches = $str->getMatches('~(?<lang>([a-zA-Z0-9]+(-[a-zA-Z0-9]+)*|\*))(; ?q=(?<quality>\d+(\.\d+)?))?~');
+        $matches = $str->capture('~(?<lang>([a-zA-Z0-9]+(-[a-zA-Z0-9]+)*|\*))(; ?q=(?<quality>\d+(\.\d+)?))?~');
         $this->assertInstanceOf(MapInterface::class, $matches);
         $this->assertSame('scalar', (string) $matches->keyType());
         $this->assertSame(S::class, (string) $matches->valueType());
