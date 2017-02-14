@@ -357,6 +357,26 @@ class StrTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('www.php.net', (string) $map['host']);
     }
 
+    public function testCastNullValuesWhenGettingMatches()
+    {
+        $str = new S('en;q=0.7');
+
+        $matches = $str->getMatches('~(?<lang>([a-zA-Z0-9]+(-[a-zA-Z0-9]+)*|\*))(; ?q=(?<quality>\d+(\.\d+)?))?~');
+        $this->assertInstanceOf(MapInterface::class, $matches);
+        $this->assertSame('scalar', (string) $matches->keyType());
+        $this->assertSame(S::class, (string) $matches->valueType());
+        $this->assertCount(9, $matches);
+        $this->assertSame('en;q=0.7', (string) $matches->get(0));
+        $this->assertSame('en', (string) $matches->get(1));
+        $this->assertSame('en', (string) $matches->get(2));
+        $this->assertSame('', (string) $matches->get(3));
+        $this->assertSame('en', (string) $matches->get('lang'));
+        $this->assertSame(';q=0.7', (string) $matches->get(4));
+        $this->assertSame('0.7', (string) $matches->get(5));
+        $this->assertSame('0.7', (string) $matches->get('quality'));
+        $this->assertSame('.7', (string) $matches->get(6));
+    }
+
     /**
      * @expectedException Innmind\Immutable\Exception\RegexException
      * @expectedExceptionMessage Internal error

@@ -393,7 +393,7 @@ class Str implements PrimitiveInterface, StringableInterface
         $map = new Map('scalar', self::class);
 
         foreach ($matches as $key => $match) {
-            $map = $map->put($key, new self($match));
+            $map = $map->put($key, new self((string) $match));
         }
 
         if ($value === false) {
