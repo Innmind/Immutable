@@ -6,7 +6,8 @@ namespace Innmind\Immutable;
 use Innmind\Immutable\{
     Specification\PrimitiveType,
     Specification\ClassType,
-    Specification\VariableType
+    Specification\VariableType,
+    Specification\MixedType
 };
 
 trait Type
@@ -26,6 +27,10 @@ trait Type
 
         if ($type === 'variable') {
             return new VariableType;
+        }
+
+        if ($type === 'mixed') {
+            return new MixedType;
         }
 
         return new ClassType($type);
@@ -51,6 +56,12 @@ trait Type
 
             case 'boolean':
                 return 'bool';
+
+            case 'NULL':
+                return 'null';
+
+            case 'double':
+                return 'float';
 
             default:
                 return $type;
