@@ -214,6 +214,14 @@ class SequenceTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(1, $s->key());
     }
 
+    /**
+     * @expectedException Innmind\Immutable\Exception\OutOfBoundException
+     */
+    public function testThrowWhenAccessingFirstValueOnEmptySequence()
+    {
+        (new Sequence)->first();
+    }
+
     public function testLast()
     {
         $s = new Sequence(1, 2, 3);
@@ -222,6 +230,14 @@ class SequenceTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(1, $s->key());
         $this->assertSame(3, $s->last());
         $this->assertSame(1, $s->key());
+    }
+
+    /**
+     * @expectedException Innmind\Immutable\Exception\OutOfBoundException
+     */
+    public function testThrowWhenAccessingLastValueOnEmptySequence()
+    {
+        (new Sequence)->last();
     }
 
     public function testContains()

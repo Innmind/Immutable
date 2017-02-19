@@ -249,6 +249,10 @@ class Sequence implements SequenceInterface
      */
     public function first()
     {
+        if ($this->size() === 0) {
+            throw new OutOfBoundException;
+        }
+
         return $this->values[0];
     }
 
@@ -257,6 +261,10 @@ class Sequence implements SequenceInterface
      */
     public function last()
     {
+        if ($this->size() === 0) {
+            throw new OutOfBoundException;
+        }
+
         return $this->values[$this->size() - 1];
     }
 
