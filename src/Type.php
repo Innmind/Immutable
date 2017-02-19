@@ -57,6 +57,12 @@ trait Type
             case 'boolean':
                 return 'bool';
 
+            case 'NULL':
+                return 'null';
+
+            case 'double':
+                return 'float';
+
             default:
                 return $type;
         }
