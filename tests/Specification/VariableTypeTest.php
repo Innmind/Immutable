@@ -4,8 +4,9 @@ declare(strict_types = 1);
 namespace Tests\Innmind\Immutable\Specification;
 
 use Innmind\Immutable\Specification\VariableType;
+use PHPUnit\Framework\TestCase;
 
-class VariableTypeTest extends \PHPUnit_Framework_TestCase
+class VariableTypeTest extends TestCase
 {
     public function testValidate()
     {

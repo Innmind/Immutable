@@ -12,8 +12,9 @@ use Innmind\Immutable\{
     MapInterface,
     StreamInterface
 };
+use PHPUnit\Framework\TestCase;
 
-class SequenceTest extends \PHPUnit_Framework_TestCase
+class SequenceTest extends TestCase
 {
     public function testInterface()
     {
@@ -431,5 +432,16 @@ class SequenceTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame(1.75, $v);
         $this->assertSame([4, 3, 2, 1], $s->toPrimitive());
+    }
+
+    public function testReverse()
+    {
+        $sequence = new Sequence(1, 3, 4, 2);
+        $reverse = $sequence->reverse();
+
+        $this->assertInstanceOf(SequenceInterface::class, $reverse);
+        $this->assertNotSame($sequence, $reverse);
+        $this->assertSame([1, 3, 4, 2], $sequence->toPrimitive());
+        $this->assertSame([2, 4, 3, 1], $reverse->toPrimitive());
     }
 }

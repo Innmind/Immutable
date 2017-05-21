@@ -7,8 +7,9 @@ use Innmind\Immutable\{
     Pair,
     Symbol
 };
+use PHPUnit\Framework\TestCase;
 
-class PairTest extends \PHPUnit_Framework_TestCase
+class PairTest extends TestCase
 {
     public function testInterface()
     {

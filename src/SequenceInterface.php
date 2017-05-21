@@ -262,4 +262,11 @@ interface SequenceInterface extends SizeableInterface, PrimitiveInterface, \Coun
      * @return mixed
      */
     public function reduce($carry, callable $reducer);
+
+    /**
+     * Return the same sequence but in reverse order
+     *
+     * @return self<T>
+     */
+    public function reverse(): self;
 }

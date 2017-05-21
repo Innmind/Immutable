@@ -269,4 +269,11 @@ interface StreamInterface extends SizeableInterface, PrimitiveInterface, \Counta
      * @return self<T>
      */
     public function clear(): self;
+
+    /**
+     * Return the same stream but in reverse order
+     *
+     * @return self<T>
+     */
+    public function reverse(): self;
 }

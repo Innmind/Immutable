@@ -7,12 +7,15 @@ use Innmind\Immutable\{
     Specification\PrimitiveType,
     SpecificationInterface
 };
+use PHPUnit\Framework\TestCase;
 
-class PrimitiveTypeTest extends \PHPUnit_Framework_TestCase
+class PrimitiveTypeTest extends TestCase
 {
     public function testValidate()
     {
-        (new PrimitiveType('int'))->validate(42);
+        $this->assertNull(
+            (new PrimitiveType('int'))->validate(42)
+        );
     }
 
     /**

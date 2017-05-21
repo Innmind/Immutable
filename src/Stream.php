@@ -479,6 +479,17 @@ class Stream implements StreamInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function reverse(): StreamInterface
+    {
+        $self = clone $this;
+        $self->values = $this->values->reverse();
+
+        return $self;
+    }
+
+    /**
      * Make sure the stream is compatible with the current one
      *
      * @param StreamInterface $stream

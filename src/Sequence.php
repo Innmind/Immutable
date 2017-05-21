@@ -432,4 +432,12 @@ class Sequence implements SequenceInterface
     {
         return array_reduce($this->values, $reducer, $carry);
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function reverse(): SequenceInterface
+    {
+        return new self(...array_reverse($this->values));
+    }
 }
