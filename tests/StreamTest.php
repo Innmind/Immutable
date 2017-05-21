@@ -652,4 +652,19 @@ class StreamTest extends \PHPUnit_Framework_TestCase
         $this->assertSame([1, 2, 3], $stream->toPrimitive());
         $this->assertSame([], $stream2->toPrimitive());
     }
+
+    public function testReverse()
+    {
+        $stream = (new Stream('int'))
+            ->add(1)
+            ->add(3)
+            ->add(4)
+            ->add(2);
+        $reverse = $stream->reverse();
+
+        $this->assertInstanceOf(StreamInterface::class, $reverse);
+        $this->assertNotSame($stream, $reverse);
+        $this->assertSame([1, 3, 4, 2], $stream->toPrimitive());
+        $this->assertSame([2, 4, 3, 1], $reverse->toPrimitive());
+    }
 }
