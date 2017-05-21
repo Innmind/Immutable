@@ -11,8 +11,9 @@ use Innmind\Immutable\{
     Str,
     MapInterface
 };
+use PHPUnit\Framework\TestCase;
 
-class StreamTest extends \PHPUnit_Framework_TestCase
+class StreamTest extends TestCase
 {
     public function testInterface()
     {

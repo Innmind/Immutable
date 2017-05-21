@@ -12,8 +12,9 @@ use Innmind\Immutable\{
     MapInterface,
     StreamInterface
 };
+use PHPUnit\Framework\TestCase;
 
-class SequenceTest extends \PHPUnit_Framework_TestCase
+class SequenceTest extends TestCase
 {
     public function testInterface()
     {

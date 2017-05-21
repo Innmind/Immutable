@@ -13,8 +13,9 @@ use Innmind\Immutable\{
     Str,
     StreamInterface
 };
+use PHPUnit\Framework\TestCase;
 
-class SetTest extends \PHPUnit_Framework_TestCase
+class SetTest extends TestCase
 {
     public function testInterface()
     {

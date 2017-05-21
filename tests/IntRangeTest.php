@@ -7,8 +7,9 @@ use Innmind\Immutable\{
     IntRange,
     PrimitiveInterface
 };
+use PHPUnit\Framework\TestCase;
 
-class IntRangeTest extends \PHPUnit_Framework_TestCase
+class IntRangeTest extends TestCase
 {
     public function testInterface()
     {

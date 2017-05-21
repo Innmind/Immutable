@@ -7,12 +7,15 @@ use Innmind\Immutable\{
     Specification\ClassType,
     SpecificationInterface
 };
+use PHPUnit\Framework\TestCase;
 
-class ClassTypeTest extends \PHPUnit_Framework_TestCase
+class ClassTypeTest extends TestCase
 {
     public function testValidate()
     {
-        (new ClassType('stdClass'))->validate(new \stdClass);
+        $this->assertNull(
+            (new ClassType('stdClass'))->validate(new \stdClass)
+        );
     }
 
     /**

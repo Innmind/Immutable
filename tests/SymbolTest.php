@@ -7,8 +7,9 @@ use Innmind\Immutable\{
     Symbol,
     PrimitiveInterface
 };
+use PHPUnit\Framework\TestCase;
 
-class SymbolTest extends \PHPUnit_Framework_TestCase
+class SymbolTest extends TestCase
 {
     public function testInterface()
     {
