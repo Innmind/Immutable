@@ -464,6 +464,10 @@ class Str implements PrimitiveInterface, StringableInterface
      */
     public function substring(int $start, int $length = null): self
     {
+        if ($this->length() === 0) {
+            return $this;
+        }
+
         if ($length === null) {
             $sub = substr($this->value, $start);
         } else {

@@ -413,6 +413,10 @@ class StrTest extends TestCase
         $this->assertNotSame($str, $str3);
         $this->assertSame('bar', (string) $str3);
         $this->assertSame('foobarbaz', (string) $str);
+
+        $str4 = ($str = new S(''))->substring(0, -1);
+
+        $this->assertSame($str, $str4);
     }
 
     public function testSprintf()
