@@ -78,6 +78,16 @@ class StrTest extends TestCase
         $this->assertSame('o', (string) $stream[2]);
     }
 
+    public function testSplitOnZeroString()
+    {
+        $parts = (new S('10101'))->split('0');
+
+        $this->assertCount(3, $parts);
+        $this->assertSame('1', (string) $parts[0]);
+        $this->assertSame('1', (string) $parts[1]);
+        $this->assertSame('1', (string) $parts[2]);
+    }
+
     public function testChunk()
     {
         $str = new S('foobarbaz');

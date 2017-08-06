@@ -49,8 +49,12 @@ class Str implements PrimitiveInterface, StringableInterface
      */
     public function split(string $delimiter = null): StreamInterface
     {
-        $parts = empty($delimiter) ?
-                str_split($this->value) : explode($delimiter, $this->value);
+        if (is_null($delimiter) || $delimiter === '') {
+            $parts = str_split($this->value);
+        } else {
+            $parts = explode($delimiter, $this->value);
+        }
+
         $stream = new Stream(self::class);
 
         foreach ($parts as $part) {
