@@ -442,10 +442,10 @@ class StrTest extends TestCase
     public function testWordCount()
     {
         $str = new S("Hello fri3nd, you're
-                    looking     🙏     good today!");
+                    looking          good today!");
 
-        $this->assertSame(8, $str->wordCount());
-        $this->assertSame(7, $str->wordCount('àáãç3'));
+        $this->assertSame(7, $str->wordCount());
+        $this->assertSame(6, $str->wordCount('àáãç3'));
     }
 
     public function testWords()
