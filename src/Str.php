@@ -129,16 +129,6 @@ class Str implements PrimitiveInterface, StringableInterface
      */
     public function replace(string $search, string $replacement): self
     {
-        if ($this->usesDefaultEncoding()) {
-            $string = (string) mb_ereg_replace(
-                $search,
-                $replacement,
-                $this->value
-            );
-
-            return new self($string, $this->encoding);
-        }
-
         if (!$this->contains($search)) {
             return $this;
         }
@@ -690,10 +680,5 @@ class Str implements PrimitiveInterface, StringableInterface
             $character,
             $direction
         ), $this->encoding);
-    }
-
-    private function usesDefaultEncoding(): bool
-    {
-        return $this->encoding === mb_internal_encoding();
     }
 }

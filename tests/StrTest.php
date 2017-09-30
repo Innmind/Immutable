@@ -237,6 +237,9 @@ class StrTest extends TestCase
         $this->assertNotSame($str, $str2);
         $this->assertSame('<body text="black">', (string) $str2);
         $this->assertSame('<body text="%body%">', (string) $str);
+
+        $this->assertSame('foo', (string) (new S('foo'))->replace('.', '/'));
+        $this->assertSame('foo/bar', (string) (new S('foo.bar'))->replace('.', '/'));
     }
 
     public function testReplaceWithDifferentEncoding()
@@ -247,8 +250,12 @@ class StrTest extends TestCase
             mb_substr('🙏', 0, 1, 'ASCII'),
             'baz'
         );
+        $remaining = mb_substr('🙏', 1, null, 'ASCII');
         $this->assertSame('foo🙏🙏🙏bar', (string) $str);
-        $this->assertSame('foo🙏🙏🙏bar', (string) $str2);
+        $this->assertSame(
+            'foobaz'.$remaining.'baz'.$remaining.'baz'.$remaining.'bar',
+            (string) $str2
+        );
 
         $str3 = $str->toEncoding('ASCII')->replace(
             mb_substr('🙏', 0, 1, 'ASCII'),
