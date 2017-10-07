@@ -23,7 +23,6 @@ class Sequence implements SequenceInterface
     public function __construct(...$values)
     {
         $this->values = $values;
-        $this->size = count($values);
     }
 
     /**
@@ -31,7 +30,7 @@ class Sequence implements SequenceInterface
      */
     public function size(): int
     {
-        return $this->size;
+        return $this->size ?? $this->size = count($this->values);
     }
 
     /**
