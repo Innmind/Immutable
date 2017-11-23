@@ -36,6 +36,28 @@ final class Map implements MapInterface
         $this->pairs = new Stream(Pair::class);
     }
 
+    public static function of(
+        string $key,
+        string $value,
+        array $keys,
+        array $values
+    ): self {
+        $keys = array_values($keys);
+        $values = array_values($values);
+
+        if (count($keys) !== count($values)) {
+            throw new LogicException('Different sizes of keys and values');
+        }
+
+        $self = new self($key, $value);
+
+        foreach ($keys as $i => $key) {
+            $self = $self->put($key, $values[$i]);
+        }
+
+        return $self;
+    }
+
     /**
      * {@inheritdoc}
      */

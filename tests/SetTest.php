@@ -30,6 +30,18 @@ class SetTest extends TestCase
         $this->assertSame('int', (string) $s->type());
     }
 
+    public function testOf()
+    {
+        $this->assertTrue(
+            Set::of('int', 1, 1, 2, 3)->equals(
+                (new Set('int'))
+                    ->add(1)
+                    ->add(2)
+                    ->add(3)
+            )
+        );
+    }
+
     public function testAdd()
     {
         $this->assertSame(0, (new Set('in'))->size());

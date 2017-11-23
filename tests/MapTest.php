@@ -32,6 +32,28 @@ class MapTest extends TestCase
         $this->assertSame('float', (string) $m->valueType());
     }
 
+    public function testOf()
+    {
+        $map = Map::of('int', 'float', [1, 2], [1.1, 2.1]);
+
+        $this->assertTrue(
+            $map->equals(
+                (new Map('int', 'float'))
+                    ->put(1, 1.1)
+                    ->put(2, 2.1)
+            )
+        );
+    }
+
+    /**
+     * @expectedException LogicException
+     * @expectedExceptionMessage Different sizes of keys and values
+     */
+    public function testThrowWhenDifferentSizes()
+    {
+        Map::of('int', 'float', [], [1.1]);
+    }
+
     public function testPut()
     {
         $m = new Map('int', 'int');
