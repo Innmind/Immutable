@@ -23,6 +23,17 @@ class Set implements SetInterface
         $this->values = new Stream($type);
     }
 
+    public static function of(string $type, ...$values): self
+    {
+        return array_reduce(
+            $values,
+            static function(self $self, $value): self {
+                return $self->add($value);
+            },
+            new self($type)
+        );
+    }
+
     /**
      * {@inheritdoc}
      */

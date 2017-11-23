@@ -28,6 +28,18 @@ class StreamTest extends TestCase
         $this->assertSame([], $stream->toPrimitive());
     }
 
+    public function testOf()
+    {
+        $this->assertTrue(
+            Stream::of('int', 1, 2, 3)->equals(
+                (new Stream('int'))
+                    ->add(1)
+                    ->add(2)
+                    ->add(3)
+            )
+        );
+    }
+
     public function testType()
     {
         $type = (new Stream('int'))->type();

@@ -29,6 +29,11 @@ class SequenceTest extends TestCase
         $this->assertSame([1], $s->toPrimitive());
     }
 
+    public function testOf()
+    {
+        $this->assertTrue(Sequence::of(1, 2, 3)->equals(new Sequence(1, 2, 3)));
+    }
+
     public function testSize()
     {
         $this->assertSame(0, (new Sequence)->size());

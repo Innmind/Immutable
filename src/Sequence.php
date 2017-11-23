@@ -25,6 +25,11 @@ class Sequence implements SequenceInterface
         $this->values = $values;
     }
 
+    public static function of(...$values): self
+    {
+        return new self(...$values);
+    }
+
     /**
      * {@inheritdoc}
      */
