@@ -335,6 +335,13 @@ class StrTest extends TestCase
         $this->assertSame(7, (new S('foo🙏'))->toEncoding('ASCII')->length());
     }
 
+    public function testEmpty()
+    {
+        $this->assertTrue(S::of('')->empty());
+        $this->assertFalse(S::of('🙏')->empty());
+        $this->assertFalse(S::of('🙏', 'ASCII')->substring(0, 1)->empty());
+    }
+
     public function testReverse()
     {
         $str = new S('foo🙏');

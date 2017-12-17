@@ -196,6 +196,11 @@ class Str implements PrimitiveInterface, StringableInterface
         return mb_strlen($this->value, $this->encoding);
     }
 
+    public function empty(): bool
+    {
+        return $this->value === '';
+    }
+
     /**
      * Reverse the string
      *
