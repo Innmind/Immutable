@@ -24,6 +24,15 @@ class StrTest extends TestCase
         $this->assertSame('foo', (string) $str);
     }
 
+    public function testOf()
+    {
+        $str = S::of('foo', 'ASCII');
+
+        $this->assertInstanceOf(S::class, $str);
+        $this->assertSame('foo', (string) $str);
+        $this->assertSame('ASCII', (string) $str->encoding());
+    }
+
     /**
      * @expectedException TypeError
      * @expectedExceptionMessage must be of the type string, integer given
@@ -324,6 +333,13 @@ class StrTest extends TestCase
     {
         $this->assertSame(4, (new S('foo🙏'))->length());
         $this->assertSame(7, (new S('foo🙏'))->toEncoding('ASCII')->length());
+    }
+
+    public function testEmpty()
+    {
+        $this->assertTrue(S::of('')->empty());
+        $this->assertFalse(S::of('🙏')->empty());
+        $this->assertFalse(S::of('🙏', 'ASCII')->substring(0, 1)->empty());
     }
 
     public function testReverse()

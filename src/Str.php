@@ -26,6 +26,11 @@ class Str implements PrimitiveInterface, StringableInterface
         $this->encoding = $encoding ?? mb_internal_encoding();
     }
 
+    public static function of(string $value, string $encoding = null): self
+    {
+        return new self($value, $encoding);
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -189,6 +194,11 @@ class Str implements PrimitiveInterface, StringableInterface
     public function length(): int
     {
         return mb_strlen($this->value, $this->encoding);
+    }
+
+    public function empty(): bool
+    {
+        return $this->value === '';
     }
 
     /**
