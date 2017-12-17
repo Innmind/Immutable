@@ -24,6 +24,15 @@ class StrTest extends TestCase
         $this->assertSame('foo', (string) $str);
     }
 
+    public function testOf()
+    {
+        $str = S::of('foo', 'ASCII');
+
+        $this->assertInstanceOf(S::class, $str);
+        $this->assertSame('foo', (string) $str);
+        $this->assertSame('ASCII', (string) $str->encoding());
+    }
+
     /**
      * @expectedException TypeError
      * @expectedExceptionMessage must be of the type string, integer given

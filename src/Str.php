@@ -26,6 +26,11 @@ class Str implements PrimitiveInterface, StringableInterface
         $this->encoding = $encoding ?? mb_internal_encoding();
     }
 
+    public static function of(string $value, string $encoding = null): self
+    {
+        return new self($value, $encoding);
+    }
+
     /**
      * {@inheritdoc}
      */
