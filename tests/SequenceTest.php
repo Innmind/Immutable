@@ -119,6 +119,24 @@ class SequenceTest extends TestCase
         $this->assertSame([1, 3], $s2->toPrimitive());
     }
 
+    public function testDiffObjects()
+    {
+        $foo = new \stdClass;
+        $bar = new \stdClass;
+        $baz = new \stdClass;
+
+        $s = new Sequence($foo, $bar, $baz, $bar);
+        $s2 = new Sequence($bar);
+
+        $s3 = $s->diff($s2);
+        $this->assertNotSame($s, $s3);
+        $this->assertNotSame($s2, $s3);
+        $this->assertInstanceOf(Sequence::class, $s3);
+        $this->assertSame([$foo, $baz], $s3->toPrimitive());
+        $this->assertSame([$foo, $bar, $baz, $bar], $s->toPrimitive());
+        $this->assertSame([$bar], $s2->toPrimitive());
+    }
+
     public function testDistinct()
     {
         $s = new Sequence(1, 2, 2, 3);
