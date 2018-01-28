@@ -198,14 +198,11 @@ class Set implements SetInterface
     {
         $this->validate($set);
 
-        return $this->values->equals(
-            $set->reduce(
-                $this->values->clear(),
-                function(Stream $carry, $value): Stream {
-                    return $carry->add($value);
-                }
-            )
-        );
+        if ($this->size() !== $set->size()) {
+            return false;
+        }
+
+        return $this->intersect($set)->size() === $this->size();
     }
 
     /**
