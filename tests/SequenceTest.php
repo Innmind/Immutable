@@ -424,6 +424,21 @@ class SequenceTest extends TestCase
         $this->assertSame([2, 3], $s2->toPrimitive());
     }
 
+    public function testIntersectObjects()
+    {
+        $foo = new \stdClass;
+        $bar = new \stdClass;
+        $baz = new \stdClass;
+
+        $s = new Sequence($foo, $bar, $baz);
+
+        $s2 = $s->intersect(new Sequence($bar, new \stdClass));
+        $this->assertNotSame($s, $s2);
+        $this->assertInstanceOf(Sequence::class, $s2);
+        $this->assertSame([$foo, $bar, $baz], $s->toPrimitive());
+        $this->assertSame([$bar], $s2->toPrimitive());
+    }
+
     public function testJoin()
     {
         $s = new Sequence(1, 2, 3);
