@@ -151,12 +151,9 @@ class Sequence implements SequenceInterface
      */
     public function diff(SequenceInterface $seq): SequenceInterface
     {
-        return new self(
-            ...array_diff(
-                $this->values,
-                $seq->toPrimitive()
-            )
-        );
+        return $this->filter(function($value) use ($seq): bool {
+            return !$seq->contains($value);
+        });
     }
 
     /**
