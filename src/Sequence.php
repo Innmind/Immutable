@@ -402,7 +402,9 @@ class Sequence implements SequenceInterface
      */
     public function intersect(SequenceInterface $seq): SequenceInterface
     {
-        return new self(...array_intersect($this->values, $seq->toPrimitive()));
+        return $this->filter(static function($value) use ($seq): bool {
+            return $seq->contains($value);
+        });
     }
 
     /**
