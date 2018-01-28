@@ -179,10 +179,11 @@ class SetTest extends TestCase
             $s->equals(
                 (new Set('int'))
                     ->add(24)
-                    ->add(42)
                     ->add(66)
+                    ->add(42)
             )
         );
+        $this->assertTrue(Set::of('int')->equals(new Set('int')));
         $this->assertFalse(
             $s->equals(
                 (new Set('int'))

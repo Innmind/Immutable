@@ -239,7 +239,12 @@ final class Map implements MapInterface
             return false;
         }
 
-        return $map->values()->equals($this->values());
+        return $this->reduce(
+            true,
+            static function(bool $return, $key, $value) use ($map): bool {
+                return $return && $map->get($key) === $value;
+            }
+        );
     }
 
     /**

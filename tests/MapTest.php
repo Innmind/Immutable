@@ -225,6 +225,17 @@ class MapTest extends TestCase
                         ->put('bar_res', 'res')
                 )
         );
+
+        $m = (new Map('int', 'int'))
+            ->put(24, 42)
+            ->put(42, 24);
+        $m2 = (new Map('int', 'int'))
+            ->put(42, 24)
+            ->put(24, 42);
+
+        $this->assertTrue($m->equals($m2));
+
+        $this->assertTrue((new Map('int', 'int'))->equals(new Map('int', 'int')));
     }
 
     public function testFilter()
