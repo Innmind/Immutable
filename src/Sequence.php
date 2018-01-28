@@ -151,7 +151,7 @@ class Sequence implements SequenceInterface
      */
     public function diff(SequenceInterface $seq): SequenceInterface
     {
-        return $this->filter(function($value) use ($seq): bool {
+        return $this->filter(static function($value) use ($seq): bool {
             return !$seq->contains($value);
         });
     }
@@ -161,7 +161,16 @@ class Sequence implements SequenceInterface
      */
     public function distinct(): SequenceInterface
     {
-        return new self(...array_unique($this->values));
+        return $this->reduce(
+            new self,
+            static function(self $values, $value): self {
+                if ($values->contains($value)) {
+                    return $values;
+                }
+
+                return $values->add($value);
+            }
+        );
     }
 
     /**
