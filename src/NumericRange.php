@@ -37,7 +37,7 @@ class NumericRange implements PrimitiveInterface, \Iterator
 
     public function toPrimitive(): array
     {
-        return range($this->start, $this->end, $this->step);
+        return \range($this->start, $this->end, $this->step);
     }
 
     public function current(): float

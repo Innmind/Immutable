@@ -35,7 +35,7 @@ class Sequence implements SequenceInterface
      */
     public function size(): int
     {
-        return $this->size ?? $this->size = count($this->values);
+        return $this->size ?? $this->size = \count($this->values);
     }
 
     /**
@@ -51,7 +51,7 @@ class Sequence implements SequenceInterface
      */
     public function current()
     {
-        return current($this->values);
+        return \current($this->values);
     }
 
     /**
@@ -59,7 +59,7 @@ class Sequence implements SequenceInterface
      */
     public function key()
     {
-        return key($this->values);
+        return \key($this->values);
     }
 
     /**
@@ -67,7 +67,7 @@ class Sequence implements SequenceInterface
      */
     public function next()
     {
-        next($this->values);
+        \next($this->values);
     }
 
     /**
@@ -75,7 +75,7 @@ class Sequence implements SequenceInterface
      */
     public function rewind()
     {
-        reset($this->values);
+        \reset($this->values);
     }
 
     /**
@@ -143,7 +143,7 @@ class Sequence implements SequenceInterface
      */
     public function has(int $index): bool
     {
-        return array_key_exists($index, $this->values);
+        return \array_key_exists($index, $this->values);
     }
 
     /**
@@ -178,7 +178,7 @@ class Sequence implements SequenceInterface
      */
     public function drop(int $size): SequenceInterface
     {
-        return new self(...array_slice($this->values, $size));
+        return new self(...\array_slice($this->values, $size));
     }
 
     /**
@@ -186,7 +186,7 @@ class Sequence implements SequenceInterface
      */
     public function dropEnd(int $size): SequenceInterface
     {
-        return new self(...array_slice($this->values, 0, $this->size() - $size));
+        return new self(...\array_slice($this->values, 0, $this->size() - $size));
     }
 
     /**
@@ -202,7 +202,7 @@ class Sequence implements SequenceInterface
      */
     public function filter(callable $predicate): SequenceInterface
     {
-        return new self(...array_filter(
+        return new self(...\array_filter(
             $this->values,
             $predicate
         ));
@@ -283,7 +283,7 @@ class Sequence implements SequenceInterface
      */
     public function contains($element): bool
     {
-        return in_array($element, $this->values, true);
+        return \in_array($element, $this->values, true);
     }
 
     /**
@@ -291,7 +291,7 @@ class Sequence implements SequenceInterface
      */
     public function indexOf($element): int
     {
-        $index = array_search($element, $this->values, true);
+        $index = \array_search($element, $this->values, true);
 
         if ($index === false) {
             throw new ElementNotFoundException;
@@ -319,7 +319,7 @@ class Sequence implements SequenceInterface
      */
     public function map(callable $function): SequenceInterface
     {
-        return new self(...array_map($function, $this->values));
+        return new self(...\array_map($function, $this->values));
     }
 
     /**
@@ -327,7 +327,7 @@ class Sequence implements SequenceInterface
      */
     public function pad(int $size, $element): SequenceInterface
     {
-        return new self(...array_pad($this->values, $size, $element));
+        return new self(...\array_pad($this->values, $size, $element));
     }
 
     /**
@@ -356,7 +356,7 @@ class Sequence implements SequenceInterface
      */
     public function slice(int $from, int $until): SequenceInterface
     {
-        return new self(...array_slice(
+        return new self(...\array_slice(
             $this->values,
             $from,
             $until - $from
@@ -412,7 +412,7 @@ class Sequence implements SequenceInterface
      */
     public function join(string $separator): Str
     {
-        return new Str(implode($separator, $this->values));
+        return new Str(\implode($separator, $this->values));
     }
 
     /**
@@ -432,7 +432,7 @@ class Sequence implements SequenceInterface
     public function sort(callable $function): SequenceInterface
     {
         $values = $this->values;
-        usort($values, $function);
+        \usort($values, $function);
 
         return new self(...$values);
     }
@@ -442,7 +442,7 @@ class Sequence implements SequenceInterface
      */
     public function reduce($carry, callable $reducer)
     {
-        return array_reduce($this->values, $reducer, $carry);
+        return \array_reduce($this->values, $reducer, $carry);
     }
 
     /**
@@ -450,6 +450,6 @@ class Sequence implements SequenceInterface
      */
     public function reverse(): SequenceInterface
     {
-        return new self(...array_reverse($this->values));
+        return new self(...\array_reverse($this->values));
     }
 }

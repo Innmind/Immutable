@@ -42,10 +42,10 @@ final class Map implements MapInterface
         array $keys,
         array $values
     ): self {
-        $keys = array_values($keys);
-        $values = array_values($values);
+        $keys = \array_values($keys);
+        $values = \array_values($values);
 
-        if (count($keys) !== count($values)) {
+        if (\count($keys) !== \count($values)) {
             throw new LogicException('Different sizes of keys and values');
         }
 

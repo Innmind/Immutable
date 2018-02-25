@@ -21,7 +21,7 @@ trait Type
      */
     private function getSpecificationFor(string $type): SpecificationInterface
     {
-        if (function_exists('is_'.$type)) {
+        if (\function_exists('is_'.$type)) {
             return new PrimitiveType($type);
         }
 
@@ -45,11 +45,11 @@ trait Type
      */
     private function determineType($value): string
     {
-        $type = gettype($value);
+        $type = \gettype($value);
 
         switch ($type) {
             case 'object':
-                return get_class($value);
+                return \get_class($value);
 
             case 'integer':
                 return 'int';
