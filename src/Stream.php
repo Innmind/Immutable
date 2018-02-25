@@ -29,7 +29,7 @@ class Stream implements StreamInterface
 
     public static function of(string $type, ...$values): self
     {
-        return array_reduce(
+        return \array_reduce(
             $values,
             static function(self $self, $value): self {
                 return $self->add($value);

@@ -14,7 +14,7 @@ class Symbol implements PrimitiveInterface
 
     public function __construct($value)
     {
-        if (!is_int($value) && !is_string($value)) {
+        if (!\is_int($value) && !\is_string($value)) {
             throw new InvalidArgumentException(
                 'A Symbol can be composed only of an int or a string'
             );

@@ -23,7 +23,7 @@ class Str implements PrimitiveInterface, StringableInterface
     public function __construct(string $value, string $encoding = null)
     {
         $this->value = $value;
-        $this->encoding = $encoding ?? mb_internal_encoding();
+        $this->encoding = $encoding ?? \mb_internal_encoding();
     }
 
     public static function of(string $value, string $encoding = null): self
@@ -66,11 +66,11 @@ class Str implements PrimitiveInterface, StringableInterface
      */
     public function split(string $delimiter = null): StreamInterface
     {
-        if (is_null($delimiter) || $delimiter === '') {
+        if (\is_null($delimiter) || $delimiter === '') {
             return $this->chunk();
         }
 
-        $parts = explode($delimiter, $this->value);
+        $parts = \explode($delimiter, $this->value);
         $stream = new Stream(self::class);
 
         foreach ($parts as $part) {
@@ -112,10 +112,10 @@ class Str implements PrimitiveInterface, StringableInterface
      */
     public function position(string $needle, int $offset = 0): int
     {
-        $position = mb_strpos($this->value, $needle, $offset, $this->encoding);
+        $position = \mb_strpos($this->value, $needle, $offset, $this->encoding);
 
         if ($position === false) {
-            throw new SubstringException(sprintf(
+            throw new SubstringException(\sprintf(
                 'Substring "%s" not found',
                 $needle
             ));
@@ -154,10 +154,10 @@ class Str implements PrimitiveInterface, StringableInterface
      */
     public function str(string $delimiter): self
     {
-        $sub = mb_strstr($this->value, $delimiter, false, $this->encoding);
+        $sub = \mb_strstr($this->value, $delimiter, false, $this->encoding);
 
         if ($sub === false) {
-            throw new SubstringException(sprintf(
+            throw new SubstringException(\sprintf(
                 'Substring "%s" not found',
                 $delimiter
             ));
@@ -173,7 +173,7 @@ class Str implements PrimitiveInterface, StringableInterface
      */
     public function toUpper(): self
     {
-        return new self(mb_strtoupper($this->value), $this->encoding);
+        return new self(\mb_strtoupper($this->value), $this->encoding);
     }
 
     /**
@@ -183,7 +183,7 @@ class Str implements PrimitiveInterface, StringableInterface
      */
     public function toLower(): self
     {
-        return new self(mb_strtolower($this->value), $this->encoding);
+        return new self(\mb_strtolower($this->value), $this->encoding);
     }
 
     /**
@@ -193,7 +193,7 @@ class Str implements PrimitiveInterface, StringableInterface
      */
     public function length(): int
     {
-        return mb_strlen($this->value, $this->encoding);
+        return \mb_strlen($this->value, $this->encoding);
     }
 
     public function empty(): bool
@@ -265,9 +265,9 @@ class Str implements PrimitiveInterface, StringableInterface
     public function cspn(string $mask, int $start = 0, int $length = null): int
     {
         if ($length === null) {
-            $value = strcspn($this->value, $mask, $start);
+            $value = \strcspn($this->value, $mask, $start);
         } else {
-            $value = strcspn(
+            $value = \strcspn(
                 $this->value,
                 $mask,
                 $start,
@@ -287,7 +287,7 @@ class Str implements PrimitiveInterface, StringableInterface
      */
     public function repeat(int $repeat): self
     {
-        return new self(str_repeat($this->value, $repeat), $this->encoding);
+        return new self(\str_repeat($this->value, $repeat), $this->encoding);
     }
 
     /**
@@ -298,9 +298,9 @@ class Str implements PrimitiveInterface, StringableInterface
     public function shuffle(): self
     {
         $parts = $this->chunk()->toPrimitive();
-        shuffle($parts);
+        \shuffle($parts);
 
-        return new self(implode('', $parts), $this->encoding);
+        return new self(\implode('', $parts), $this->encoding);
     }
 
     /**
@@ -310,7 +310,7 @@ class Str implements PrimitiveInterface, StringableInterface
      */
     public function stripSlashes(): self
     {
-        return new self(stripslashes($this->value), $this->encoding);
+        return new self(\stripslashes($this->value), $this->encoding);
     }
 
     /**
@@ -320,7 +320,7 @@ class Str implements PrimitiveInterface, StringableInterface
      */
     public function stripCSlashes(): self
     {
-        return new self(stripcslashes($this->value), $this->encoding);
+        return new self(\stripcslashes($this->value), $this->encoding);
     }
 
     /**
@@ -332,7 +332,7 @@ class Str implements PrimitiveInterface, StringableInterface
      */
     public function wordCount(string $charlist = ''): int
     {
-        return (int) str_word_count(
+        return (int) \str_word_count(
             $this->value,
             0,
             $charlist
@@ -348,7 +348,7 @@ class Str implements PrimitiveInterface, StringableInterface
      */
     public function words(string $charlist = ''): MapInterface
     {
-        $words = str_word_count($this->value, 2, $charlist);
+        $words = \str_word_count($this->value, 2, $charlist);
         $map = new Map('int', self::class);
 
         foreach ($words as $position => $word) {
@@ -368,7 +368,7 @@ class Str implements PrimitiveInterface, StringableInterface
      */
     public function pregSplit(string $regex, int $limit = -1): StreamInterface
     {
-        $strings = preg_split($regex, $this->value, $limit);
+        $strings = \preg_split($regex, $this->value, $limit);
         $stream = new Stream(self::class);
 
         foreach ($strings as $string) {
@@ -391,10 +391,10 @@ class Str implements PrimitiveInterface, StringableInterface
     public function matches(string $regex, int $offset = 0): bool
     {
         $matches = [];
-        $value = preg_match($regex, $this->value, $matches, 0, $offset);
+        $value = \preg_match($regex, $this->value, $matches, 0, $offset);
 
         if ($value === false) {
-            throw new RegexException('', preg_last_error());
+            throw new RegexException('', \preg_last_error());
         }
 
         return (bool) $value;
@@ -438,7 +438,7 @@ class Str implements PrimitiveInterface, StringableInterface
         int $flags = self::PREG_NO_FLAGS
     ): MapInterface {
         $matches = [];
-        $value = preg_match(
+        $value = \preg_match(
             $regex,
             $this->value,
             $matches,
@@ -452,7 +452,7 @@ class Str implements PrimitiveInterface, StringableInterface
         }
 
         if ($value === false) {
-            throw new RegexException('', preg_last_error());
+            throw new RegexException('', \preg_last_error());
         }
 
         return $map;
@@ -474,7 +474,7 @@ class Str implements PrimitiveInterface, StringableInterface
         string $replacement,
         int $limit = -1
     ): self {
-        $value = preg_replace(
+        $value = \preg_replace(
             $regex,
             $replacement,
             $this->value,
@@ -482,7 +482,7 @@ class Str implements PrimitiveInterface, StringableInterface
         );
 
         if ($value === null) {
-            throw new RegexException('', preg_last_error());
+            throw new RegexException('', \preg_last_error());
         }
 
         return new self($value, $this->encoding);
@@ -502,7 +502,7 @@ class Str implements PrimitiveInterface, StringableInterface
             return $this;
         }
 
-        $sub = mb_substr($this->value, $start, $length, $this->encoding);
+        $sub = \mb_substr($this->value, $start, $length, $this->encoding);
 
         return new self($sub, $this->encoding);
     }
@@ -514,7 +514,7 @@ class Str implements PrimitiveInterface, StringableInterface
      */
     public function sprintf(...$values): self
     {
-        return new self(sprintf($this->value, ...$values), $this->encoding);
+        return new self(\sprintf($this->value, ...$values), $this->encoding);
     }
 
     /**
@@ -605,7 +605,7 @@ class Str implements PrimitiveInterface, StringableInterface
     public function trim(string $mask = null): self
     {
         return new self(
-            $mask === null ? trim((string) $this) : trim((string) $this, $mask),
+            $mask === null ? \trim((string) $this) : \trim((string) $this, $mask),
             $this->encoding
         );
     }
@@ -620,7 +620,7 @@ class Str implements PrimitiveInterface, StringableInterface
     public function rightTrim(string $mask = null): self
     {
         return new self(
-            $mask === null ? rtrim((string) $this) : rtrim((string) $this, $mask),
+            $mask === null ? \rtrim((string) $this) : \rtrim((string) $this, $mask),
             $this->encoding
         );
     }
@@ -635,7 +635,7 @@ class Str implements PrimitiveInterface, StringableInterface
     public function leftTrim(string $mask = null): self
     {
         return new self(
-            $mask === null ? ltrim((string) $this) : ltrim((string) $this, $mask),
+            $mask === null ? \ltrim((string) $this) : \ltrim((string) $this, $mask),
             $this->encoding
         );
     }
@@ -667,7 +667,7 @@ class Str implements PrimitiveInterface, StringableInterface
      */
     public function pregQuote(string $delimiter = ''): self
     {
-        return new self(preg_quote((string) $this, $delimiter), $this->encoding);
+        return new self(\preg_quote((string) $this, $delimiter), $this->encoding);
     }
 
     /**
@@ -684,7 +684,7 @@ class Str implements PrimitiveInterface, StringableInterface
         string $character = ' ',
         int $direction = self::PAD_RIGHT
     ): self {
-        return new self(str_pad(
+        return new self(\str_pad(
             $this->value,
             $length,
             $character,
