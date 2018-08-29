@@ -3,4 +3,6 @@
 /.scrutinizer.yml export-ignore
 /.travis.yml export-ignore
 /phpunit.xml.dist export-ignore
-/Tests export-ignore
+/tests export-ignore
+/_storage export-ignore
+/benchmarks export-ignore
