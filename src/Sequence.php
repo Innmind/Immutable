@@ -314,13 +314,7 @@ class Sequence implements SequenceInterface
      */
     public function indices(): StreamInterface
     {
-        $indices = new Stream('int');
-
-        foreach ($this->values as $index => $value) {
-            $indices = $indices->add($index);
-        }
-
-        return $indices;
+        return Stream::of('int', ...\range(0, $this->size() - 1));
     }
 
     /**
