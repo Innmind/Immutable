@@ -27,7 +27,10 @@ class Sequence implements SequenceInterface
 
     public static function of(...$values): self
     {
-        return new self(...$values);
+        $self = new self;
+        $self->values = $values;
+
+        return $self;
     }
 
     /**
@@ -178,7 +181,10 @@ class Sequence implements SequenceInterface
      */
     public function drop(int $size): SequenceInterface
     {
-        return new self(...\array_slice($this->values, $size));
+        $self = new self;
+        $self->values = \array_slice($this->values, $size);
+
+        return $self;
     }
 
     /**
@@ -186,7 +192,10 @@ class Sequence implements SequenceInterface
      */
     public function dropEnd(int $size): SequenceInterface
     {
-        return new self(...\array_slice($this->values, 0, $this->size() - $size));
+        $self = new self;
+        $self->values = \array_slice($this->values, 0, $this->size() - $size);
+
+        return $self;
     }
 
     /**
@@ -319,7 +328,10 @@ class Sequence implements SequenceInterface
      */
     public function map(callable $function): SequenceInterface
     {
-        return new self(...\array_map($function, $this->values));
+        $self = clone $this;
+        $self->values = \array_map($function, $this->values);
+
+        return $self;
     }
 
     /**
@@ -394,7 +406,10 @@ class Sequence implements SequenceInterface
      */
     public function append(SequenceInterface $seq): SequenceInterface
     {
-        return new self(...$this->values, ...$seq->toPrimitive());
+        $self = new self;
+        $self->values = \array_merge($this->values, $seq->toPrimitive());
+
+        return $self;
     }
 
     /**
