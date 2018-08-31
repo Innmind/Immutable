@@ -333,7 +333,10 @@ class Sequence implements SequenceInterface
      */
     public function pad(int $size, $element): SequenceInterface
     {
-        return new self(...\array_pad($this->values, $size, $element));
+        $self = new self;
+        $self->values = \array_pad($this->values, $size, $element);
+
+        return $self;
     }
 
     /**
@@ -352,9 +355,14 @@ class Sequence implements SequenceInterface
             }
         }
 
+        $true = new self;
+        $true->values = $truthy;
+        $false = new self;
+        $false->values = $falsy;
+
         return (new Map('bool', SequenceInterface::class))
-            ->put(true, new self(...$truthy))
-            ->put(false, new self(...$falsy));
+            ->put(true, $true)
+            ->put(false, $false);
     }
 
     /**
@@ -362,11 +370,14 @@ class Sequence implements SequenceInterface
      */
     public function slice(int $from, int $until): SequenceInterface
     {
-        return new self(...\array_slice(
+        $self = new self;
+        $self->values = \array_slice(
             $this->values,
             $from,
             $until - $from
-        ));
+        );
+
+        return $self;
     }
 
     /**
@@ -429,10 +440,11 @@ class Sequence implements SequenceInterface
      */
     public function add($element): SequenceInterface
     {
-        $values = $this->values;
-        $values[] = $element;
+        $self = clone $this;
+        $self->values[] = $element;
+        $self->size = $this->size() + 1;
 
-        return new self(...$values);
+        return $self;
     }
 
     /**
@@ -440,10 +452,10 @@ class Sequence implements SequenceInterface
      */
     public function sort(callable $function): SequenceInterface
     {
-        $values = $this->values;
-        \usort($values, $function);
+        $self = clone $this;
+        \usort($self->values, $function);
 
-        return new self(...$values);
+        return $self;
     }
 
     /**
@@ -459,6 +471,9 @@ class Sequence implements SequenceInterface
      */
     public function reverse(): SequenceInterface
     {
-        return new self(...\array_reverse($this->values));
+        $self = clone $this;
+        $self->values = \array_reverse($this->values);
+
+        return $self;
     }
 }
