@@ -29,13 +29,13 @@ class Stream implements StreamInterface
 
     public static function of(string $type, ...$values): self
     {
-        return \array_reduce(
-            $values,
-            static function(self $self, $value): self {
-                return $self->add($value);
-            },
-            new self($type)
-        );
+        $self = new self($type);
+        $self->values = new Sequence(...$values);
+        $self->values->foreach(static function($element) use ($self): void {
+            $self->spec->validate($element);
+        });
+
+        return $self;
     }
 
     /**
@@ -316,14 +316,13 @@ class Stream implements StreamInterface
      */
     public function map(callable $function): StreamInterface
     {
-        return $this
-            ->values
-            ->reduce(
-                new self((string) $this->type),
-                function(self $carry, $element) use($function): StreamInterface {
-                    return $carry->add($function($element));
-                }
-            );
+        $self = clone $this;
+        $self->values = $this->values->map($function);
+        $self->values->foreach(function($element): void {
+            $this->spec->validate($element);
+        });
+
+        return $self;
     }
 
     /**
@@ -344,20 +343,25 @@ class Stream implements StreamInterface
      */
     public function partition(callable $predicate): MapInterface
     {
-        $truthy = new self((string) $this->type);
-        $falsy = new self((string) $this->type);
+        $truthy = [];
+        $falsy = [];
 
         foreach ($this->values as $value) {
             if ($predicate($value) === true) {
-                $truthy = $truthy->add($value);
+                $truthy[] = $value;
             } else {
-                $falsy = $falsy->add($value);
+                $falsy[] = $value;
             }
         }
 
+        $true = $this->clear();
+        $true->values = new Sequence(...$truthy);
+        $false = $this->clear();
+        $false->values = new Sequence(...$falsy);
+
         return (new Map('bool', StreamInterface::class))
-            ->put(true, $truthy)
-            ->put(false, $falsy);
+            ->put(true, $true)
+            ->put(false, $false);
     }
 
     /**
