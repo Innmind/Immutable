@@ -178,12 +178,10 @@ final class Map implements MapInterface
 
         if ($this->keys->contains($key)) {
             $index = $this->keys->indexOf($key);
-            $map->values = (new Stream((string) $this->valueType))
-                ->append($this->values->take($index))
+            $map->values = $this->values->take($index)
                 ->add($value)
                 ->append($this->values->drop($index + 1));
-            $map->pairs = (new Stream(Pair::class))
-                ->append($this->pairs->take($index))
+            $map->pairs = $this->pairs->take($index)
                 ->add(new Pair($key, $value))
                 ->append($this->pairs->drop($index + 1));
         } else {
@@ -223,9 +221,9 @@ final class Map implements MapInterface
     public function clear(): MapInterface
     {
         $map = clone $this;
-        $map->keys = new Stream((string) $this->keyType);
-        $map->values = new Stream((string) $this->valueType);
-        $map->pairs = new Stream(Pair::class);
+        $map->keys = $this->keys->clear();
+        $map->values = $this->values->clear();
+        $map->pairs = $this->pairs->clear();
 
         return $map;
     }
@@ -239,12 +237,13 @@ final class Map implements MapInterface
             return false;
         }
 
-        return $this->reduce(
-            true,
-            static function(bool $return, $key, $value) use ($map): bool {
-                return $return && $map->get($key) === $value;
+        foreach ($this->pairs as $pair) {
+            if ($map->get($pair->key()) !== $pair->value()) {
+                return false;
             }
-        );
+        }
+
+        return true;
     }
 
     /**
@@ -325,14 +324,7 @@ final class Map implements MapInterface
      */
     public function keys(): SetInterface
     {
-        return $this
-            ->keys
-            ->reduce(
-                new Set((string) $this->keyType),
-                function(Set $carry, $key): Set {
-                    return $carry->add($key);
-                }
-            );
+        return Set::of((string) $this->keyType, ...$this->keys);
     }
 
     /**
@@ -340,14 +332,7 @@ final class Map implements MapInterface
      */
     public function values(): StreamInterface
     {
-        return $this
-            ->values
-            ->reduce(
-                new Stream((string) $this->valueType),
-                function(Stream $carry, $value): Stream {
-                    return $carry->add($value);
-                }
-            );
+        return $this->values;
     }
 
     /**

@@ -25,13 +25,10 @@ class Set implements SetInterface
 
     public static function of(string $type, ...$values): self
     {
-        return \array_reduce(
-            $values,
-            static function(self $self, $value): self {
-                return $self->add($value);
-            },
-            new self($type)
-        );
+        $self = new self($type);
+        $self->values = Stream::of($type, ...$values)->distinct();
+
+        return $self;
     }
 
     /**
@@ -115,12 +112,7 @@ class Set implements SetInterface
 
         $newSet = clone $this;
         $newSet->values = $this->values->intersect(
-            $set->reduce(
-                $this->values->clear(),
-                function(Stream $carry, $value): Stream {
-                    return $carry->add($value);
-                }
-            )
+            Stream::of((string) $this->type, ...$set)
         );
 
         return $newSet;
@@ -180,12 +172,7 @@ class Set implements SetInterface
 
         $newSet = clone $this;
         $newSet->values = $this->values->diff(
-            $set->reduce(
-                $this->values->clear(),
-                function(Stream $carry, $value): Stream {
-                    return $carry->add($value);
-                }
-            )
+            Stream::of((string) $this->type, ...$set)
         );
 
         return $newSet;
@@ -236,15 +223,10 @@ class Set implements SetInterface
         return $map->reduce(
             new Map((string) $map->keyType(), SetInterface::class),
             function(Map $carry, $key, StreamInterface $values): Map {
-                return $carry->put(
-                    $key,
-                    $values->reduce(
-                        $this->clear(),
-                        function(Set $carry, $value): Set {
-                            return $carry->add($value);
-                        }
-                    )
-                );
+                $set = $this->clear();
+                $set->values = $values;
+
+                return $carry->put($key, $set);
             }
         );
     }

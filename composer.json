@@ -15,7 +15,7 @@
         "issues": "http://github.com/Innmind/Immutable/issues"
     },
     "require": {
-        "php": "~7.0"
+        "php": "~7.1"
     },
     "autoload": {
         "psr-4": {
@@ -28,9 +28,11 @@
         }
     },
     "require-dev": {
-        "phpunit/phpunit": "~6.0"
+        "phpunit/phpunit": "~6.0",
+        "phpbench/phpbench": "^0.14.0"
     },
     "scripts": {
-        "test": "vendor/bin/phpunit --colors=always"
+        "test": "vendor/bin/phpunit --colors=always",
+        "bench": "vendor/bin/phpbench run benchmarks --report=aggregate --iterations=5 --revs=2"
     }
 }
