@@ -13,7 +13,7 @@ use Innmind\Immutable\{
 trait Type
 {
     /**
-     * Build the approprivate specification for the given type
+     * Build the appropriate specification for the given type
      *
      * @param string $type
      *
