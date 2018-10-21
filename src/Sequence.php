@@ -314,6 +314,10 @@ class Sequence implements SequenceInterface
      */
     public function indices(): StreamInterface
     {
+        if ($this->size() === 0) {
+            return Stream::of('int');
+        }
+
         return Stream::of('int', ...\range(0, $this->size() - 1));
     }
 

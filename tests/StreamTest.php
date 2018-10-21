@@ -375,6 +375,16 @@ class StreamTest extends TestCase
         $this->assertSame([0, 1, 2, 3], $indices->toPrimitive());
     }
 
+    public function testEmptyIndices()
+    {
+        $stream = new Stream('int');
+        $indices = $stream->indices();
+
+        $this->assertInstanceOf(StreamInterface::class, $indices);
+        $this->assertSame('int', (string) $indices->type());
+        $this->assertSame([], $indices->toPrimitive());
+    }
+
     public function testMap()
     {
         $a = (new Stream('int'))
