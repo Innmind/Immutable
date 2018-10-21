@@ -314,6 +314,15 @@ class SequenceTest extends TestCase
         $this->assertSame([0, 1, 2], $indices->toPrimitive());
     }
 
+    public function testEmptyIndices()
+    {
+        $indices = Sequence::of()->indices();
+
+        $this->assertInstanceOf(StreamInterface::class, $indices);
+        $this->assertSame('int', (string) $indices->type());
+        $this->assertSame([], $indices->toPrimitive());
+    }
+
     public function testMap()
     {
         $s = new Sequence(1, 2, 3);
