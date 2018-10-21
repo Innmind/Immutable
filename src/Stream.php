@@ -305,10 +305,7 @@ class Stream implements StreamInterface
      */
     public function indices(): StreamInterface
     {
-        $stream = new self('int');
-        $stream->values = $this->values->indices();
-
-        return $stream;
+        return $this->values->indices();
     }
 
     /**
