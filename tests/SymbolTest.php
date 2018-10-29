@@ -5,7 +5,8 @@ namespace Tests\Innmind\Immutable;
 
 use Innmind\Immutable\{
     Symbol,
-    PrimitiveInterface
+    PrimitiveInterface,
+    Exception\InvalidArgumentException
 };
 use PHPUnit\Framework\TestCase;
 
@@ -22,12 +23,11 @@ class SymbolTest extends TestCase
         $this->assertSame(42, (new Symbol(42))->toPrimitive());
     }
 
-    /**
-     * @expectedException Innmind\Immutable\Exception\InvalidArgumentException
-     * @expectedExceptionMessage A Symbol can be composed only of an int or a string
-     */
     public function testThrowWhenInvalidPrimitiveUsed()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('A Symbol can be composed only of an int or a string');
+
         new Symbol(42.0);
     }
 }

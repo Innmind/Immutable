@@ -11,7 +11,11 @@ use Innmind\Immutable\{
     Str,
     Symbol,
     SetInterface,
-    StreamInterface
+    StreamInterface,
+    Exception\LogicException,
+    Exception\InvalidArgumentException,
+    Exception\ElementNotFoundException,
+    Exception\GroupEmptyMapException
 };
 use PHPUnit\Framework\TestCase;
 
@@ -50,12 +54,11 @@ class MapTest extends TestCase
         $this->assertTrue(Map::of('int', 'int')->equals(new Map('int', 'int')));
     }
 
-    /**
-     * @expectedException LogicException
-     * @expectedExceptionMessage Different sizes of keys and values
-     */
     public function testThrowWhenDifferentSizes()
     {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Different sizes of keys and values');
+
         Map::of('int', 'float', [], [1.1]);
     }
 
@@ -96,11 +99,10 @@ class MapTest extends TestCase
         $this->assertTrue($map->equals($expected));
     }
 
-    /**
-     * @expectedException Innmind\Immutable\Exception\InvalidArgumentException
-     */
     public function testThrowWhenInvalidType()
     {
+        $this->expectException(InvalidArgumentException::class);
+
         (new Map('int', 'int'))->put(42, 42.0);
     }
 
@@ -136,51 +138,46 @@ class MapTest extends TestCase
         $this->assertSame($v, $m[$k]);
     }
 
-    /**
-     * @expectedException Innmind\Immutable\Exception\LogicException
-     * @expectedExceptionMessage You can't modify a map
-     */
     public function testThrowWhenInjectingData()
     {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('You can\'t modify a map');
+
         $m = new Map('int', 'int');
         $m[24] = 42;
     }
 
-    /**
-     * @expectedException Innmind\Immutable\Exception\LogicException
-     * @expectedExceptionMessage You can't modify a map
-     */
     public function testThrowWhenDeletingData()
     {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('You can\'t modify a map');
+
         $m = new Map('int', 'int');
         $m = $m->put(24, 42);
 
         unset($m[24]);
     }
 
-    /**
-     * @expectedException Innmind\Immutable\Exception\ElementNotFoundException
-     */
     public function testThrowWhenUnknownOffset()
     {
+        $this->expectException(ElementNotFoundException::class);
+
         $m = new Map('int', 'int');
         $m[24];
     }
 
-    /**
-     * @expectedException Innmind\Immutable\Exception\InvalidArgumentException
-     */
     public function testThrowWhenKeyDoesntMatchType()
     {
+        $this->expectException(InvalidArgumentException::class);
+
         $m = new Map('int', 'int');
         $m->put('24', 42);
     }
 
-    /**
-     * @expectedException Innmind\Immutable\Exception\InvalidArgumentException
-     */
     public function testThrowWhenValueDoesntMatchType()
     {
+        $this->expectException(InvalidArgumentException::class);
+
         $m = new Map('int', 'int');
         $m->put(24, 42.0);
     }
@@ -193,11 +190,10 @@ class MapTest extends TestCase
         $this->assertSame(24, $m->get(23));
     }
 
-    /**
-     * @expectedException Innmind\Immutable\Exception\ElementNotFoundException
-     */
     public function testThrowWhenGettingUnknownKey()
     {
+        $this->expectException(ElementNotFoundException::class);
+
         (new Map('int', 'int'))->get(24);
     }
 
@@ -296,11 +292,10 @@ class MapTest extends TestCase
         $this->assertSame(4, $count);
     }
 
-    /**
-     * @expectedException Innmind\Immutable\Exception\GroupEmptyMapException
-     */
     public function testThrowWhenGroupingAnEmptyMap()
     {
+        $this->expectException(GroupEmptyMapException::class);
+
         (new Map('int', 'int'))->groupBy(function() {});
     }
 
@@ -392,11 +387,10 @@ class MapTest extends TestCase
         $this->assertSame([1, 4, 3, 5], $m2->values()->toPrimitive());
     }
 
-    /**
-     * @expectedException Innmind\Immutable\Exception\InvalidArgumentException
-     */
     public function testTrhowWhenTryingToModifyValueTypeInTheMap()
     {
+        $this->expectException(InvalidArgumentException::class);
+
         (new Map('int', 'int'))
             ->put(1, 2)
             ->map(function(int $key, int $value) {
@@ -404,11 +398,10 @@ class MapTest extends TestCase
             });
     }
 
-    /**
-     * @expectedException Innmind\Immutable\Exception\InvalidArgumentException
-     */
     public function testTrhowWhenTryingToModifyKeyTypeInTheMap()
     {
+        $this->expectException(InvalidArgumentException::class);
+
         (new Map('int', 'int'))
             ->put(1, 2)
             ->map(function(int $key, int $value) {
@@ -494,12 +487,11 @@ class MapTest extends TestCase
         $this->assertFalse($m3->equals($m2->merge($m)));
     }
 
-    /**
-     * @expectedException Innmind\Immutable\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The 2 maps does not reference the same types
-     */
     public function testThrowWhenMergingSetsOfDifferentType()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The 2 maps does not reference the same types');
+
         (new Map('int', 'int'))->merge(new Map('float', 'int'));
     }
 

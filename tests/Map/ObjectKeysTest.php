@@ -12,7 +12,10 @@ use Innmind\Immutable\{
     Symbol,
     SetInterface,
     StreamInterface,
-    Exception\LogicException
+    Exception\LogicException,
+    Exception\InvalidArgumentException,
+    Exception\ElementNotFoundException,
+    Exception\GroupEmptyMapException
 };
 use PHPUnit\Framework\TestCase;
 
@@ -65,11 +68,10 @@ class ObjectKeysTest extends TestCase
         $this->assertSame(4, $m->size());
     }
 
-    /**
-     * @expectedException Innmind\Immutable\Exception\InvalidArgumentException
-     */
     public function testThrowWhenInvalidType()
     {
+        $this->expectException(InvalidArgumentException::class);
+
         (new ObjectKeys('stdClass', 'int'))->put(new \stdClass, 42.0);
     }
 
@@ -105,51 +107,46 @@ class ObjectKeysTest extends TestCase
         $this->assertSame($v, $m[$k]);
     }
 
-    /**
-     * @expectedException Innmind\Immutable\Exception\LogicException
-     * @expectedExceptionMessage You can't modify a map
-     */
     public function testThrowWhenInjectingData()
     {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('You can\'t modify a map');
+
         $m = new ObjectKeys('stdClass', 'int');
         $m[new \stdClass] = 42;
     }
 
-    /**
-     * @expectedException Innmind\Immutable\Exception\LogicException
-     * @expectedExceptionMessage You can't modify a map
-     */
     public function testThrowWhenDeletingData()
     {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('You can\'t modify a map');
+
         $m = new ObjectKeys('stdClass', 'int');
         $m = $m->put($a = new \stdClass, 42);
 
         unset($m[$a]);
     }
 
-    /**
-     * @expectedException Innmind\Immutable\Exception\ElementNotFoundException
-     */
     public function testThrowWhenUnknownOffset()
     {
+        $this->expectException(ElementNotFoundException::class);
+
         $m = new ObjectKeys('stdClass', 'int');
         $m[new \stdClass];
     }
 
-    /**
-     * @expectedException Innmind\Immutable\Exception\InvalidArgumentException
-     */
     public function testThrowWhenKeyDoesntMatchType()
     {
+        $this->expectException(InvalidArgumentException::class);
+
         $m = new ObjectKeys('stdClass', 'int');
         $m->put(new \stdClass, '42');
     }
 
-    /**
-     * @expectedException Innmind\Immutable\Exception\InvalidArgumentException
-     */
     public function testThrowWhenValueDoesntMatchType()
     {
+        $this->expectException(InvalidArgumentException::class);
+
         $m = new ObjectKeys('stdClass', 'int');
         $m->put(new \stdClass, 42.0);
     }
@@ -162,11 +159,10 @@ class ObjectKeysTest extends TestCase
         $this->assertSame(24, $m->get($a));
     }
 
-    /**
-     * @expectedException Innmind\Immutable\Exception\ElementNotFoundException
-     */
     public function testThrowWhenGettingUnknownKey()
     {
+        $this->expectException(ElementNotFoundException::class);
+
         (new ObjectKeys('stdClass', 'int'))->get(new \stdClass);
     }
 
@@ -243,11 +239,10 @@ class ObjectKeysTest extends TestCase
         $this->assertSame(4, $count);
     }
 
-    /**
-     * @expectedException Innmind\Immutable\Exception\GroupEmptyMapException
-     */
     public function testThrowWhenGroupingAnEmptyMap()
     {
+        $this->expectException(GroupEmptyMapException::class);
+
         (new ObjectKeys('stdClass', 'int'))->groupBy(function() {});
     }
 
@@ -335,11 +330,10 @@ class ObjectKeysTest extends TestCase
         $this->assertSame([1, 12, 9, 14], $m2->values()->toPrimitive());
     }
 
-    /**
-     * @expectedException Innmind\Immutable\Exception\InvalidArgumentException
-     */
     public function testThrowWhenTryingToModifyValueTypeInTheMap()
     {
+        $this->expectException(InvalidArgumentException::class);
+
         (new ObjectKeys('stdClass', 'int'))
             ->put(new \stdClass, 2)
             ->map(function(\stdClass $key, int $value) {
@@ -347,11 +341,10 @@ class ObjectKeysTest extends TestCase
             });
     }
 
-    /**
-     * @expectedException Innmind\Immutable\Exception\InvalidArgumentException
-     */
     public function testThrowWhenTryingToModifyKeyTypeInTheMap()
     {
+        $this->expectException(InvalidArgumentException::class);
+
         (new ObjectKeys('stdClass', 'int'))
             ->put(new \stdClass, 2)
             ->map(function(\stdClass $key, int $value) {
@@ -437,12 +430,11 @@ class ObjectKeysTest extends TestCase
         $this->assertFalse($m3->equals($m2->merge($m)));
     }
 
-    /**
-     * @expectedException Innmind\Immutable\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The 2 maps does not reference the same types
-     */
     public function testThrowWhenMergingSetsOfDifferentType()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The 2 maps does not reference the same types');
+
         (new ObjectKeys('stdClass', 'int'))->merge(new ObjectKeys(Symbol::class, 'int'));
     }
 

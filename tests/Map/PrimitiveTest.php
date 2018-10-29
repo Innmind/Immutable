@@ -11,7 +11,10 @@ use Innmind\Immutable\{
     Str,
     SetInterface,
     StreamInterface,
-    Exception\LogicException
+    Exception\LogicException,
+    Exception\InvalidArgumentException,
+    Exception\ElementNotFoundException,
+    Exception\GroupEmptyMapException
 };
 use PHPUnit\Framework\TestCase;
 
@@ -71,11 +74,10 @@ class PrimitiveTest extends TestCase
         $this->assertSame(4, $m->size());
     }
 
-    /**
-     * @expectedException Innmind\Immutable\Exception\InvalidArgumentException
-     */
     public function testThrowWhenInvalidType()
     {
+        $this->expectException(InvalidArgumentException::class);
+
         (new Primitive('int', 'int'))->put(42, 42.0);
     }
 
@@ -111,51 +113,46 @@ class PrimitiveTest extends TestCase
         $this->assertSame($v, $m[24]);
     }
 
-    /**
-     * @expectedException Innmind\Immutable\Exception\LogicException
-     * @expectedExceptionMessage You can't modify a map
-     */
     public function testThrowWhenInjectingData()
     {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('You can\'t modify a map');
+
         $m = new Primitive('int', 'int');
         $m[24] = 42;
     }
 
-    /**
-     * @expectedException Innmind\Immutable\Exception\LogicException
-     * @expectedExceptionMessage You can't modify a map
-     */
     public function testThrowWhenDeletingData()
     {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('You can\'t modify a map');
+
         $m = new Primitive('int', 'int');
         $m = $m->put(24, 42);
 
         unset($m[24]);
     }
 
-    /**
-     * @expectedException Innmind\Immutable\Exception\ElementNotFoundException
-     */
     public function testThrowWhenUnknownOffset()
     {
+        $this->expectException(ElementNotFoundException::class);
+
         $m = new Primitive('int', 'int');
         $m[24];
     }
 
-    /**
-     * @expectedException Innmind\Immutable\Exception\InvalidArgumentException
-     */
     public function testThrowWhenKeyDoesntMatchType()
     {
+        $this->expectException(InvalidArgumentException::class);
+
         $m = new Primitive('int', 'int');
         $m->put('24', 42);
     }
 
-    /**
-     * @expectedException Innmind\Immutable\Exception\InvalidArgumentException
-     */
     public function testThrowWhenValueDoesntMatchType()
     {
+        $this->expectException(InvalidArgumentException::class);
+
         $m = new Primitive('int', 'int');
         $m->put(24, 42.0);
     }
@@ -168,11 +165,10 @@ class PrimitiveTest extends TestCase
         $this->assertSame(24, $m->get(23));
     }
 
-    /**
-     * @expectedException Innmind\Immutable\Exception\ElementNotFoundException
-     */
     public function testThrowWhenGettingUnknownKey()
     {
+        $this->expectException(ElementNotFoundException::class);
+
         (new Primitive('int', 'int'))->get(24);
     }
 
@@ -271,11 +267,10 @@ class PrimitiveTest extends TestCase
         $this->assertSame(4, $count);
     }
 
-    /**
-     * @expectedException Innmind\Immutable\Exception\GroupEmptyMapException
-     */
     public function testThrowWhenGroupingAnEmptyMap()
     {
+        $this->expectException(GroupEmptyMapException::class);
+
         (new Primitive('int', 'int'))->groupBy(function() {});
     }
 
@@ -367,11 +362,10 @@ class PrimitiveTest extends TestCase
         $this->assertSame([1, 4, 3, 5], $m2->values()->toPrimitive());
     }
 
-    /**
-     * @expectedException Innmind\Immutable\Exception\InvalidArgumentException
-     */
     public function testThrowWhenTryingToModifyValueTypeInTheMap()
     {
+        $this->expectException(InvalidArgumentException::class);
+
         (new Primitive('int', 'int'))
             ->put(1, 2)
             ->map(function(int $key, int $value) {
@@ -379,11 +373,10 @@ class PrimitiveTest extends TestCase
             });
     }
 
-    /**
-     * @expectedException Innmind\Immutable\Exception\InvalidArgumentException
-     */
     public function testThrowWhenTryingToModifyKeyTypeInTheMap()
     {
+        $this->expectException(InvalidArgumentException::class);
+
         (new Primitive('int', 'int'))
             ->put(1, 2)
             ->map(function(int $key, int $value) {
@@ -469,12 +462,11 @@ class PrimitiveTest extends TestCase
         $this->assertFalse($m3->equals($m2->merge($m)));
     }
 
-    /**
-     * @expectedException Innmind\Immutable\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The 2 maps does not reference the same types
-     */
     public function testThrowWhenMergingSetsOfDifferentType()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The 2 maps does not reference the same types');
+
         (new Primitive('int', 'int'))->merge(new Primitive('string', 'int'));
     }
 

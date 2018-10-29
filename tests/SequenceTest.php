@@ -10,7 +10,11 @@ use Innmind\Immutable\{
     PrimitiveInterface,
     Str,
     MapInterface,
-    StreamInterface
+    StreamInterface,
+    Exception\LogicException,
+    Exception\OutOfBoundException,
+    Exception\GroupEmptySequenceException,
+    Exception\ElementNotFoundException
 };
 use PHPUnit\Framework\TestCase;
 
@@ -66,22 +70,20 @@ class SequenceTest extends TestCase
         $this->assertSame(2, (new Sequence(1, 2))[1]);
     }
 
-    /**
-     * @expectedException Innmind\Immutable\Exception\LogicException
-     * @expectedExceptionMessage You can't modify a sequence
-     */
     public function testThrowWhenAddingAnElement()
     {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('You can\'t modify a sequence');
+
         $s = new Sequence;
         $s[0] = 1;
     }
 
-    /**
-     * @expectedException Innmind\Immutable\Exception\LogicException
-     * @expectedExceptionMessage You can't modify a sequence
-     */
     public function testThrowWhenRemovingAnElement()
     {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('You can\'t modify a sequence');
+
         $s = new Sequence(1);
         unset($s[0]);
     }
@@ -91,11 +93,10 @@ class SequenceTest extends TestCase
         $this->assertSame(3, (new Sequence(1, 2, 3))->get(2));
     }
 
-    /**
-     * @expectedException Innmind\Immutable\Exception\OutOfBoundException
-     */
     public function testThrowWhenAccessingUnknownIndex()
     {
+        $this->expectException(OutOfBoundException::class);
+
         (new Sequence)->get(0);
     }
 
@@ -235,11 +236,10 @@ class SequenceTest extends TestCase
         $this->assertSame([2, 4], $m->get(0)->toPrimitive());
     }
 
-    /**
-     * @expectedException Innmind\Immutable\Exception\GroupEmptySequenceException
-     */
     public function testThrowWhenGroupingAnEmptySequence()
     {
+        $this->expectException(GroupEmptySequenceException::class);
+
         (new Sequence)->groupBy(function() {});
     }
 
@@ -253,11 +253,10 @@ class SequenceTest extends TestCase
         $this->assertSame(1, $s->key());
     }
 
-    /**
-     * @expectedException Innmind\Immutable\Exception\OutOfBoundException
-     */
     public function testThrowWhenAccessingFirstValueOnEmptySequence()
     {
+        $this->expectException(OutOfBoundException::class);
+
         (new Sequence)->first();
     }
 
@@ -271,11 +270,10 @@ class SequenceTest extends TestCase
         $this->assertSame(1, $s->key());
     }
 
-    /**
-     * @expectedException Innmind\Immutable\Exception\OutOfBoundException
-     */
     public function testThrowWhenAccessingLastValueOnEmptySequence()
     {
+        $this->expectException(OutOfBoundException::class);
+
         (new Sequence)->last();
     }
 
@@ -297,11 +295,10 @@ class SequenceTest extends TestCase
         $this->assertSame(4, $s->indexOf($o));
     }
 
-    /**
-     * @expectedException Innmind\Immutable\Exception\ElementNotFoundException
-     */
     public function testThrowWhenElementNotInSequence()
     {
+        $this->expectException(ElementNotFoundException::class);
+
         (new Sequence)->indexOf(1);
     }
 
