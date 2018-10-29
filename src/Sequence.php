@@ -362,9 +362,9 @@ class Sequence implements SequenceInterface
         $false = new self;
         $false->values = $falsy;
 
-        return (new Map('bool', SequenceInterface::class))
-            ->put(true, $true)
-            ->put(false, $false);
+        return Map::of('bool', SequenceInterface::class)
+            (true, $true)
+            (false, $false);
     }
 
     /**

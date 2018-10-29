@@ -354,9 +354,9 @@ class Stream implements StreamInterface
         $false = $this->clear();
         $false->values = new Sequence(...$falsy);
 
-        return (new Map('bool', StreamInterface::class))
-            ->put(true, $true)
-            ->put(false, $false);
+        return Map::of('bool', StreamInterface::class)
+            (true, $true)
+            (false, $false);
     }
 
     /**

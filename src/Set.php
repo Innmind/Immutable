@@ -253,9 +253,9 @@ class Set implements SetInterface
         $truthy->values = $partitions->get(true);
         $falsy->values = $partitions->get(false);
 
-        return (new Map('bool', SetInterface::class))
-            ->put(true, $truthy)
-            ->put(false, $falsy);
+        return Map::of('bool', SetInterface::class)
+            (true, $truthy)
+            (false, $falsy);
     }
 
     /**
