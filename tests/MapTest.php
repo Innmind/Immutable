@@ -45,6 +45,11 @@ class MapTest extends TestCase
         );
     }
 
+    public function testEmptyOf()
+    {
+        $this->assertTrue(Map::of('int', 'int')->equals(new Map('int', 'int')));
+    }
+
     /**
      * @expectedException LogicException
      * @expectedExceptionMessage Different sizes of keys and values

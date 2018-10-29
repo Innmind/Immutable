@@ -39,8 +39,8 @@ final class Map implements MapInterface
     public static function of(
         string $key,
         string $value,
-        array $keys,
-        array $values
+        array $keys = [],
+        array $values = []
     ): self {
         $keys = \array_values($keys);
         $values = \array_values($values);
