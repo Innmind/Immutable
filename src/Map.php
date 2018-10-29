@@ -14,26 +14,22 @@ final class Map implements MapInterface
 {
     use Type;
 
-    private $keyType;
-    private $valueType;
-    private $keySpecification;
-    private $valueSpecification;
-    private $keys;
-    private $values;
-    private $pairs;
+    private $implementation;
 
     /**
      * {@inheritdoc}
      */
     public function __construct(string $keyType, string $valueType)
     {
-        $this->keySpecification = $this->getSpecificationFor($keyType);
-        $this->valueSpecification = $this->getSpecificationFor($valueType);
-        $this->keyType = new Str($keyType);
-        $this->valueType = new Str($valueType);
-        $this->keys = new Stream($keyType);
-        $this->values = new Stream($valueType);
-        $this->pairs = new Stream(Pair::class);
+        $type = $this->getSpecificationFor($keyType);
+
+        if ($type instanceof ClassType) {
+            $this->implementation = new Map\ObjectKeys($keyType, $valueType);
+        } else if (\in_array($keyType, ['int', 'integer', 'string'], true)) {
+            $this->implementation = new Map\Primitive($keyType, $valueType);
+        } else {
+            $this->implementation = new Map\DoubleIndex($keyType, $valueType);
+        }
     }
 
     public static function of(
@@ -63,7 +59,7 @@ final class Map implements MapInterface
      */
     public function keyType(): Str
     {
-        return $this->keyType;
+        return $this->implementation->keyType();
     }
 
     /**
@@ -71,7 +67,7 @@ final class Map implements MapInterface
      */
     public function valueType(): Str
     {
-        return $this->valueType;
+        return $this->implementation->valueType();
     }
 
     /**
@@ -79,7 +75,7 @@ final class Map implements MapInterface
      */
     public function size(): int
     {
-        return $this->keys->size();
+        return $this->implementation->size();
     }
 
     /**
@@ -87,7 +83,7 @@ final class Map implements MapInterface
      */
     public function count(): int
     {
-        return $this->keys->count();
+        return $this->implementation->count();
     }
 
     /**
@@ -95,7 +91,7 @@ final class Map implements MapInterface
      */
     public function current()
     {
-        return $this->values->current();
+        return $this->implementation->current();
     }
 
     /**
@@ -103,7 +99,7 @@ final class Map implements MapInterface
      */
     public function key()
     {
-        return $this->keys->current();
+        return $this->implementation->key();
     }
 
     /**
@@ -111,9 +107,7 @@ final class Map implements MapInterface
      */
     public function next()
     {
-        $this->keys->next();
-        $this->values->next();
-        $this->pairs->next();
+        $this->implementation->next();
     }
 
     /**
@@ -121,9 +115,7 @@ final class Map implements MapInterface
      */
     public function rewind()
     {
-        $this->keys->rewind();
-        $this->values->rewind();
-        $this->pairs->rewind();
+        $this->implementation->rewind();
     }
 
     /**
@@ -131,7 +123,7 @@ final class Map implements MapInterface
      */
     public function valid()
     {
-        return $this->keys->valid();
+        return $this->implementation->valid();
     }
 
     /**
@@ -139,7 +131,7 @@ final class Map implements MapInterface
      */
     public function offsetExists($offset): bool
     {
-        return $this->keys->contains($offset);
+        return $this->implementation->offsetExists($offset);
     }
 
     /**
@@ -147,7 +139,7 @@ final class Map implements MapInterface
      */
     public function offsetGet($offset)
     {
-        return $this->get($offset);
+        return $this->implementation->offsetGet($offset);
     }
 
     /**
@@ -171,24 +163,8 @@ final class Map implements MapInterface
      */
     public function put($key, $value): MapInterface
     {
-        $this->keySpecification->validate($key);
-        $this->valueSpecification->validate($value);
-
         $map = clone $this;
-
-        if ($this->keys->contains($key)) {
-            $index = $this->keys->indexOf($key);
-            $map->values = $this->values->take($index)
-                ->add($value)
-                ->append($this->values->drop($index + 1));
-            $map->pairs = $this->pairs->take($index)
-                ->add(new Pair($key, $value))
-                ->append($this->pairs->drop($index + 1));
-        } else {
-            $map->keys = $this->keys->add($key);
-            $map->values = $this->values->add($value);
-            $map->pairs = $this->pairs->add(new Pair($key, $value));
-        }
+        $map->implementation = $this->implementation->put($key, $value);
 
         return $map;
     }
@@ -219,13 +195,7 @@ final class Map implements MapInterface
      */
     public function get($key)
     {
-        if (!$this->keys->contains($key)) {
-            throw new ElementNotFoundException;
-        }
-
-        return $this->values->get(
-            $this->keys->indexOf($key)
-        );
+        return $this->implementation->get($key);
     }
 
     /**
@@ -233,7 +203,7 @@ final class Map implements MapInterface
      */
     public function contains($key): bool
     {
-        return $this->keys->contains($key);
+        return $this->implementation->contains($key);
     }
 
     /**
@@ -242,9 +212,7 @@ final class Map implements MapInterface
     public function clear(): MapInterface
     {
         $map = clone $this;
-        $map->keys = $this->keys->clear();
-        $map->values = $this->values->clear();
-        $map->pairs = $this->pairs->clear();
+        $map->implementation = $this->implementation->clear();
 
         return $map;
     }
@@ -254,17 +222,7 @@ final class Map implements MapInterface
      */
     public function equals(MapInterface $map): bool
     {
-        if (!$map->keys()->equals($this->keys())) {
-            return false;
-        }
-
-        foreach ($this->pairs as $pair) {
-            if ($map->get($pair->key()) !== $pair->value()) {
-                return false;
-            }
-        }
-
-        return true;
+        return $this->implementation->equals($map);
     }
 
     /**
@@ -273,14 +231,7 @@ final class Map implements MapInterface
     public function filter(callable $predicate): MapInterface
     {
         $map = $this->clear();
-
-        foreach ($this->pairs as $pair) {
-            if ($predicate($pair->key(), $pair->value()) === true) {
-                $map->keys = $map->keys->add($pair->key());
-                $map->values = $map->values->add($pair->value());
-                $map->pairs = $map->pairs->add($pair);
-            }
-        }
+        $map->implementation = $this->implementation->filter($predicate);
 
         return $map;
     }
@@ -290,9 +241,7 @@ final class Map implements MapInterface
      */
     public function foreach(callable $function): MapInterface
     {
-        foreach ($this->pairs as $pair) {
-            $function($pair->key(), $pair->value());
-        }
+        $this->implementation->foreach($function);
 
         return $this;
     }
@@ -302,42 +251,7 @@ final class Map implements MapInterface
      */
     public function groupBy(callable $discriminator): MapInterface
     {
-        if ($this->size() === 0) {
-            throw new GroupEmptyMapException;
-        }
-
-        $map = null;
-
-        foreach ($this->pairs as $pair) {
-            $key = $discriminator($pair->key(), $pair->value());
-
-            if ($map === null) {
-                $map = new self(
-                    $this->determineType($key),
-                    MapInterface::class
-                );
-            }
-
-            if ($map->contains($key)) {
-                $map = $map->put(
-                    $key,
-                    $map->get($key)->put(
-                        $pair->key(),
-                        $pair->value()
-                    )
-                );
-            } else {
-                $map = $map->put(
-                    $key,
-                    $this->clear()->put(
-                        $pair->key(),
-                        $pair->value()
-                    )
-                );
-            }
-        }
-
-        return $map;
+        return $this->implementation->groupBy($discriminator);
     }
 
     /**
@@ -345,7 +259,7 @@ final class Map implements MapInterface
      */
     public function keys(): SetInterface
     {
-        return Set::of((string) $this->keyType, ...$this->keys);
+        return $this->implementation->keys();
     }
 
     /**
@@ -353,7 +267,7 @@ final class Map implements MapInterface
      */
     public function values(): StreamInterface
     {
-        return $this->values;
+        return $this->implementation->values();
     }
 
     /**
@@ -362,23 +276,7 @@ final class Map implements MapInterface
     public function map(callable $function): MapInterface
     {
         $map = $this->clear();
-
-        foreach ($this->pairs as $pair) {
-            $return = $function(
-                $pair->key(),
-                $pair->value()
-            );
-
-            if ($return instanceof Pair) {
-                $key = $return->key();
-                $value = $return->value();
-            } else {
-                $key = $pair->key();
-                $value = $return;
-            }
-
-            $map = $map->put($key, $value);
-        }
+        $map->implementation = $this->implementation->map($function);
 
         return $map;
     }
@@ -388,7 +286,7 @@ final class Map implements MapInterface
      */
     public function join(string $separator): Str
     {
-        return $this->values->join($separator);
+        return $this->implementation->join($separator);
     }
 
     /**
@@ -396,24 +294,8 @@ final class Map implements MapInterface
      */
     public function remove($key): MapInterface
     {
-        if (!$this->contains($key)) {
-            return $this;
-        }
-
-        $index = $this->keys->indexOf($key);
         $map = clone $this;
-        $map->keys = $this
-            ->keys
-            ->slice(0, $index)
-            ->append($this->keys->slice($index + 1, $this->keys->size()));
-        $map->values = $this
-            ->values
-            ->slice(0, $index)
-            ->append($this->values->slice($index + 1, $this->values->size()));
-        $map->pairs = $this
-            ->pairs
-            ->slice(0, $index)
-            ->append($this->pairs->slice($index + 1, $this->pairs->size()));
+        $map->implementation = $this->implementation->remove($key);
 
         return $map;
     }
@@ -423,21 +305,10 @@ final class Map implements MapInterface
      */
     public function merge(MapInterface $map): MapInterface
     {
-        if (
-            !$this->keyType()->equals($map->keyType()) ||
-            !$this->valueType()->equals($map->valueType())
-        ) {
-            throw new InvalidArgumentException(
-                'The 2 maps does not reference the same types'
-            );
-        }
+        $self = clone $this;
+        $self->implementation = $this->implementation->merge($map);
 
-        return $map->reduce(
-            $this,
-            function(self $carry, $key, $value): self {
-                return $carry->put($key, $value);
-            }
-        );
+        return $self;
     }
 
     /**
@@ -445,25 +316,7 @@ final class Map implements MapInterface
      */
     public function partition(callable $predicate): MapInterface
     {
-        $truthy = $this->clear();
-        $falsy = $this->clear();
-
-        foreach ($this->pairs as $pair) {
-            $return = $predicate(
-                $pair->key(),
-                $pair->value()
-            );
-
-            if ($return === true) {
-                $truthy = $truthy->put($pair->key(), $pair->value());
-            } else {
-                $falsy = $falsy->put($pair->key(), $pair->value());
-            }
-        }
-
-        return (new self('bool', MapInterface::class))
-            ->put(true, $truthy)
-            ->put(false, $falsy);
+        return $this->implementation->partition($predicate);
     }
 
     /**
@@ -471,10 +324,6 @@ final class Map implements MapInterface
      */
     public function reduce($carry, callable $reducer)
     {
-        foreach ($this->pairs as $pair) {
-            $carry = $reducer($carry, $pair->key(), $pair->value());
-        }
-
-        return $carry;
+        return $this->implementation->reduce($carry, $reducer);
     }
 }

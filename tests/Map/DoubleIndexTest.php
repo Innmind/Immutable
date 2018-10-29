@@ -1,10 +1,10 @@
 <?php
 declare(strict_types = 1);
 
-namespace Tests\Innmind\Immutable;
+namespace Tests\Innmind\Immutable\Map;
 
 use Innmind\Immutable\{
-    Map,
+    Map\DoubleIndex,
     MapInterface,
     SizeableInterface,
     Pair,
@@ -15,11 +15,11 @@ use Innmind\Immutable\{
 };
 use PHPUnit\Framework\TestCase;
 
-class MapTest extends TestCase
+class DoubleIndexTest extends TestCase
 {
     public function testInterface()
     {
-        $m = new Map('int', 'float');
+        $m = new DoubleIndex('int', 'float');
 
         $this->assertInstanceOf(MapInterface::class, $m);
         $this->assertInstanceOf(SizeableInterface::class, $m);
@@ -32,36 +32,9 @@ class MapTest extends TestCase
         $this->assertSame('float', (string) $m->valueType());
     }
 
-    public function testOf()
-    {
-        $map = Map::of('int', 'float', [1, 2], [1.1, 2.1]);
-
-        $this->assertTrue(
-            $map->equals(
-                (new Map('int', 'float'))
-                    ->put(1, 1.1)
-                    ->put(2, 2.1)
-            )
-        );
-    }
-
-    public function testEmptyOf()
-    {
-        $this->assertTrue(Map::of('int', 'int')->equals(new Map('int', 'int')));
-    }
-
-    /**
-     * @expectedException LogicException
-     * @expectedExceptionMessage Different sizes of keys and values
-     */
-    public function testThrowWhenDifferentSizes()
-    {
-        Map::of('int', 'float', [], [1.1]);
-    }
-
     public function testPut()
     {
-        $m = new Map('int', 'int');
+        $m = new DoubleIndex('int', 'int');
 
         $this->assertSame(0, $m->size());
         $m2 = $m->put(42, 42);
@@ -69,7 +42,7 @@ class MapTest extends TestCase
         $this->assertSame(0, $m->size());
         $this->assertSame(1, $m2->size());
 
-        $m = new Map('int', 'int');
+        $m = new DoubleIndex('int', 'int');
         $m = $m
             ->put(23, 24)
             ->put(41, 42)
@@ -84,29 +57,17 @@ class MapTest extends TestCase
         $this->assertSame(4, $m->size());
     }
 
-    public function testTupleLikeInjection()
-    {
-        $map = Map::of('int', 'int')
-            (1, 2)
-            (3, 4);
-        $expected = Map::of('int', 'int')
-            ->put(1, 2)
-            ->put(3, 4);
-
-        $this->assertTrue($map->equals($expected));
-    }
-
     /**
      * @expectedException Innmind\Immutable\Exception\InvalidArgumentException
      */
     public function testThrowWhenInvalidType()
     {
-        (new Map('int', 'int'))->put(42, 42.0);
+        (new DoubleIndex('int', 'int'))->put(42, 42.0);
     }
 
     public function testIterator()
     {
-        $m = new Map('int', 'int');
+        $m = new DoubleIndex('int', 'int');
         $m = $m
             ->put(23, 24)
             ->put(41, 42)
@@ -129,7 +90,7 @@ class MapTest extends TestCase
 
     public function testArrayAccess()
     {
-        $m = new Map('stdClass', 'stdClass');
+        $m = new DoubleIndex('stdClass', 'stdClass');
         $m = $m->put($k = new \stdClass, $v = new \stdClass);
 
         $this->assertTrue(isset($m[$k]));
@@ -142,7 +103,7 @@ class MapTest extends TestCase
      */
     public function testThrowWhenInjectingData()
     {
-        $m = new Map('int', 'int');
+        $m = new DoubleIndex('int', 'int');
         $m[24] = 42;
     }
 
@@ -152,7 +113,7 @@ class MapTest extends TestCase
      */
     public function testThrowWhenDeletingData()
     {
-        $m = new Map('int', 'int');
+        $m = new DoubleIndex('int', 'int');
         $m = $m->put(24, 42);
 
         unset($m[24]);
@@ -163,7 +124,7 @@ class MapTest extends TestCase
      */
     public function testThrowWhenUnknownOffset()
     {
-        $m = new Map('int', 'int');
+        $m = new DoubleIndex('int', 'int');
         $m[24];
     }
 
@@ -172,7 +133,7 @@ class MapTest extends TestCase
      */
     public function testThrowWhenKeyDoesntMatchType()
     {
-        $m = new Map('int', 'int');
+        $m = new DoubleIndex('int', 'int');
         $m->put('24', 42);
     }
 
@@ -181,13 +142,13 @@ class MapTest extends TestCase
      */
     public function testThrowWhenValueDoesntMatchType()
     {
-        $m = new Map('int', 'int');
+        $m = new DoubleIndex('int', 'int');
         $m->put(24, 42.0);
     }
 
     public function testGet()
     {
-        $m = new Map('int', 'int');
+        $m = new DoubleIndex('int', 'int');
         $m = $m->put(23, 24);
 
         $this->assertSame(24, $m->get(23));
@@ -198,12 +159,12 @@ class MapTest extends TestCase
      */
     public function testThrowWhenGettingUnknownKey()
     {
-        (new Map('int', 'int'))->get(24);
+        (new DoubleIndex('int', 'int'))->get(24);
     }
 
     public function testContains()
     {
-        $m = new Map('int', 'int');
+        $m = new DoubleIndex('int', 'int');
         $m = $m->put(23, 24);
 
         $this->assertFalse($m->contains(24));
@@ -212,12 +173,12 @@ class MapTest extends TestCase
 
     public function testClear()
     {
-        $m = new Map('int', 'float');
+        $m = new DoubleIndex('int', 'float');
         $m = $m->put(24, 42.0);
 
         $m2 = $m->clear();
         $this->assertNotSame($m, $m2);
-        $this->assertInstanceOf(Map::class, $m2);
+        $this->assertInstanceOf(DoubleIndex::class, $m2);
         $this->assertSame(1, $m->size());
         $this->assertSame(0, $m2->size());
         $this->assertSame('int', (string) $m2->keyType());
@@ -226,38 +187,38 @@ class MapTest extends TestCase
 
     public function testEquals()
     {
-        $m = (new Map('int', 'int'))->put(24, 42);
-        $m2 = (new Map('int', 'int'))->put(24, 42);
+        $m = (new DoubleIndex('int', 'int'))->put(24, 42);
+        $m2 = (new DoubleIndex('int', 'int'))->put(24, 42);
 
         $this->assertTrue($m->equals($m2));
         $this->assertFalse($m->equals($m2->put(65, 66)));
         $this->assertFalse($m->equals($m2->put(24, 24)));
         $this->assertFalse(
-            (new Map('string', 'string'))
+            (new DoubleIndex('string', 'string'))
                 ->put('foo_res', 'res')
                 ->put('foo_bar_res', 'res')
                 ->equals(
-                    (new Map('string', 'string'))
+                    (new DoubleIndex('string', 'string'))
                         ->put('foo_res', 'res')
                         ->put('bar_res', 'res')
                 )
         );
 
-        $m = (new Map('int', 'int'))
+        $m = (new DoubleIndex('int', 'int'))
             ->put(24, 42)
             ->put(42, 24);
-        $m2 = (new Map('int', 'int'))
+        $m2 = (new DoubleIndex('int', 'int'))
             ->put(42, 24)
             ->put(24, 42);
 
         $this->assertTrue($m->equals($m2));
 
-        $this->assertTrue((new Map('int', 'int'))->equals(new Map('int', 'int')));
+        $this->assertTrue((new DoubleIndex('int', 'int'))->equals(new DoubleIndex('int', 'int')));
     }
 
     public function testFilter()
     {
-        $m = (new Map('int', 'int'))
+        $m = (new DoubleIndex('int', 'int'))
             ->put(0, 1)
             ->put(1, 2)
             ->put(2, 3)
@@ -268,7 +229,7 @@ class MapTest extends TestCase
         });
 
         $this->assertNotSame($m, $m2);
-        $this->assertInstanceOf(Map::class, $m2);
+        $this->assertInstanceOf(DoubleIndex::class, $m2);
         $this->assertSame($m->keyType(), $m2->keyType());
         $this->assertSame($m->valueType(), $m2->valueType());
         $this->assertSame(4, $m->size());
@@ -281,7 +242,7 @@ class MapTest extends TestCase
 
     public function testForeach()
     {
-        $m = (new Map('int', 'int'))
+        $m = (new DoubleIndex('int', 'int'))
             ->put(0, 1)
             ->put(1, 2)
             ->put(2, 3)
@@ -301,12 +262,12 @@ class MapTest extends TestCase
      */
     public function testThrowWhenGroupingAnEmptyMap()
     {
-        (new Map('int', 'int'))->groupBy(function() {});
+        (new DoubleIndex('int', 'int'))->groupBy(function() {});
     }
 
     public function testGroupBy()
     {
-        $m = (new Map('int', 'int'))
+        $m = (new DoubleIndex('int', 'int'))
             ->put(0, 1)
             ->put(1, 2)
             ->put(2, 3)
@@ -316,7 +277,7 @@ class MapTest extends TestCase
             return ($key + $value) % 3;
         });
         $this->assertNotSame($m, $m2);
-        $this->assertInstanceOf(Map::class, $m2);
+        $this->assertInstanceOf(MapInterface::class, $m2);
         $this->assertSame('int', (string) $m2->keyType());
         $this->assertSame(MapInterface::class, (string) $m2->valueType());
         $this->assertTrue($m2->contains(0));
@@ -338,7 +299,7 @@ class MapTest extends TestCase
     }
     public function testKeys()
     {
-        $m = (new Map('int', 'int'))
+        $m = (new DoubleIndex('int', 'int'))
             ->put(0, 1)
             ->put(1, 2)
             ->put(2, 3)
@@ -353,7 +314,7 @@ class MapTest extends TestCase
 
     public function testValues()
     {
-        $m = (new Map('int', 'int'))
+        $m = (new DoubleIndex('int', 'int'))
             ->put(0, 1)
             ->put(1, 2)
             ->put(2, 3)
@@ -369,7 +330,7 @@ class MapTest extends TestCase
 
     public function testMap()
     {
-        $m = (new Map('int', 'int'))
+        $m = (new DoubleIndex('int', 'int'))
             ->put(0, 1)
             ->put(1, 2)
             ->put(2, 3)
@@ -383,7 +344,7 @@ class MapTest extends TestCase
             return $value**2;
         });
         $this->assertNotSame($m, $m2);
-        $this->assertInstanceOf(Map::class, $m2);
+        $this->assertInstanceOf(DoubleIndex::class, $m2);
         $this->assertSame($m->keyType(), $m2->keyType());
         $this->assertSame($m->valueType(), $m2->valueType());
         $this->assertSame([0, 1, 2, 4], $m->keys()->toPrimitive());
@@ -395,9 +356,9 @@ class MapTest extends TestCase
     /**
      * @expectedException Innmind\Immutable\Exception\InvalidArgumentException
      */
-    public function testTrhowWhenTryingToModifyValueTypeInTheMap()
+    public function testThrowWhenTryingToModifyValueTypeInTheMap()
     {
-        (new Map('int', 'int'))
+        (new DoubleIndex('int', 'int'))
             ->put(1, 2)
             ->map(function(int $key, int $value) {
                 return (string) $value;
@@ -407,9 +368,9 @@ class MapTest extends TestCase
     /**
      * @expectedException Innmind\Immutable\Exception\InvalidArgumentException
      */
-    public function testTrhowWhenTryingToModifyKeyTypeInTheMap()
+    public function testThrowWhenTryingToModifyKeyTypeInTheMap()
     {
-        (new Map('int', 'int'))
+        (new DoubleIndex('int', 'int'))
             ->put(1, 2)
             ->map(function(int $key, int $value) {
                 return new Pair((string) $key, $value);
@@ -418,7 +379,7 @@ class MapTest extends TestCase
 
     public function testJoin()
     {
-        $m = (new Map('int', 'int'))
+        $m = (new DoubleIndex('int', 'int'))
             ->put(0, 1)
             ->put(1, 2)
             ->put(2, 3)
@@ -431,7 +392,7 @@ class MapTest extends TestCase
 
     public function testRemove()
     {
-        $m = (new Map('int', 'int'))
+        $m = (new DoubleIndex('int', 'int'))
             ->put(0, 1)
             ->put(1, 2)
             ->put(2, 3)
@@ -439,13 +400,13 @@ class MapTest extends TestCase
             ->put(4, 5);
 
         $m2 = $m->remove(12);
-        $this->assertTrue($m->equals($m2));
+        $this->assertSame($m, $m2);
         $this->assertSame([0, 1, 2, 3, 4], $m->keys()->toPrimitive());
         $this->assertSame([1, 2, 3, 4, 5], $m->values()->toPrimitive());
 
         $m2 = $m->remove(3);
         $this->assertNotSame($m, $m2);
-        $this->assertInstanceOf(Map::class, $m2);
+        $this->assertInstanceOf(DoubleIndex::class, $m2);
         $this->assertSame([0, 1, 2, 3, 4], $m->keys()->toPrimitive());
         $this->assertSame([1, 2, 3, 4, 5], $m->values()->toPrimitive());
         $this->assertSame([0, 1, 2, 4], $m2->keys()->toPrimitive());
@@ -453,7 +414,7 @@ class MapTest extends TestCase
 
         $m2 = $m->remove(4);
         $this->assertNotSame($m, $m2);
-        $this->assertInstanceOf(Map::class, $m2);
+        $this->assertInstanceOf(DoubleIndex::class, $m2);
         $this->assertSame([0, 1, 2, 3, 4], $m->keys()->toPrimitive());
         $this->assertSame([1, 2, 3, 4, 5], $m->values()->toPrimitive());
         $this->assertSame([0, 1, 2, 3], $m2->keys()->toPrimitive());
@@ -461,7 +422,7 @@ class MapTest extends TestCase
 
         $m2 = $m->remove(0);
         $this->assertNotSame($m, $m2);
-        $this->assertInstanceOf(Map::class, $m2);
+        $this->assertInstanceOf(DoubleIndex::class, $m2);
         $this->assertSame([0, 1, 2, 3, 4], $m->keys()->toPrimitive());
         $this->assertSame([1, 2, 3, 4, 5], $m->values()->toPrimitive());
         $this->assertSame([1, 2, 3, 4], $m2->keys()->toPrimitive());
@@ -470,10 +431,10 @@ class MapTest extends TestCase
 
     public function testMerge()
     {
-        $m = (new Map(Symbol::class, 'int'))
+        $m = (new DoubleIndex(Symbol::class, 'int'))
             ->put($s = new Symbol('foo'), 24)
             ->put($s2 = new Symbol('foo'), 42);
-        $m2 = (new Map(Symbol::class, 'int'))
+        $m2 = (new DoubleIndex(Symbol::class, 'int'))
             ->put($s3 = new Symbol('foo'), 24)
             ->put($s2, 66)
             ->put($s4 = new Symbol('bar'), 42);
@@ -481,7 +442,7 @@ class MapTest extends TestCase
         $m3 = $m->merge($m2);
         $this->assertNotSame($m, $m3);
         $this->assertNotSame($m2, $m3);
-        $this->assertInstanceOf(Map::class, $m3);
+        $this->assertInstanceOf(DoubleIndex::class, $m3);
         $this->assertSame($m->keyType(), $m3->keyType());
         $this->assertSame($m->valueType(), $m3->valueType());
         $this->assertSame(4, $m3->size());
@@ -500,12 +461,12 @@ class MapTest extends TestCase
      */
     public function testThrowWhenMergingSetsOfDifferentType()
     {
-        (new Map('int', 'int'))->merge(new Map('float', 'int'));
+        (new DoubleIndex('int', 'int'))->merge(new DoubleIndex('float', 'int'));
     }
 
     public function testPartition()
     {
-        $m = (new Map('int', 'int'))
+        $m = (new DoubleIndex('int', 'int'))
             ->put(0, 1)
             ->put(1, 2)
             ->put(2, 3)
@@ -516,7 +477,7 @@ class MapTest extends TestCase
             return ($i + $v) % 3 === 0;
         });
 
-        $this->assertInstanceOf(Map::class, $p);
+        $this->assertInstanceOf(MapInterface::class, $p);
         $this->assertNotSame($p, $m);
         $this->assertSame('bool', (string) $p->keyType());
         $this->assertSame(MapInterface::class, (string) $p->valueType());
@@ -548,7 +509,7 @@ class MapTest extends TestCase
 
     public function testReduce()
     {
-        $m = (new Map('int', 'int'))
+        $m = (new DoubleIndex('int', 'int'))
             ->put(4, 4);
 
         $v = $m->reduce(
