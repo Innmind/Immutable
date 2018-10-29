@@ -7,8 +7,6 @@ use Innmind\Immutable\Exception\InvalidArgumentException;
 
 class Set implements SetInterface
 {
-    use Type;
-
     private $type;
     private $spec;
     private $values;
@@ -19,7 +17,7 @@ class Set implements SetInterface
     public function __construct(string $type)
     {
         $this->type = new Str($type);
-        $this->spec = $this->getSpecificationFor($type);
+        $this->spec = Type::of($type);
         $this->values = new Stream($type);
     }
 

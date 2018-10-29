@@ -21,8 +21,6 @@ use Innmind\Immutable\{
 
 final class DoubleIndex implements MapInterface
 {
-    use Type;
-
     private $keyType;
     private $valueType;
     private $keySpecification;
@@ -36,8 +34,8 @@ final class DoubleIndex implements MapInterface
      */
     public function __construct(string $keyType, string $valueType)
     {
-        $this->keySpecification = $this->getSpecificationFor($keyType);
-        $this->valueSpecification = $this->getSpecificationFor($valueType);
+        $this->keySpecification = Type::of($keyType);
+        $this->valueSpecification = Type::of($valueType);
         $this->keyType = new Str($keyType);
         $this->valueType = new Str($valueType);
         $this->keys = new Stream($keyType);
@@ -279,7 +277,7 @@ final class DoubleIndex implements MapInterface
 
             if ($map === null) {
                 $map = new Map(
-                    $this->determineType($key),
+                    Type::determine($key),
                     MapInterface::class
                 );
             }

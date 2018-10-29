@@ -14,8 +14,6 @@ use Innmind\Immutable\Exception\{
  */
 class Stream implements StreamInterface
 {
-    use Type;
-
     private $type;
     private $spec;
     private $values;
@@ -23,7 +21,7 @@ class Stream implements StreamInterface
     public function __construct(string $type)
     {
         $this->type = new Str($type);
-        $this->spec = $this->getSpecificationFor($type);
+        $this->spec = Type::of($type);
         $this->values = new Sequence;
     }
 
@@ -247,7 +245,7 @@ class Stream implements StreamInterface
 
             if ($map === null) {
                 $map = new Map(
-                    $this->determineType($key),
+                    Type::determine($key),
                     StreamInterface::class
                 );
             }

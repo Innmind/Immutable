@@ -22,8 +22,6 @@ use Innmind\Immutable\{
 
 final class ObjectKeys implements MapInterface
 {
-    use Type;
-
     private $keyType;
     private $valueType;
     private $keySpecification;
@@ -35,13 +33,13 @@ final class ObjectKeys implements MapInterface
      */
     public function __construct(string $keyType, string $valueType)
     {
-        $this->keySpecification = $this->getSpecificationFor($keyType);
+        $this->keySpecification = Type::of($keyType);
 
         if (!$this->keySpecification instanceof ClassType) {
             throw new LogicException;
         }
 
-        $this->valueSpecification = $this->getSpecificationFor($valueType);
+        $this->valueSpecification = Type::of($valueType);
         $this->keyType = new Str($keyType);
         $this->valueType = new Str($valueType);
         $this->values = new \SplObjectStorage;
@@ -278,7 +276,7 @@ final class ObjectKeys implements MapInterface
 
             if ($map === null) {
                 $map = new Map(
-                    $this->determineType($key),
+                    Type::determine($key),
                     MapInterface::class
                 );
             }

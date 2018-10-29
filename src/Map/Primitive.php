@@ -21,8 +21,6 @@ use Innmind\Immutable\{
 
 final class Primitive implements MapInterface
 {
-    use Type;
-
     private $keyType;
     private $valueType;
     private $keySpecification;
@@ -35,13 +33,13 @@ final class Primitive implements MapInterface
      */
     public function __construct(string $keyType, string $valueType)
     {
-        $this->keySpecification = $this->getSpecificationFor($keyType);
+        $this->keySpecification = Type::of($keyType);
 
         if (!in_array($keyType, ['int', 'integer', 'string'], true)) {
             throw new LogicException;
         }
 
-        $this->valueSpecification = $this->getSpecificationFor($valueType);
+        $this->valueSpecification = Type::of($valueType);
         $this->keyType = new Str($keyType);
         $this->valueType = new Str($valueType);
         $this->values = [];
@@ -267,7 +265,7 @@ final class Primitive implements MapInterface
 
             if ($map === null) {
                 $map = new Map(
-                    $this->determineType($key),
+                    Type::determine($key),
                     MapInterface::class
                 );
             }

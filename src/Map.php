@@ -12,8 +12,6 @@ use Innmind\Immutable\{
 
 final class Map implements MapInterface
 {
-    use Type;
-
     private $implementation;
 
     /**
@@ -21,7 +19,7 @@ final class Map implements MapInterface
      */
     public function __construct(string $keyType, string $valueType)
     {
-        $type = $this->getSpecificationFor($keyType);
+        $type = Type::of($keyType);
 
         if ($type instanceof ClassType) {
             $this->implementation = new Map\ObjectKeys($keyType, $valueType);

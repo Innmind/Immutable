@@ -15,8 +15,6 @@ use Innmind\Immutable\{
  */
 class Sequence implements SequenceInterface
 {
-    use Type;
-
     private $values;
     private $size;
 
@@ -245,7 +243,7 @@ class Sequence implements SequenceInterface
 
             if ($map === null) {
                 $map = new Map(
-                    $this->determineType($key),
+                    Type::determine($key),
                     SequenceInterface::class
                 );
             }
