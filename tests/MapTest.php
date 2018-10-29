@@ -84,6 +84,18 @@ class MapTest extends TestCase
         $this->assertSame(4, $m->size());
     }
 
+    public function testTupleLikeInjection()
+    {
+        $map = Map::of('int', 'int')
+            (1, 2)
+            (3, 4);
+        $expected = Map::of('int', 'int')
+            ->put(1, 2)
+            ->put(3, 4);
+
+        $this->assertTrue($map->equals($expected));
+    }
+
     /**
      * @expectedException Innmind\Immutable\Exception\InvalidArgumentException
      */

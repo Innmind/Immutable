@@ -194,6 +194,27 @@ final class Map implements MapInterface
     }
 
     /**
+     * Alias for put method in order to have a syntax similar to a true tuple
+     * when constructing the map
+     *
+     * Example:
+     * <code>
+     * Map::of('int', 'int')
+     *     (1, 2)
+     *     (3, 4)
+     * </code>
+     *
+     * @param T $key
+     * @param S $value
+     *
+     * @return self<T, S>
+     */
+    public function __invoke($key, $value): self
+    {
+        return $this->put($key, $value);
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function get($key)
