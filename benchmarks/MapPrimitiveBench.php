@@ -3,7 +3,7 @@ declare(strict_types = 1);
 
 use Innmind\Immutable\Map;
 
-final class MapBench
+final class MapPrimitiveBench
 {
     private $data;
     private $map;
@@ -61,7 +61,7 @@ final class MapBench
     public function benchGroupBy()
     {
         $this->map->groupBy(static function(int $k, int $v): int {
-            return $i % 2;
+            return $v % 2;
         });
     }
 
