@@ -94,4 +94,4 @@ $range->toPrimitive(); //[0, 1, 2, 3? 4, 5, 6, 7, 8, 9, 10]
 
 ## Performance
 
-Latest [performance report](_storage/7e2/9/1/133efa5d4d81f85151ea4ddbb3244c3a347cf990.xml)
+Latest [performance report](_storage/7e2/a/1d/133f025e1f19db4136e3818d6f6b0216d47e184e.xml)
