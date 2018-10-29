@@ -107,7 +107,7 @@ final class MapDoubleIndexBench
     {
         $this->map->reduce(
             0,
-            static function(int $sump, array $k, int $v): int {
+            static function(int $sum, array $k, int $v): int {
                 return $sum + $v;
             }
         );

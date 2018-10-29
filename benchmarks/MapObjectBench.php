@@ -107,7 +107,7 @@ final class MapObjectBench
     {
         $this->map->reduce(
             0,
-            static function(int $sump, \stdClass $k, int $v): int {
+            static function(int $sum, \stdClass $k, int $v): int {
                 return $sum + $v;
             }
         );
