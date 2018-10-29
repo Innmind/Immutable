@@ -4,6 +4,7 @@ declare(strict_types = 1);
 namespace Innmind\Immutable;
 
 use Innmind\Immutable\{
+    Specification\ClassType,
     Exception\InvalidArgumentException,
     Exception\LogicException,
     Exception\ElementNotFoundException,
