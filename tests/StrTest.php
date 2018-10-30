@@ -539,9 +539,9 @@ class StrTest extends TestCase
     public function testThrowWhenMatchInvalidRegex()
     {
         $this->expectException(RegexException::class);
-        $this->expectExceptionMessage('Internal error');
+        $this->expectExceptionMessage('Backtrack limit error');
 
-        (new S(''))->matches('/foo/', 4);
+        (new S(str_repeat("x", 1000000)))->matches('/x+x+y/');
     }
 
     public function testCapture()
@@ -581,9 +581,9 @@ class StrTest extends TestCase
     public function testThrowWhenGettingMatchesInvalidRegex()
     {
         $this->expectException(RegexException::class);
-        $this->expectExceptionMessage('Internal error');
+        $this->expectExceptionMessage('Backtrack limit error');
 
-        (new S(''))->getMatches('/foo/', 4);
+        (new S(str_repeat("x", 1000000)))->capture('/x+x+y/');
     }
 
     public function testPregReplace()

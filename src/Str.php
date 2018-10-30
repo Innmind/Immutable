@@ -3,8 +3,11 @@ declare(strict_types = 1);
 
 namespace Innmind\Immutable;
 
-use Innmind\Immutable\Exception\RegexException;
-use Innmind\Immutable\Exception\SubstringException;
+use Innmind\Immutable\{
+    Exception\RegexException,
+    Exception\SubstringException,
+    Exception\LogicException
+};
 
 class Str implements PrimitiveInterface, StringableInterface
 {
@@ -382,22 +385,18 @@ class Str implements PrimitiveInterface, StringableInterface
      * Check if the string match the given regular expression
      *
      * @param string $regex
-     * @param int $offset
      *
      * @throws Exception If the regex failed
      *
      * @return bool
      */
-    public function matches(string $regex, int $offset = 0): bool
+    public function matches(string $regex): bool
     {
-        $matches = [];
-        $value = \preg_match($regex, $this->value, $matches, 0, $offset);
-
-        if ($value === false) {
-            throw new RegexException('', \preg_last_error());
+        if (\func_num_args() !== 1) {
+            throw new LogicException('Offset is no longer supported');
         }
 
-        return (bool) $value;
+        return RegExp::of($regex)->matches($this);
     }
 
     /**
@@ -425,37 +424,18 @@ class Str implements PrimitiveInterface, StringableInterface
      * Return a collection of the elements matching the regex
      *
      * @param string $regex
-     * @param int $offset
-     * @param int $flags
      *
      * @throws Exception If the regex failed
      *
      * @return MapInterface<scalar, self>
      */
-    public function capture(
-        string $regex,
-        int $offset = 0,
-        int $flags = self::PREG_NO_FLAGS
-    ): MapInterface {
-        $matches = [];
-        $value = \preg_match(
-            $regex,
-            $this->value,
-            $matches,
-            $flags,
-            $offset
-        );
-        $map = new Map('scalar', self::class);
-
-        foreach ($matches as $key => $match) {
-            $map = $map->put($key, new self((string) $match, $this->encoding));
+    public function capture(string $regex): MapInterface
+    {
+        if (\func_num_args() !== 1) {
+            throw new LogicException('Offset and flags are no longer supported');
         }
 
-        if ($value === false) {
-            throw new RegexException('', \preg_last_error());
-        }
-
-        return $map;
+        return RegExp::of($regex)->capture($this);
     }
 
     /**
