@@ -81,6 +81,20 @@ echo $var
 echo $var; // outputs: the hitchhiker\'s guide to the galaxy
 ```
 
+## Regular expressions
+
+```php
+use Innmind\Immutable\{
+    RegExp,
+    Str
+};
+
+$regexp = new RegExp('/(?<i>\d+)/');
+$regexp->matches(Str::of('foo123bar')); // true
+$regexp->matches(Str::of('foobar')); // false
+$regexp->capture(Str::of('foo123bar')); // MapInterface<scalar, Str> with index `i` set to Str::of('123')
+```
+
 ## Range
 
 ```php
@@ -94,4 +108,4 @@ $range->toPrimitive(); //[0, 1, 2, 3? 4, 5, 6, 7, 8, 9, 10]
 
 ## Performance
 
-Latest [performance report](_storage/7e2/9/1/133efa5d4d81f85151ea4ddbb3244c3a347cf990.xml)
+Latest [performance report](_storage/7e2/a/1d/133f0254e4c12bbe78b39429790c450a5e7e6d84.xml)

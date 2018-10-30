@@ -11,7 +11,8 @@ use Innmind\Immutable\{
     MapInterface,
     SequenceInterface,
     Str,
-    StreamInterface
+    StreamInterface,
+    Exception\InvalidArgumentException
 };
 use PHPUnit\Framework\TestCase;
 
@@ -60,11 +61,10 @@ class SetTest extends TestCase
         $this->assertSame([42, 24], $s->toPrimitive());
     }
 
-    /**
-     * @expectedException Innmind\Immutable\Exception\InvalidArgumentException
-     */
     public function testThrowWhenAddindInvalidElementType()
     {
+        $this->expectException(InvalidArgumentException::class);
+
         (new Set('int'))->add(42.0);
     }
 
@@ -105,12 +105,11 @@ class SetTest extends TestCase
         $this->assertSame([42], $s2->toPrimitive());
     }
 
-    /**
-     * @expectedException Innmind\Immutable\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The 2 sets does not reference the same type
-     */
     public function testThrowWhenIntersectingSetsOfDifferentTypes()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The 2 sets does not reference the same type');
+
         (new Set('int'))->intersect(new Set('float'));
     }
 
@@ -159,12 +158,11 @@ class SetTest extends TestCase
         $this->assertSame([24, 66], $s2->toPrimitive());
     }
 
-    /**
-     * @expectedException Innmind\Immutable\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The 2 sets does not reference the same type
-     */
     public function testThrowWhenDiffingSetsOfDifferentType()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The 2 sets does not reference the same type');
+
         (new Set('int'))->diff(new Set('float'));
     }
 
@@ -193,12 +191,11 @@ class SetTest extends TestCase
         );
     }
 
-    /**
-     * @expectedException Innmind\Immutable\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The 2 sets does not reference the same type
-     */
     public function testThrowWhenCheckingEqualityBetweenSetsOfDifferentType()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The 2 sets does not reference the same type');
+
         (new Set('int'))->equals(new Set('float'));
     }
 
@@ -274,11 +271,10 @@ class SetTest extends TestCase
         $this->assertSame([1, 4, 9, 16], $s2->toPrimitive());
     }
 
-    /**
-     * @expectedException Innmind\Immutable\Exception\InvalidArgumentException
-     */
     public function testThrowWhenTryingToModifyValueTypeInMap()
     {
+        $this->expectException(InvalidArgumentException::class);
+
         (new Set('int'))
             ->add(1)
             ->map(function(int $value) {
@@ -372,12 +368,11 @@ class SetTest extends TestCase
         $this->assertSame($s->type(), $s->merge(new Set('int'))->type());
     }
 
-    /**
-     * @expectedException Innmind\Immutable\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The 2 sets does not reference the same type
-     */
     public function testThrowWhenMergingSetsOfDifferentType()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The 2 sets does not reference the same type');
+
         (new Set('int'))->merge(new Set('float'));
     }
 

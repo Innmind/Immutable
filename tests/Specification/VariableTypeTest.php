@@ -3,7 +3,10 @@ declare(strict_types = 1);
 
 namespace Tests\Innmind\Immutable\Specification;
 
-use Innmind\Immutable\Specification\VariableType;
+use Innmind\Immutable\{
+    Specification\VariableType,
+    Exception\InvalidArgumentException
+};
 use PHPUnit\Framework\TestCase;
 
 class VariableTypeTest extends TestCase
@@ -19,11 +22,10 @@ class VariableTypeTest extends TestCase
         $this->assertNull($type->validate([]));
     }
 
-    /**
-     * @expectedException Innmind\Immutable\Exception\InvalidArgumentException
-     */
     public function testThrowWhenValidationFails()
     {
+        $this->expectException(InvalidArgumentException::class);
+
         (new VariableType)->validate(new \stdClass);
     }
 }

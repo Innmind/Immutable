@@ -10,7 +10,7 @@ use Innmind\Immutable\{
     Specification\MixedType
 };
 
-trait Type
+final class Type
 {
     /**
      * Build the appropriate specification for the given type
@@ -19,7 +19,7 @@ trait Type
      *
      * @return SpecificationInterface
      */
-    private function getSpecificationFor(string $type): SpecificationInterface
+    public static function of(string $type): SpecificationInterface
     {
         if (\function_exists('is_'.$type)) {
             return new PrimitiveType($type);
@@ -43,7 +43,7 @@ trait Type
      *
      * @return string
      */
-    private function determineType($value): string
+    public static function determine($value): string
     {
         $type = \gettype($value);
 

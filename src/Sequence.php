@@ -15,8 +15,6 @@ use Innmind\Immutable\{
  */
 class Sequence implements SequenceInterface
 {
-    use Type;
-
     private $values;
     private $size;
 
@@ -245,7 +243,7 @@ class Sequence implements SequenceInterface
 
             if ($map === null) {
                 $map = new Map(
-                    $this->determineType($key),
+                    Type::determine($key),
                     SequenceInterface::class
                 );
             }
@@ -364,9 +362,9 @@ class Sequence implements SequenceInterface
         $false = new self;
         $false->values = $falsy;
 
-        return (new Map('bool', SequenceInterface::class))
-            ->put(true, $true)
-            ->put(false, $false);
+        return Map::of('bool', SequenceInterface::class)
+            (true, $true)
+            (false, $false);
     }
 
     /**

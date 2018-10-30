@@ -8,7 +8,9 @@ use Innmind\Immutable\{
     PrimitiveInterface,
     StringableInterface,
     StreamInterface,
-    MapInterface
+    MapInterface,
+    Exception\SubstringException,
+    Exception\RegexException
 };
 use PHPUnit\Framework\TestCase;
 
@@ -33,12 +35,11 @@ class StrTest extends TestCase
         $this->assertSame('ASCII', (string) $str->encoding());
     }
 
-    /**
-     * @expectedException TypeError
-     * @expectedExceptionMessage must be of the type string, integer given
-     */
     public function testThrowWhenInvalidType()
     {
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage('must be of the type string, integer given');
+
         new S(42);
     }
 
@@ -228,12 +229,11 @@ class StrTest extends TestCase
         $this->assertSame(7, $emoji->toEncoding('ASCII')->position('bar'));
     }
 
-    /**
-     * @expectedException Innmind\Immutable\Exception\SubstringException
-     * @expectedExceptionMessage Substring "o" not found
-     */
     public function testThrowWhenPositionNotFound()
     {
+        $this->expectException(SubstringException::class);
+        $this->expectExceptionMessage('Substring "o" not found');
+
         (new S('bar'))->position('o');
     }
 
@@ -298,12 +298,11 @@ class StrTest extends TestCase
         $this->assertSame('🙏bar', (string) $str2);
     }
 
-    /**
-     * @expectedException Innmind\Immutable\Exception\SubstringException
-     * @expectedExceptionMessage Substring "foo" not found
-     */
     public function testThrowWhenStrDelimiterNotFound()
     {
+        $this->expectException(SubstringException::class);
+        $this->expectExceptionMessage('Substring "foo" not found');
+
         (new S('name@example.com'))->str('foo');
     }
 
@@ -537,13 +536,12 @@ class StrTest extends TestCase
         $this->assertTrue((new S('foo🙏bar'))->toEncoding('ASCII')->matches('/🙏/'));
     }
 
-    /**
-     * @expectedException Innmind\Immutable\Exception\RegexException
-     * @expectedExceptionMessage Internal error
-     */
     public function testThrowWhenMatchInvalidRegex()
     {
-        (new S(''))->matches('/foo/', 4);
+        $this->expectException(RegexException::class);
+        $this->expectExceptionMessage('Backtrack limit error');
+
+        (new S(str_repeat("x", 1000000)))->matches('/x+x+y/');
     }
 
     public function testCapture()
@@ -580,13 +578,12 @@ class StrTest extends TestCase
         $this->assertSame('.7', (string) $matches->get(6));
     }
 
-    /**
-     * @expectedException Innmind\Immutable\Exception\RegexException
-     * @expectedExceptionMessage Internal error
-     */
     public function testThrowWhenGettingMatchesInvalidRegex()
     {
-        (new S(''))->getMatches('/foo/', 4);
+        $this->expectException(RegexException::class);
+        $this->expectExceptionMessage('Backtrack limit error');
+
+        (new S(str_repeat("x", 1000000)))->capture('/x+x+y/');
     }
 
     public function testPregReplace()

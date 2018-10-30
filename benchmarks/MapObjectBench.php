@@ -3,7 +3,7 @@ declare(strict_types = 1);
 
 use Innmind\Immutable\Map;
 
-final class MapBench
+final class MapObjectBench
 {
     private $data;
     private $map;
@@ -12,9 +12,11 @@ final class MapBench
     {
         $this->data = unserialize(file_get_contents(__DIR__.'/fixtures.data'));
         $this->map = Map::of(
+            'stdClass',
             'int',
-            'int',
-            array_keys($this->data),
+            array_map(function() {
+                return new \stdClass;
+            }, array_keys($this->data)),
             array_values($this->data)
         );
     }
@@ -22,21 +24,23 @@ final class MapBench
     public function benchNamedConstructor()
     {
         Map::of(
+            'stdClass',
             'int',
-            'int',
-            array_keys($this->data),
+            array_map(function() {
+                return new \stdClass;
+            }, array_keys($this->data)),
             array_values($this->data)
         );
     }
 
     public function benchGet()
     {
-        $this->map->get(500);
+        $this->map->get($this->map->key());
     }
 
     public function benchContains()
     {
-        $this->map->contains(500);
+        $this->map->contains(new \stdClass);
     }
 
     public function benchEquals()
@@ -46,22 +50,22 @@ final class MapBench
 
     public function benchFilter()
     {
-        $this->map->filter(static function(int $k, int $v): bool {
+        $this->map->filter(static function(\stdClass $k, int $v): bool {
             return $v % 2 === 0;
         });
     }
 
     public function benchForeach()
     {
-        $this->map->foreach(static function(int $k, int $v): void {
+        $this->map->foreach(static function(\stdClass $k, int $v): void {
             // pass
         });
     }
 
     public function benchGroupBy()
     {
-        $this->map->groupBy(static function(int $k, int $v): int {
-            return $i % 2;
+        $this->map->groupBy(static function(\stdClass $k, int $v): int {
+            return $v % 2;
         });
     }
 
@@ -77,14 +81,14 @@ final class MapBench
 
     public function benchMap()
     {
-        $this->map->map(static function(int $i): int {
+        $this->map->map(static function(\stdClass $k, int $i): int {
             return $i ** 2;
         });
     }
 
     public function benchRemove()
     {
-        $this->map->remove(500);
+        $this->map->remove($this->map->key());
     }
 
     public function benchMerge()
@@ -94,7 +98,7 @@ final class MapBench
 
     public function benchPartition()
     {
-        $this->map->partition(static function(int $k, int $v): bool {
+        $this->map->partition(static function(\stdClass $k, int $v): bool {
             return $v % 2 === 0;
         });
     }
@@ -103,8 +107,8 @@ final class MapBench
     {
         $this->map->reduce(
             0,
-            static function(int $sump, int $k, int $v): int {
-                return $sum + $k + $v;
+            static function(int $sum, \stdClass $k, int $v): int {
+                return $sum + $v;
             }
         );
     }

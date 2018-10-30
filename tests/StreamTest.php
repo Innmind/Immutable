@@ -9,7 +9,11 @@ use Innmind\Immutable\{
     SizeableInterface,
     PrimitiveInterface,
     Str,
-    MapInterface
+    MapInterface,
+    Exception\OutOfBoundException,
+    Exception\LogicException,
+    Exception\InvalidArgumentException,
+    Exception\GroupEmptySequenceException
 };
 use PHPUnit\Framework\TestCase;
 
@@ -107,30 +111,27 @@ class StreamTest extends TestCase
         $this->assertSame(1, $stream[0]);
     }
 
-    /**
-     * @expectedException Innmind\Immutable\Exception\OutOfBoundException
-     */
     public function testThrowWhenAccessingUnknownIndex()
     {
+        $this->expectException(OutOfBoundException::class);
+
         (new Stream('int'))[0];
     }
 
-    /**
-     * @expectedException Innmind\Immutable\Exception\LogicException
-     * @expectedExceptionMessage You can't modify a stream
-     */
     public function testThrowWhenSettingValue()
     {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('You can\'t modify a stream');
+
         $stream = new Stream('int');
         $stream[0] = 1;
     }
 
-    /**
-     * @expectedException Innmind\Immutable\Exception\LogicException
-     * @expectedExceptionMessage You can't modify a stream
-     */
     public function testThrowWhenUnsettingValue()
     {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('You can\'t modify a stream');
+
         $stream = (new Stream('int'))->add(1);
         unset($stream[0]);
     }
@@ -143,11 +144,10 @@ class StreamTest extends TestCase
         );
     }
 
-    /**
-     * @expectedException Innmind\Immutable\Exception\OutOfBoundException
-     */
     public function testThrowWhenGettingUnknownIndex()
     {
+        $this->expectException(OutOfBoundException::class);
+
         (new Stream('int'))->get(0);
     }
 
@@ -241,12 +241,11 @@ class StreamTest extends TestCase
         $this->assertFalse($a->equals($b));
     }
 
-    /**
-     * @expectedException Innmind\Immutable\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The 2 streams does not reference the same type
-     */
     public function testThrowWhenTryingToTestEqualityForDifferentTypes()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The 2 streams does not reference the same type');
+
         (new Stream('int'))->equals(new Stream('stdClass'));
     }
 
@@ -307,11 +306,10 @@ class StreamTest extends TestCase
         $this->assertSame([2], $map->get(2)->toPrimitive());
     }
 
-    /**
-     * @expectedException Innmind\Immutable\Exception\GroupEmptySequenceException
-     */
     public function testThrowWhenGroupingEmptyStream()
     {
+        $this->expectException(GroupEmptySequenceException::class);
+
         (new Stream('int'))->groupBy(function() {});
     }
 
@@ -404,11 +402,10 @@ class StreamTest extends TestCase
         $this->assertSame([1, 4, 9, 16], $b->toPrimitive());
     }
 
-    /**
-     * @expectedException Innmind\Immutable\Exception\InvalidArgumentException
-     */
     public function testThrowWhenTryingToModifyValueTypeInMap()
     {
+        $this->expectException(InvalidArgumentException::class);
+
         (new Stream('int'))
             ->add(1)
             ->add(2)
@@ -434,11 +431,10 @@ class StreamTest extends TestCase
         $this->assertSame([1, 2, 0, 0], $b->toPrimitive());
     }
 
-    /**
-     * @expectedException Innmind\Immutable\Exception\InvalidArgumentException
-     */
     public function testThrowWhenPaddingWithDifferentType()
     {
+        $this->expectException(InvalidArgumentException::class);
+
         (new Stream('int'))->pad(2, '0');
     }
 
@@ -554,12 +550,11 @@ class StreamTest extends TestCase
         $this->assertSame([3, 4, 1, 2], $c->toPrimitive());
     }
 
-    /**
-     * @expectedException Innmind\Immutable\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The 2 streams does not reference the same type
-     */
     public function testThrowWhenAppendingDifferentTypes()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The 2 streams does not reference the same type');
+
         (new Stream('int'))->append(new Stream('stdClass'));
     }
 
@@ -584,12 +579,11 @@ class StreamTest extends TestCase
         $this->assertSame([2], $c->toPrimitive());
     }
 
-    /**
-     * @expectedException Innmind\Immutable\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The 2 streams does not reference the same type
-     */
     public function testThrowWhenIntersectingDifferentTypes()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The 2 streams does not reference the same type');
+
         (new Stream('int'))->intersect(new Stream('stdClass'));
     }
 
@@ -617,11 +611,10 @@ class StreamTest extends TestCase
         $this->assertSame([1], $b->toPrimitive());
     }
 
-    /**
-     * @expectedException Innmind\Immutable\Exception\InvalidArgumentException
-     */
     public function testThrowWhenAddingInvalidType()
     {
+        $this->expectException(InvalidArgumentException::class);
+
         (new Stream('int'))->add(4.2);
     }
 

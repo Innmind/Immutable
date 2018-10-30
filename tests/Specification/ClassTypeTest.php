@@ -5,7 +5,8 @@ namespace Tests\Innmind\Immutable\Specification;
 
 use Innmind\Immutable\{
     Specification\ClassType,
-    SpecificationInterface
+    SpecificationInterface,
+    Exception\InvalidArgumentException
 };
 use PHPUnit\Framework\TestCase;
 
@@ -18,11 +19,10 @@ class ClassTypeTest extends TestCase
         );
     }
 
-    /**
-     * @expectedException Innmind\Immutable\Exception\InvalidArgumentException
-     */
     public function testThrowWhenValidationFails()
     {
+        $this->expectException(InvalidArgumentException::class);
+
         (new ClassType('Foo'))->validate(new \stdClass);
     }
 }
