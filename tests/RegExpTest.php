@@ -31,7 +31,6 @@ class RegExpTest extends TestCase
     public function testThrowWhenInvalidRegexp()
     {
         $this->expectException(DomainException::class);
-        $this->expectExceptionCode(1);
 
         new RegExp('/foo');
     }
