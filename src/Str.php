@@ -487,6 +487,26 @@ class Str implements PrimitiveInterface, StringableInterface
         return new self($sub, $this->encoding);
     }
 
+    public function take(int $size): self
+    {
+        return $this->substring(0, $size);
+    }
+
+    public function takeEnd(int $size): self
+    {
+        return $this->substring(-$size);
+    }
+
+    public function drop(int $size): self
+    {
+        return $this->substring($size);
+    }
+
+    public function dropEnd(int $size): self
+    {
+        return $this->substring(0, $this->length() - $size);
+    }
+
     /**
      * Return a formatted string
      *

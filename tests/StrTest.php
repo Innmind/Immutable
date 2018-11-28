@@ -618,6 +618,54 @@ class StrTest extends TestCase
         $this->assertSame($str, $str4);
     }
 
+    public function testTake()
+    {
+        $str = new S('foobarbaz');
+
+        $str2 = $str->take(3);
+
+        $this->assertInstanceOf(S::class, $str2);
+        $this->assertNotSame($str, $str2);
+        $this->assertSame('foo', (string) $str2);
+        $this->assertSame('foobarbaz', (string) $str);
+    }
+
+    public function testTakeEnd()
+    {
+        $str = new S('foobarbaz');
+
+        $str2 = $str->takeEnd(3);
+
+        $this->assertInstanceOf(S::class, $str2);
+        $this->assertNotSame($str, $str2);
+        $this->assertSame('baz', (string) $str2);
+        $this->assertSame('foobarbaz', (string) $str);
+    }
+
+    public function testDrop()
+    {
+        $str = new S('foobarbaz');
+
+        $str2 = $str->drop(3);
+
+        $this->assertInstanceOf(S::class, $str2);
+        $this->assertNotSame($str, $str2);
+        $this->assertSame('barbaz', (string) $str2);
+        $this->assertSame('foobarbaz', (string) $str);
+    }
+
+    public function testDropEnd()
+    {
+        $str = new S('foobarbaz');
+
+        $str2 = $str->dropEnd(3);
+
+        $this->assertInstanceOf(S::class, $str2);
+        $this->assertNotSame($str, $str2);
+        $this->assertSame('foobar', (string) $str2);
+        $this->assertSame('foobarbaz', (string) $str);
+    }
+
     public function testSubstringUtf8ManipulatedAsAscii()
     {
         $str = (new S('foo🙏bar'))->toEncoding('ASCII');
