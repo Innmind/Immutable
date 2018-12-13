@@ -499,6 +499,11 @@ class Stream implements StreamInterface
         return $self;
     }
 
+    public function empty(): bool
+    {
+        return $this->values->empty();
+    }
+
     /**
      * Make sure the stream is compatible with the current one
      *

@@ -276,4 +276,6 @@ interface StreamInterface extends SizeableInterface, PrimitiveInterface, \Counta
      * @return self<T>
      */
     public function reverse(): self;
+
+    public function empty(): bool;
 }

@@ -169,4 +169,6 @@ interface MapInterface extends SizeableInterface, \Countable, \Iterator, \ArrayA
      * @return mixed
      */
     public function reduce($carry, callable $reducer);
+
+    public function empty(): bool;
 }

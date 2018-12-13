@@ -269,4 +269,6 @@ interface SequenceInterface extends SizeableInterface, PrimitiveInterface, \Coun
      * @return self<T>
      */
     public function reverse(): self;
+
+    public function empty(): bool;
 }

@@ -516,4 +516,10 @@ class DoubleIndexTest extends TestCase
         $this->assertSame([4], $m->keys()->toPrimitive());
         $this->assertSame([4], $m->values()->toPrimitive());
     }
+
+    public function testEmpty()
+    {
+        $this->assertTrue((new DoubleIndex('int', 'int'))->empty());
+        $this->assertFalse((new DoubleIndex('int', 'int'))->put(1, 2)->empty());
+    }
 }

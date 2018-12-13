@@ -497,4 +497,15 @@ class ObjectKeysTest extends TestCase
         $this->assertSame([$a], $m->keys()->toPrimitive());
         $this->assertSame([4], $m->values()->toPrimitive());
     }
+
+    public function testEmpty()
+    {
+        $this->assertTrue((new ObjectKeys('stdClass', 'int'))->empty());
+        $this->assertFalse((new ObjectKeys('stdClass', 'int'))->put(new \stdClass, 1)->empty());
+    }
+
+    public function testGenericObjectTypeAllowedAsKey()
+    {
+        $this->assertSame('object', (string) (new ObjectKeys('object', 'int'))->keyType());
+    }
 }

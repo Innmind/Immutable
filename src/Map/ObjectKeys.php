@@ -35,7 +35,7 @@ final class ObjectKeys implements MapInterface
     {
         $this->keySpecification = Type::of($keyType);
 
-        if (!$this->keySpecification instanceof ClassType) {
+        if (!$this->keySpecification instanceof ClassType && $keyType !== 'object') {
             throw new LogicException;
         }
 
@@ -442,5 +442,12 @@ final class ObjectKeys implements MapInterface
         }
 
         return $carry;
+    }
+
+    public function empty(): bool
+    {
+        $this->rewind();
+
+        return !$this->valid();
     }
 }

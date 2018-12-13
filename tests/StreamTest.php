@@ -683,4 +683,10 @@ class StreamTest extends TestCase
         $this->assertSame([1, 3, 4, 2], $stream->toPrimitive());
         $this->assertSame([2, 4, 3, 1], $reverse->toPrimitive());
     }
+
+    public function testEmpty()
+    {
+        $this->assertTrue(Stream::of('int')->empty());
+        $this->assertFalse(Stream::of('int', 1)->empty());
+    }
 }
