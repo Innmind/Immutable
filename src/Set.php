@@ -308,6 +308,11 @@ class Set implements SetInterface
         return $self;
     }
 
+    public function empty(): bool
+    {
+        return $this->values->empty();
+    }
+
     /**
      * Make sure the set is compatible with the current one
      *

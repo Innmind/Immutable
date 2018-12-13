@@ -441,4 +441,9 @@ final class DoubleIndex implements MapInterface
 
         return $carry;
     }
+
+    public function empty(): bool
+    {
+        return $this->pairs->empty();
+    }
 }

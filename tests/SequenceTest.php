@@ -503,4 +503,10 @@ class SequenceTest extends TestCase
         $this->assertSame([1, 3, 4, 2], $sequence->toPrimitive());
         $this->assertSame([2, 4, 3, 1], $reverse->toPrimitive());
     }
+
+    public function testEmpty()
+    {
+        $this->assertTrue(Sequence::of()->empty());
+        $this->assertFalse(Sequence::of(1)->empty());
+    }
 }

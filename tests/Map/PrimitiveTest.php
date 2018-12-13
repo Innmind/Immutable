@@ -529,4 +529,10 @@ class PrimitiveTest extends TestCase
         $this->assertSame([4], $m->keys()->toPrimitive());
         $this->assertSame([4], $m->values()->toPrimitive());
     }
+
+    public function testEmpty()
+    {
+        $this->assertTrue((new Primitive('int', 'int'))->empty());
+        $this->assertFalse((new Primitive('int', 'int'))->put(1, 2)->empty());
+    }
 }

@@ -325,4 +325,9 @@ final class Map implements MapInterface
     {
         return $this->implementation->reduce($carry, $reducer);
     }
+
+    public function empty(): bool
+    {
+        return $this->implementation->empty();
+    }
 }

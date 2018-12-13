@@ -165,4 +165,6 @@ interface SetInterface extends SizeableInterface, PrimitiveInterface, \Countable
      * @return self<T>
      */
     public function clear(): self;
+
+    public function empty(): bool;
 }

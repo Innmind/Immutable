@@ -407,4 +407,10 @@ class SetTest extends TestCase
                 ->toPrimitive()
         );
     }
+
+    public function testEmpty()
+    {
+        $this->assertTrue(Set::of('int')->empty());
+        $this->assertFalse(Set::of('int', 1)->empty());
+    }
 }

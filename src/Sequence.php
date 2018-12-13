@@ -478,4 +478,9 @@ class Sequence implements SequenceInterface
 
         return $self;
     }
+
+    public function empty(): bool
+    {
+        return !$this->has(0);
+    }
 }

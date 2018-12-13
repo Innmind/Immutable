@@ -416,4 +416,11 @@ final class Primitive implements MapInterface
 
         return $carry;
     }
+
+    public function empty(): bool
+    {
+        $this->rewind();
+
+        return !$this->valid();
+    }
 }
