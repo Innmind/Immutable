@@ -22,7 +22,7 @@ final class Map implements MapInterface
     {
         $type = Type::of($keyType);
 
-        if ($type instanceof ClassType) {
+        if ($type instanceof ClassType || $keyType === 'object') {
             $this->implementation = new Map\ObjectKeys($keyType, $valueType);
         } else if (\in_array($keyType, ['int', 'integer', 'string'], true)) {
             $this->implementation = new Map\Primitive($keyType, $valueType);
