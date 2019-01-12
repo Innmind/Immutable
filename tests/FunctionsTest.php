@@ -6,12 +6,12 @@ namespace Tests\Innmind\Immutable;
 use function Innmind\Immutable\{
     assertSet,
     assertStream,
-    assertMap,
+    assertMap
 };
 use Innmind\Immutable\{
     Set,
     Stream,
-    Map,
+    Map
 };
 use PHPUnit\Framework\TestCase;
 
