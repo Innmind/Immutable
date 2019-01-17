@@ -544,5 +544,8 @@ class PrimitiveTest extends TestCase
         $this->assertSame('1', $map->key());
         $this->assertSame('foo', $map->get('1'));
         $this->assertSame(['1'], $map->keys()->toPrimitive());
+        $this->assertTrue($map->valid());
+        $map->next();
+        $this->assertFalse($map->valid());
     }
 }
