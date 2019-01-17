@@ -90,7 +90,7 @@ final class Primitive implements MapInterface
      */
     public function key()
     {
-        return \key($this->values);
+        return $this->normalizeKey(\key($this->values));
     }
 
     /**
@@ -227,7 +227,7 @@ final class Primitive implements MapInterface
         $map = $this->clear();
 
         foreach ($this->values as $k => $v) {
-            if ($predicate($k, $v) === true) {
+            if ($predicate($this->normalizeKey($k), $v) === true) {
                 $map->values[$k] = $v;
             }
         }
@@ -243,7 +243,7 @@ final class Primitive implements MapInterface
     public function foreach(callable $function): MapInterface
     {
         foreach ($this->values as $k => $v) {
-            $function($k, $v);
+            $function($this->normalizeKey($k), $v);
         }
 
         return $this;
@@ -261,7 +261,7 @@ final class Primitive implements MapInterface
         $map = null;
 
         foreach ($this->values as $k => $v) {
-            $key = $discriminator($k, $v);
+            $key = $discriminator($this->normalizeKey($k), $v);
 
             if ($map === null) {
                 $map = new Map(
@@ -291,7 +291,12 @@ final class Primitive implements MapInterface
      */
     public function keys(): SetInterface
     {
-        return Set::of((string) $this->keyType, ...\array_keys($this->values));
+        return Set::of(
+            (string) $this->keyType,
+            ...\array_map(function($key) {
+                return $this->normalizeKey($key);
+            }, \array_keys($this->values))
+        );
     }
 
     /**
@@ -310,7 +315,7 @@ final class Primitive implements MapInterface
         $map = $this->clear();
 
         foreach ($this->values as $k => $v) {
-            $return = $function($k, $v);
+            $return = $function($this->normalizeKey($k), $v);
 
             if ($return instanceof Pair) {
                 $this->keySpecification->validate($return->key());
@@ -388,7 +393,7 @@ final class Primitive implements MapInterface
         $falsy = $this->clear();
 
         foreach ($this->values as $k => $v) {
-            $return = $predicate($k, $v);
+            $return = $predicate($this->normalizeKey($k), $v);
 
             if ($return === true) {
                 $truthy->values[$k] = $v;
@@ -411,7 +416,7 @@ final class Primitive implements MapInterface
     public function reduce($carry, callable $reducer)
     {
         foreach ($this->values as $k => $v) {
-            $carry = $reducer($carry, $k, $v);
+            $carry = $reducer($carry, $this->normalizeKey($k), $v);
         }
 
         return $carry;
@@ -422,5 +427,14 @@ final class Primitive implements MapInterface
         $this->rewind();
 
         return !$this->valid();
+    }
+
+    private function normalizeKey($value)
+    {
+        if ((string) $this->keyType === 'string') {
+            return (string) $value;
+        }
+
+        return $value;
     }
 }
