@@ -535,4 +535,14 @@ class PrimitiveTest extends TestCase
         $this->assertTrue((new Primitive('int', 'int'))->empty());
         $this->assertFalse((new Primitive('int', 'int'))->put(1, 2)->empty());
     }
+
+    public function testWorkAroundPhpImplicitCast()
+    {
+        $map = (new Primitive('string', 'string'))->put('1', 'foo');
+
+        $this->assertTrue($map->contains('1'));
+        $this->assertSame('1', $map->key());
+        $this->assertSame('foo', $map->get('1'));
+        $this->assertSame(['1'], $map->keys()->toPrimitive());
+    }
 }
