@@ -431,7 +431,7 @@ final class Primitive implements MapInterface
 
     private function normalizeKey($value)
     {
-        if ((string) $this->keyType === 'string') {
+        if ((string) $this->keyType === 'string' && !\is_null($value)) {
             return (string) $value;
         }
 
