@@ -26,7 +26,7 @@ class Str implements PrimitiveInterface, StringableInterface
     public function __construct(string $value, string $encoding = null)
     {
         $this->value = $value;
-        $this->encoding = $encoding ?? \mb_internal_encoding();
+        $this->encoding = $encoding;
     }
 
     public static function of(string $value, string $encoding = null): self
@@ -52,6 +52,10 @@ class Str implements PrimitiveInterface, StringableInterface
 
     public function encoding(): self
     {
+        if (\is_null($this->encoding)) {
+            $this->encoding = \mb_internal_encoding();
+        }
+
         return new self($this->encoding);
     }
 
@@ -115,7 +119,7 @@ class Str implements PrimitiveInterface, StringableInterface
      */
     public function position(string $needle, int $offset = 0): int
     {
-        $position = \mb_strpos($this->value, $needle, $offset, $this->encoding);
+        $position = \mb_strpos($this->value, $needle, $offset, (string) $this->encoding());
 
         if ($position === false) {
             throw new SubstringException(\sprintf(
@@ -157,7 +161,7 @@ class Str implements PrimitiveInterface, StringableInterface
      */
     public function str(string $delimiter): self
     {
-        $sub = \mb_strstr($this->value, $delimiter, false, $this->encoding);
+        $sub = \mb_strstr($this->value, $delimiter, false, (string) $this->encoding());
 
         if ($sub === false) {
             throw new SubstringException(\sprintf(
@@ -196,7 +200,7 @@ class Str implements PrimitiveInterface, StringableInterface
      */
     public function length(): int
     {
-        return \mb_strlen($this->value, $this->encoding);
+        return \mb_strlen($this->value, (string) $this->encoding());
     }
 
     public function empty(): bool
@@ -482,7 +486,7 @@ class Str implements PrimitiveInterface, StringableInterface
             return $this;
         }
 
-        $sub = \mb_substr($this->value, $start, $length, $this->encoding);
+        $sub = \mb_substr($this->value, $start, $length, (string) $this->encoding());
 
         return new self($sub, $this->encoding);
     }
@@ -556,7 +560,7 @@ class Str implements PrimitiveInterface, StringableInterface
                 return $part->ucfirst();
             })
             ->join('')
-            ->toEncoding($this->encoding);
+            ->toEncoding((string) $this->encoding());
     }
 
     /**
