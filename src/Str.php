@@ -671,12 +671,12 @@ class Str implements PrimitiveInterface, StringableInterface
      */
     public function startsWith(string $value): bool
     {
-        if ('' === $value) {
+        if ($value === '') {
             return false;
         }
 
         try {
-            return 0 === $this->position($value);
+            return $this->position($value) === 0;
         } catch (SubstringException $e) {
             return false;
         }
@@ -691,7 +691,7 @@ class Str implements PrimitiveInterface, StringableInterface
      */
     public function endsWith(string $value): bool
     {
-        if ('' === $value) {
+        if ($value === '') {
             return false;
         }
 
