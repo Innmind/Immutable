@@ -683,6 +683,22 @@ class Str implements PrimitiveInterface, StringableInterface
     }
 
     /**
+     * Check if the current string ends with the given string
+     *
+     * @param string $value
+     *
+     * @return bool
+     */
+    public function endsWith(string $value): bool
+    {
+        if ('' === $value) {
+            return false;
+        }
+
+        return $value === (string) $this->substring(-strlen($value));
+    }
+
+    /**
      * Quote regular expression characters
      *
      * @param string $delimiter

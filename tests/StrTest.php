@@ -808,6 +808,19 @@ class StrTest extends TestCase
         $this->assertFalse($str->startsWith('foobar '));
     }
 
+    public function testEndsWith()
+    {
+        $str = new S('foobar');
+
+        $this->assertTrue($str->endsWith('bar'));
+        $this->assertTrue($str->endsWith('obar'));
+        $this->assertTrue($str->endsWith('foobar'));
+        $this->assertFalse($str->endsWith(''));
+        $this->assertFalse($str->endsWith('foo'));
+        $this->assertFalse($str->endsWith('fooba'));
+        $this->assertFalse($str->endsWith('xfoobar'));
+    }
+
     public function testPregQuote()
     {
         $a = new S('foo#bar.*');
