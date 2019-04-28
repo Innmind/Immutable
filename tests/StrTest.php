@@ -799,10 +799,10 @@ class StrTest extends TestCase
     {
         $str = new S('foobar');
 
+        $this->assertTrue($str->startsWith(''));
         $this->assertTrue($str->startsWith('foo'));
         $this->assertTrue($str->startsWith('foob'));
         $this->assertTrue($str->startsWith('foobar'));
-        $this->assertFalse($str->startsWith(''));
         $this->assertFalse($str->startsWith('bar'));
         $this->assertFalse($str->startsWith('oobar'));
         $this->assertFalse($str->startsWith('foobar '));
@@ -812,10 +812,10 @@ class StrTest extends TestCase
     {
         $str = new S('foobar');
 
+        $this->assertTrue($str->endsWith(''));
         $this->assertTrue($str->endsWith('bar'));
         $this->assertTrue($str->endsWith('obar'));
         $this->assertTrue($str->endsWith('foobar'));
-        $this->assertFalse($str->endsWith(''));
         $this->assertFalse($str->endsWith('foo'));
         $this->assertFalse($str->endsWith('fooba'));
         $this->assertFalse($str->endsWith('xfoobar'));

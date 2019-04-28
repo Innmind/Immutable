@@ -672,7 +672,7 @@ class Str implements PrimitiveInterface, StringableInterface
     public function startsWith(string $value): bool
     {
         if ($value === '') {
-            return false;
+            return true;
         }
 
         try {
@@ -692,7 +692,7 @@ class Str implements PrimitiveInterface, StringableInterface
     public function endsWith(string $value): bool
     {
         if ($value === '') {
-            return false;
+            return true;
         }
 
         return (string) $this->takeEnd(self::of($value, $this->encoding)->length()) === $value;
