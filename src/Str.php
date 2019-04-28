@@ -695,7 +695,7 @@ class Str implements PrimitiveInterface, StringableInterface
             return false;
         }
 
-        return $value === (string) $this->substring(-strlen($value));
+        return (string) $this->takeEnd(self::of($value, $this->encoding)->length()) === $value;
     }
 
     /**
