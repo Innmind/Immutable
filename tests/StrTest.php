@@ -795,6 +795,19 @@ class StrTest extends TestCase
         $this->assertFalse($str->contains('baz'));
     }
 
+    public function testStartsWith()
+    {
+        $str = new S('foobar');
+
+        $this->assertTrue($str->startsWith('foo'));
+        $this->assertTrue($str->startsWith('foob'));
+        $this->assertTrue($str->startsWith('foobar'));
+        $this->assertFalse($str->startsWith(''));
+        $this->assertFalse($str->startsWith('bar'));
+        $this->assertFalse($str->startsWith('oobar'));
+        $this->assertFalse($str->startsWith('foobar '));
+    }
+
     public function testPregQuote()
     {
         $a = new S('foo#bar.*');

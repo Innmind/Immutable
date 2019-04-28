@@ -663,6 +663,26 @@ class Str implements PrimitiveInterface, StringableInterface
     }
 
     /**
+     * Check if the current string starts with the given string
+     *
+     * @param string $value
+     *
+     * @return bool
+     */
+    public function startsWith(string $value): bool
+    {
+        if ('' === $value) {
+            return false;
+        }
+
+        try {
+            return 0 === $this->position($value);
+        } catch (SubstringException $e) {
+            return false;
+        }
+    }
+
+    /**
      * Quote regular expression characters
      *
      * @param string $delimiter
