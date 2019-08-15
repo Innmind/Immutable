@@ -50,14 +50,14 @@ interface SequenceInterface extends SizeableInterface, PrimitiveInterface, \Coun
     /**
      * Return all elements that satisfy the given predicate
      *
-     * @param callable $predicate
+     * @param callable(mixed): bool $predicate
      */
     public function filter(callable $predicate): self;
 
     /**
      * Apply the given function to all elements of the sequence
      *
-     * @param callable $function
+     * @param callable(mixed): void $function
      */
     public function foreach(callable $function): self;
 
@@ -65,7 +65,7 @@ interface SequenceInterface extends SizeableInterface, PrimitiveInterface, \Coun
      * Return a new map of pairs grouped by keys determined with the given
      * discriminator function
      *
-     * @param callable $discriminator
+     * @param callable(mixed) $discriminator
      *
      * @return MapInterface<mixed, self>
      */
@@ -111,7 +111,7 @@ interface SequenceInterface extends SizeableInterface, PrimitiveInterface, \Coun
     /**
      * Return a new sequence by applying the given function to all elements
      *
-     * @param callable $function
+     * @param callable(mixed) $function
      */
     public function map(callable $function): self;
 
@@ -125,7 +125,7 @@ interface SequenceInterface extends SizeableInterface, PrimitiveInterface, \Coun
     /**
      * Return a sequence of 2 sequences partitioned according to the given predicate
      *
-     * @param callable $predicate
+     * @param callable(mixed): bool $predicate
      *
      * @return MapInterface<bool, self>
      */
@@ -178,7 +178,7 @@ interface SequenceInterface extends SizeableInterface, PrimitiveInterface, \Coun
     /**
      * Sort the sequence in a different order
      *
-     * @param callable $function
+     * @param callable(mixed): int $function
      */
     public function sort(callable $function): self;
 
@@ -186,7 +186,7 @@ interface SequenceInterface extends SizeableInterface, PrimitiveInterface, \Coun
      * Reduce the sequence to a single value
      *
      * @param mixed $carry
-     * @param callable $reducer
+     * @param callable(mixed, mixed) $reducer
      *
      * @return mixed
      */
