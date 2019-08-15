@@ -3,6 +3,10 @@ declare(strict_types = 1);
 
 namespace Innmind\Immutable;
 
+/**
+ * @template T
+ * @template S
+ */
 interface MapInterface extends SizeableInterface, \Countable, \Iterator, \ArrayAccess
 {
     /**
@@ -74,7 +78,7 @@ interface MapInterface extends SizeableInterface, \Countable, \Iterator, \ArrayA
     /**
      * Filter the map based on the given predicate
      *
-     * @param callable $predicate
+     * @param callable(T, S): bool $predicate
      *
      * @return self<T, S>
      */
@@ -83,7 +87,7 @@ interface MapInterface extends SizeableInterface, \Countable, \Iterator, \ArrayA
     /**
      * Run the given function for each element of the map
      *
-     * @param callable $function
+     * @param callable(T, S): void $function
      *
      * @return self<T, S>
      */
@@ -93,7 +97,7 @@ interface MapInterface extends SizeableInterface, \Countable, \Iterator, \ArrayA
      * Return a new map of pairs' sequences grouped by keys determined with the given
      * discriminator function
      *
-     * @param callable $discriminator
+     * @param callable(T, S) $discriminator
      *
      * @return self<mixed, self<T, S>>
      */
@@ -118,7 +122,7 @@ interface MapInterface extends SizeableInterface, \Countable, \Iterator, \ArrayA
      *
      * Keys can't be modified
      *
-     * @param callable $function
+     * @param callable(T, S): S|Pair<T, S> $function
      *
      * @return self<T, S>
      */
@@ -154,7 +158,7 @@ interface MapInterface extends SizeableInterface, \Countable, \Iterator, \ArrayA
     /**
      * Return a map of 2 maps partitioned according to the given predicate
      *
-     * @param callable $predicate
+     * @param callable(T, S): bool $predicate
      *
      * @return self<bool, self<T, S>>
      */
@@ -164,7 +168,7 @@ interface MapInterface extends SizeableInterface, \Countable, \Iterator, \ArrayA
      * Reduce the map to a single value
      *
      * @param mixed $carry
-     * @param callable $reducer
+     * @param callable(mixed, T, S) $reducer
      *
      * @return mixed
      */

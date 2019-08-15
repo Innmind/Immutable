@@ -35,6 +35,9 @@ class IntRange implements PrimitiveInterface, \Iterator
         return $this->step;
     }
 
+    /**
+     * @return array<int>
+     */
     public function toPrimitive(): array
     {
         return \range($this->start, $this->end, $this->step);

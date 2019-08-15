@@ -7,11 +7,16 @@ use Innmind\Immutable\Exception\InvalidArgumentException;
 
 /**
  * Think of it as a unique identifier
+ *
+ * @template T
  */
 class Symbol implements PrimitiveInterface
 {
     private $value;
 
+    /**
+     * @param T $value
+     */
     public function __construct($value)
     {
         if (!\is_int($value) && !\is_string($value)) {
@@ -23,6 +28,9 @@ class Symbol implements PrimitiveInterface
         $this->value = $value;
     }
 
+    /**
+     * @return T
+     */
     public function toPrimitive()
     {
         return $this->value;

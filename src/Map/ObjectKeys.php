@@ -20,6 +20,9 @@ use Innmind\Immutable\{
     Exception\GroupEmptyMapException
 };
 
+/**
+ * {@inheritdoc}
+ */
 final class ObjectKeys implements MapInterface
 {
     private $keyType;

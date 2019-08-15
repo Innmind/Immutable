@@ -19,6 +19,9 @@ use Innmind\Immutable\{
     Exception\GroupEmptyMapException
 };
 
+/**
+ * {@inheritdoc}
+ */
 final class Primitive implements MapInterface
 {
     private $keyType;

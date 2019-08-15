@@ -25,6 +25,9 @@ class Stream implements StreamInterface
         $this->values = new Sequence;
     }
 
+    /**
+     * @param T $values
+     */
     public static function of(string $type, ...$values): self
     {
         $self = new self($type);
