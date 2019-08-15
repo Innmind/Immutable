@@ -188,7 +188,7 @@ interface StreamInterface extends SizeableInterface, PrimitiveInterface, \Counta
     /**
      * Append the given stream to the current one
      *
-     * @param self $stream
+     * @param self<T> $stream
      *
      * @return self<T>
      */
