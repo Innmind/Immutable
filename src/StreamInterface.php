@@ -12,15 +12,11 @@ interface StreamInterface extends SizeableInterface, PrimitiveInterface, \Counta
 {
     /**
      * Type of the elements
-     *
-     * @return Str
      */
     public function type(): Str;
 
     /**
      * Return the element at the given index
-     *
-     * @param int $index
      *
      * @throws OutOfBoundException
      *
@@ -47,16 +43,12 @@ interface StreamInterface extends SizeableInterface, PrimitiveInterface, \Counta
     /**
      * Remove the n first elements
      *
-     * @param int $size
-     *
      * @return self<T>
      */
     public function drop(int $size): self;
 
     /**
      * Remove the n last elements
-     *
-     * @param int $size
      *
      * @return self<T>
      */
@@ -66,8 +58,6 @@ interface StreamInterface extends SizeableInterface, PrimitiveInterface, \Counta
      * Check if the two streams are equal
      *
      * @param self<T> $stream
-     *
-     * @return bool
      */
     public function equals(self $stream): bool;
 
@@ -119,8 +109,6 @@ interface StreamInterface extends SizeableInterface, PrimitiveInterface, \Counta
      * Check if the stream contains the given element
      *
      * @param T $element
-     *
-     * @return bool
      */
     public function contains($element): bool;
 
@@ -130,8 +118,6 @@ interface StreamInterface extends SizeableInterface, PrimitiveInterface, \Counta
      * @param T $element
      *
      * @throws ElementNotFoundException
-     *
-     * @return int
      */
     public function indexOf($element): int;
 
@@ -154,7 +140,6 @@ interface StreamInterface extends SizeableInterface, PrimitiveInterface, \Counta
     /**
      * Pad the stream to a defined size with the given element
      *
-     * @param int $size
      * @param T $element
      *
      * @return self<T>
@@ -173,17 +158,12 @@ interface StreamInterface extends SizeableInterface, PrimitiveInterface, \Counta
     /**
      * Slice the stream
      *
-     * @param int $from
-     * @param int $until
-     *
      * @return self<T>
      */
     public function slice(int $from, int $until): self;
 
     /**
      * Split the stream in a stream of 2 streams splitted at the given position
-     *
-     * @param int $position
      *
      * @throws OutOfBoundException
      *
@@ -194,16 +174,12 @@ interface StreamInterface extends SizeableInterface, PrimitiveInterface, \Counta
     /**
      * Return a stream with the n first elements
      *
-     * @param int $size
-     *
      * @return self<T>
      */
     public function take(int $size): self;
 
     /**
      * Return a stream with the n last elements
-     *
-     * @param int $size
      *
      * @return self<T>
      */
@@ -230,10 +206,6 @@ interface StreamInterface extends SizeableInterface, PrimitiveInterface, \Counta
 
     /**
      * Concatenate all elements with the given separator
-     *
-     * @param string $separator
-     *
-     * @return Str
      */
     public function join(string $separator): Str;
 

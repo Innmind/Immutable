@@ -17,8 +17,6 @@ interface SetInterface extends SizeableInterface, PrimitiveInterface, \Countable
 
     /**
      * Return the type of this set
-     *
-     * @return Str
      */
     public function type(): Str;
 
@@ -46,8 +44,6 @@ interface SetInterface extends SizeableInterface, PrimitiveInterface, \Countable
      * Check if the set contains the given element
      *
      * @param T $element
-     *
-     * @return bool
      */
     public function contains($element): bool;
 
@@ -73,8 +69,6 @@ interface SetInterface extends SizeableInterface, PrimitiveInterface, \Countable
      * Check if the given set is identical to this one
      *
      * @param self<T> $set
-     *
-     * @return bool
      */
     public function equals(self $set): bool;
 
@@ -126,10 +120,6 @@ interface SetInterface extends SizeableInterface, PrimitiveInterface, \Countable
 
     /**
      * Concatenate all elements with the given separator
-     *
-     * @param string $separator
-     *
-     * @return Str
      */
     public function join(string $separator): Str;
 

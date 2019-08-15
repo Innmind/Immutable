@@ -67,8 +67,6 @@ class Str implements PrimitiveInterface, StringableInterface
     /**
      * Split the string into a collection of ones
      *
-     * @param string $delimiter
-     *
      * @return StreamInterface<self>
      */
     public function split(string $delimiter = null): StreamInterface
@@ -90,8 +88,6 @@ class Str implements PrimitiveInterface, StringableInterface
     /**
      * Returns a collection of the string splitted by the given chunk size
      *
-     * @param int $size
-     *
      * @return StreamInterface<self>
      */
     public function chunk(int $size = 1): StreamInterface
@@ -110,12 +106,7 @@ class Str implements PrimitiveInterface, StringableInterface
     /**
      * Returns the position of the first occurence of the string
      *
-     * @param string $needle
-     * @param int $offset
-     *
      * @throws SubstringException If the string is not found
-     *
-     * @return int
      */
     public function position(string $needle, int $offset = 0): int
     {
@@ -133,11 +124,6 @@ class Str implements PrimitiveInterface, StringableInterface
 
     /**
      * Replace all occurences of the search string with the replacement one
-     *
-     * @param string $search
-     * @param string $replacement
-     *
-     * @return self
      */
     public function replace(string $search, string $replacement): self
     {
@@ -153,11 +139,7 @@ class Str implements PrimitiveInterface, StringableInterface
     /**
      * Returns the string following the given delimiter
      *
-     * @param string $delimiter
-     *
      * @throws SubstringException If the string is not found
-     *
-     * @return self
      */
     public function str(string $delimiter): self
     {
@@ -175,8 +157,6 @@ class Str implements PrimitiveInterface, StringableInterface
 
     /**
      * Return the string in upper case
-     *
-     * @return self
      */
     public function toUpper(): self
     {
@@ -185,8 +165,6 @@ class Str implements PrimitiveInterface, StringableInterface
 
     /**
      * Return the string in lower case
-     *
-     * @return self
      */
     public function toLower(): self
     {
@@ -195,8 +173,6 @@ class Str implements PrimitiveInterface, StringableInterface
 
     /**
      * Return the string length
-     *
-     * @return int
      */
     public function length(): int
     {
@@ -210,8 +186,6 @@ class Str implements PrimitiveInterface, StringableInterface
 
     /**
      * Reverse the string
-     *
-     * @return self
      */
     public function reverse(): self
     {
@@ -223,11 +197,6 @@ class Str implements PrimitiveInterface, StringableInterface
 
     /**
      * Pad to the right
-     *
-     * @param int $length
-     * @param string $character
-     *
-     * @return self
      */
     public function rightPad(int $length, string $character = ' '): self
     {
@@ -236,11 +205,6 @@ class Str implements PrimitiveInterface, StringableInterface
 
     /**
      * Pad to the left
-     *
-     * @param int $length
-     * @param string $character
-     *
-     * @return self
      */
     public function leftPad(int $length, string $character = ' '): self
     {
@@ -249,11 +213,6 @@ class Str implements PrimitiveInterface, StringableInterface
 
     /**
      * Pad both sides
-     *
-     * @param int $length
-     * @param string $character
-     *
-     * @return self
      */
     public function uniPad(int $length, string $character = ' '): self
     {
@@ -262,12 +221,6 @@ class Str implements PrimitiveInterface, StringableInterface
 
     /**
      * Find length of initial segment not matching mask
-     *
-     * @param string $mask
-     * @param int $start
-     * @param int $length
-     *
-     * @return int
      */
     public function cspn(string $mask, int $start = 0, int $length = null): int
     {
@@ -287,10 +240,6 @@ class Str implements PrimitiveInterface, StringableInterface
 
     /**
      * Repeat the string n times
-     *
-     * @param int $repeat
-     *
-     * @return self
      */
     public function repeat(int $repeat): self
     {
@@ -299,8 +248,6 @@ class Str implements PrimitiveInterface, StringableInterface
 
     /**
      * Shuffle the string
-     *
-     * @return self
      */
     public function shuffle(): self
     {
@@ -310,11 +257,6 @@ class Str implements PrimitiveInterface, StringableInterface
         return new self(\implode('', $parts), $this->encoding);
     }
 
-    /**
-     * Strip slashes
-     *
-     * @return self
-     */
     public function stripSlashes(): self
     {
         return new self(\stripslashes($this->value), $this->encoding);
@@ -322,8 +264,6 @@ class Str implements PrimitiveInterface, StringableInterface
 
     /**
      * Strip C-like slashes
-     *
-     * @return self
      */
     public function stripCSlashes(): self
     {
@@ -332,10 +272,6 @@ class Str implements PrimitiveInterface, StringableInterface
 
     /**
      * Return the word count
-     *
-     * @param string $charlist
-     *
-     * @return int
      */
     public function wordCount(string $charlist = ''): int
     {
@@ -348,8 +284,6 @@ class Str implements PrimitiveInterface, StringableInterface
 
     /**
      * Return the collection of words
-     *
-     * @param string $charlist
      *
      * @return MapInterface<int, self>
      */
@@ -368,9 +302,6 @@ class Str implements PrimitiveInterface, StringableInterface
     /**
      * Split the string using a regular expression
      *
-     * @param string $regex
-     * @param int $limit
-     *
      * @return StreamInterface<self>
      */
     public function pregSplit(string $regex, int $limit = -1): StreamInterface
@@ -388,11 +319,7 @@ class Str implements PrimitiveInterface, StringableInterface
     /**
      * Check if the string match the given regular expression
      *
-     * @param string $regex
-     *
      * @throws Exception If the regex failed
-     *
-     * @return bool
      */
     public function matches(string $regex): bool
     {
@@ -408,10 +335,6 @@ class Str implements PrimitiveInterface, StringableInterface
      *
      * @deprecated replaced by self::capture, to be removed in 3.0
      *
-     * @param string $regex
-     * @param int $offset
-     * @param int $flags
-     *
      * @throws Exception If the regex failed
      *
      * @return MapInterface<scalar, self>
@@ -426,8 +349,6 @@ class Str implements PrimitiveInterface, StringableInterface
 
     /**
      * Return a collection of the elements matching the regex
-     *
-     * @param string $regex
      *
      * @throws Exception If the regex failed
      *
@@ -445,13 +366,7 @@ class Str implements PrimitiveInterface, StringableInterface
     /**
      * Replace part of the string by using a regular expression
      *
-     * @param string $regex
-     * @param string $replacement
-     * @param int $limit
-     *
      * @throws Exception If the regex failed
-     *
-     * @return self
      */
     public function pregReplace(
         string $regex,
@@ -474,11 +389,6 @@ class Str implements PrimitiveInterface, StringableInterface
 
     /**
      * Return part of the string
-     *
-     * @param int $start
-     * @param int $length
-     *
-     * @return self
      */
     public function substring(int $start, int $length = null): self
     {
@@ -513,8 +423,6 @@ class Str implements PrimitiveInterface, StringableInterface
 
     /**
      * Return a formatted string
-     *
-     * @return self
      */
     public function sprintf(...$values): self
     {
@@ -523,8 +431,6 @@ class Str implements PrimitiveInterface, StringableInterface
 
     /**
      * Return the string with the first letter as uppercase
-     *
-     * @return self
      */
     public function ucfirst(): self
     {
@@ -536,8 +442,6 @@ class Str implements PrimitiveInterface, StringableInterface
 
     /**
      * Return the string with the first letter as lowercase
-     *
-     * @return self
      */
     public function lcfirst(): self
     {
@@ -549,8 +453,6 @@ class Str implements PrimitiveInterface, StringableInterface
 
     /**
      * Return a CamelCase representation of the string
-     *
-     * @return self
      */
     public function camelize(): self
     {
@@ -565,10 +467,6 @@ class Str implements PrimitiveInterface, StringableInterface
 
     /**
      * Append a string at the end of the current one
-     *
-     * @param string $string
-     *
-     * @return self
      */
     public function append(string $string): self
     {
@@ -577,10 +475,6 @@ class Str implements PrimitiveInterface, StringableInterface
 
     /**
      * Prepend a string at the beginning of the current one
-     *
-     * @param string $string
-     *
-     * @return self
      */
     public function prepend(string $string): self
     {
@@ -589,10 +483,6 @@ class Str implements PrimitiveInterface, StringableInterface
 
     /**
      * Check if the 2 strings are equal
-     *
-     * @param self $string
-     *
-     * @return bool
      */
     public function equals(self $string): bool
     {
@@ -601,10 +491,6 @@ class Str implements PrimitiveInterface, StringableInterface
 
     /**
      * Trim the string
-     *
-     * @param string $mask
-     *
-     * @return self
      */
     public function trim(string $mask = null): self
     {
@@ -616,10 +502,6 @@ class Str implements PrimitiveInterface, StringableInterface
 
     /**
      * Trim the right side of the string
-     *
-     * @param string $mask
-     *
-     * @return self
      */
     public function rightTrim(string $mask = null): self
     {
@@ -631,10 +513,6 @@ class Str implements PrimitiveInterface, StringableInterface
 
     /**
      * Trim the left side of the string
-     *
-     * @param string $mask
-     *
-     * @return self
      */
     public function leftTrim(string $mask = null): self
     {
@@ -646,10 +524,6 @@ class Str implements PrimitiveInterface, StringableInterface
 
     /**
      * Check if the given string is present in the current one
-     *
-     * @param string $value
-     *
-     * @return bool
      */
     public function contains(string $value): bool
     {
@@ -664,10 +538,6 @@ class Str implements PrimitiveInterface, StringableInterface
 
     /**
      * Check if the current string starts with the given string
-     *
-     * @param string $value
-     *
-     * @return bool
      */
     public function startsWith(string $value): bool
     {
@@ -684,10 +554,6 @@ class Str implements PrimitiveInterface, StringableInterface
 
     /**
      * Check if the current string ends with the given string
-     *
-     * @param string $value
-     *
-     * @return bool
      */
     public function endsWith(string $value): bool
     {
@@ -700,10 +566,6 @@ class Str implements PrimitiveInterface, StringableInterface
 
     /**
      * Quote regular expression characters
-     *
-     * @param string $delimiter
-     *
-     * @return self
      */
     public function pregQuote(string $delimiter = ''): self
     {
@@ -712,12 +574,6 @@ class Str implements PrimitiveInterface, StringableInterface
 
     /**
      * Pad the string
-     *
-     * @param int $length
-     * @param string $character
-     * @param int $direction
-     *
-     * @return self
      */
     private function pad(
         int $length,

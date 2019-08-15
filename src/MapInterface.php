@@ -17,15 +17,11 @@ interface MapInterface extends SizeableInterface, \Countable, \Iterator, \ArrayA
 
     /**
      * Return the key type for this map
-     *
-     * @return Str
      */
     public function keyType(): Str;
 
     /**
      * Return the value type for this map
-     *
-     * @return Str
      */
     public function valueType(): Str;
 
@@ -54,8 +50,6 @@ interface MapInterface extends SizeableInterface, \Countable, \Iterator, \ArrayA
      * Check if there is an element for the given key
      *
      * @param T $key
-     *
-     * @return bool
      */
     public function contains($key): bool;
 
@@ -70,8 +64,6 @@ interface MapInterface extends SizeableInterface, \Countable, \Iterator, \ArrayA
      * Check if the two maps are equal
      *
      * @param self<T, S> $map
-     *
-     * @return bool
      */
     public function equals(self $map): bool;
 
@@ -130,10 +122,6 @@ interface MapInterface extends SizeableInterface, \Countable, \Iterator, \ArrayA
 
     /**
      * Concatenate all elements with the given separator
-     *
-     * @param string $separator
-     *
-     * @return Str
      */
     public function join(string $separator): Str;
 
