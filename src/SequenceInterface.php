@@ -136,7 +136,7 @@ interface SequenceInterface extends SizeableInterface, PrimitiveInterface, \Coun
     /**
      * Return the list of indices
      *
-     * @return SteamInterface<int>
+     * @return StreamInterface<int>
      */
     public function indices(): StreamInterface;
 
