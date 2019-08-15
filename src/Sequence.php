@@ -11,7 +11,7 @@ use Innmind\Immutable\{
 };
 
 /**
- * A defined set of ordered elements
+ * {@inheritdoc}
  */
 class Sequence implements SequenceInterface
 {
@@ -164,7 +164,7 @@ class Sequence implements SequenceInterface
     {
         return $this->reduce(
             new self,
-            static function(self $values, $value): self {
+            static function(SequenceInterface $values, $value): SequenceInterface {
                 if ($values->contains($value)) {
                     return $values;
                 }

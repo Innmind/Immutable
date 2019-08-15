@@ -11,6 +11,9 @@ use Innmind\Immutable\{
     Exception\GroupEmptyMapException
 };
 
+/**
+ * {@inheritdoc}
+ */
 final class Map implements MapInterface
 {
     private $implementation;

@@ -220,7 +220,7 @@ class Set implements SetInterface
 
         return $map->reduce(
             new Map((string) $map->keyType(), SetInterface::class),
-            function(Map $carry, $key, StreamInterface $values): Map {
+            function(MapInterface $carry, $key, StreamInterface $values): MapInterface {
                 $set = $this->clear();
                 $set->values = $values;
 
@@ -236,7 +236,7 @@ class Set implements SetInterface
     {
         return $this->reduce(
             $this->clear(),
-            function(self $carry, $value) use ($function): self {
+            function(SetInterface $carry, $value) use ($function): SetInterface {
                 return $carry->add($function($value));
             }
         );
@@ -283,7 +283,7 @@ class Set implements SetInterface
 
         return $set->reduce(
             $this,
-            function(self $carry, $value): self {
+            function(SetInterface $carry, $value): SetInterface {
                 return $carry->add($value);
             }
         );
