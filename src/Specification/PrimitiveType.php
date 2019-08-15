@@ -20,7 +20,7 @@ class PrimitiveType implements SpecificationInterface
     /**
      * {@inheritdoc}
      */
-    public function validate($value)
+    public function validate($value): void
     {
         if (call_user_func($this->function, $value) === false) {
             throw new InvalidArgumentException;

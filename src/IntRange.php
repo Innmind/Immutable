@@ -50,13 +50,13 @@ class IntRange implements PrimitiveInterface, \Iterator
         return $this->key;
     }
 
-    public function next()
+    public function next(): void
     {
         ++$this->key;
         $this->current += $this->step;
     }
 
-    public function rewind()
+    public function rewind(): void
     {
         $this->key = 0;
         $this->current = $this->start;

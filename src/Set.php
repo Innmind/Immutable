@@ -56,7 +56,7 @@ class Set implements SetInterface
     /**
      * {@inheritdoc}
      */
-    public function toPrimitive()
+    public function toPrimitive(): array
     {
         return $this->values->toPrimitive();
     }
@@ -72,7 +72,7 @@ class Set implements SetInterface
     /**
      * {@inheritdoc}
      */
-    public function key()
+    public function key(): int
     {
         return $this->values->key();
     }
@@ -80,7 +80,7 @@ class Set implements SetInterface
     /**
      * {@inheritdoc}
      */
-    public function next()
+    public function next(): void
     {
         $this->values->next();
     }
@@ -88,7 +88,7 @@ class Set implements SetInterface
     /**
      * {@inheritdoc}
      */
-    public function rewind()
+    public function rewind(): void
     {
         $this->values->rewind();
     }
@@ -96,7 +96,7 @@ class Set implements SetInterface
     /**
      * {@inheritdoc}
      */
-    public function valid()
+    public function valid(): bool
     {
         return $this->values->valid();
     }

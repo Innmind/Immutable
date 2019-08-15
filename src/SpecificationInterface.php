@@ -11,8 +11,6 @@ interface SpecificationInterface
      * @param mixed $value
      *
      * @throws InvalidArgumentException If the validation fails
-     *
-     * @return void
      */
-    public function validate($value);
+    public function validate($value): void;
 }

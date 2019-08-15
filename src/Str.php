@@ -37,7 +37,7 @@ class Str implements PrimitiveInterface, StringableInterface
     /**
      * {@inheritdoc}
      */
-    public function toPrimitive()
+    public function toPrimitive(): string
     {
         return $this->value;
     }

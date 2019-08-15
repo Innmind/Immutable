@@ -94,7 +94,7 @@ final class DoubleIndex implements MapInterface
     /**
      * {@inheritdoc}
      */
-    public function next()
+    public function next(): void
     {
         $this->keys->next();
         $this->values->next();
@@ -104,7 +104,7 @@ final class DoubleIndex implements MapInterface
     /**
      * {@inheritdoc}
      */
-    public function rewind()
+    public function rewind(): void
     {
         $this->keys->rewind();
         $this->values->rewind();
@@ -114,7 +114,7 @@ final class DoubleIndex implements MapInterface
     /**
      * {@inheritdoc}
      */
-    public function valid()
+    public function valid(): bool
     {
         return $this->keys->valid();
     }
@@ -138,7 +138,7 @@ final class DoubleIndex implements MapInterface
     /**
      * {@inheritdoc}
      */
-    public function offsetSet($offset, $value)
+    public function offsetSet($offset, $value): void
     {
         throw new LogicException('You can\'t modify a map');
     }
@@ -146,7 +146,7 @@ final class DoubleIndex implements MapInterface
     /**
      * {@inheritdoc}
      */
-    public function offsetUnset($offset)
+    public function offsetUnset($offset): void
     {
         throw new LogicException('You can\'t modify a map');
     }

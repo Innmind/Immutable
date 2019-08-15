@@ -58,7 +58,6 @@ class SequenceTest extends TestCase
         $this->assertSame(1, $s->key());
         $this->assertTrue($s->valid());
         $s->next();
-        $this->assertSame(null, $s->key());
         $this->assertFalse($s->valid());
         $this->assertSame(null, $s->rewind());
         $this->assertSame(0, $s->key());
