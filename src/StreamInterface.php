@@ -5,24 +5,22 @@ namespace Innmind\Immutable;
 
 /**
  * Sequence of elements of the same type
+ *
+ * @template T
  */
 interface StreamInterface extends SizeableInterface, PrimitiveInterface, \Countable, \Iterator, \ArrayAccess
 {
     /**
      * Type of the elements
-     *
-     * @return Str
      */
     public function type(): Str;
 
     /**
      * Return the element at the given index
      *
-     * @param int $index
-     *
      * @throws OutOfBoundException
      *
-     * @return mixed
+     * @return T
      */
     public function get(int $index);
 
@@ -45,16 +43,12 @@ interface StreamInterface extends SizeableInterface, PrimitiveInterface, \Counta
     /**
      * Remove the n first elements
      *
-     * @param int $size
-     *
      * @return self<T>
      */
     public function drop(int $size): self;
 
     /**
      * Remove the n last elements
-     *
-     * @param int $size
      *
      * @return self<T>
      */
@@ -64,15 +58,13 @@ interface StreamInterface extends SizeableInterface, PrimitiveInterface, \Counta
      * Check if the two streams are equal
      *
      * @param self<T> $stream
-     *
-     * @return bool
      */
     public function equals(self $stream): bool;
 
     /**
      * Return all elements that satisfy the given predicate
      *
-     * @param callable $predicate
+     * @param callable(T): bool $predicate
      *
      * @return self<T>
      */
@@ -81,7 +73,7 @@ interface StreamInterface extends SizeableInterface, PrimitiveInterface, \Counta
     /**
      * Apply the given function to all elements of the stream
      *
-     * @param callable $function
+     * @param callable(T): void $function
      *
      * @return self<T>
      */
@@ -91,7 +83,7 @@ interface StreamInterface extends SizeableInterface, PrimitiveInterface, \Counta
      * Return a new map of pairs grouped by keys determined with the given
      * discriminator function
      *
-     * @param callable $discriminator
+     * @param callable(T) $discriminator
      *
      * @throws GroupEmptySequenceException
      *
@@ -117,8 +109,6 @@ interface StreamInterface extends SizeableInterface, PrimitiveInterface, \Counta
      * Check if the stream contains the given element
      *
      * @param T $element
-     *
-     * @return bool
      */
     public function contains($element): bool;
 
@@ -128,8 +118,6 @@ interface StreamInterface extends SizeableInterface, PrimitiveInterface, \Counta
      * @param T $element
      *
      * @throws ElementNotFoundException
-     *
-     * @return int
      */
     public function indexOf($element): int;
 
@@ -143,7 +131,7 @@ interface StreamInterface extends SizeableInterface, PrimitiveInterface, \Counta
     /**
      * Return a new stream by applying the given function to all elements
      *
-     * @param callable $function
+     * @param callable(T): T $function
      *
      * @return self<T>
      */
@@ -152,7 +140,6 @@ interface StreamInterface extends SizeableInterface, PrimitiveInterface, \Counta
     /**
      * Pad the stream to a defined size with the given element
      *
-     * @param int $size
      * @param T $element
      *
      * @return self<T>
@@ -162,7 +149,7 @@ interface StreamInterface extends SizeableInterface, PrimitiveInterface, \Counta
     /**
      * Return a stream of 2 streams partitioned according to the given predicate
      *
-     * @param callable $predicate
+     * @param callable(T): bool $predicate
      *
      * @return MapInterface<bool, self<T>>
      */
@@ -171,17 +158,12 @@ interface StreamInterface extends SizeableInterface, PrimitiveInterface, \Counta
     /**
      * Slice the stream
      *
-     * @param int $from
-     * @param int $until
-     *
      * @return self<T>
      */
     public function slice(int $from, int $until): self;
 
     /**
      * Split the stream in a stream of 2 streams splitted at the given position
-     *
-     * @param int $position
      *
      * @throws OutOfBoundException
      *
@@ -192,16 +174,12 @@ interface StreamInterface extends SizeableInterface, PrimitiveInterface, \Counta
     /**
      * Return a stream with the n first elements
      *
-     * @param int $size
-     *
      * @return self<T>
      */
     public function take(int $size): self;
 
     /**
      * Return a stream with the n last elements
-     *
-     * @param int $size
      *
      * @return self<T>
      */
@@ -210,7 +188,7 @@ interface StreamInterface extends SizeableInterface, PrimitiveInterface, \Counta
     /**
      * Append the given stream to the current one
      *
-     * @param self $stream
+     * @param self<T> $stream
      *
      * @return self<T>
      */
@@ -228,10 +206,6 @@ interface StreamInterface extends SizeableInterface, PrimitiveInterface, \Counta
 
     /**
      * Concatenate all elements with the given separator
-     *
-     * @param string $separator
-     *
-     * @return Str
      */
     public function join(string $separator): Str;
 
@@ -247,7 +221,7 @@ interface StreamInterface extends SizeableInterface, PrimitiveInterface, \Counta
     /**
      * Sort the stream in a different order
      *
-     * @param callable $function
+     * @param callable(T): int $function
      *
      * @return self<T>
      */
@@ -257,7 +231,7 @@ interface StreamInterface extends SizeableInterface, PrimitiveInterface, \Counta
      * Reduce the stream to a single value
      *
      * @param mixed $carry
-     * @param callable $reducer
+     * @param callable(mixed, T) $reducer
      *
      * @return mixed
      */

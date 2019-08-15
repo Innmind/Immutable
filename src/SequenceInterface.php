@@ -11,8 +11,6 @@ interface SequenceInterface extends SizeableInterface, PrimitiveInterface, \Coun
     /**
      * Return the element at the given index
      *
-     * @param int $index
-     *
      * @throws OutOfBoundException
      *
      * @return mixed
@@ -21,71 +19,45 @@ interface SequenceInterface extends SizeableInterface, PrimitiveInterface, \Coun
 
     /**
      * Check the index exist
-     *
-     * @param int $index
-     *
-     * @return bool
      */
     public function has(int $index): bool;
 
     /**
      * Return the diff between this sequence and another
-     *
-     * @param self $seq
-     *
-     * @return self
      */
     public function diff(self $seq): self;
 
     /**
      * Remove all duplicates from the sequence
-     *
-     * @return self
      */
     public function distinct(): self;
 
     /**
      * Remove the n first elements
-     *
-     * @param int $size
-     *
-     * @return self
      */
     public function drop(int $size): self;
 
     /**
      * Remove the n last elements
-     *
-     * @param int $size
-     *
-     * @return self
      */
     public function dropEnd(int $size): self;
 
     /**
      * Check if the two sequences are equal
-     *
-     * @param self $seq
-     *
-     * @return bool
      */
     public function equals(self $seq): bool;
 
     /**
      * Return all elements that satisfy the given predicate
      *
-     * @param callable $predicate
-     *
-     * @return self
+     * @param callable(mixed): bool $predicate
      */
     public function filter(callable $predicate): self;
 
     /**
      * Apply the given function to all elements of the sequence
      *
-     * @param callable $function
-     *
-     * @return self
+     * @param callable(mixed): void $function
      */
     public function foreach(callable $function): self;
 
@@ -93,7 +65,7 @@ interface SequenceInterface extends SizeableInterface, PrimitiveInterface, \Coun
      * Return a new map of pairs grouped by keys determined with the given
      * discriminator function
      *
-     * @param callable $discriminator
+     * @param callable(mixed) $discriminator
      *
      * @return MapInterface<mixed, self>
      */
@@ -117,8 +89,6 @@ interface SequenceInterface extends SizeableInterface, PrimitiveInterface, \Coun
      * Check if the sequence contains the given element
      *
      * @param mixed $element
-     *
-     * @return bool
      */
     public function contains($element): bool;
 
@@ -128,60 +98,43 @@ interface SequenceInterface extends SizeableInterface, PrimitiveInterface, \Coun
      * @param mixed $element
      *
      * @throws ElementNotFoundException
-     *
-     * @return int
      */
     public function indexOf($element): int;
 
     /**
      * Return the list of indices
      *
-     * @return SteamInterface<int>
+     * @return StreamInterface<int>
      */
     public function indices(): StreamInterface;
 
     /**
      * Return a new sequence by applying the given function to all elements
      *
-     * @param callable $function
-     *
-     * @return self
+     * @param callable(mixed) $function
      */
     public function map(callable $function): self;
 
     /**
      * Pad the sequence to a defined size with the given element
      *
-     * @param int $size
      * @param mixed $element
-     *
-     * @return self
      */
     public function pad(int $size, $element): self;
 
     /**
      * Return a sequence of 2 sequences partitioned according to the given predicate
      *
-     * @param callable $predicate
+     * @param callable(mixed): bool $predicate
      *
      * @return MapInterface<bool, self>
      */
     public function partition(callable $predicate): MapInterface;
 
-    /**
-     * Slice the sequence
-     *
-     * @param int $from
-     * @param int $until
-     *
-     * @return self
-     */
     public function slice(int $from, int $until): self;
 
     /**
      * Split the sequence in a sequence of 2 sequences splitted at the given position
-     *
-     * @param int $position
      *
      * @throws OutOfBoundException
      *
@@ -191,47 +144,27 @@ interface SequenceInterface extends SizeableInterface, PrimitiveInterface, \Coun
 
     /**
      * Return a sequence with the n first elements
-     *
-     * @param int $size
-     *
-     * @return self
      */
     public function take(int $size): self;
 
     /**
      * Return a sequence with the n last elements
-     *
-     * @param int $size
-     *
-     * @return self
      */
     public function takeEnd(int $size): self;
 
     /**
      * Append the given sequence to the current one
-     *
-     * @param self $seq
-     *
-     * @return self
      */
     public function append(self $seq): self;
 
     /**
      * Return a sequence with all elements from the current one that exist
      * in the given one
-     *
-     * @param self $seq
-     *
-     * @return self
      */
     public function intersect(self $seq): self;
 
     /**
      * Concatenate all elements with the given separator
-     *
-     * @param string $separator
-     *
-     * @return Str
      */
     public function join(string $separator): Str;
 
@@ -239,17 +172,13 @@ interface SequenceInterface extends SizeableInterface, PrimitiveInterface, \Coun
      * Add the given element at the end of the sequence
      *
      * @param mixed $element
-     *
-     * @return self
      */
     public function add($element): self;
 
     /**
      * Sort the sequence in a different order
      *
-     * @param callable $function
-     *
-     * @return self
+     * @param callable(mixed): int $function
      */
     public function sort(callable $function): self;
 
@@ -257,7 +186,7 @@ interface SequenceInterface extends SizeableInterface, PrimitiveInterface, \Coun
      * Reduce the sequence to a single value
      *
      * @param mixed $carry
-     * @param callable $reducer
+     * @param callable(mixed, mixed) $reducer
      *
      * @return mixed
      */

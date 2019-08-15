@@ -56,7 +56,7 @@ class Set implements SetInterface
     /**
      * {@inheritdoc}
      */
-    public function toPrimitive()
+    public function toPrimitive(): array
     {
         return $this->values->toPrimitive();
     }
@@ -72,7 +72,7 @@ class Set implements SetInterface
     /**
      * {@inheritdoc}
      */
-    public function key()
+    public function key(): int
     {
         return $this->values->key();
     }
@@ -80,7 +80,7 @@ class Set implements SetInterface
     /**
      * {@inheritdoc}
      */
-    public function next()
+    public function next(): void
     {
         $this->values->next();
     }
@@ -88,7 +88,7 @@ class Set implements SetInterface
     /**
      * {@inheritdoc}
      */
-    public function rewind()
+    public function rewind(): void
     {
         $this->values->rewind();
     }
@@ -96,7 +96,7 @@ class Set implements SetInterface
     /**
      * {@inheritdoc}
      */
-    public function valid()
+    public function valid(): bool
     {
         return $this->values->valid();
     }
@@ -220,7 +220,7 @@ class Set implements SetInterface
 
         return $map->reduce(
             new Map((string) $map->keyType(), SetInterface::class),
-            function(Map $carry, $key, StreamInterface $values): Map {
+            function(MapInterface $carry, $key, StreamInterface $values): MapInterface {
                 $set = $this->clear();
                 $set->values = $values;
 
@@ -236,7 +236,7 @@ class Set implements SetInterface
     {
         return $this->reduce(
             $this->clear(),
-            function(self $carry, $value) use ($function): self {
+            function(SetInterface $carry, $value) use ($function): SetInterface {
                 return $carry->add($function($value));
             }
         );
@@ -283,7 +283,7 @@ class Set implements SetInterface
 
         return $set->reduce(
             $this,
-            function(self $carry, $value): self {
+            function(SetInterface $carry, $value): SetInterface {
                 return $carry->add($value);
             }
         );

@@ -20,7 +20,7 @@ class ClassType implements SpecificationInterface
     /**
      * {@inheritdoc}
      */
-    public function validate($value)
+    public function validate($value): void
     {
         if (!$value instanceof $this->class) {
             throw new InvalidArgumentException;

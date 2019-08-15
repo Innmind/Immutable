@@ -5,6 +5,8 @@ namespace Innmind\Immutable;
 
 /**
  * Set of unique elements in a non deterministic order
+ *
+ * @template T
  */
 interface SetInterface extends SizeableInterface, PrimitiveInterface, \Countable, \Iterator
 {
@@ -15,8 +17,6 @@ interface SetInterface extends SizeableInterface, PrimitiveInterface, \Countable
 
     /**
      * Return the type of this set
-     *
-     * @return Str
      */
     public function type(): Str;
 
@@ -44,8 +44,6 @@ interface SetInterface extends SizeableInterface, PrimitiveInterface, \Countable
      * Check if the set contains the given element
      *
      * @param T $element
-     *
-     * @return bool
      */
     public function contains($element): bool;
 
@@ -71,15 +69,13 @@ interface SetInterface extends SizeableInterface, PrimitiveInterface, \Countable
      * Check if the given set is identical to this one
      *
      * @param self<T> $set
-     *
-     * @return bool
      */
     public function equals(self $set): bool;
 
     /**
      * Return all elements that satisfy the given predicate
      *
-     * @param callable $predicate
+     * @param callable(T): bool $predicate
      *
      * @return self<T>
      */
@@ -88,7 +84,7 @@ interface SetInterface extends SizeableInterface, PrimitiveInterface, \Countable
     /**
      * Apply the given function to all elements of the set
      *
-     * @param callable $function
+     * @param callable(T): void $function
      *
      * @return self<T>
      */
@@ -98,7 +94,7 @@ interface SetInterface extends SizeableInterface, PrimitiveInterface, \Countable
      * Return a new map of pairs grouped by keys determined with the given
      * discriminator function
      *
-     * @param callable $discriminator
+     * @param callable(T) $discriminator
      *
      * @return MapInterface<mixed, self<T>>
      */
@@ -107,7 +103,7 @@ interface SetInterface extends SizeableInterface, PrimitiveInterface, \Countable
     /**
      * Return a new set by applying the given function to all elements
      *
-     * @param callable $function
+     * @param callable(T): T $function
      *
      * @return self<T>
      */
@@ -116,7 +112,7 @@ interface SetInterface extends SizeableInterface, PrimitiveInterface, \Countable
     /**
      * Return a sequence of 2 sets partitioned according to the given predicate
      *
-     * @param callable $predicate
+     * @param callable(T): bool $predicate
      *
      * @return MapInterface<bool, self<T>>
      */
@@ -124,17 +120,13 @@ interface SetInterface extends SizeableInterface, PrimitiveInterface, \Countable
 
     /**
      * Concatenate all elements with the given separator
-     *
-     * @param string $separator
-     *
-     * @return Str
      */
     public function join(string $separator): Str;
 
     /**
      * Return a sequence sorted with the given function
      *
-     * @param callable $function
+     * @param callable(T): int $function
      *
      * @return StreamInterface<T>
      */
@@ -153,7 +145,7 @@ interface SetInterface extends SizeableInterface, PrimitiveInterface, \Countable
      * Reduce the set to a single value
      *
      * @param mixed $carry
-     * @param callable $reducer
+     * @param callable(mixed, T) $reducer
      *
      * @return mixed
      */

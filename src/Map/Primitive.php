@@ -19,6 +19,9 @@ use Innmind\Immutable\{
     Exception\GroupEmptyMapException
 };
 
+/**
+ * {@inheritdoc}
+ */
 final class Primitive implements MapInterface
 {
     private $keyType;
@@ -96,7 +99,7 @@ final class Primitive implements MapInterface
     /**
      * {@inheritdoc}
      */
-    public function next()
+    public function next(): void
     {
         \next($this->values);
     }
@@ -104,7 +107,7 @@ final class Primitive implements MapInterface
     /**
      * {@inheritdoc}
      */
-    public function rewind()
+    public function rewind(): void
     {
         \reset($this->values);
     }
@@ -112,7 +115,7 @@ final class Primitive implements MapInterface
     /**
      * {@inheritdoc}
      */
-    public function valid()
+    public function valid(): bool
     {
         return $this->key() !== null;
     }
@@ -136,7 +139,7 @@ final class Primitive implements MapInterface
     /**
      * {@inheritdoc}
      */
-    public function offsetSet($offset, $value)
+    public function offsetSet($offset, $value): void
     {
         throw new LogicException('You can\'t modify a map');
     }
@@ -144,7 +147,7 @@ final class Primitive implements MapInterface
     /**
      * {@inheritdoc}
      */
-    public function offsetUnset($offset)
+    public function offsetUnset($offset): void
     {
         throw new LogicException('You can\'t modify a map');
     }

@@ -10,7 +10,7 @@ final class MixedType implements SpecificationInterface
     /**
      * {@inheritdoc}
      */
-    public function validate($value)
+    public function validate($value): void
     {
         //pass
     }

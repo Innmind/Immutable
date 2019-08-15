@@ -11,7 +11,7 @@ use Innmind\Immutable\{
 };
 
 /**
- * A defined set of ordered elements
+ * {@inheritdoc}
  */
 class Sequence implements SequenceInterface
 {
@@ -58,7 +58,7 @@ class Sequence implements SequenceInterface
     /**
      * {@inheritdoc}
      */
-    public function key()
+    public function key(): int
     {
         return \key($this->values);
     }
@@ -66,7 +66,7 @@ class Sequence implements SequenceInterface
     /**
      * {@inheritdoc}
      */
-    public function next()
+    public function next(): void
     {
         \next($this->values);
     }
@@ -74,7 +74,7 @@ class Sequence implements SequenceInterface
     /**
      * {@inheritdoc}
      */
-    public function rewind()
+    public function rewind(): void
     {
         \reset($this->values);
     }
@@ -84,7 +84,7 @@ class Sequence implements SequenceInterface
      */
     public function valid(): bool
     {
-        return $this->key() !== null;
+        return \key($this->values) !== null;
     }
 
     /**
@@ -106,7 +106,7 @@ class Sequence implements SequenceInterface
     /**
      * {@inheritdoc}
      */
-    public function offsetSet($offset, $value)
+    public function offsetSet($offset, $value): void
     {
         throw new LogicException('You can\'t modify a sequence');
     }
@@ -114,7 +114,7 @@ class Sequence implements SequenceInterface
     /**
      * {@inheritdoc}
      */
-    public function offsetUnset($offset)
+    public function offsetUnset($offset): void
     {
         throw new LogicException('You can\'t modify a sequence');
     }
@@ -122,7 +122,7 @@ class Sequence implements SequenceInterface
     /**
      * {@inheritdoc}
      */
-    public function toPrimitive()
+    public function toPrimitive(): array
     {
         return $this->values;
     }
@@ -164,7 +164,7 @@ class Sequence implements SequenceInterface
     {
         return $this->reduce(
             new self,
-            static function(self $values, $value): self {
+            static function(SequenceInterface $values, $value): SequenceInterface {
                 if ($values->contains($value)) {
                     return $values;
                 }

@@ -13,7 +13,7 @@ final class VariableType implements SpecificationInterface
     /**
      * {@inheritdoc}
      */
-    public function validate($value)
+    public function validate($value): void
     {
         if (!\is_scalar($value) && !\is_array($value)) {
             throw new InvalidArgumentException;
