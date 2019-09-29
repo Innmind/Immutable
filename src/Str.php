@@ -11,14 +11,14 @@ use Innmind\Immutable\{
 
 class Str implements PrimitiveInterface, StringableInterface
 {
-    const PAD_RIGHT = STR_PAD_RIGHT;
-    const PAD_LEFT = STR_PAD_LEFT;
-    const PAD_BOTH = STR_PAD_BOTH;
-    const PREG_NO_FLAGS = 0;
-    const PREG_SPLIT_NO_EMPTY = PREG_SPLIT_NO_EMPTY;
-    const PREG_SPLIT_DELIM_CAPTURE = PREG_SPLIT_DELIM_CAPTURE;
-    const PREG_SPLIT_OFFSET_CAPTURE = PREG_SPLIT_OFFSET_CAPTURE;
-    const PREG_OFFSET_CAPTURE = PREG_OFFSET_CAPTURE;
+    private const PAD_RIGHT = STR_PAD_RIGHT;
+    private const PAD_LEFT = STR_PAD_LEFT;
+    private const PAD_BOTH = STR_PAD_BOTH;
+    private const PREG_NO_FLAGS = 0;
+    private const PREG_SPLIT_NO_EMPTY = PREG_SPLIT_NO_EMPTY;
+    private const PREG_SPLIT_DELIM_CAPTURE = PREG_SPLIT_DELIM_CAPTURE;
+    private const PREG_SPLIT_OFFSET_CAPTURE = PREG_SPLIT_OFFSET_CAPTURE;
+    private const PREG_OFFSET_CAPTURE = PREG_OFFSET_CAPTURE;
 
     private $value;
     private $encoding;
