@@ -315,6 +315,7 @@ class StrTest extends TestCase
         $this->assertNotSame($str, $str2);
         $this->assertSame('FOO🙏', (string) $str2);
         $this->assertSame('foo🙏', (string) $str);
+        $this->assertSame('ÉGÉRIE', (string) S::of('égérie')->toUpper());
     }
 
     public function testToLower()
@@ -326,6 +327,7 @@ class StrTest extends TestCase
         $this->assertNotSame($str, $str2);
         $this->assertSame('foo🙏', (string) $str2);
         $this->assertSame('FOO🙏', (string) $str);
+        $this->assertSame('égérie', (string) S::of('ÉGÉRIE')->toLower());
     }
 
     public function testLength()
@@ -699,6 +701,7 @@ class StrTest extends TestCase
         $this->assertSame('foo', (string) $str);
         $this->assertSame('Foo', (string) $str2);
         $this->assertSame('🙏', (string) (new S('🙏'))->ucfirst());
+        $this->assertSame('Égérie', (string) S::of('égérie')->ucfirst());
     }
 
     public function testLcfirst()
@@ -711,6 +714,7 @@ class StrTest extends TestCase
         $this->assertSame('FOO', (string) $str);
         $this->assertSame('fOO', (string) $str2);
         $this->assertSame('🙏', (string) (new S('🙏'))->lcfirst());
+        $this->assertSame('éGÉRIE', (string) S::of('ÉGÉRIE')->lcfirst());
     }
 
     public function testCamelize()
