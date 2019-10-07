@@ -22,7 +22,7 @@ $another->toPrimitive(); // [Hitchhiker, Magrathea]
 $seq->toPrimitive(); // [24, 42, Hitchhiker, Magrathea]
 ```
 
-For a complete list of methods check [`SequenceInterface`](SequenceInterface.php).
+For a complete list of methods check [`SequenceInterface`](src/SequenceInterface.php).
 
 ## Set
 
@@ -41,7 +41,7 @@ $set->add(42.0); // will throw as it's a float and not an integer
 
 The type passed in the constructor can be any primitive type (more precisely any type having a `is_{type}` function) or any class name.
 
-For a complete list of methods check [`SetInterface`](SetInterface.php).
+For a complete list of methods check [`SetInterface`](src/SetInterface.php).
 
 ## Map
 
@@ -64,9 +64,9 @@ $map->values()->toPrimitive(); // [42, 66]
 
 The types passed in the constructor can be any primitive type (more precisely any type having a `is_{type}` function) or any class name.
 
-For a complete list of methods check [`MapInterface`](MapInterface.php).
+For a complete list of methods check [`MapInterface`](src/MapInterface.php).
 
-**Note**: As a map is not a simple associative array, when you call `map` the return value can be an instance of [`Pair`](Pair.php). If this this the case, the key used to reference the original value will be replaced by the key from the `Pair` instance in the new `Map` instance.
+**Note**: As a map is not a simple associative array, when you call `map` the return value can be an instance of [`Pair`](src/Pair.php). If this this the case, the key used to reference the original value will be replaced by the key from the `Pair` instance in the new `Map` instance.
 
 ## Strings
 
