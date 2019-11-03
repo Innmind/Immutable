@@ -7,7 +7,8 @@ use Innmind\Immutable\{
     Specification\PrimitiveType,
     Specification\ClassType,
     Specification\VariableType,
-    Specification\MixedType
+    Specification\MixedType,
+    Specification\NullableType
 };
 
 final class Type
@@ -21,19 +22,23 @@ final class Type
      */
     public static function of(string $type): SpecificationInterface
     {
-        if (\function_exists('is_'.$type)) {
-            return new PrimitiveType($type);
+        if ($type === '?null') {
+            throw new \ParseError('\'null\' type is already nullable');
         }
 
-        if ($type === 'variable') {
-            return new VariableType;
+        if ($type === '?mixed') {
+            throw new \ParseError('\'mixed\' type already accepts \'null\' values');
         }
 
-        if ($type === 'mixed') {
-            return new MixedType;
+        $type = Str::of($type);
+
+        if ($type->startsWith('?')) {
+            return new NullableType(
+                self::ofPrimitive((string) $type->drop(1))
+            );
         }
 
-        return new ClassType($type);
+        return self::ofPrimitive((string) $type);
     }
 
     /**
@@ -66,5 +71,22 @@ final class Type
             default:
                 return $type;
         }
+    }
+
+    private static function ofPrimitive(string $type): SpecificationInterface
+    {
+        if (\function_exists('is_'.$type)) {
+            return new PrimitiveType($type);
+        }
+
+        if ($type === 'variable') {
+            return new VariableType;
+        }
+
+        if ($type === 'mixed') {
+            return new MixedType;
+        }
+
+        return new ClassType($type);
     }
 }

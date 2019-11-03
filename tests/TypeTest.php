@@ -8,7 +8,8 @@ use Innmind\Immutable\{
     Specification\PrimitiveType,
     Specification\VariableType,
     Specification\MixedType,
-    Specification\ClassType
+    Specification\ClassType,
+    Specification\NullableType
 };
 use PHPUnit\Framework\TestCase;
 
@@ -26,6 +27,39 @@ class TypeTest extends TestCase
         $this->assertInstanceOf(VariableType::class, Type::of('variable'));
         $this->assertInstanceOf(MixedType::class, Type::of('mixed'));
         $this->assertInstanceOf(ClassType::class, Type::of('stdClass'));
+        $this->assertInstanceOf(NullableType::class, Type::of('?string'));
+        $this->assertInstanceOf(NullableType::class, Type::of('?int'));
+        $this->assertInstanceOf(NullableType::class, Type::of('?float'));
+        $this->assertInstanceOf(NullableType::class, Type::of('?array'));
+        $this->assertInstanceOf(NullableType::class, Type::of('?bool'));
+        $this->assertInstanceOf(NullableType::class, Type::of('?object'));
+        $this->assertInstanceOf(NullableType::class, Type::of('?variable'));
+        $this->assertInstanceOf(NullableType::class, Type::of('?stdClass'));
+
+        $this->assertNull(Type::of('?string')->validate('foo'));
+        $this->assertNull(Type::of('?int')->validate(42));
+        $this->assertNull(Type::of('?float')->validate(2.4));
+        $this->assertNull(Type::of('?array')->validate([]));
+        $this->assertNull(Type::of('?bool')->validate(true));
+        $this->assertNull(Type::of('?object')->validate(new \stdClass));
+        $this->assertNull(Type::of('?variable')->validate(false));
+        $this->assertNull(Type::of('?stdClass')->validate(new \stdClass));
+    }
+
+    public function testTypeOfNullableNullIsNotAccepted()
+    {
+        $this->expectException(\ParseError::class);
+        $this->expectExceptionMessage('\'null\' type is already nullable');
+
+        Type::of('?null');
+    }
+
+    public function testTypeOfNullableMixedIsNotAccepted()
+    {
+        $this->expectException(\ParseError::class);
+        $this->expectExceptionMessage('\'mixed\' type already accepts \'null\' values');
+
+        Type::of('?mixed');
     }
 
     public function testDetermineType()
