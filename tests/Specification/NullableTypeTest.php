@@ -5,7 +5,7 @@ namespace Tests\Innmind\Immutable\Specification;
 
 use Innmind\Immutable\{
     Specification\NullableType,
-    SpecificationInterface,
+    SpecificationInterface
 };
 use PHPUnit\Framework\TestCase;
 
