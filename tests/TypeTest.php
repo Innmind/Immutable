@@ -9,7 +9,8 @@ use Innmind\Immutable\{
     Specification\VariableType,
     Specification\MixedType,
     Specification\ClassType,
-    Specification\NullableType
+    Specification\NullableType,
+    Specification\UnionType
 };
 use PHPUnit\Framework\TestCase;
 
@@ -35,6 +36,7 @@ class TypeTest extends TestCase
         $this->assertInstanceOf(NullableType::class, Type::of('?object'));
         $this->assertInstanceOf(NullableType::class, Type::of('?variable'));
         $this->assertInstanceOf(NullableType::class, Type::of('?stdClass'));
+        $this->assertInstanceOf(UnionType::class, Type::of('int|stdClass'));
 
         $this->assertNull(Type::of('?string')->validate('foo'));
         $this->assertNull(Type::of('?int')->validate(42));
@@ -44,6 +46,9 @@ class TypeTest extends TestCase
         $this->assertNull(Type::of('?object')->validate(new \stdClass));
         $this->assertNull(Type::of('?variable')->validate(false));
         $this->assertNull(Type::of('?stdClass')->validate(new \stdClass));
+        $this->assertNull(Type::of('int|stdClass')->validate(new \stdClass));
+        $this->assertNull(Type::of('int|stdClass')->validate(42));
+        $this->assertNull(Type::of('int|stdClass|bool')->validate(true));
     }
 
     public function testTypeOfNullableNullIsNotAccepted()
@@ -60,6 +65,14 @@ class TypeTest extends TestCase
         $this->expectExceptionMessage('\'mixed\' type already accepts \'null\' values');
 
         Type::of('?mixed');
+    }
+
+    public function testTypeOfNullableUnionIsNotAccepted()
+    {
+        $this->expectException(\ParseError::class);
+        $this->expectExceptionMessage('Nullable expression is not allowed in a union type');
+
+        Type::of('int|?float');
     }
 
     public function testDetermineType()

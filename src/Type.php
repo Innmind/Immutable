@@ -8,7 +8,8 @@ use Innmind\Immutable\{
     Specification\ClassType,
     Specification\VariableType,
     Specification\MixedType,
-    Specification\NullableType
+    Specification\NullableType,
+    Specification\UnionType
 };
 
 final class Type
@@ -31,6 +32,23 @@ final class Type
         }
 
         $type = Str::of($type);
+
+        if ($type->contains('|') && $type->contains('?')) {
+            throw new \ParseError('Nullable expression is not allowed in a union type');
+        }
+
+        if ($type->contains('|')) {
+            return new UnionType(
+                ...$type->split('|')->reduce(
+                    [],
+                    static function(array $types, Str $type): array {
+                        $types[] = self::of((string) $type);
+
+                        return $types;
+                    }
+                )
+            );
+        }
 
         if ($type->startsWith('?')) {
             return new NullableType(
