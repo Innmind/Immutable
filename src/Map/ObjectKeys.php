@@ -176,15 +176,13 @@ final class ObjectKeys implements Implementation
     /**
      * {@inheritdoc}
      */
-    public function foreach(callable $function): Implementation
+    public function foreach(callable $function): void
     {
         foreach ($this->values as $k) {
             $v = $this->values[$k];
 
             $function($k, $v);
         }
-
-        return $this;
     }
 
     /**

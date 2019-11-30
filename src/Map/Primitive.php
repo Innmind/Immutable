@@ -169,13 +169,11 @@ final class Primitive implements Implementation
     /**
      * {@inheritdoc}
      */
-    public function foreach(callable $function): Implementation
+    public function foreach(callable $function): void
     {
         foreach ($this->values as $k => $v) {
             $function($this->normalizeKey($k), $v);
         }
-
-        return $this;
     }
 
     /**

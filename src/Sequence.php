@@ -148,13 +148,11 @@ final class Sequence implements \Countable
      *
      * @param callable(mixed): void $function
      */
-    public function foreach(callable $function): self
+    public function foreach(callable $function): void
     {
         foreach ($this->values as $value) {
             $function($value);
         }
-
-        return $this;
     }
 
     /**

@@ -171,11 +171,9 @@ final class Stream implements \Countable
      *
      * @return self<T>
      */
-    public function foreach(callable $function): self
+    public function foreach(callable $function): void
     {
         $this->values->foreach($function);
-
-        return $this;
     }
 
     /**

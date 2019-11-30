@@ -177,13 +177,11 @@ final class DoubleIndex implements Implementation
     /**
      * {@inheritdoc}
      */
-    public function foreach(callable $function): Implementation
+    public function foreach(callable $function): void
     {
         foreach ($this->pairs->toArray() as $pair) {
             $function($pair->key(), $pair->value());
         }
-
-        return $this;
     }
 
     /**

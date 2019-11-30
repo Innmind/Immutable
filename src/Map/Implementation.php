@@ -83,10 +83,8 @@ interface Implementation extends SizeableInterface, \Countable
      * Run the given function for each element of the map
      *
      * @param callable(T, S): void $function
-     *
-     * @return self<T, S>
      */
-    public function foreach(callable $function): self;
+    public function foreach(callable $function): void;
 
     /**
      * Return a new map of pairs' sequences grouped by keys determined with the given

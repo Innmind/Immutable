@@ -189,11 +189,9 @@ final class Map implements \Countable
      *
      * @return self<T, S>
      */
-    public function foreach(callable $function): self
+    public function foreach(callable $function): void
     {
         $this->implementation->foreach($function);
-
-        return $this;
     }
 
     /**
