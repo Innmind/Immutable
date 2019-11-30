@@ -7,7 +7,6 @@ use Innmind\Immutable\{
     Map\DoubleIndex,
     Map\Implementation,
     Map,
-    SizeableInterface,
     Pair,
     Str,
     Symbol,
@@ -27,7 +26,6 @@ class DoubleIndexTest extends TestCase
         $m = new DoubleIndex('int', 'float');
 
         $this->assertInstanceOf(Map\Implementation::class, $m);
-        $this->assertInstanceOf(SizeableInterface::class, $m);
         $this->assertInstanceOf(\Countable::class, $m);
         $this->assertSame('int', $m->keyType());
         $this->assertSame('float', $m->valueType());

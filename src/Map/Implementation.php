@@ -8,7 +8,6 @@ use Innmind\Immutable\{
     Str,
     Set,
     Stream,
-    SizeableInterface,
 };
 
 /**
@@ -16,7 +15,7 @@ use Innmind\Immutable\{
  * @template S
  * @internal Dot not code against this interface
  */
-interface Implementation extends SizeableInterface, \Countable
+interface Implementation extends \Countable
 {
     /**
      * Return the key type for this map
@@ -27,6 +26,8 @@ interface Implementation extends SizeableInterface, \Countable
      * Return the value type for this map
      */
     public function valueType(): string;
+
+    public function size(): int;
 
     /**
      * Set a new key/value pair

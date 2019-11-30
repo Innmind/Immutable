@@ -7,7 +7,6 @@ use Innmind\Immutable\{
     Map\ObjectKeys,
     Map\Implementation,
     Map,
-    SizeableInterface,
     Pair,
     Str,
     Symbol,
@@ -27,7 +26,6 @@ class ObjectKeysTest extends TestCase
         $m = new ObjectKeys('stdClass', 'float');
 
         $this->assertInstanceOf(Map\Implementation::class, $m);
-        $this->assertInstanceOf(SizeableInterface::class, $m);
         $this->assertInstanceOf(\Countable::class, $m);
         $this->assertSame('stdClass', $m->keyType());
         $this->assertSame('float', $m->valueType());

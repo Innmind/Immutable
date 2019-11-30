@@ -7,7 +7,6 @@ use Innmind\Immutable\{
     Map\Primitive,
     Map\Implementation,
     Map,
-    SizeableInterface,
     Pair,
     Str,
     Set,
@@ -26,7 +25,6 @@ class PrimitiveTest extends TestCase
         $m = new Primitive('int', 'float');
 
         $this->assertInstanceOf(Map\Implementation::class, $m);
-        $this->assertInstanceOf(SizeableInterface::class, $m);
         $this->assertInstanceOf(\Countable::class, $m);
         $this->assertSame('int', $m->keyType());
         $this->assertSame('float', $m->valueType());
