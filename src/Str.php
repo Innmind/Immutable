@@ -325,33 +325,12 @@ final class Str
     /**
      * Return a collection of the elements matching the regex
      *
-     * @deprecated replaced by self::capture, to be removed in 3.0
-     *
-     * @throws Exception If the regex failed
-     *
-     * @return Map<scalar, self>
-     */
-    public function getMatches(
-        string $regex,
-        int $offset = 0,
-        int $flags = self::PREG_NO_FLAGS
-    ): Map {
-        return $this->capture($regex, $offset, $flags);
-    }
-
-    /**
-     * Return a collection of the elements matching the regex
-     *
      * @throws Exception If the regex failed
      *
      * @return Map<scalar, self>
      */
     public function capture(string $regex): Map
     {
-        if (\func_num_args() !== 1) {
-            throw new LogicException('Offset and flags are no longer supported');
-        }
-
         return RegExp::of($regex)->capture($this);
     }
 
