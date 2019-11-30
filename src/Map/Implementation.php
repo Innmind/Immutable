@@ -19,12 +19,6 @@ use Innmind\Immutable\{
 interface Implementation extends SizeableInterface, \Countable
 {
     /**
-     * @param string $keyType Type T
-     * @param string $valueType Type S
-     */
-    public function __construct(string $keyType, string $valueType);
-
-    /**
      * Return the key type for this map
      */
     public function keyType(): Str;
