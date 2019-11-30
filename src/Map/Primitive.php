@@ -8,7 +8,6 @@ use Innmind\Immutable\{
     Type,
     Str,
     Stream,
-    StreamInterface,
     Set,
     Pair,
     SpecificationInterface,
@@ -232,7 +231,7 @@ final class Primitive implements Implementation
     /**
      * {@inheritdoc}
      */
-    public function values(): StreamInterface
+    public function values(): Stream
     {
         return Stream::of((string) $this->valueType, ...\array_values($this->values));
     }

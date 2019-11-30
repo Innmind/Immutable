@@ -41,12 +41,12 @@ function assertMap(string $key, string $value, Map $map, int $position = null): 
 /**
  * @throws TypeError
  */
-function assertStream(string $type, StreamInterface $stream, int $position = null): void
+function assertStream(string $type, Stream $stream, int $position = null): void
 {
     $message = '';
 
     if (is_int($position)) {
-        $message = "Argument $position must be of type StreamInterface<$type>";
+        $message = "Argument $position must be of type Stream<$type>";
     }
 
     if ((string) $stream->type() !== $type) {

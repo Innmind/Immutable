@@ -10,7 +10,7 @@ use Innmind\Immutable\{
     PrimitiveInterface,
     Str,
     Map,
-    StreamInterface,
+    Stream,
     Exception\LogicException,
     Exception\OutOfBoundException,
     Exception\GroupEmptySequenceException,
@@ -255,7 +255,7 @@ class SequenceTest extends TestCase
     {
         $indices = (new Sequence(1, 2, 3))->indices();
 
-        $this->assertInstanceOf(StreamInterface::class, $indices);
+        $this->assertInstanceOf(Stream::class, $indices);
         $this->assertSame('int', (string) $indices->type());
         $this->assertSame([0, 1, 2], $indices->toArray());
     }
@@ -264,7 +264,7 @@ class SequenceTest extends TestCase
     {
         $indices = Sequence::of()->indices();
 
-        $this->assertInstanceOf(StreamInterface::class, $indices);
+        $this->assertInstanceOf(Stream::class, $indices);
         $this->assertSame('int', (string) $indices->type());
         $this->assertSame([], $indices->toArray());
     }
@@ -327,7 +327,7 @@ class SequenceTest extends TestCase
 
         $s2 = $s->splitAt(3);
         $this->assertNotSame($s, $s2);
-        $this->assertInstanceOf(StreamInterface::class, $s2);
+        $this->assertInstanceOf(Stream::class, $s2);
         $this->assertSame(SequenceInterface::class, (string) $s2->type());
         $this->assertSame([3, 1, 2, 4, 5, 6, 7], $s->toArray());
         $this->assertSame(2, $s2->size());

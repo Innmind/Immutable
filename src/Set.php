@@ -209,7 +209,7 @@ final class Set implements \Countable
 
         return $map->reduce(
             new Map((string) $map->keyType(), Set::class),
-            function(Map $carry, $key, StreamInterface $values): Map {
+            function(Map $carry, $key, Stream $values): Map {
                 $set = $this->clear();
                 $set->values = $values;
 
@@ -268,9 +268,9 @@ final class Set implements \Countable
      *
      * @param callable(T, T): int $function
      *
-     * @return StreamInterface<T>
+     * @return Stream<T>
      */
-    public function sort(callable $function): StreamInterface
+    public function sort(callable $function): Stream
     {
         return $this->values->sort($function);
     }

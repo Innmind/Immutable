@@ -104,9 +104,9 @@ interface SequenceInterface extends SizeableInterface, \Countable
     /**
      * Return the list of indices
      *
-     * @return StreamInterface<int>
+     * @return Stream<int>
      */
-    public function indices(): StreamInterface;
+    public function indices(): Stream;
 
     /**
      * Return a new sequence by applying the given function to all elements
@@ -138,9 +138,9 @@ interface SequenceInterface extends SizeableInterface, \Countable
      *
      * @throws OutOfBoundException
      *
-     * @return StreamInterface<self>
+     * @return Stream<self>
      */
-    public function splitAt(int $position): StreamInterface;
+    public function splitAt(int $position): Stream;
 
     /**
      * Return a sequence with the n first elements

@@ -59,9 +59,9 @@ final class Str
     /**
      * Split the string into a collection of ones
      *
-     * @return StreamInterface<self>
+     * @return Stream<self>
      */
-    public function split(string $delimiter = null): StreamInterface
+    public function split(string $delimiter = null): Stream
     {
         if (\is_null($delimiter) || $delimiter === '') {
             return $this->chunk();
@@ -80,9 +80,9 @@ final class Str
     /**
      * Returns a collection of the string splitted by the given chunk size
      *
-     * @return StreamInterface<self>
+     * @return Stream<self>
      */
-    public function chunk(int $size = 1): StreamInterface
+    public function chunk(int $size = 1): Stream
     {
         $stream = new Stream(self::class);
         $string = $this;
@@ -294,9 +294,9 @@ final class Str
     /**
      * Split the string using a regular expression
      *
-     * @return StreamInterface<self>
+     * @return Stream<self>
      */
-    public function pregSplit(string $regex, int $limit = -1): StreamInterface
+    public function pregSplit(string $regex, int $limit = -1): Stream
     {
         $strings = \preg_split($regex, $this->value, $limit);
         $stream = new Stream(self::class);

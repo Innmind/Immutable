@@ -7,7 +7,7 @@ use Innmind\Immutable\{
     Map,
     Str,
     Set,
-    StreamInterface,
+    Stream,
     SizeableInterface,
 };
 
@@ -108,9 +108,9 @@ interface Implementation extends SizeableInterface, \Countable
     /**
      * Return all values
      *
-     * @return StreamInterface<S>
+     * @return Stream<S>
      */
-    public function values(): StreamInterface;
+    public function values(): Stream;
 
     /**
      * Apply the given function on all elements and return a new map

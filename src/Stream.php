@@ -12,7 +12,7 @@ use Innmind\Immutable\Exception\{
 /**
  * {@inheritdoc}
  */
-final class Stream implements StreamInterface
+final class Stream implements \Countable
 {
     private Str $type;
     private SpecificationInterface $spec;
@@ -40,16 +40,13 @@ final class Stream implements StreamInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Type of the elements
      */
     public function type(): Str
     {
         return $this->type;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function size(): int
     {
         return $this->values->size();
@@ -69,7 +66,11 @@ final class Stream implements StreamInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Return the element at the given index
+     *
+     * @throws OutOfBoundException
+     *
+     * @return T
      */
     public function get(int $index)
     {
@@ -77,9 +78,13 @@ final class Stream implements StreamInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Return the diff between this stream and another
+     *
+     * @param self<T> $stream
+     *
+     * @return self<T>
      */
-    public function diff(StreamInterface $stream): StreamInterface
+    public function diff(self $stream): self
     {
         $this->validate($stream);
 
@@ -92,9 +97,11 @@ final class Stream implements StreamInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Remove all duplicates from the stream
+     *
+     * @return self<T>
      */
-    public function distinct(): StreamInterface
+    public function distinct(): self
     {
         $stream = clone $this;
         $stream->values = $this->values->distinct();
@@ -103,9 +110,11 @@ final class Stream implements StreamInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Remove the n first elements
+     *
+     * @return self<T>
      */
-    public function drop(int $size): StreamInterface
+    public function drop(int $size): self
     {
         $stream = clone $this;
         $stream->values = $this->values->drop($size);
@@ -114,9 +123,11 @@ final class Stream implements StreamInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Remove the n last elements
+     *
+     * @return self<T>
      */
-    public function dropEnd(int $size): StreamInterface
+    public function dropEnd(int $size): self
     {
         $stream = clone $this;
         $stream->values = $this->values->dropEnd($size);
@@ -125,9 +136,11 @@ final class Stream implements StreamInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Check if the two streams are equal
+     *
+     * @param self<T> $stream
      */
-    public function equals(StreamInterface $stream): bool
+    public function equals(self $stream): bool
     {
         $this->validate($stream);
 
@@ -137,9 +150,13 @@ final class Stream implements StreamInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Return all elements that satisfy the given predicate
+     *
+     * @param callable(T): bool $predicate
+     *
+     * @return self<T>
      */
-    public function filter(callable $predicate): StreamInterface
+    public function filter(callable $predicate): self
     {
         $stream = clone $this;
         $stream->values = $this->values->filter($predicate);
@@ -148,9 +165,13 @@ final class Stream implements StreamInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Apply the given function to all elements of the stream
+     *
+     * @param callable(T): void $function
+     *
+     * @return self<T>
      */
-    public function foreach(callable $function): StreamInterface
+    public function foreach(callable $function): self
     {
         $this->values->foreach($function);
 
@@ -158,7 +179,14 @@ final class Stream implements StreamInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Return a new map of pairs grouped by keys determined with the given
+     * discriminator function
+     *
+     * @param callable(T) $discriminator
+     *
+     * @throws GroupEmptySequenceException
+     *
+     * @return Map<mixed, self<T>>
      */
     public function groupBy(callable $discriminator): Map
     {
@@ -174,7 +202,7 @@ final class Stream implements StreamInterface
             if ($map === null) {
                 $map = new Map(
                     Type::determine($key),
-                    StreamInterface::class
+                    self::class
                 );
             }
 
@@ -195,7 +223,9 @@ final class Stream implements StreamInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Return the first element
+     *
+     * @return T
      */
     public function first()
     {
@@ -203,7 +233,9 @@ final class Stream implements StreamInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Return the last element
+     *
+     * @return T
      */
     public function last()
     {
@@ -211,7 +243,9 @@ final class Stream implements StreamInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Check if the stream contains the given element
+     *
+     * @param T $element
      */
     public function contains($element): bool
     {
@@ -219,7 +253,11 @@ final class Stream implements StreamInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Return the index for the given element
+     *
+     * @param T $element
+     *
+     * @throws ElementNotFoundException
      */
     public function indexOf($element): int
     {
@@ -227,17 +265,23 @@ final class Stream implements StreamInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Return the list of indices
+     *
+     * @return self<int>
      */
-    public function indices(): StreamInterface
+    public function indices(): self
     {
         return $this->values->indices();
     }
 
     /**
-     * {@inheritdoc}
+     * Return a new stream by applying the given function to all elements
+     *
+     * @param callable(T): T $function
+     *
+     * @return self<T>
      */
-    public function map(callable $function): StreamInterface
+    public function map(callable $function): self
     {
         $self = clone $this;
         $self->values = $this->values->map($function);
@@ -249,9 +293,13 @@ final class Stream implements StreamInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Pad the stream to a defined size with the given element
+     *
+     * @param T $element
+     *
+     * @return self<T>
      */
-    public function pad(int $size, $element): StreamInterface
+    public function pad(int $size, $element): self
     {
         $this->spec->validate($element);
 
@@ -262,7 +310,11 @@ final class Stream implements StreamInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Return a stream of 2 streams partitioned according to the given predicate
+     *
+     * @param callable(T): bool $predicate
+     *
+     * @return Map<bool, self<T>>
      */
     public function partition(callable $predicate): Map
     {
@@ -282,15 +334,17 @@ final class Stream implements StreamInterface
         $false = $this->clear();
         $false->values = new Sequence(...$falsy);
 
-        return Map::of('bool', StreamInterface::class)
+        return Map::of('bool', self::class)
             (true, $true)
             (false, $false);
     }
 
     /**
-     * {@inheritdoc}
+     * Slice the stream
+     *
+     * @return self<T>
      */
-    public function slice(int $from, int $until): StreamInterface
+    public function slice(int $from, int $until): self
     {
         $stream = clone $this;
         $stream->values = $this->values->slice($from, $until);
@@ -299,11 +353,15 @@ final class Stream implements StreamInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Split the stream in a stream of 2 streams splitted at the given position
+     *
+     * @throws OutOfBoundException
+     *
+     * @return self<self<T>>
      */
-    public function splitAt(int $position): StreamInterface
+    public function splitAt(int $position): self
     {
-        $stream = new self(StreamInterface::class);
+        $stream = new self(self::class);
         $splitted = $this->values->splitAt($position);
         $first = new self((string) $this->type);
         $second = new self((string) $this->type);
@@ -314,9 +372,11 @@ final class Stream implements StreamInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Return a stream with the n first elements
+     *
+     * @return self<T>
      */
-    public function take(int $size): StreamInterface
+    public function take(int $size): self
     {
         $stream = clone $this;
         $stream->values = $this->values->take($size);
@@ -325,9 +385,11 @@ final class Stream implements StreamInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Return a stream with the n last elements
+     *
+     * @return self<T>
      */
-    public function takeEnd(int $size): StreamInterface
+    public function takeEnd(int $size): self
     {
         $stream = clone $this;
         $stream->values = $this->values->takeEnd($size);
@@ -336,9 +398,13 @@ final class Stream implements StreamInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Append the given stream to the current one
+     *
+     * @param self<T> $stream
+     *
+     * @return self<T>
      */
-    public function append(StreamInterface $stream): StreamInterface
+    public function append(self $stream): self
     {
         $this->validate($stream);
 
@@ -351,9 +417,14 @@ final class Stream implements StreamInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Return a stream with all elements from the current one that exist
+     * in the given one
+     *
+     * @param self<T> $stream
+     *
+     * @return self<T>
      */
-    public function intersect(StreamInterface $stream): StreamInterface
+    public function intersect(self $stream): self
     {
         $this->validate($stream);
 
@@ -366,7 +437,7 @@ final class Stream implements StreamInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Concatenate all elements with the given separator
      */
     public function join(string $separator): Str
     {
@@ -374,9 +445,13 @@ final class Stream implements StreamInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Add the given element at the end of the stream
+     *
+     * @param T $element
+     *
+     * @return self<T>
      */
-    public function add($element): StreamInterface
+    public function add($element): self
     {
         $this->spec->validate($element);
 
@@ -387,9 +462,13 @@ final class Stream implements StreamInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Sort the stream in a different order
+     *
+     * @param callable(T, T): int $function
+     *
+     * @return self<T>
      */
-    public function sort(callable $function): StreamInterface
+    public function sort(callable $function): self
     {
         $stream = clone $this;
         $stream->values = $this->values->sort($function);
@@ -398,7 +477,12 @@ final class Stream implements StreamInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Reduce the stream to a single value
+     *
+     * @param mixed $carry
+     * @param callable(mixed, T) $reducer
+     *
+     * @return mixed
      */
     public function reduce($carry, callable $reducer)
     {
@@ -406,9 +490,11 @@ final class Stream implements StreamInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Return a set of the same type but without any value
+     *
+     * @return self<T>
      */
-    public function clear(): StreamInterface
+    public function clear(): self
     {
         $self = clone $this;
         $self->values = new Sequence;
@@ -417,9 +503,11 @@ final class Stream implements StreamInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Return the same stream but in reverse order
+     *
+     * @return self<T>
      */
-    public function reverse(): StreamInterface
+    public function reverse(): self
     {
         $self = clone $this;
         $self->values = $this->values->reverse();
@@ -435,13 +523,9 @@ final class Stream implements StreamInterface
     /**
      * Make sure the stream is compatible with the current one
      *
-     * @param StreamInterface $stream
-     *
      * @throws InvalidArgumentException
-     *
-     * @return void
      */
-    private function validate(StreamInterface $stream)
+    private function validate(self $stream): void
     {
         if (!$stream->type()->equals($this->type)) {
             throw new InvalidArgumentException(

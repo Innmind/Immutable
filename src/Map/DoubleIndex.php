@@ -8,7 +8,6 @@ use Innmind\Immutable\{
     Type,
     Str,
     Stream,
-    StreamInterface,
     Set,
     Pair,
     SpecificationInterface,
@@ -241,7 +240,7 @@ final class DoubleIndex implements Implementation
     /**
      * {@inheritdoc}
      */
-    public function values(): StreamInterface
+    public function values(): Stream
     {
         return $this->values;
     }

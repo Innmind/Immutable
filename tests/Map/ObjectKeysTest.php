@@ -12,7 +12,7 @@ use Innmind\Immutable\{
     Str,
     Symbol,
     Set,
-    StreamInterface,
+    Stream,
     Exception\LogicException,
     Exception\InvalidArgumentException,
     Exception\ElementNotFoundException,
@@ -238,7 +238,7 @@ class ObjectKeysTest extends TestCase
             ->put(new \stdClass, 5);
 
         $v = $m->values();
-        $this->assertInstanceOf(StreamInterface::class, $v);
+        $this->assertInstanceOf(Stream::class, $v);
         $this->assertSame('int', (string) $v->type());
         $this->assertSame([1, 2, 3, 5, 5], $v->toArray());
         $this->assertTrue($v->equals($m->values()));

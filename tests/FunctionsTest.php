@@ -32,7 +32,7 @@ class FunctionsTest extends TestCase
         $this->assertNull(assertStream('string', Stream::of('string')));
 
         $this->expectException(\TypeError::class);
-        $this->expectExceptionMessage('Argument 42 must be of type StreamInterface<string>');
+        $this->expectExceptionMessage('Argument 42 must be of type Stream<string>');
 
         assertStream('string', Stream::of('int'), 42);
     }

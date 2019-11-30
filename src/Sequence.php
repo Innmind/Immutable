@@ -235,7 +235,7 @@ final class Sequence implements SequenceInterface
     /**
      * {@inheritdoc}
      */
-    public function indices(): StreamInterface
+    public function indices(): Stream
     {
         if ($this->size() === 0) {
             return Stream::of('int');
@@ -310,7 +310,7 @@ final class Sequence implements SequenceInterface
     /**
      * {@inheritdoc}
      */
-    public function splitAt(int $index): StreamInterface
+    public function splitAt(int $index): Stream
     {
         return (new Stream(SequenceInterface::class))
             ->add($this->slice(0, $index))

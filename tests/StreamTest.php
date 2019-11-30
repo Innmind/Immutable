@@ -5,9 +5,6 @@ namespace Tests\Innmind\Immutable;
 
 use Innmind\Immutable\{
     Stream,
-    StreamInterface,
-    SizeableInterface,
-    PrimitiveInterface,
     Str,
     Map,
     Exception\OutOfBoundException,
@@ -23,8 +20,6 @@ class StreamTest extends TestCase
     {
         $stream = new Stream('int');
 
-        $this->assertInstanceOf(StreamInterface::class, $stream);
-        $this->assertInstanceOf(SizeableInterface::class, $stream);
         $this->assertInstanceOf(\Countable::class, $stream);
         $this->assertSame([], $stream->toArray());
     }
@@ -230,7 +225,7 @@ class StreamTest extends TestCase
 
         $this->assertInstanceOf(Map::class, $map);
         $this->assertSame('int', (string) $map->keyType());
-        $this->assertSame(StreamInterface::class, (string) $map->valueType());
+        $this->assertSame(Stream::class, (string) $map->valueType());
         $this->assertCount(3, $map);
         $this->assertSame('int', (string) $map->get(0)->type());
         $this->assertSame('int', (string) $map->get(1)->type());
@@ -302,7 +297,7 @@ class StreamTest extends TestCase
             ->add(4);
         $indices = $stream->indices();
 
-        $this->assertInstanceOf(StreamInterface::class, $indices);
+        $this->assertInstanceOf(Stream::class, $indices);
         $this->assertSame('int', (string) $indices->type());
         $this->assertSame([0, 1, 2, 3], $indices->toArray());
     }
@@ -312,7 +307,7 @@ class StreamTest extends TestCase
         $stream = new Stream('int');
         $indices = $stream->indices();
 
-        $this->assertInstanceOf(StreamInterface::class, $indices);
+        $this->assertInstanceOf(Stream::class, $indices);
         $this->assertSame('int', (string) $indices->type());
         $this->assertSame([], $indices->toArray());
     }
@@ -385,7 +380,7 @@ class StreamTest extends TestCase
 
         $this->assertInstanceOf(Map::class, $map);
         $this->assertSame('bool', (string) $map->keyType());
-        $this->assertSame(StreamInterface::class, (string) $map->valueType());
+        $this->assertSame(Stream::class, (string) $map->valueType());
         $this->assertSame('int', (string) $map->get(true)->type());
         $this->assertSame('int', (string) $map->get(false)->type());
         $this->assertSame([2, 4], $map->get(true)->toArray());
@@ -421,7 +416,7 @@ class StreamTest extends TestCase
         $this->assertInstanceOf(Stream::class, $b);
         $this->assertNotSame($a, $b);
         $this->assertSame('int', (string) $a->type());
-        $this->assertSame(StreamInterface::class, (string) $b->type());
+        $this->assertSame(Stream::class, (string) $b->type());
         $this->assertSame([1, 2, 3, 4], $a->toArray());
         $this->assertSame('int', (string) $b->first()->type());
         $this->assertSame('int', (string) $b->last()->type());
@@ -612,7 +607,7 @@ class StreamTest extends TestCase
             ->add(2);
         $reverse = $stream->reverse();
 
-        $this->assertInstanceOf(StreamInterface::class, $reverse);
+        $this->assertInstanceOf(Stream::class, $reverse);
         $this->assertNotSame($stream, $reverse);
         $this->assertSame([1, 3, 4, 2], $stream->toArray());
         $this->assertSame([2, 4, 3, 1], $reverse->toArray());

@@ -7,7 +7,7 @@ use Innmind\Immutable\{
     Str as S,
     PrimitiveInterface,
     StringableInterface,
-    StreamInterface,
+    Stream,
     Map,
     Exception\SubstringException,
     Exception\RegexException
@@ -64,7 +64,7 @@ class StrTest extends TestCase
         $str = new S('foo');
 
         $stream = $str->split();
-        $this->assertInstanceOf(StreamInterface::class, $stream);
+        $this->assertInstanceOf(Stream::class, $stream);
         $this->assertSame(S::class, (string) $stream->type());
         $this->assertCount(3, $stream);
 
@@ -87,7 +87,7 @@ class StrTest extends TestCase
         );
 
         $stream = $str->split('');
-        $this->assertInstanceOf(StreamInterface::class, $stream);
+        $this->assertInstanceOf(Stream::class, $stream);
         $this->assertSame(S::class, (string) $stream->type());
         $this->assertCount(3, $stream);
 
@@ -101,7 +101,7 @@ class StrTest extends TestCase
 
         $str = new S('f|o|o');
         $stream = $str->split('|');
-        $this->assertInstanceOf(StreamInterface::class, $stream);
+        $this->assertInstanceOf(Stream::class, $stream);
         $this->assertSame(S::class, (string) $stream->type());
         $this->assertCount(3, $stream);
 
@@ -180,7 +180,7 @@ class StrTest extends TestCase
         $str = new S('foobarbaz');
 
         $stream = $str->chunk(4);
-        $this->assertInstanceOf(StreamInterface::class, $stream);
+        $this->assertInstanceOf(Stream::class, $stream);
         $this->assertSame(S::class, (string) $stream->type());
         $this->assertInstanceOf(S::class, $stream->get(0));
         $this->assertInstanceOf(S::class, $stream->get(1));
@@ -527,7 +527,7 @@ class StrTest extends TestCase
         $str = new S('hypertext language, programming');
 
         $c = $str->pregSplit('/[\s,]+/');
-        $this->assertInstanceOf(StreamInterface::class, $c);
+        $this->assertInstanceOf(Stream::class, $c);
         $this->assertSame(S::class, (string) $c->type());
         $this->assertSame('hypertext', (string) $c->get(0));
         $this->assertSame('language', (string) $c->get(1));
