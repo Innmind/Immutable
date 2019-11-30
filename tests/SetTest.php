@@ -25,7 +25,6 @@ class SetTest extends TestCase
         $this->assertInstanceOf(SetInterface::class, $s);
         $this->assertInstanceOf(SizeableInterface::class, $s);
         $this->assertInstanceOf(\Countable::class, $s);
-        $this->assertInstanceOf(\Iterator::class, $s);
         $this->assertInstanceOf(Str::class, $s->type());
         $this->assertSame('int', (string) $s->type());
     }
@@ -65,28 +64,6 @@ class SetTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
 
         (new Set('int'))->add(42.0);
-    }
-
-    public function testIterator()
-    {
-        $s = (new Set('int'))
-            ->add(24)
-            ->add(42)
-            ->add(66);
-
-        $this->assertSame(24, $s->current());
-        $this->assertSame(0, $s->key());
-        $this->assertTrue($s->valid());
-        $this->assertSame(null, $s->next());
-        $this->assertSame(42, $s->current());
-        $this->assertSame(1, $s->key());
-        $this->assertTrue($s->valid());
-        $s->next();
-        $s->next();
-        $this->assertFalse($s->valid());
-        $this->assertSame(null, $s->rewind());
-        $this->assertSame(24, $s->current());
-        $this->assertTrue($s->valid());
     }
 
     public function testIntersect()

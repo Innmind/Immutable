@@ -83,46 +83,6 @@ final class ObjectKeys implements MapInterface
     /**
      * {@inheritdoc}
      */
-    public function current()
-    {
-        return $this->get($this->key());
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function key()
-    {
-        return $this->values->current();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function next(): void
-    {
-        $this->values->next();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function rewind(): void
-    {
-        $this->values->rewind();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function valid(): bool
-    {
-        return $this->values->valid();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function offsetExists($offset): bool
     {
         if (!is_object($offset)) {
@@ -167,7 +127,7 @@ final class ObjectKeys implements MapInterface
         $map = clone $this;
         $map->values = clone $this->values;
         $map->values[$key] = $value;
-        $map->rewind();
+        $map->values->rewind();
 
         return $map;
     }
@@ -242,7 +202,7 @@ final class ObjectKeys implements MapInterface
             }
         }
 
-        $map->rewind();
+        $map->values->rewind();
 
         return $map;
     }
@@ -353,7 +313,7 @@ final class ObjectKeys implements MapInterface
             $map->values[$key] = $value;
         }
 
-        $map->rewind();
+        $map->values->rewind();
 
         return $map;
     }
@@ -378,7 +338,7 @@ final class ObjectKeys implements MapInterface
         $map = clone $this;
         $map->values = clone $this->values;
         $map->values->detach($key);
-        $map->rewind();
+        $map->values->rewind();
 
         return $map;
     }
@@ -425,8 +385,8 @@ final class ObjectKeys implements MapInterface
             }
         }
 
-        $truthy->rewind();
-        $falsy->rewind();
+        $truthy->values->rewind();
+        $falsy->values->rewind();
 
         return Map::of('bool', MapInterface::class)
             (true, $truthy)
@@ -449,8 +409,8 @@ final class ObjectKeys implements MapInterface
 
     public function empty(): bool
     {
-        $this->rewind();
+        $this->values->rewind();
 
-        return !$this->valid();
+        return !$this->values->valid();
     }
 }

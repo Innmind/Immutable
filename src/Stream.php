@@ -71,46 +71,6 @@ class Stream implements StreamInterface
     /**
      * {@inheritdoc}
      */
-    public function current()
-    {
-        return $this->values->current();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function key(): int
-    {
-        return $this->values->key();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function next(): void
-    {
-        $this->values->next();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function rewind(): void
-    {
-        $this->values->rewind();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function valid(): bool
-    {
-        return $this->values->valid();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function offsetExists($offset): bool
     {
         return $this->values->offsetExists($offset);
@@ -157,7 +117,7 @@ class Stream implements StreamInterface
 
         $newStream = clone $this;
         $newStream->values = $this->values->diff(
-            new Sequence(...$stream)
+            new Sequence(...$stream->toArray())
         );
 
         return $newStream;
@@ -204,7 +164,7 @@ class Stream implements StreamInterface
         $this->validate($stream);
 
         return $this->values->equals(
-            new Sequence(...$stream)
+            new Sequence(...$stream->toArray())
         );
     }
 
@@ -240,7 +200,7 @@ class Stream implements StreamInterface
 
         $map = null;
 
-        foreach ($this->values as $value) {
+        foreach ($this->values->toArray() as $value) {
             $key = $discriminator($value);
 
             if ($map === null) {
@@ -341,7 +301,7 @@ class Stream implements StreamInterface
         $truthy = [];
         $falsy = [];
 
-        foreach ($this->values as $value) {
+        foreach ($this->values->toArray() as $value) {
             if ($predicate($value) === true) {
                 $truthy[] = $value;
             } else {
@@ -416,7 +376,7 @@ class Stream implements StreamInterface
 
         $self = clone $this;
         $self->values = $this->values->append(
-            new Sequence(...$stream)
+            new Sequence(...$stream->toArray())
         );
 
         return $self;
@@ -431,7 +391,7 @@ class Stream implements StreamInterface
 
         $self = clone $this;
         $self->values = $this->values->intersect(
-            new Sequence(...$stream)
+            new Sequence(...$stream->toArray())
         );
 
         return $self;

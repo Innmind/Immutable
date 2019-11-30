@@ -50,46 +50,6 @@ class Sequence implements SequenceInterface
     /**
      * {@inheritdoc}
      */
-    public function current()
-    {
-        return \current($this->values);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function key(): int
-    {
-        return \key($this->values);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function next(): void
-    {
-        \next($this->values);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function rewind(): void
-    {
-        \reset($this->values);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function valid(): bool
-    {
-        return \key($this->values) !== null;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function offsetExists($offset): bool
     {
         return $this->has($offset);

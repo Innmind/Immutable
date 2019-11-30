@@ -28,7 +28,6 @@ class ObjectKeysTest extends TestCase
         $this->assertInstanceOf(MapInterface::class, $m);
         $this->assertInstanceOf(SizeableInterface::class, $m);
         $this->assertInstanceOf(\Countable::class, $m);
-        $this->assertInstanceOf(\Iterator::class, $m);
         $this->assertInstanceOf(\ArrayAccess::class, $m);
         $this->assertInstanceOf(Str::class, $m->keyType());
         $this->assertInstanceOf(Str::class, $m->valueType());
@@ -73,29 +72,6 @@ class ObjectKeysTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
 
         (new ObjectKeys('stdClass', 'int'))->put(new \stdClass, 42.0);
-    }
-
-    public function testIterator()
-    {
-        $m = new ObjectKeys('stdClass', 'int');
-        $m = $m
-            ->put($a = new \stdClass, 24)
-            ->put($b = new \stdClass, 42)
-            ->put(new \stdClass, 66);
-
-        $this->assertSame(24, $m->current());
-        $this->assertSame($a, $m->key());
-        $this->assertTrue($m->valid());
-        $this->assertSame(null, $m->next());
-        $this->assertSame(42, $m->current());
-        $this->assertSame($b, $m->key());
-        $this->assertTrue($m->valid());
-        $m->next();
-        $m->next();
-        $this->assertFalse($m->valid());
-        $this->assertSame(null, $m->rewind());
-        $this->assertSame(24, $m->current());
-        $this->assertSame($a, $m->key());
     }
 
     public function testArrayAccess()

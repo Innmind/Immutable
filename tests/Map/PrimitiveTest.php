@@ -27,7 +27,6 @@ class PrimitiveTest extends TestCase
         $this->assertInstanceOf(MapInterface::class, $m);
         $this->assertInstanceOf(SizeableInterface::class, $m);
         $this->assertInstanceOf(\Countable::class, $m);
-        $this->assertInstanceOf(\Iterator::class, $m);
         $this->assertInstanceOf(\ArrayAccess::class, $m);
         $this->assertInstanceOf(Str::class, $m->keyType());
         $this->assertInstanceOf(Str::class, $m->valueType());
@@ -79,29 +78,6 @@ class PrimitiveTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
 
         (new Primitive('int', 'int'))->put(42, 42.0);
-    }
-
-    public function testIterator()
-    {
-        $m = new Primitive('int', 'int');
-        $m = $m
-            ->put(23, 24)
-            ->put(41, 42)
-            ->put(65, 66);
-
-        $this->assertSame(24, $m->current());
-        $this->assertSame(23, $m->key());
-        $this->assertTrue($m->valid());
-        $this->assertSame(null, $m->next());
-        $this->assertSame(42, $m->current());
-        $this->assertSame(41, $m->key());
-        $this->assertTrue($m->valid());
-        $m->next();
-        $m->next();
-        $this->assertFalse($m->valid());
-        $this->assertSame(null, $m->rewind());
-        $this->assertSame(24, $m->current());
-        $this->assertSame(23, $m->key());
     }
 
     public function testArrayAccess()
@@ -541,11 +517,11 @@ class PrimitiveTest extends TestCase
         $map = (new Primitive('string', 'string'))->put('1', 'foo');
 
         $this->assertTrue($map->contains('1'));
-        $this->assertSame('1', $map->key());
+        $map->foreach(function($key, $value) {
+            $this->assertSame('1', $key);
+            $this->assertSame('foo', $value);
+        });
         $this->assertSame('foo', $map->get('1'));
         $this->assertSame(['1'], $map->keys()->toArray());
-        $this->assertTrue($map->valid());
-        $map->next();
-        $this->assertFalse($map->valid());
     }
 }

@@ -83,46 +83,6 @@ final class Primitive implements MapInterface
     /**
      * {@inheritdoc}
      */
-    public function current()
-    {
-        return \current($this->values);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function key()
-    {
-        return $this->normalizeKey(\key($this->values));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function next(): void
-    {
-        \next($this->values);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function rewind(): void
-    {
-        \reset($this->values);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function valid(): bool
-    {
-        return $this->key() !== null;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function offsetExists($offset): bool
     {
         return \array_key_exists($offset, $this->values);
@@ -163,7 +123,7 @@ final class Primitive implements MapInterface
         $map = clone $this;
         $map->size = null;
         $map->values[$key] = $value;
-        $map->rewind();
+        \reset($map->values);
 
         return $map;
     }
@@ -235,7 +195,7 @@ final class Primitive implements MapInterface
             }
         }
 
-        $map->rewind();
+        \reset($map->values);
 
         return $map;
     }
@@ -335,7 +295,7 @@ final class Primitive implements MapInterface
             $map->values[$key] = $value;
         }
 
-        $map->rewind();
+        \reset($map->values);
 
         return $map;
     }
@@ -360,7 +320,7 @@ final class Primitive implements MapInterface
         $map = clone $this;
         $map->size = null;
         unset($map->values[$key]);
-        $map->rewind();
+        \reset($map->values);
 
         return $map;
     }
@@ -405,8 +365,8 @@ final class Primitive implements MapInterface
             }
         }
 
-        $truthy->rewind();
-        $falsy->rewind();
+        \reset($truthy->values);
+        \reset($falsy->values);
 
         return Map::of('bool', MapInterface::class)
             (true, $truthy)
@@ -427,9 +387,9 @@ final class Primitive implements MapInterface
 
     public function empty(): bool
     {
-        $this->rewind();
+        \reset($this->values);
 
-        return !$this->valid();
+        return \is_null(\key($this->values));
     }
 
     private function normalizeKey($value)

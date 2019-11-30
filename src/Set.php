@@ -61,53 +61,13 @@ class Set implements SetInterface
     /**
      * {@inheritdoc}
      */
-    public function current()
-    {
-        return $this->values->current();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function key(): int
-    {
-        return $this->values->key();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function next(): void
-    {
-        $this->values->next();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function rewind(): void
-    {
-        $this->values->rewind();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function valid(): bool
-    {
-        return $this->values->valid();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function intersect(SetInterface $set): SetInterface
     {
         $this->validate($set);
 
         $newSet = clone $this;
         $newSet->values = $this->values->intersect(
-            Stream::of((string) $this->type, ...$set)
+            Stream::of((string) $this->type, ...$set->toArray())
         );
 
         return $newSet;
@@ -167,7 +127,7 @@ class Set implements SetInterface
 
         $newSet = clone $this;
         $newSet->values = $this->values->diff(
-            Stream::of((string) $this->type, ...$set)
+            Stream::of((string) $this->type, ...$set->toArray())
         );
 
         return $newSet;

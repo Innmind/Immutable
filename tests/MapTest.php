@@ -28,7 +28,6 @@ class MapTest extends TestCase
         $this->assertInstanceOf(MapInterface::class, $m);
         $this->assertInstanceOf(SizeableInterface::class, $m);
         $this->assertInstanceOf(\Countable::class, $m);
-        $this->assertInstanceOf(\Iterator::class, $m);
         $this->assertInstanceOf(\ArrayAccess::class, $m);
         $this->assertInstanceOf(Str::class, $m->keyType());
         $this->assertInstanceOf(Str::class, $m->valueType());
@@ -104,29 +103,6 @@ class MapTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
 
         (new Map('int', 'int'))->put(42, 42.0);
-    }
-
-    public function testIterator()
-    {
-        $m = new Map('int', 'int');
-        $m = $m
-            ->put(23, 24)
-            ->put(41, 42)
-            ->put(65, 66);
-
-        $this->assertSame(24, $m->current());
-        $this->assertSame(23, $m->key());
-        $this->assertTrue($m->valid());
-        $this->assertSame(null, $m->next());
-        $this->assertSame(42, $m->current());
-        $this->assertSame(41, $m->key());
-        $this->assertTrue($m->valid());
-        $m->next();
-        $m->next();
-        $this->assertFalse($m->valid());
-        $this->assertSame(null, $m->rewind());
-        $this->assertSame(24, $m->current());
-        $this->assertSame(23, $m->key());
     }
 
     public function testArrayAccess()

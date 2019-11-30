@@ -91,46 +91,6 @@ final class Map implements MapInterface
     /**
      * {@inheritdoc}
      */
-    public function current()
-    {
-        return $this->implementation->current();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function key()
-    {
-        return $this->implementation->key();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function next(): void
-    {
-        $this->implementation->next();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function rewind(): void
-    {
-        $this->implementation->rewind();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function valid(): bool
-    {
-        return $this->implementation->valid();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function offsetExists($offset): bool
     {
         return $this->implementation->offsetExists($offset);

@@ -81,50 +81,6 @@ final class DoubleIndex implements MapInterface
     /**
      * {@inheritdoc}
      */
-    public function current()
-    {
-        return $this->values->current();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function key()
-    {
-        return $this->keys->current();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function next(): void
-    {
-        $this->keys->next();
-        $this->values->next();
-        $this->pairs->next();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function rewind(): void
-    {
-        $this->keys->rewind();
-        $this->values->rewind();
-        $this->pairs->rewind();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function valid(): bool
-    {
-        return $this->keys->valid();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function offsetExists($offset): bool
     {
         return $this->keys->contains($offset);
@@ -225,7 +181,7 @@ final class DoubleIndex implements MapInterface
             return false;
         }
 
-        foreach ($this->pairs as $pair) {
+        foreach ($this->pairs->toArray() as $pair) {
             if ($map->get($pair->key()) !== $pair->value()) {
                 return false;
             }
@@ -241,7 +197,7 @@ final class DoubleIndex implements MapInterface
     {
         $map = $this->clear();
 
-        foreach ($this->pairs as $pair) {
+        foreach ($this->pairs->toArray() as $pair) {
             if ($predicate($pair->key(), $pair->value()) === true) {
                 $map->keys = $map->keys->add($pair->key());
                 $map->values = $map->values->add($pair->value());
@@ -257,7 +213,7 @@ final class DoubleIndex implements MapInterface
      */
     public function foreach(callable $function): MapInterface
     {
-        foreach ($this->pairs as $pair) {
+        foreach ($this->pairs->toArray() as $pair) {
             $function($pair->key(), $pair->value());
         }
 
@@ -275,7 +231,7 @@ final class DoubleIndex implements MapInterface
 
         $map = null;
 
-        foreach ($this->pairs as $pair) {
+        foreach ($this->pairs->toArray() as $pair) {
             $key = $discriminator($pair->key(), $pair->value());
 
             if ($map === null) {
@@ -312,7 +268,7 @@ final class DoubleIndex implements MapInterface
      */
     public function keys(): SetInterface
     {
-        return Set::of((string) $this->keyType, ...$this->keys);
+        return Set::of((string) $this->keyType, ...$this->keys->toArray());
     }
 
     /**
@@ -330,7 +286,7 @@ final class DoubleIndex implements MapInterface
     {
         $map = $this->clear();
 
-        foreach ($this->pairs as $pair) {
+        foreach ($this->pairs->toArray() as $pair) {
             $return = $function(
                 $pair->key(),
                 $pair->value()
@@ -415,7 +371,7 @@ final class DoubleIndex implements MapInterface
         $truthy = $this->clear();
         $falsy = $this->clear();
 
-        foreach ($this->pairs as $pair) {
+        foreach ($this->pairs->toArray() as $pair) {
             $return = $predicate(
                 $pair->key(),
                 $pair->value()
@@ -438,7 +394,7 @@ final class DoubleIndex implements MapInterface
      */
     public function reduce($carry, callable $reducer)
     {
-        foreach ($this->pairs as $pair) {
+        foreach ($this->pairs->toArray() as $pair) {
             $carry = $reducer($carry, $pair->key(), $pair->value());
         }
 

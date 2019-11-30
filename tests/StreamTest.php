@@ -26,7 +26,6 @@ class StreamTest extends TestCase
         $this->assertInstanceOf(StreamInterface::class, $stream);
         $this->assertInstanceOf(SizeableInterface::class, $stream);
         $this->assertInstanceOf(\Countable::class, $stream);
-        $this->assertInstanceOf(\Iterator::class, $stream);
         $this->assertInstanceOf(\ArrayAccess::class, $stream);
         $this->assertSame([], $stream->toArray());
     }
@@ -70,29 +69,6 @@ class StreamTest extends TestCase
                 ->add(1)
                 ->add(2)
         );
-    }
-
-    public function testIterator()
-    {
-        $stream = (new Stream('int'))
-            ->add(1)
-            ->add(2)
-            ->add(3)
-            ->add(4);
-
-        $this->assertSame(1, $stream->current());
-        $this->assertSame(0, $stream->key());
-        $this->assertTrue($stream->valid());
-        $this->assertNull($stream->next());
-        $this->assertSame(2, $stream->current());
-        $this->assertSame(1, $stream->key());
-        $stream->next();
-        $stream->next();
-        $stream->next();
-        $this->assertFalse($stream->valid());
-        $this->assertNull($stream->rewind());
-        $this->assertTrue($stream->valid());
-        $this->assertSame(0, $stream->key());
     }
 
     public function testOffsetExists()

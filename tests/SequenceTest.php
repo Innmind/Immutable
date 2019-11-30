@@ -27,7 +27,6 @@ class SequenceTest extends TestCase
         $this->assertInstanceOf(SequenceInterface::class, $s);
         $this->assertInstanceOf(SizeableInterface::class, $s);
         $this->assertInstanceOf(\Countable::class, $s);
-        $this->assertInstanceOf(\Iterator::class, $s);
         $this->assertInstanceOf(\ArrayAccess::class, $s);
         $this->assertSame([1], $s->toArray());
     }
@@ -43,23 +42,6 @@ class SequenceTest extends TestCase
         $this->assertSame(0, (new Sequence)->count());
         $this->assertSame(2, (new Sequence('foo', 42))->size());
         $this->assertSame(2, (new Sequence('foo', 42))->count());
-    }
-
-    public function testIterator()
-    {
-        $s = new Sequence(1, 2);
-
-        $this->assertSame(1, $s->current());
-        $this->assertSame(0, $s->key());
-        $this->assertTrue($s->valid());
-        $this->assertSame(null, $s->next());
-        $this->assertSame(2, $s->current());
-        $this->assertSame(1, $s->key());
-        $this->assertTrue($s->valid());
-        $s->next();
-        $this->assertFalse($s->valid());
-        $this->assertSame(null, $s->rewind());
-        $this->assertSame(0, $s->key());
     }
 
     public function testArrayAccess()
@@ -244,11 +226,8 @@ class SequenceTest extends TestCase
     public function testFirst()
     {
         $s = new Sequence(1, 2, 3);
-        $s->next();
 
-        $this->assertSame(1, $s->key());
         $this->assertSame(1, $s->first());
-        $this->assertSame(1, $s->key());
     }
 
     public function testThrowWhenAccessingFirstValueOnEmptySequence()
@@ -261,11 +240,8 @@ class SequenceTest extends TestCase
     public function testLast()
     {
         $s = new Sequence(1, 2, 3);
-        $s->next();
 
-        $this->assertSame(1, $s->key());
         $this->assertSame(3, $s->last());
-        $this->assertSame(1, $s->key());
     }
 
     public function testThrowWhenAccessingLastValueOnEmptySequence()
