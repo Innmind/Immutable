@@ -38,7 +38,7 @@ class StrTest extends TestCase
     public function testThrowWhenInvalidType()
     {
         $this->expectException(\TypeError::class);
-        $this->expectExceptionMessage('must be of the type string, integer given');
+        $this->expectExceptionMessage('must be of the type string, int given');
 
         new S(42);
     }
@@ -829,12 +829,12 @@ class StrTest extends TestCase
     {
         $a = new S('foo#bar.*');
         $b = $a->pregQuote();
-        $c = $a->pregQuote('#');
+        $c = $a->pregQuote('o');
 
         $this->assertInstanceOf(S::class, $b);
         $this->assertInstanceOf(S::class, $c);
         $this->assertSame('foo#bar.*', (string) $a);
-        $this->assertSame('foo#bar\.\*', (string) $b);
-        $this->assertSame('foo\#bar\.\*', (string) $c);
+        $this->assertSame('foo\#bar\.\*', (string) $b);
+        $this->assertSame('f\o\o\#bar\.\*', (string) $c);
     }
 }
