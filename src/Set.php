@@ -29,6 +29,11 @@ final class Set implements \Countable
         return $self;
     }
 
+    public function isOfType(string $type): bool
+    {
+        return $this->type === $type;
+    }
+
     /**
      * Return the type of this set
      */
@@ -330,7 +335,7 @@ final class Set implements \Countable
      */
     private function validate(self $set): void
     {
-        if ($set->type() !== $this->type) {
+        if (!$set->isOfType($this->type)) {
             throw new InvalidArgumentException(
                 'The 2 sets does not reference the same type'
             );

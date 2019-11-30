@@ -18,6 +18,8 @@ use Innmind\Immutable\{
 final class Map implements \Countable
 {
     private Map\Implementation $implementation;
+    private string $keyType;
+    private string $valueType;
 
     public function __construct(string $keyType, string $valueType)
     {
@@ -30,6 +32,9 @@ final class Map implements \Countable
         } else {
             $this->implementation = new Map\DoubleIndex($keyType, $valueType);
         }
+
+        $this->keyType = $keyType;
+        $this->valueType = $valueType;
     }
 
     public static function of(
@@ -52,6 +57,11 @@ final class Map implements \Countable
         }
 
         return $self;
+    }
+
+    public function isOfType(string $key, string $value): bool
+    {
+        return $this->keyType === $key && $this->valueType === $value;
     }
 
     /**

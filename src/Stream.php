@@ -39,6 +39,11 @@ final class Stream implements \Countable
         return $self;
     }
 
+    public function isOfType(string $type): bool
+    {
+        return $this->type === $type;
+    }
+
     /**
      * Type of the elements
      */
@@ -525,7 +530,7 @@ final class Stream implements \Countable
      */
     private function validate(self $stream): void
     {
-        if ($stream->type() !== $this->type) {
+        if (!$stream->isOfType($this->type)) {
             throw new InvalidArgumentException(
                 'The 2 streams does not reference the same type'
             );

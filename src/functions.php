@@ -14,7 +14,7 @@ function assertSet(string $type, Set $set, int $position = null): void
         $message = "Argument $position must be of type Set<$type>";
     }
 
-    if ((string) $set->type() !== $type) {
+    if (!$set->isOfType($type)) {
         throw new \TypeError($message);
     }
 }
@@ -30,10 +30,7 @@ function assertMap(string $key, string $value, Map $map, int $position = null): 
         $message = "Argument $position must be of type Map<$key, $value>";
     }
 
-    if (
-        (string) $map->keyType() !== $key ||
-        (string) $map->valueType() !== $value
-    ) {
+    if (!$map->isOfType($key, $value)) {
         throw new \TypeError($message);
     }
 }
@@ -49,7 +46,7 @@ function assertStream(string $type, Stream $stream, int $position = null): void
         $message = "Argument $position must be of type Stream<$type>";
     }
 
-    if ((string) $stream->type() !== $type) {
+    if (!$stream->isOfType($type)) {
         throw new \TypeError($message);
     }
 }
