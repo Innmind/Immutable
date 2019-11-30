@@ -9,7 +9,7 @@ use Innmind\Immutable\{
     Exception\LogicException
 };
 
-class Str
+final class Str
 {
     private const PAD_RIGHT = STR_PAD_RIGHT;
     private const PAD_LEFT = STR_PAD_LEFT;

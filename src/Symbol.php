@@ -10,7 +10,7 @@ use Innmind\Immutable\Exception\InvalidArgumentException;
  *
  * @template T
  */
-class Symbol
+final class Symbol
 {
     private $value;
 

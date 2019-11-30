@@ -9,7 +9,7 @@ namespace Innmind\Immutable;
  * @template T
  * @template S
  */
-class Pair
+final class Pair
 {
     private $key;
     private $value;

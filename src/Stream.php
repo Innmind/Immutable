@@ -12,7 +12,7 @@ use Innmind\Immutable\Exception\{
 /**
  * {@inheritdoc}
  */
-class Stream implements StreamInterface
+final class Stream implements StreamInterface
 {
     private $type;
     private $spec;

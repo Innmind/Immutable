@@ -5,7 +5,7 @@ namespace Innmind\Immutable;
 
 use Innmind\Immutable\Exception\InvalidArgumentException;
 
-class Set implements SetInterface
+final class Set implements SetInterface
 {
     private $type;
     private $spec;

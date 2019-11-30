@@ -8,7 +8,7 @@ use Innmind\Immutable\{
     Exception\InvalidArgumentException
 };
 
-class ClassType implements SpecificationInterface
+final class ClassType implements SpecificationInterface
 {
     private $class;
 

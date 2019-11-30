@@ -8,7 +8,7 @@ use Innmind\Immutable\{
     Exception\InvalidArgumentException
 };
 
-class PrimitiveType implements SpecificationInterface
+final class PrimitiveType implements SpecificationInterface
 {
     private $function;
 

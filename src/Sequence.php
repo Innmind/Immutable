@@ -13,7 +13,7 @@ use Innmind\Immutable\{
 /**
  * {@inheritdoc}
  */
-class Sequence implements SequenceInterface
+final class Sequence implements SequenceInterface
 {
     private $values;
     private $size;

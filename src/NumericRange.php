@@ -3,7 +3,7 @@ declare(strict_types = 1);
 
 namespace Innmind\Immutable;
 
-class NumericRange implements \Iterator
+final class NumericRange implements \Iterator
 {
     private $start;
     private $end;
