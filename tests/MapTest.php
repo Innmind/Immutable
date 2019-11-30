@@ -9,7 +9,7 @@ use Innmind\Immutable\{
     Pair,
     Str,
     Symbol,
-    SetInterface,
+    Set,
     StreamInterface,
     Exception\LogicException,
     Exception\InvalidArgumentException,
@@ -275,7 +275,7 @@ class MapTest extends TestCase
             ->put(4, 5);
 
         $k = $m->keys();
-        $this->assertInstanceOf(SetInterface::class, $k);
+        $this->assertInstanceOf(Set::class, $k);
         $this->assertSame('int', (string) $k->type());
         $this->assertSame([0, 1, 2, 4], $k->toArray());
         $this->assertTrue($k->equals($m->keys()));

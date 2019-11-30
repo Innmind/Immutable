@@ -212,9 +212,9 @@ final class Map implements \Countable
     /**
      * Return all keys
      *
-     * @return SetInterface<T>
+     * @return Set<T>
      */
-    public function keys(): SetInterface
+    public function keys(): Set
     {
         return $this->implementation->keys();
     }

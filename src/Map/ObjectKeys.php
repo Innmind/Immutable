@@ -9,7 +9,6 @@ use Innmind\Immutable\{
     Str,
     Stream,
     StreamInterface,
-    SetInterface,
     Set,
     Pair,
     SpecificationInterface,
@@ -231,11 +230,11 @@ final class ObjectKeys implements Implementation
     /**
      * {@inheritdoc}
      */
-    public function keys(): SetInterface
+    public function keys(): Set
     {
         return $this->reduce(
             Set::of((string) $this->keyType),
-            static function(SetInterface $keys, $key): SetInterface {
+            static function(Set $keys, $key): Set {
                 return $keys->add($key);
             }
         );

@@ -5,9 +5,6 @@ namespace Tests\Innmind\Immutable;
 
 use Innmind\Immutable\{
     Set,
-    SetInterface,
-    SizeableInterface,
-    PrimitiveInterface,
     Map,
     SequenceInterface,
     Str,
@@ -22,8 +19,6 @@ class SetTest extends TestCase
     {
         $s = new Set('int');
 
-        $this->assertInstanceOf(SetInterface::class, $s);
-        $this->assertInstanceOf(SizeableInterface::class, $s);
         $this->assertInstanceOf(\Countable::class, $s);
         $this->assertInstanceOf(Str::class, $s->type());
         $this->assertSame('int', (string) $s->type());
@@ -221,7 +216,7 @@ class SetTest extends TestCase
         });
         $this->assertInstanceOf(Map::class, $m);
         $this->assertSame('int', (string) $m->keyType());
-        $this->assertSame(SetInterface::class, (string) $m->valueType());
+        $this->assertSame(Set::class, (string) $m->valueType());
         $this->assertSame('int', (string) $m->get(0)->type());
         $this->assertSame('int', (string) $m->get(1)->type());
         $this->assertSame([1, 0], $m->keys()->toArray());
@@ -272,7 +267,7 @@ class SetTest extends TestCase
         $this->assertNotSame($s, $s2);
         $this->assertInstanceOf(Map::class, $s2);
         $this->assertSame('bool', (string) $s2->keyType());
-        $this->assertSame(SetInterface::class, (string) $s2->valueType());
+        $this->assertSame(Set::class, (string) $s2->valueType());
         $this->assertSame([1, 2, 3, 4], $s->toArray());
         $this->assertInstanceOf(Set::class, $s2->get(true));
         $this->assertInstanceOf(Set::class, $s2->get(false));

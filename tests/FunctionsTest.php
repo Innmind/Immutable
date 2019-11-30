@@ -22,7 +22,7 @@ class FunctionsTest extends TestCase
         $this->assertNull(assertSet('string', Set::of('string')));
 
         $this->expectException(\TypeError::class);
-        $this->expectExceptionMessage('Argument 42 must be of type SetInterface<string>');
+        $this->expectExceptionMessage('Argument 42 must be of type Set<string>');
 
         assertSet('string', Set::of('int'), 42);
     }

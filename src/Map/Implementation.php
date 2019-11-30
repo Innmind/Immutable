@@ -6,7 +6,7 @@ namespace Innmind\Immutable\Map;
 use Innmind\Immutable\{
     Map,
     Str,
-    SetInterface,
+    Set,
     StreamInterface,
     SizeableInterface,
 };
@@ -101,9 +101,9 @@ interface Implementation extends SizeableInterface, \Countable
     /**
      * Return all keys
      *
-     * @return SetInterface<T>
+     * @return Set<T>
      */
-    public function keys(): SetInterface;
+    public function keys(): Set;
 
     /**
      * Return all values

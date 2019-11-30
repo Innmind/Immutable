@@ -5,7 +5,7 @@ namespace Innmind\Immutable;
 
 use Innmind\Immutable\Exception\InvalidArgumentException;
 
-final class Set implements SetInterface
+final class Set implements \Countable
 {
     private Str $type;
     private SpecificationInterface $spec;
@@ -30,16 +30,13 @@ final class Set implements SetInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Return the type of this set
      */
     public function type(): Str
     {
         return $this->type;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function size(): int
     {
         return $this->values->size();
@@ -59,9 +56,15 @@ final class Set implements SetInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Intersect this set with the given one
+     *
+     * @param self<T> $set
+     *
+     * @throws InvalidArgumentException If the sets are not of the same type
+     *
+     * @return self<T>
      */
-    public function intersect(SetInterface $set): SetInterface
+    public function intersect(self $set): self
     {
         $this->validate($set);
 
@@ -74,9 +77,13 @@ final class Set implements SetInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Add a element to the set
+     *
+     * @param T $element
+     *
+     * @return self<T>
      */
-    public function add($element): SetInterface
+    public function add($element): self
     {
         $this->spec->validate($element);
 
@@ -91,7 +98,9 @@ final class Set implements SetInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Check if the set contains the given element
+     *
+     * @param T $element
      */
     public function contains($element): bool
     {
@@ -99,9 +108,13 @@ final class Set implements SetInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Remove the element from the set
+     *
+     * @param T $element
+     *
+     * @return self<T>
      */
-    public function remove($element): SetInterface
+    public function remove($element): self
     {
         if (!$this->contains($element)) {
             return $this;
@@ -119,9 +132,13 @@ final class Set implements SetInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Return the diff between this set and the given one
+     *
+     * @param self<T> $set
+     *
+     * @return self<T>
      */
-    public function diff(SetInterface $set): SetInterface
+    public function diff(self $set): self
     {
         $this->validate($set);
 
@@ -134,9 +151,11 @@ final class Set implements SetInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Check if the given set is identical to this one
+     *
+     * @param self<T> $set
      */
-    public function equals(SetInterface $set): bool
+    public function equals(self $set): bool
     {
         $this->validate($set);
 
@@ -148,9 +167,13 @@ final class Set implements SetInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Return all elements that satisfy the given predicate
+     *
+     * @param callable(T): bool $predicate
+     *
+     * @return self<T>
      */
-    public function filter(callable $predicate): SetInterface
+    public function filter(callable $predicate): self
     {
         $set = clone $this;
         $set->values = $this->values->filter($predicate);
@@ -159,9 +182,13 @@ final class Set implements SetInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Apply the given function to all elements of the set
+     *
+     * @param callable(T): void $function
+     *
+     * @return self<T>
      */
-    public function foreach(callable $function): SetInterface
+    public function foreach(callable $function): self
     {
         $this->values->foreach($function);
 
@@ -169,14 +196,19 @@ final class Set implements SetInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Return a new map of pairs grouped by keys determined with the given
+     * discriminator function
+     *
+     * @param callable(T) $discriminator
+     *
+     * @return Map<mixed, self<T>>
      */
     public function groupBy(callable $discriminator): Map
     {
         $map = $this->values->groupBy($discriminator);
 
         return $map->reduce(
-            new Map((string) $map->keyType(), SetInterface::class),
+            new Map((string) $map->keyType(), Set::class),
             function(Map $carry, $key, StreamInterface $values): Map {
                 $set = $this->clear();
                 $set->values = $values;
@@ -187,20 +219,28 @@ final class Set implements SetInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Return a new set by applying the given function to all elements
+     *
+     * @param callable(T): T $function
+     *
+     * @return self<T>
      */
-    public function map(callable $function): SetInterface
+    public function map(callable $function): self
     {
         return $this->reduce(
             $this->clear(),
-            function(SetInterface $carry, $value) use ($function): SetInterface {
+            function(self $carry, $value) use ($function): self {
                 return $carry->add($function($value));
             }
         );
     }
 
     /**
-     * {@inheritdoc}
+     * Return a sequence of 2 sets partitioned according to the given predicate
+     *
+     * @param callable(T): bool $predicate
+     *
+     * @return Map<bool, self<T>>
      */
     public function partition(callable $predicate): Map
     {
@@ -210,13 +250,13 @@ final class Set implements SetInterface
         $truthy->values = $partitions->get(true);
         $falsy->values = $partitions->get(false);
 
-        return Map::of('bool', SetInterface::class)
+        return Map::of('bool', Set::class)
             (true, $truthy)
             (false, $falsy);
     }
 
     /**
-     * {@inheritdoc}
+     * Concatenate all elements with the given separator
      */
     public function join(string $separator): Str
     {
@@ -224,7 +264,11 @@ final class Set implements SetInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Return a sequence sorted with the given function
+     *
+     * @param callable(T, T): int $function
+     *
+     * @return StreamInterface<T>
      */
     public function sort(callable $function): StreamInterface
     {
@@ -232,22 +276,31 @@ final class Set implements SetInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Create a new set with elements of both sets
+     *
+     * @param self<T> $set
+     *
+     * @return self<T>
      */
-    public function merge(SetInterface $set): SetInterface
+    public function merge(self $set): self
     {
         $this->validate($set);
 
         return $set->reduce(
             $this,
-            function(SetInterface $carry, $value): SetInterface {
+            function(self $carry, $value): self {
                 return $carry->add($value);
             }
         );
     }
 
     /**
-     * {@inheritdoc}
+     * Reduce the set to a single value
+     *
+     * @param mixed $carry
+     * @param callable(mixed, T) $reducer
+     *
+     * @return mixed
      */
     public function reduce($carry, callable $reducer)
     {
@@ -255,9 +308,11 @@ final class Set implements SetInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Return a set of the same type but without any value
+     *
+     * @return self<T>
      */
-    public function clear(): SetInterface
+    public function clear(): self
     {
         $self = clone $this;
         $self->values = $this->values->clear();
@@ -273,13 +328,9 @@ final class Set implements SetInterface
     /**
      * Make sure the set is compatible with the current one
      *
-     * @param SetInterface $set
-     *
      * @throws InvalidArgumentException
-     *
-     * @return void
      */
-    private function validate(SetInterface $set)
+    private function validate(self $set): void
     {
         if (!$set->type()->equals($this->type)) {
             throw new InvalidArgumentException(

@@ -6,12 +6,12 @@ namespace Innmind\Immutable;
 /**
  * @throws TypeError
  */
-function assertSet(string $type, SetInterface $set, int $position = null): void
+function assertSet(string $type, Set $set, int $position = null): void
 {
     $message = '';
 
     if (is_int($position)) {
-        $message = "Argument $position must be of type SetInterface<$type>";
+        $message = "Argument $position must be of type Set<$type>";
     }
 
     if ((string) $set->type() !== $type) {

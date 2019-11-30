@@ -11,7 +11,7 @@ use Innmind\Immutable\{
     Pair,
     Str,
     Symbol,
-    SetInterface,
+    Set,
     StreamInterface,
     Exception\LogicException,
     Exception\InvalidArgumentException,
@@ -222,7 +222,7 @@ class ObjectKeysTest extends TestCase
             ->put($d = new \stdClass, 5);
 
         $k = $m->keys();
-        $this->assertInstanceOf(SetInterface::class, $k);
+        $this->assertInstanceOf(Set::class, $k);
         $this->assertSame('stdClass', (string) $k->type());
         $this->assertSame([$a, $b, $c, $d], $k->toArray());
         $this->assertTrue($k->equals($m->keys()));

@@ -9,7 +9,6 @@ use Innmind\Immutable\{
     Str,
     Stream,
     StreamInterface,
-    SetInterface,
     Set,
     Pair,
     SpecificationInterface,
@@ -220,7 +219,7 @@ final class Primitive implements Implementation
     /**
      * {@inheritdoc}
      */
-    public function keys(): SetInterface
+    public function keys(): Set
     {
         return Set::of(
             (string) $this->keyType,
