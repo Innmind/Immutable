@@ -155,7 +155,7 @@ final class Sequence implements SequenceInterface
     /**
      * {@inheritdoc}
      */
-    public function groupBy(callable $discriminator): MapInterface
+    public function groupBy(callable $discriminator): Map
     {
         if ($this->size() === 0) {
             throw new GroupEmptySequenceException;
@@ -269,7 +269,7 @@ final class Sequence implements SequenceInterface
     /**
      * {@inheritdoc}
      */
-    public function partition(callable $predicate): MapInterface
+    public function partition(callable $predicate): Map
     {
         $truthy = [];
         $falsy = [];

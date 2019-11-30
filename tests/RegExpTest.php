@@ -6,7 +6,7 @@ namespace Tests\Innmind\Immutable;
 use Innmind\Immutable\{
     RegExp,
     Str,
-    MapInterface,
+    Map,
     Exception\DomainException
 };
 use PHPUnit\Framework\TestCase;
@@ -49,7 +49,7 @@ class RegExpTest extends TestCase
 
         $map = $regexp->capture(Str::of('foo123bar'));
 
-        $this->assertInstanceOf(MapInterface::class, $map);
+        $this->assertInstanceOf(Map::class, $map);
         $this->assertSame('scalar', (string) $map->keyType());
         $this->assertSame(Str::class, (string) $map->valueType());
         $this->assertSame('1', (string) $map->get('i'));

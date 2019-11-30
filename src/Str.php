@@ -277,9 +277,9 @@ final class Str
     /**
      * Return the collection of words
      *
-     * @return MapInterface<int, self>
+     * @return Map<int, self>
      */
-    public function words(string $charlist = ''): MapInterface
+    public function words(string $charlist = ''): Map
     {
         $words = \str_word_count($this->value, 2, $charlist);
         $map = new Map('int', self::class);
@@ -329,13 +329,13 @@ final class Str
      *
      * @throws Exception If the regex failed
      *
-     * @return MapInterface<scalar, self>
+     * @return Map<scalar, self>
      */
     public function getMatches(
         string $regex,
         int $offset = 0,
         int $flags = self::PREG_NO_FLAGS
-    ): MapInterface {
+    ): Map {
         return $this->capture($regex, $offset, $flags);
     }
 
@@ -344,9 +344,9 @@ final class Str
      *
      * @throws Exception If the regex failed
      *
-     * @return MapInterface<scalar, self>
+     * @return Map<scalar, self>
      */
-    public function capture(string $regex): MapInterface
+    public function capture(string $regex): Map
     {
         if (\func_num_args() !== 1) {
             throw new LogicException('Offset and flags are no longer supported');

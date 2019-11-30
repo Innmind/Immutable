@@ -39,9 +39,9 @@ final class RegExp
 
 
     /**
-     * @return MapInterface<scalar, Str>
+     * @return Map<scalar, Str>
      */
-    public function capture(Str $string): MapInterface
+    public function capture(Str $string): Map
     {
         $matches = [];
         $value = \preg_match($this->pattern, (string) $string, $matches);

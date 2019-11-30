@@ -5,7 +5,6 @@ namespace Tests\Innmind\Immutable;
 
 use Innmind\Immutable\{
     Map,
-    MapInterface,
     SizeableInterface,
     Pair,
     Str,
@@ -25,8 +24,6 @@ class MapTest extends TestCase
     {
         $m = new Map('int', 'float');
 
-        $this->assertInstanceOf(MapInterface::class, $m);
-        $this->assertInstanceOf(SizeableInterface::class, $m);
         $this->assertInstanceOf(\Countable::class, $m);
         $this->assertInstanceOf(Str::class, $m->keyType());
         $this->assertInstanceOf(Str::class, $m->valueType());
@@ -251,7 +248,7 @@ class MapTest extends TestCase
         $this->assertNotSame($m, $m2);
         $this->assertInstanceOf(Map::class, $m2);
         $this->assertSame('int', (string) $m2->keyType());
-        $this->assertSame(MapInterface::class, (string) $m2->valueType());
+        $this->assertSame(Map::class, (string) $m2->valueType());
         $this->assertTrue($m2->contains(0));
         $this->assertTrue($m2->contains(1));
         $this->assertTrue($m2->contains(2));
@@ -449,7 +446,7 @@ class MapTest extends TestCase
         $this->assertInstanceOf(Map::class, $p);
         $this->assertNotSame($p, $m);
         $this->assertSame('bool', (string) $p->keyType());
-        $this->assertSame(MapInterface::class, (string) $p->valueType());
+        $this->assertSame(Map::class, (string) $p->valueType());
         $this->assertSame(
             [true, false],
             $p->keys()->toArray()

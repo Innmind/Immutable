@@ -5,7 +5,8 @@ namespace Tests\Innmind\Immutable\Map;
 
 use Innmind\Immutable\{
     Map\Primitive,
-    MapInterface,
+    Map\Implementation,
+    Map,
     SizeableInterface,
     Pair,
     Str,
@@ -24,7 +25,7 @@ class PrimitiveTest extends TestCase
     {
         $m = new Primitive('int', 'float');
 
-        $this->assertInstanceOf(MapInterface::class, $m);
+        $this->assertInstanceOf(Map\Implementation::class, $m);
         $this->assertInstanceOf(SizeableInterface::class, $m);
         $this->assertInstanceOf(\Countable::class, $m);
         $this->assertInstanceOf(Str::class, $m->keyType());
@@ -224,9 +225,9 @@ class PrimitiveTest extends TestCase
             return ($key + $value) % 3;
         });
         $this->assertNotSame($m, $m2);
-        $this->assertInstanceOf(MapInterface::class, $m2);
+        $this->assertInstanceOf(Map::class, $m2);
         $this->assertSame('int', (string) $m2->keyType());
-        $this->assertSame(MapInterface::class, (string) $m2->valueType());
+        $this->assertSame(Map::class, (string) $m2->valueType());
         $this->assertTrue($m2->contains(0));
         $this->assertTrue($m2->contains(1));
         $this->assertTrue($m2->contains(2));
@@ -421,10 +422,10 @@ class PrimitiveTest extends TestCase
             return ($i + $v) % 3 === 0;
         });
 
-        $this->assertInstanceOf(MapInterface::class, $p);
+        $this->assertInstanceOf(Map::class, $p);
         $this->assertNotSame($p, $m);
         $this->assertSame('bool', (string) $p->keyType());
-        $this->assertSame(MapInterface::class, (string) $p->valueType());
+        $this->assertSame(Map::class, (string) $p->valueType());
         $this->assertSame(
             [true, false],
             $p->keys()->toArray()

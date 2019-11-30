@@ -4,7 +4,6 @@ declare(strict_types = 1);
 namespace Innmind\Immutable\Map;
 
 use Innmind\Immutable\{
-    MapInterface,
     Map,
     Type,
     Str,
@@ -23,7 +22,7 @@ use Innmind\Immutable\{
 /**
  * {@inheritdoc}
  */
-final class DoubleIndex implements MapInterface
+final class DoubleIndex implements Implementation
 {
     private Str $keyType;
     private Str $valueType;
@@ -82,7 +81,7 @@ final class DoubleIndex implements MapInterface
     /**
      * {@inheritdoc}
      */
-    public function put($key, $value): MapInterface
+    public function put($key, $value): Implementation
     {
         $this->keySpecification->validate($key);
         $this->valueSpecification->validate($value);
@@ -131,7 +130,7 @@ final class DoubleIndex implements MapInterface
     /**
      * {@inheritdoc}
      */
-    public function clear(): MapInterface
+    public function clear(): Implementation
     {
         $map = clone $this;
         $map->keys = $this->keys->clear();
@@ -144,7 +143,7 @@ final class DoubleIndex implements MapInterface
     /**
      * {@inheritdoc}
      */
-    public function equals(MapInterface $map): bool
+    public function equals(Implementation $map): bool
     {
         if (!$map->keys()->equals($this->keys())) {
             return false;
@@ -162,7 +161,7 @@ final class DoubleIndex implements MapInterface
     /**
      * {@inheritdoc}
      */
-    public function filter(callable $predicate): MapInterface
+    public function filter(callable $predicate): Implementation
     {
         $map = $this->clear();
 
@@ -180,7 +179,7 @@ final class DoubleIndex implements MapInterface
     /**
      * {@inheritdoc}
      */
-    public function foreach(callable $function): MapInterface
+    public function foreach(callable $function): Implementation
     {
         foreach ($this->pairs->toArray() as $pair) {
             $function($pair->key(), $pair->value());
@@ -192,7 +191,7 @@ final class DoubleIndex implements MapInterface
     /**
      * {@inheritdoc}
      */
-    public function groupBy(callable $discriminator): MapInterface
+    public function groupBy(callable $discriminator): Map
     {
         if ($this->size() === 0) {
             throw new GroupEmptyMapException;
@@ -206,7 +205,7 @@ final class DoubleIndex implements MapInterface
             if ($map === null) {
                 $map = new Map(
                     Type::determine($key),
-                    MapInterface::class
+                    Map::class
                 );
             }
 
@@ -221,7 +220,7 @@ final class DoubleIndex implements MapInterface
             } else {
                 $map = $map->put(
                     $key,
-                    $this->clear()->put(
+                    $this->clearMap()->put(
                         $pair->key(),
                         $pair->value()
                     )
@@ -251,7 +250,7 @@ final class DoubleIndex implements MapInterface
     /**
      * {@inheritdoc}
      */
-    public function map(callable $function): MapInterface
+    public function map(callable $function): Implementation
     {
         $map = $this->clear();
 
@@ -286,7 +285,7 @@ final class DoubleIndex implements MapInterface
     /**
      * {@inheritdoc}
      */
-    public function remove($key): MapInterface
+    public function remove($key): Implementation
     {
         if (!$this->contains($key)) {
             return $this;
@@ -313,7 +312,7 @@ final class DoubleIndex implements MapInterface
     /**
      * {@inheritdoc}
      */
-    public function merge(MapInterface $map): MapInterface
+    public function merge(Implementation $map): Implementation
     {
         if (
             !$this->keyType()->equals($map->keyType()) ||
@@ -335,10 +334,10 @@ final class DoubleIndex implements MapInterface
     /**
      * {@inheritdoc}
      */
-    public function partition(callable $predicate): MapInterface
+    public function partition(callable $predicate): Map
     {
-        $truthy = $this->clear();
-        $falsy = $this->clear();
+        $truthy = $this->clearMap();
+        $falsy = $this->clearMap();
 
         foreach ($this->pairs->toArray() as $pair) {
             $return = $predicate(
@@ -353,7 +352,7 @@ final class DoubleIndex implements MapInterface
             }
         }
 
-        return Map::of('bool', MapInterface::class)
+        return Map::of('bool', Map::class)
             (true, $truthy)
             (false, $falsy);
     }
@@ -373,5 +372,13 @@ final class DoubleIndex implements MapInterface
     public function empty(): bool
     {
         return $this->pairs->empty();
+    }
+
+    /**
+     * @return Map<T, S>
+     */
+    private function clearMap(): Map
+    {
+        return Map::of((string) $this->keyType, (string) $this->valueType);
     }
 }

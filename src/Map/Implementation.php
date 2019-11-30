@@ -1,13 +1,22 @@
 <?php
 declare(strict_types = 1);
 
-namespace Innmind\Immutable;
+namespace Innmind\Immutable\Map;
+
+use Innmind\Immutable\{
+    Map,
+    Str,
+    SetInterface,
+    StreamInterface,
+    SizeableInterface,
+};
 
 /**
  * @template T
  * @template S
+ * @internal Dot not code against this interface
  */
-interface MapInterface extends SizeableInterface, \Countable
+interface Implementation extends SizeableInterface, \Countable
 {
     /**
      * @param string $keyType Type T
@@ -91,9 +100,9 @@ interface MapInterface extends SizeableInterface, \Countable
      *
      * @param callable(T, S) $discriminator
      *
-     * @return self<mixed, self<T, S>>
+     * @return Map<mixed, Map<T, S>>
      */
-    public function groupBy(callable $discriminator): self;
+    public function groupBy(callable $discriminator): Map;
 
     /**
      * Return all keys
@@ -148,9 +157,9 @@ interface MapInterface extends SizeableInterface, \Countable
      *
      * @param callable(T, S): bool $predicate
      *
-     * @return self<bool, self<T, S>>
+     * @return Map<bool, Map<T, S>>
      */
-    public function partition(callable $predicate): self;
+    public function partition(callable $predicate): Map;
 
     /**
      * Reduce the map to a single value

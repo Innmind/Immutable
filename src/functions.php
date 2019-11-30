@@ -22,12 +22,12 @@ function assertSet(string $type, SetInterface $set, int $position = null): void
 /**
  * @throws TypeError
  */
-function assertMap(string $key, string $value, MapInterface $map, int $position = null): void
+function assertMap(string $key, string $value, Map $map, int $position = null): void
 {
     $message = '';
 
     if (is_int($position)) {
-        $message = "Argument $position must be of type MapInterface<$key, $value>";
+        $message = "Argument $position must be of type Map<$key, $value>";
     }
 
     if (

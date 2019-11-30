@@ -42,7 +42,7 @@ class FunctionsTest extends TestCase
         $this->assertNull(assertMap('string', 'int', Map::of('string', 'int')));
 
         $this->expectException(\TypeError::class);
-        $this->expectExceptionMessage('Argument 42 must be of type MapInterface<string, int>');
+        $this->expectExceptionMessage('Argument 42 must be of type Map<string, int>');
 
         assertMap('string', 'int', Map::of('string', 'string'), 42);
     }

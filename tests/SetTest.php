@@ -8,7 +8,7 @@ use Innmind\Immutable\{
     SetInterface,
     SizeableInterface,
     PrimitiveInterface,
-    MapInterface,
+    Map,
     SequenceInterface,
     Str,
     StreamInterface,
@@ -219,7 +219,7 @@ class SetTest extends TestCase
         $m = $s->groupBy(function(int $v) {
             return $v % 2;
         });
-        $this->assertInstanceOf(MapInterface::class, $m);
+        $this->assertInstanceOf(Map::class, $m);
         $this->assertSame('int', (string) $m->keyType());
         $this->assertSame(SetInterface::class, (string) $m->valueType());
         $this->assertSame('int', (string) $m->get(0)->type());
@@ -270,7 +270,7 @@ class SetTest extends TestCase
             return $v % 2 === 0;
         });
         $this->assertNotSame($s, $s2);
-        $this->assertInstanceOf(MapInterface::class, $s2);
+        $this->assertInstanceOf(Map::class, $s2);
         $this->assertSame('bool', (string) $s2->keyType());
         $this->assertSame(SetInterface::class, (string) $s2->valueType());
         $this->assertSame([1, 2, 3, 4], $s->toArray());

@@ -8,7 +8,7 @@ use Innmind\Immutable\{
     PrimitiveInterface,
     StringableInterface,
     StreamInterface,
-    MapInterface,
+    Map,
     Exception\SubstringException,
     Exception\RegexException
 };
@@ -485,7 +485,7 @@ class StrTest extends TestCase
         looking          good today!");
 
         $map = $str->words();
-        $this->assertInstanceOf(MapInterface::class, $map);
+        $this->assertInstanceOf(Map::class, $map);
         $this->assertSame('int', (string) $map->keyType());
         $this->assertSame(S::class, (string) $map->valueType());
         $words = [
@@ -504,7 +504,7 @@ class StrTest extends TestCase
         }
 
         $map = $str->words('àáãç3');
-        $this->assertInstanceOf(MapInterface::class, $map);
+        $this->assertInstanceOf(Map::class, $map);
         $this->assertSame('int', (string) $map->keyType());
         $this->assertSame(S::class, (string) $map->valueType());
         $words = [
@@ -558,7 +558,7 @@ class StrTest extends TestCase
         $str = new S('http://www.php.net/index.html');
 
         $map = $str->capture('@^(?:http://)?(?P<host>[^/]+)@i');
-        $this->assertInstanceOf(MapInterface::class, $map);
+        $this->assertInstanceOf(Map::class, $map);
         $this->assertSame('scalar', (string) $map->keyType());
         $this->assertSame(S::class, (string) $map->valueType());
         $this->assertCount(3, $map);
@@ -572,7 +572,7 @@ class StrTest extends TestCase
         $str = new S('en;q=0.7');
 
         $matches = $str->capture('~(?<lang>([a-zA-Z0-9]+(-[a-zA-Z0-9]+)*|\*))(; ?q=(?<quality>\d+(\.\d+)?))?~');
-        $this->assertInstanceOf(MapInterface::class, $matches);
+        $this->assertInstanceOf(Map::class, $matches);
         $this->assertSame('scalar', (string) $matches->keyType());
         $this->assertSame(S::class, (string) $matches->valueType());
         $this->assertCount(9, $matches);

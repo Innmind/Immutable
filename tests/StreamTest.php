@@ -9,7 +9,7 @@ use Innmind\Immutable\{
     SizeableInterface,
     PrimitiveInterface,
     Str,
-    MapInterface,
+    Map,
     Exception\OutOfBoundException,
     Exception\LogicException,
     Exception\InvalidArgumentException,
@@ -228,7 +228,7 @@ class StreamTest extends TestCase
             return $value % 3;
         });
 
-        $this->assertInstanceOf(MapInterface::class, $map);
+        $this->assertInstanceOf(Map::class, $map);
         $this->assertSame('int', (string) $map->keyType());
         $this->assertSame(StreamInterface::class, (string) $map->valueType());
         $this->assertCount(3, $map);
@@ -383,7 +383,7 @@ class StreamTest extends TestCase
                 return $value % 2 === 0;
             });
 
-        $this->assertInstanceOf(MapInterface::class, $map);
+        $this->assertInstanceOf(Map::class, $map);
         $this->assertSame('bool', (string) $map->keyType());
         $this->assertSame(StreamInterface::class, (string) $map->valueType());
         $this->assertSame('int', (string) $map->get(true)->type());

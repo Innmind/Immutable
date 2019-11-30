@@ -67,9 +67,9 @@ interface SequenceInterface extends SizeableInterface, \Countable
      *
      * @param callable(mixed) $discriminator
      *
-     * @return MapInterface<mixed, self>
+     * @return Map<mixed, self>
      */
-    public function groupBy(callable $discriminator): MapInterface;
+    public function groupBy(callable $discriminator): Map;
 
     /**
      * Return the first element
@@ -127,9 +127,9 @@ interface SequenceInterface extends SizeableInterface, \Countable
      *
      * @param callable(mixed): bool $predicate
      *
-     * @return MapInterface<bool, self>
+     * @return Map<bool, self>
      */
-    public function partition(callable $predicate): MapInterface;
+    public function partition(callable $predicate): Map;
 
     public function slice(int $from, int $until): self;
 

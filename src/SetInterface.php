@@ -96,9 +96,9 @@ interface SetInterface extends SizeableInterface, \Countable
      *
      * @param callable(T) $discriminator
      *
-     * @return MapInterface<mixed, self<T>>
+     * @return Map<mixed, self<T>>
      */
-    public function groupBy(callable $discriminator): MapInterface;
+    public function groupBy(callable $discriminator): Map;
 
     /**
      * Return a new set by applying the given function to all elements
@@ -114,9 +114,9 @@ interface SetInterface extends SizeableInterface, \Countable
      *
      * @param callable(T): bool $predicate
      *
-     * @return MapInterface<bool, self<T>>
+     * @return Map<bool, self<T>>
      */
-    public function partition(callable $predicate): MapInterface;
+    public function partition(callable $predicate): Map;
 
     /**
      * Concatenate all elements with the given separator

@@ -9,7 +9,7 @@ use Innmind\Immutable\{
     SizeableInterface,
     PrimitiveInterface,
     Str,
-    MapInterface,
+    Map,
     StreamInterface,
     Exception\LogicException,
     Exception\OutOfBoundException,
@@ -182,7 +182,7 @@ class SequenceTest extends TestCase
         $m = $s->groupBy(function(int $v) {
             return $v % 2;
         });
-        $this->assertInstanceOf(MapInterface::class, $m);
+        $this->assertInstanceOf(Map::class, $m);
         $this->assertSame('int', (string) $m->keyType());
         $this->assertSame(SequenceInterface::class, (string) $m->valueType());
         $this->assertSame(2, $m->size());
@@ -301,7 +301,7 @@ class SequenceTest extends TestCase
             return $v % 2 === 0;
         });
         $this->assertNotSame($s, $s2);
-        $this->assertInstanceOf(MapInterface::class, $s2);
+        $this->assertInstanceOf(Map::class, $s2);
         $this->assertSame('bool', (string) $s2->keyType());
         $this->assertSame(SequenceInterface::class, (string) $s2->valueType());
         $this->assertSame([1, 2, 3, 4], $s->toArray());

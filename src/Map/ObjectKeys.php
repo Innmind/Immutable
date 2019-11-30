@@ -4,7 +4,6 @@ declare(strict_types = 1);
 namespace Innmind\Immutable\Map;
 
 use Innmind\Immutable\{
-    MapInterface,
     Map,
     Type,
     Str,
@@ -24,7 +23,7 @@ use Innmind\Immutable\{
 /**
  * {@inheritdoc}
  */
-final class ObjectKeys implements MapInterface
+final class ObjectKeys implements Implementation
 {
     private Str $keyType;
     private Str $valueType;
@@ -84,7 +83,7 @@ final class ObjectKeys implements MapInterface
     /**
      * {@inheritdoc}
      */
-    public function put($key, $value): MapInterface
+    public function put($key, $value): Implementation
     {
         $this->keySpecification->validate($key);
         $this->valueSpecification->validate($value);
@@ -124,7 +123,7 @@ final class ObjectKeys implements MapInterface
     /**
      * {@inheritdoc}
      */
-    public function clear(): MapInterface
+    public function clear(): Implementation
     {
         $map = clone $this;
         $map->values = new \SplObjectStorage;
@@ -135,7 +134,7 @@ final class ObjectKeys implements MapInterface
     /**
      * {@inheritdoc}
      */
-    public function equals(MapInterface $map): bool
+    public function equals(Implementation $map): bool
     {
         if ($map->size() !== $this->size()) {
             return false;
@@ -159,7 +158,7 @@ final class ObjectKeys implements MapInterface
     /**
      * {@inheritdoc}
      */
-    public function filter(callable $predicate): MapInterface
+    public function filter(callable $predicate): Implementation
     {
         $map = $this->clear();
 
@@ -179,7 +178,7 @@ final class ObjectKeys implements MapInterface
     /**
      * {@inheritdoc}
      */
-    public function foreach(callable $function): MapInterface
+    public function foreach(callable $function): Implementation
     {
         foreach ($this->values as $k) {
             $v = $this->values[$k];
@@ -193,7 +192,7 @@ final class ObjectKeys implements MapInterface
     /**
      * {@inheritdoc}
      */
-    public function groupBy(callable $discriminator): MapInterface
+    public function groupBy(callable $discriminator): Map
     {
         if ($this->size() === 0) {
             throw new GroupEmptyMapException;
@@ -209,7 +208,7 @@ final class ObjectKeys implements MapInterface
             if ($map === null) {
                 $map = new Map(
                     Type::determine($key),
-                    MapInterface::class
+                    Map::class
                 );
             }
 
@@ -221,7 +220,7 @@ final class ObjectKeys implements MapInterface
             } else {
                 $map = $map->put(
                     $key,
-                    $this->clear()->put($k, $v)
+                    $this->clearMap()->put($k, $v)
                 );
             }
         }
@@ -258,7 +257,7 @@ final class ObjectKeys implements MapInterface
     /**
      * {@inheritdoc}
      */
-    public function map(callable $function): MapInterface
+    public function map(callable $function): Implementation
     {
         $map = $this->clear();
 
@@ -298,7 +297,7 @@ final class ObjectKeys implements MapInterface
     /**
      * {@inheritdoc}
      */
-    public function remove($key): MapInterface
+    public function remove($key): Implementation
     {
         if (!$this->contains($key)) {
             return $this;
@@ -315,7 +314,7 @@ final class ObjectKeys implements MapInterface
     /**
      * {@inheritdoc}
      */
-    public function merge(MapInterface $map): MapInterface
+    public function merge(Implementation $map): Implementation
     {
         if (
             !$this->keyType()->equals($map->keyType()) ||
@@ -337,10 +336,10 @@ final class ObjectKeys implements MapInterface
     /**
      * {@inheritdoc}
      */
-    public function partition(callable $predicate): MapInterface
+    public function partition(callable $predicate): Map
     {
-        $truthy = $this->clear();
-        $falsy = $this->clear();
+        $truthy = $this->clearMap();
+        $falsy = $this->clearMap();
 
         foreach ($this->values as $k) {
             $v = $this->values[$k];
@@ -348,16 +347,13 @@ final class ObjectKeys implements MapInterface
             $return = $predicate($k, $v);
 
             if ($return === true) {
-                $truthy->values[$k] = $v;
+                $truthy = $truthy->put($k, $v);
             } else {
-                $falsy->values[$k] = $v;
+                $falsy = $falsy->put($k, $v);
             }
         }
 
-        $truthy->values->rewind();
-        $falsy->values->rewind();
-
-        return Map::of('bool', MapInterface::class)
+        return Map::of('bool', Map::class)
             (true, $truthy)
             (false, $falsy);
     }
@@ -381,5 +377,13 @@ final class ObjectKeys implements MapInterface
         $this->values->rewind();
 
         return !$this->values->valid();
+    }
+
+    /**
+     * @return Map<T, S>
+     */
+    private function clearMap(): Map
+    {
+        return Map::of((string) $this->keyType, (string) $this->valueType);
     }
 }

@@ -12,15 +12,13 @@ use Innmind\Immutable\{
 };
 
 /**
- * {@inheritdoc}
+ * @template T
+ * @template S
  */
-final class Map implements MapInterface
+final class Map implements \Countable
 {
-    private MapInterface $implementation;
+    private Map\Implementation $implementation;
 
-    /**
-     * {@inheritdoc}
-     */
     public function __construct(string $keyType, string $valueType)
     {
         $type = Type::of($keyType);
@@ -57,7 +55,7 @@ final class Map implements MapInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Return the key type for this map
      */
     public function keyType(): Str
     {
@@ -65,16 +63,13 @@ final class Map implements MapInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Return the value type for this map
      */
     public function valueType(): Str
     {
         return $this->implementation->valueType();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function size(): int
     {
         return $this->implementation->size();
@@ -89,9 +84,14 @@ final class Map implements MapInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Set a new key/value pair
+     *
+     * @param T $key
+     * @param S $value
+     *
+     * @return self<T, S>
      */
-    public function put($key, $value): MapInterface
+    public function put($key, $value): self
     {
         $map = clone $this;
         $map->implementation = $this->implementation->put($key, $value);
@@ -121,7 +121,13 @@ final class Map implements MapInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Return the element with the given key
+     *
+     * @param T $key
+     *
+     * @throws ElementNotFoundException
+     *
+     * @return S
      */
     public function get($key)
     {
@@ -129,7 +135,9 @@ final class Map implements MapInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Check if there is an element for the given key
+     *
+     * @param T $key
      */
     public function contains($key): bool
     {
@@ -137,9 +145,11 @@ final class Map implements MapInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Return an empty map given the same given type
+     *
+     * @return self<T, S>
      */
-    public function clear(): MapInterface
+    public function clear(): self
     {
         $map = clone $this;
         $map->implementation = $this->implementation->clear();
@@ -148,17 +158,23 @@ final class Map implements MapInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Check if the two maps are equal
+     *
+     * @param self<T, S> $map
      */
-    public function equals(MapInterface $map): bool
+    public function equals(self $map): bool
     {
-        return $this->implementation->equals($map);
+        return $this->implementation->equals($map->implementation);
     }
 
     /**
-     * {@inheritdoc}
+     * Filter the map based on the given predicate
+     *
+     * @param callable(T, S): bool $predicate
+     *
+     * @return self<T, S>
      */
-    public function filter(callable $predicate): MapInterface
+    public function filter(callable $predicate): self
     {
         $map = $this->clear();
         $map->implementation = $this->implementation->filter($predicate);
@@ -167,9 +183,13 @@ final class Map implements MapInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Run the given function for each element of the map
+     *
+     * @param callable(T, S): void $function
+     *
+     * @return self<T, S>
      */
-    public function foreach(callable $function): MapInterface
+    public function foreach(callable $function): self
     {
         $this->implementation->foreach($function);
 
@@ -177,15 +197,22 @@ final class Map implements MapInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Return a new map of pairs' sequences grouped by keys determined with the given
+     * discriminator function
+     *
+     * @param callable(T, S) $discriminator
+     *
+     * @return self<mixed, self<T, S>>
      */
-    public function groupBy(callable $discriminator): MapInterface
+    public function groupBy(callable $discriminator): self
     {
         return $this->implementation->groupBy($discriminator);
     }
 
     /**
-     * {@inheritdoc}
+     * Return all keys
+     *
+     * @return SetInterface<T>
      */
     public function keys(): SetInterface
     {
@@ -193,7 +220,9 @@ final class Map implements MapInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Return all values
+     *
+     * @return StreamInterface<S>
      */
     public function values(): StreamInterface
     {
@@ -201,9 +230,15 @@ final class Map implements MapInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Apply the given function on all elements and return a new map
+     *
+     * Keys can't be modified
+     *
+     * @param callable(T, S): S|Pair<T, S> $function
+     *
+     * @return self<T, S>
      */
-    public function map(callable $function): MapInterface
+    public function map(callable $function): self
     {
         $map = $this->clear();
         $map->implementation = $this->implementation->map($function);
@@ -212,7 +247,7 @@ final class Map implements MapInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Concatenate all elements with the given separator
      */
     public function join(string $separator): Str
     {
@@ -220,9 +255,13 @@ final class Map implements MapInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Remove the element with the given key
+     *
+     * @param T $key
+     *
+     * @return self<T, S>
      */
-    public function remove($key): MapInterface
+    public function remove($key): self
     {
         $map = clone $this;
         $map->implementation = $this->implementation->remove($key);
@@ -231,26 +270,39 @@ final class Map implements MapInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Create a new map by combining both maps
+     *
+     * @param self<T, S> $map
+     *
+     * @return self<T, S>
      */
-    public function merge(MapInterface $map): MapInterface
+    public function merge(self $map): self
     {
         $self = clone $this;
-        $self->implementation = $this->implementation->merge($map);
+        $self->implementation = $this->implementation->merge($map->implementation);
 
         return $self;
     }
 
     /**
-     * {@inheritdoc}
+     * Return a map of 2 maps partitioned according to the given predicate
+     *
+     * @param callable(T, S): bool $predicate
+     *
+     * @return self<bool, self<T, S>>
      */
-    public function partition(callable $predicate): MapInterface
+    public function partition(callable $predicate): self
     {
         return $this->implementation->partition($predicate);
     }
 
     /**
-     * {@inheritdoc}
+     * Reduce the map to a single value
+     *
+     * @param mixed $carry
+     * @param callable(mixed, T, S) $reducer
+     *
+     * @return mixed
      */
     public function reduce($carry, callable $reducer)
     {

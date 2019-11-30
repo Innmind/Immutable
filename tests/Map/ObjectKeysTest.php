@@ -5,7 +5,8 @@ namespace Tests\Innmind\Immutable\Map;
 
 use Innmind\Immutable\{
     Map\ObjectKeys,
-    MapInterface,
+    Map\Implementation,
+    Map,
     SizeableInterface,
     Pair,
     Str,
@@ -25,7 +26,7 @@ class ObjectKeysTest extends TestCase
     {
         $m = new ObjectKeys('stdClass', 'float');
 
-        $this->assertInstanceOf(MapInterface::class, $m);
+        $this->assertInstanceOf(Map\Implementation::class, $m);
         $this->assertInstanceOf(SizeableInterface::class, $m);
         $this->assertInstanceOf(\Countable::class, $m);
         $this->assertInstanceOf(Str::class, $m->keyType());
@@ -196,9 +197,9 @@ class ObjectKeysTest extends TestCase
             return $value % 2;
         });
         $this->assertNotSame($m, $m2);
-        $this->assertInstanceOf(MapInterface::class, $m2);
+        $this->assertInstanceOf(Map::class, $m2);
         $this->assertSame('int', (string) $m2->keyType());
-        $this->assertSame(MapInterface::class, (string) $m2->valueType());
+        $this->assertSame(Map::class, (string) $m2->valueType());
         $this->assertTrue($m2->contains(0));
         $this->assertTrue($m2->contains(1));
         $this->assertSame(2, $m2->get(0)->size());
@@ -389,10 +390,10 @@ class ObjectKeysTest extends TestCase
             return $v % 2 === 0;
         });
 
-        $this->assertInstanceOf(MapInterface::class, $p);
+        $this->assertInstanceOf(Map::class, $p);
         $this->assertNotSame($p, $m);
         $this->assertSame('bool', (string) $p->keyType());
-        $this->assertSame(MapInterface::class, (string) $p->valueType());
+        $this->assertSame(Map::class, (string) $p->valueType());
         $this->assertSame(
             [true, false],
             $p->keys()->toArray()

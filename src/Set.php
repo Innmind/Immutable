@@ -171,13 +171,13 @@ final class Set implements SetInterface
     /**
      * {@inheritdoc}
      */
-    public function groupBy(callable $discriminator): MapInterface
+    public function groupBy(callable $discriminator): Map
     {
         $map = $this->values->groupBy($discriminator);
 
         return $map->reduce(
             new Map((string) $map->keyType(), SetInterface::class),
-            function(MapInterface $carry, $key, StreamInterface $values): MapInterface {
+            function(Map $carry, $key, StreamInterface $values): Map {
                 $set = $this->clear();
                 $set->values = $values;
 
@@ -202,7 +202,7 @@ final class Set implements SetInterface
     /**
      * {@inheritdoc}
      */
-    public function partition(callable $predicate): MapInterface
+    public function partition(callable $predicate): Map
     {
         $truthy = $this->clear();
         $falsy = $this->clear();

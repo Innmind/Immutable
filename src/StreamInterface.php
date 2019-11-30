@@ -87,9 +87,9 @@ interface StreamInterface extends SizeableInterface, \Countable
      *
      * @throws GroupEmptySequenceException
      *
-     * @return MapInterface<mixed, StreamInterface<T>>
+     * @return Map<mixed, StreamInterface<T>>
      */
-    public function groupBy(callable $discriminator): MapInterface;
+    public function groupBy(callable $discriminator): Map;
 
     /**
      * Return the first element
@@ -151,9 +151,9 @@ interface StreamInterface extends SizeableInterface, \Countable
      *
      * @param callable(T): bool $predicate
      *
-     * @return MapInterface<bool, self<T>>
+     * @return Map<bool, self<T>>
      */
-    public function partition(callable $predicate): MapInterface;
+    public function partition(callable $predicate): Map;
 
     /**
      * Slice the stream
