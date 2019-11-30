@@ -83,38 +83,6 @@ final class Primitive implements MapInterface
     /**
      * {@inheritdoc}
      */
-    public function offsetExists($offset): bool
-    {
-        return \array_key_exists($offset, $this->values);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function offsetGet($offset)
-    {
-        return $this->get($offset);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function offsetSet($offset, $value): void
-    {
-        throw new LogicException('You can\'t modify a map');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function offsetUnset($offset): void
-    {
-        throw new LogicException('You can\'t modify a map');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function put($key, $value): MapInterface
     {
         $this->keySpecification->validate($key);
@@ -133,7 +101,7 @@ final class Primitive implements MapInterface
      */
     public function get($key)
     {
-        if (!$this->offsetExists($key)) {
+        if (!$this->contains($key)) {
             throw new ElementNotFoundException;
         }
 
@@ -145,7 +113,7 @@ final class Primitive implements MapInterface
      */
     public function contains($key): bool
     {
-        return $this->offsetExists($key);
+        return \array_key_exists($key, $this->values);
     }
 
     /**

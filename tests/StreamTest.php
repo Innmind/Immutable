@@ -26,7 +26,6 @@ class StreamTest extends TestCase
         $this->assertInstanceOf(StreamInterface::class, $stream);
         $this->assertInstanceOf(SizeableInterface::class, $stream);
         $this->assertInstanceOf(\Countable::class, $stream);
-        $this->assertInstanceOf(\ArrayAccess::class, $stream);
         $this->assertSame([], $stream->toArray());
     }
 
@@ -69,46 +68,6 @@ class StreamTest extends TestCase
                 ->add(1)
                 ->add(2)
         );
-    }
-
-    public function testOffsetExists()
-    {
-        $stream = (new Stream('int'))->add(1);
-
-        $this->assertTrue(isset($stream[0]));
-        $this->assertFalse(isset($stream[1]));
-    }
-
-    public function testOffsetGet()
-    {
-        $stream = (new Stream('int'))->add(1);
-
-        $this->assertSame(1, $stream[0]);
-    }
-
-    public function testThrowWhenAccessingUnknownIndex()
-    {
-        $this->expectException(OutOfBoundException::class);
-
-        (new Stream('int'))[0];
-    }
-
-    public function testThrowWhenSettingValue()
-    {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('You can\'t modify a stream');
-
-        $stream = new Stream('int');
-        $stream[0] = 1;
-    }
-
-    public function testThrowWhenUnsettingValue()
-    {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('You can\'t modify a stream');
-
-        $stream = (new Stream('int'))->add(1);
-        unset($stream[0]);
     }
 
     public function testGet()

@@ -83,42 +83,6 @@ final class ObjectKeys implements MapInterface
     /**
      * {@inheritdoc}
      */
-    public function offsetExists($offset): bool
-    {
-        if (!is_object($offset)) {
-            return false;
-        }
-
-        return $this->values->offsetExists($offset);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function offsetGet($offset)
-    {
-        return $this->get($offset);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function offsetSet($offset, $value): void
-    {
-        throw new LogicException('You can\'t modify a map');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function offsetUnset($offset): void
-    {
-        throw new LogicException('You can\'t modify a map');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function put($key, $value): MapInterface
     {
         $this->keySpecification->validate($key);
@@ -137,7 +101,7 @@ final class ObjectKeys implements MapInterface
      */
     public function get($key)
     {
-        if (!$this->offsetExists($key)) {
+        if (!$this->contains($key)) {
             throw new ElementNotFoundException;
         }
 
@@ -149,7 +113,11 @@ final class ObjectKeys implements MapInterface
      */
     public function contains($key): bool
     {
-        return $this->offsetExists($key);
+        if (!is_object($key)) {
+            return false;
+        }
+
+        return $this->values->offsetExists($key);
     }
 
     /**

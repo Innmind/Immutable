@@ -27,7 +27,6 @@ class SequenceTest extends TestCase
         $this->assertInstanceOf(SequenceInterface::class, $s);
         $this->assertInstanceOf(SizeableInterface::class, $s);
         $this->assertInstanceOf(\Countable::class, $s);
-        $this->assertInstanceOf(\ArrayAccess::class, $s);
         $this->assertSame([1], $s->toArray());
     }
 
@@ -44,36 +43,12 @@ class SequenceTest extends TestCase
         $this->assertSame(2, (new Sequence('foo', 42))->count());
     }
 
-    public function testArrayAccess()
-    {
-        $this->assertSame(1, (new Sequence(1))[0]);
-        $this->assertSame(2, (new Sequence(1, 2))[1]);
-    }
-
-    public function testThrowWhenAddingAnElement()
-    {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('You can\'t modify a sequence');
-
-        $s = new Sequence;
-        $s[0] = 1;
-    }
-
-    public function testThrowWhenRemovingAnElement()
-    {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('You can\'t modify a sequence');
-
-        $s = new Sequence(1);
-        unset($s[0]);
-    }
-
     public function testGet()
     {
         $this->assertSame(3, (new Sequence(1, 2, 3))->get(2));
     }
 
-    public function testThrowWhenAccessingUnknownIndex()
+    public function testThrowWhenGettingUnknownIndex()
     {
         $this->expectException(OutOfBoundException::class);
 

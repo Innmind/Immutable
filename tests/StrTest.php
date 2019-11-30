@@ -72,18 +72,18 @@ class StrTest extends TestCase
             $this->assertInstanceOf(S::class, $part);
         }
 
-        $this->assertSame('f', (string) $stream[0]);
-        $this->assertSame('o', (string) $stream[1]);
-        $this->assertSame('o', (string) $stream[2]);
+        $this->assertSame('f', (string) $stream->get(0));
+        $this->assertSame('o', (string) $stream->get(1));
+        $this->assertSame('o', (string) $stream->get(2));
 
         $parts = S::of('🤩👍🤔', 'UTF-8')->split();
 
-        $this->assertSame('🤩', (string) $parts[0]);
-        $this->assertSame('👍', (string) $parts[1]);
-        $this->assertSame('🤔', (string) $parts[2]);
+        $this->assertSame('🤩', (string) $parts->get(0));
+        $this->assertSame('👍', (string) $parts->get(1));
+        $this->assertSame('🤔', (string) $parts->get(2));
         $this->assertNotSame(
             '🤩',
-            (string) S::of('🤩👍🤔', 'ASCII')->split()[0]
+            (string) S::of('🤩👍🤔', 'ASCII')->split()->get(0)
         );
 
         $stream = $str->split('');
@@ -95,9 +95,9 @@ class StrTest extends TestCase
             $this->assertInstanceOf(S::class, $part);
         }
 
-        $this->assertSame('f', (string) $stream[0]);
-        $this->assertSame('o', (string) $stream[1]);
-        $this->assertSame('o', (string) $stream[2]);
+        $this->assertSame('f', (string) $stream->get(0));
+        $this->assertSame('o', (string) $stream->get(1));
+        $this->assertSame('o', (string) $stream->get(2));
 
         $str = new S('f|o|o');
         $stream = $str->split('|');
@@ -109,9 +109,9 @@ class StrTest extends TestCase
             $this->assertInstanceOf(S::class, $part);
         }
 
-        $this->assertSame('f', (string) $stream[0]);
-        $this->assertSame('o', (string) $stream[1]);
-        $this->assertSame('o', (string) $stream[2]);
+        $this->assertSame('f', (string) $stream->get(0));
+        $this->assertSame('o', (string) $stream->get(1));
+        $this->assertSame('o', (string) $stream->get(2));
     }
 
     public function testSplitOnZeroString()
@@ -119,9 +119,9 @@ class StrTest extends TestCase
         $parts = (new S('10101'))->split('0');
 
         $this->assertCount(3, $parts);
-        $this->assertSame('1', (string) $parts[0]);
-        $this->assertSame('1', (string) $parts[1]);
-        $this->assertSame('1', (string) $parts[2]);
+        $this->assertSame('1', (string) $parts->get(0));
+        $this->assertSame('1', (string) $parts->get(1));
+        $this->assertSame('1', (string) $parts->get(2));
     }
 
     public function testSplitUtf8ManipulatedAsAscii()
@@ -129,26 +129,26 @@ class StrTest extends TestCase
         $str = new S('foo🙏bar');
         $splits = $str->split();
 
-        $this->assertSame('f', (string) $splits[0]);
-        $this->assertSame('o', (string) $splits[1]);
-        $this->assertSame('o', (string) $splits[2]);
-        $this->assertSame('🙏', (string) $splits[3]);
-        $this->assertSame('b', (string) $splits[4]);
-        $this->assertSame('a', (string) $splits[5]);
-        $this->assertSame('r', (string) $splits[6]);
+        $this->assertSame('f', (string) $splits->get(0));
+        $this->assertSame('o', (string) $splits->get(1));
+        $this->assertSame('o', (string) $splits->get(2));
+        $this->assertSame('🙏', (string) $splits->get(3));
+        $this->assertSame('b', (string) $splits->get(4));
+        $this->assertSame('a', (string) $splits->get(5));
+        $this->assertSame('r', (string) $splits->get(6));
 
         $splits = $str->toEncoding('ASCII')->split();
 
-        $this->assertSame('f', (string) $splits[0]);
-        $this->assertSame('o', (string) $splits[1]);
-        $this->assertSame('o', (string) $splits[2]);
+        $this->assertSame('f', (string) $splits->get(0));
+        $this->assertSame('o', (string) $splits->get(1));
+        $this->assertSame('o', (string) $splits->get(2));
         $this->assertSame(
             '🙏',
-            $splits[3].$splits[4].$splits[5].$splits[6]
+            $splits->get(3).$splits->get(4).$splits->get(5).$splits->get(6)
         );
-        $this->assertSame('b', (string) $splits[7]);
-        $this->assertSame('a', (string) $splits[8]);
-        $this->assertSame('r', (string) $splits[9]);
+        $this->assertSame('b', (string) $splits->get(7));
+        $this->assertSame('a', (string) $splits->get(8));
+        $this->assertSame('r', (string) $splits->get(9));
     }
 
     public function testSplitUtf8ManipulatedAsAsciiWithDelimiter()
@@ -156,22 +156,22 @@ class StrTest extends TestCase
         $str = new S('foo🙏bar');
         $splits = $str->split('🙏');
 
-        $this->assertSame('foo', (string) $splits[0]);
-        $this->assertSame('bar', (string) $splits[1]);
+        $this->assertSame('foo', (string) $splits->get(0));
+        $this->assertSame('bar', (string) $splits->get(1));
 
         $splits = $str->toEncoding('ASCII')->split('🙏');
 
-        $this->assertSame('foo', (string) $splits[0]);
-        $this->assertSame('bar', (string) $splits[1]);
+        $this->assertSame('foo', (string) $splits->get(0));
+        $this->assertSame('bar', (string) $splits->get(1));
 
         $splits = $str->toEncoding('ASCII')->split(
             mb_substr('🙏', 0, 1, 'ASCII')
         );
 
-        $this->assertSame('foo', (string) $splits[0]);
+        $this->assertSame('foo', (string) $splits->get(0));
         $this->assertSame(
             mb_substr('🙏', 1, null, 'ASCII').'bar',
-            (string) $splits[1]
+            (string) $splits->get(1)
         );
     }
 
@@ -182,12 +182,12 @@ class StrTest extends TestCase
         $stream = $str->chunk(4);
         $this->assertInstanceOf(StreamInterface::class, $stream);
         $this->assertSame(S::class, (string) $stream->type());
-        $this->assertInstanceOf(S::class, $stream[0]);
-        $this->assertInstanceOf(S::class, $stream[1]);
-        $this->assertInstanceOf(S::class, $stream[2]);
-        $this->assertSame('foob', (string) $stream[0]);
-        $this->assertSame('arba', (string) $stream[1]);
-        $this->assertSame('z', (string) $stream[2]);
+        $this->assertInstanceOf(S::class, $stream->get(0));
+        $this->assertInstanceOf(S::class, $stream->get(1));
+        $this->assertInstanceOf(S::class, $stream->get(2));
+        $this->assertSame('foob', (string) $stream->get(0));
+        $this->assertSame('arba', (string) $stream->get(1));
+        $this->assertSame('z', (string) $stream->get(2));
     }
 
     public function testChunkUtf8ManipulatedAsAscii()
@@ -196,31 +196,31 @@ class StrTest extends TestCase
             ->toEncoding('ASCII')
             ->chunk();
 
-        $this->assertSame('f', (string) $splits[0]);
-        $this->assertSame('o', (string) $splits[1]);
-        $this->assertSame('o', (string) $splits[2]);
+        $this->assertSame('f', (string) $splits->get(0));
+        $this->assertSame('o', (string) $splits->get(1));
+        $this->assertSame('o', (string) $splits->get(2));
         $this->assertSame(
             '🙏',
-            $splits[3].$splits[4].$splits[5].$splits[6]
+            $splits->get(3).$splits->get(4).$splits->get(5).$splits->get(6)
         );
-        $this->assertSame('b', (string) $splits[7]);
-        $this->assertSame('a', (string) $splits[8]);
-        $this->assertSame('r', (string) $splits[9]);
+        $this->assertSame('b', (string) $splits->get(7));
+        $this->assertSame('a', (string) $splits->get(8));
+        $this->assertSame('r', (string) $splits->get(9));
 
         $splits = (new S('foo🙏bar'))
             ->toEncoding('ASCII')
             ->chunk(3);
 
-        $this->assertSame('foo', (string) $splits[0]);
+        $this->assertSame('foo', (string) $splits->get(0));
         $this->assertSame(
             mb_substr('🙏', 0, 3, 'ASCII'),
-            (string) $splits[1]
+            (string) $splits->get(1)
         );
         $this->assertSame(
             mb_substr('🙏', 3, 4, 'ASCII').'ba',
-            (string) $splits[2]
+            (string) $splits->get(2)
         );
-        $this->assertSame('r', (string) $splits[3]);
+        $this->assertSame('r', (string) $splits->get(3));
     }
 
     public function testPosition()
@@ -499,8 +499,8 @@ class StrTest extends TestCase
         ];
 
         foreach ($words as $pos => $word) {
-            $this->assertInstanceOf(S::class, $map[$pos]);
-            $this->assertSame($word, (string) $map[$pos]);
+            $this->assertInstanceOf(S::class, $map->get($pos));
+            $this->assertSame($word, (string) $map->get($pos));
         }
 
         $map = $str->words('àáãç3');
@@ -517,8 +517,8 @@ class StrTest extends TestCase
         ];
 
         foreach ($words as $pos => $word) {
-            $this->assertInstanceOf(S::class, $map[$pos]);
-            $this->assertSame($word, (string) $map[$pos]);
+            $this->assertInstanceOf(S::class, $map->get($pos));
+            $this->assertSame($word, (string) $map->get($pos));
         }
     }
 
@@ -529,9 +529,9 @@ class StrTest extends TestCase
         $c = $str->pregSplit('/[\s,]+/');
         $this->assertInstanceOf(StreamInterface::class, $c);
         $this->assertSame(S::class, (string) $c->type());
-        $this->assertSame('hypertext', (string) $c[0]);
-        $this->assertSame('language', (string) $c[1]);
-        $this->assertSame('programming', (string) $c[2]);
+        $this->assertSame('hypertext', (string) $c->get(0));
+        $this->assertSame('language', (string) $c->get(1));
+        $this->assertSame('programming', (string) $c->get(2));
     }
 
     public function testMatches()
@@ -562,9 +562,9 @@ class StrTest extends TestCase
         $this->assertSame('scalar', (string) $map->keyType());
         $this->assertSame(S::class, (string) $map->valueType());
         $this->assertCount(3, $map);
-        $this->assertSame('http://www.php.net', (string) $map[0]);
-        $this->assertSame('www.php.net', (string) $map[1]);
-        $this->assertSame('www.php.net', (string) $map['host']);
+        $this->assertSame('http://www.php.net', (string) $map->get(0));
+        $this->assertSame('www.php.net', (string) $map->get(1));
+        $this->assertSame('www.php.net', (string) $map->get('host'));
     }
 
     public function testCastNullValuesWhenCapturing()

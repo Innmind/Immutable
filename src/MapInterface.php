@@ -7,7 +7,7 @@ namespace Innmind\Immutable;
  * @template T
  * @template S
  */
-interface MapInterface extends SizeableInterface, \Countable, \ArrayAccess
+interface MapInterface extends SizeableInterface, \Countable
 {
     /**
      * @param string $keyType Type T

@@ -28,7 +28,6 @@ class DoubleIndexTest extends TestCase
         $this->assertInstanceOf(MapInterface::class, $m);
         $this->assertInstanceOf(SizeableInterface::class, $m);
         $this->assertInstanceOf(\Countable::class, $m);
-        $this->assertInstanceOf(\ArrayAccess::class, $m);
         $this->assertInstanceOf(Str::class, $m->keyType());
         $this->assertInstanceOf(Str::class, $m->valueType());
         $this->assertSame('int', (string) $m->keyType());
@@ -65,43 +64,6 @@ class DoubleIndexTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
 
         (new DoubleIndex('int', 'int'))->put(42, 42.0);
-    }
-
-    public function testArrayAccess()
-    {
-        $m = new DoubleIndex('stdClass', 'stdClass');
-        $m = $m->put($k = new \stdClass, $v = new \stdClass);
-
-        $this->assertTrue(isset($m[$k]));
-        $this->assertSame($v, $m[$k]);
-    }
-
-    public function testThrowWhenInjectingData()
-    {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('You can\'t modify a map');
-
-        $m = new DoubleIndex('int', 'int');
-        $m[24] = 42;
-    }
-
-    public function testThrowWhenDeletingData()
-    {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('You can\'t modify a map');
-
-        $m = new DoubleIndex('int', 'int');
-        $m = $m->put(24, 42);
-
-        unset($m[24]);
-    }
-
-    public function testThrowWhenUnknownOffset()
-    {
-        $this->expectException(ElementNotFoundException::class);
-
-        $m = new DoubleIndex('int', 'int');
-        $m[24];
     }
 
     public function testThrowWhenKeyDoesntMatchType()

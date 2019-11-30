@@ -28,7 +28,6 @@ class ObjectKeysTest extends TestCase
         $this->assertInstanceOf(MapInterface::class, $m);
         $this->assertInstanceOf(SizeableInterface::class, $m);
         $this->assertInstanceOf(\Countable::class, $m);
-        $this->assertInstanceOf(\ArrayAccess::class, $m);
         $this->assertInstanceOf(Str::class, $m->keyType());
         $this->assertInstanceOf(Str::class, $m->valueType());
         $this->assertSame('stdClass', (string) $m->keyType());
@@ -72,43 +71,6 @@ class ObjectKeysTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
 
         (new ObjectKeys('stdClass', 'int'))->put(new \stdClass, 42.0);
-    }
-
-    public function testArrayAccess()
-    {
-        $m = new ObjectKeys('stdClass', 'stdClass');
-        $m = $m->put($k = new \stdClass, $v = new \stdClass);
-
-        $this->assertTrue(isset($m[$k]));
-        $this->assertSame($v, $m[$k]);
-    }
-
-    public function testThrowWhenInjectingData()
-    {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('You can\'t modify a map');
-
-        $m = new ObjectKeys('stdClass', 'int');
-        $m[new \stdClass] = 42;
-    }
-
-    public function testThrowWhenDeletingData()
-    {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('You can\'t modify a map');
-
-        $m = new ObjectKeys('stdClass', 'int');
-        $m = $m->put($a = new \stdClass, 42);
-
-        unset($m[$a]);
-    }
-
-    public function testThrowWhenUnknownOffset()
-    {
-        $this->expectException(ElementNotFoundException::class);
-
-        $m = new ObjectKeys('stdClass', 'int');
-        $m[new \stdClass];
     }
 
     public function testThrowWhenKeyDoesntMatchType()

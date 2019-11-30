@@ -27,7 +27,6 @@ class PrimitiveTest extends TestCase
         $this->assertInstanceOf(MapInterface::class, $m);
         $this->assertInstanceOf(SizeableInterface::class, $m);
         $this->assertInstanceOf(\Countable::class, $m);
-        $this->assertInstanceOf(\ArrayAccess::class, $m);
         $this->assertInstanceOf(Str::class, $m->keyType());
         $this->assertInstanceOf(Str::class, $m->valueType());
         $this->assertSame('int', (string) $m->keyType());
@@ -78,43 +77,6 @@ class PrimitiveTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
 
         (new Primitive('int', 'int'))->put(42, 42.0);
-    }
-
-    public function testArrayAccess()
-    {
-        $m = new Primitive('int', 'stdClass');
-        $m = $m->put(24, $v = new \stdClass);
-
-        $this->assertTrue(isset($m[24]));
-        $this->assertSame($v, $m[24]);
-    }
-
-    public function testThrowWhenInjectingData()
-    {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('You can\'t modify a map');
-
-        $m = new Primitive('int', 'int');
-        $m[24] = 42;
-    }
-
-    public function testThrowWhenDeletingData()
-    {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('You can\'t modify a map');
-
-        $m = new Primitive('int', 'int');
-        $m = $m->put(24, 42);
-
-        unset($m[24]);
-    }
-
-    public function testThrowWhenUnknownOffset()
-    {
-        $this->expectException(ElementNotFoundException::class);
-
-        $m = new Primitive('int', 'int');
-        $m[24];
     }
 
     public function testThrowWhenKeyDoesntMatchType()

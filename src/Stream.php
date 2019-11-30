@@ -71,38 +71,6 @@ class Stream implements StreamInterface
     /**
      * {@inheritdoc}
      */
-    public function offsetExists($offset): bool
-    {
-        return $this->values->offsetExists($offset);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function offsetGet($offset)
-    {
-        return $this->get($offset);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function offsetSet($offset, $value): void
-    {
-        throw new LogicException('You can\'t modify a stream');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function offsetUnset($offset): void
-    {
-        throw new LogicException('You can\'t modify a stream');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function get(int $index)
     {
         return $this->values->get($index);

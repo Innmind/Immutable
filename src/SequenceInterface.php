@@ -6,7 +6,7 @@ namespace Innmind\Immutable;
 /**
  * Collection of elements in a determined order (maybe with duplicates)
  */
-interface SequenceInterface extends SizeableInterface, \Countable, \ArrayAccess
+interface SequenceInterface extends SizeableInterface, \Countable
 {
     /**
      * Return the element at the given index

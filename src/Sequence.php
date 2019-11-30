@@ -47,38 +47,6 @@ class Sequence implements SequenceInterface
         return $this->size();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function offsetExists($offset): bool
-    {
-        return $this->has($offset);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function offsetGet($offset)
-    {
-        return $this->get($offset);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function offsetSet($offset, $value): void
-    {
-        throw new LogicException('You can\'t modify a sequence');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function offsetUnset($offset): void
-    {
-        throw new LogicException('You can\'t modify a sequence');
-    }
-
     public function toArray(): array
     {
         return $this->values;

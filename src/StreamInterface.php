@@ -8,7 +8,7 @@ namespace Innmind\Immutable;
  *
  * @template T
  */
-interface StreamInterface extends SizeableInterface, \Countable, \ArrayAccess
+interface StreamInterface extends SizeableInterface, \Countable
 {
     /**
      * Type of the elements

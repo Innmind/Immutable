@@ -81,38 +81,6 @@ final class DoubleIndex implements MapInterface
     /**
      * {@inheritdoc}
      */
-    public function offsetExists($offset): bool
-    {
-        return $this->keys->contains($offset);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function offsetGet($offset)
-    {
-        return $this->get($offset);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function offsetSet($offset, $value): void
-    {
-        throw new LogicException('You can\'t modify a map');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function offsetUnset($offset): void
-    {
-        throw new LogicException('You can\'t modify a map');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function put($key, $value): MapInterface
     {
         $this->keySpecification->validate($key);
