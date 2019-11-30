@@ -5,11 +5,11 @@ namespace Innmind\Immutable;
 
 final class NumericRange implements \Iterator
 {
-    private $start;
-    private $end;
-    private $step;
-    private $key;
-    private $current;
+    private float $start;
+    private float $end;
+    private float $step;
+    private int $key;
+    private float $current;
 
     public function __construct(float $start, float $end, float $step = 1)
     {

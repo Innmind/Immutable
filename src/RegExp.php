@@ -10,7 +10,7 @@ use Innmind\Immutable\Exception\{
 
 final class RegExp
 {
-    private $pattern;
+    private string $pattern;
 
     public function __construct(string $pattern)
     {

@@ -14,9 +14,9 @@ use Innmind\Immutable\Exception\{
  */
 final class Stream implements StreamInterface
 {
-    private $type;
-    private $spec;
-    private $values;
+    private Str $type;
+    private SpecificationInterface $spec;
+    private Sequence $values;
 
     public function __construct(string $type)
     {

@@ -13,6 +13,7 @@ use Innmind\Immutable\{
     SetInterface,
     Set,
     Pair,
+    SpecificationInterface,
     Specification\ClassType,
     Exception\InvalidArgumentException,
     Exception\LogicException,
@@ -25,11 +26,11 @@ use Innmind\Immutable\{
  */
 final class ObjectKeys implements MapInterface
 {
-    private $keyType;
-    private $valueType;
-    private $keySpecification;
-    private $valueSpecification;
-    private $values;
+    private Str $keyType;
+    private Str $valueType;
+    private SpecificationInterface $keySpecification;
+    private SpecificationInterface $valueSpecification;
+    private \SplObjectStorage $values;
 
     /**
      * {@inheritdoc}

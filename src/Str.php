@@ -20,8 +20,8 @@ final class Str
     private const PREG_SPLIT_OFFSET_CAPTURE = PREG_SPLIT_OFFSET_CAPTURE;
     private const PREG_OFFSET_CAPTURE = PREG_OFFSET_CAPTURE;
 
-    private $value;
-    private $encoding;
+    private string $value;
+    private ?string $encoding;
 
     public function __construct(string $value, string $encoding = null)
     {

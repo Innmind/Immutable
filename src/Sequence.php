@@ -15,8 +15,8 @@ use Innmind\Immutable\{
  */
 final class Sequence implements SequenceInterface
 {
-    private $values;
-    private $size;
+    private array $values;
+    private ?int $size;
 
     public function __construct(...$values)
     {

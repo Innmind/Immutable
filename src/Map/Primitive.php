@@ -13,6 +13,7 @@ use Innmind\Immutable\{
     SetInterface,
     Set,
     Pair,
+    SpecificationInterface,
     Exception\InvalidArgumentException,
     Exception\LogicException,
     Exception\ElementNotFoundException,
@@ -24,12 +25,12 @@ use Innmind\Immutable\{
  */
 final class Primitive implements MapInterface
 {
-    private $keyType;
-    private $valueType;
-    private $keySpecification;
-    private $valueSpecification;
-    private $values;
-    private $size;
+    private Str $keyType;
+    private Str $valueType;
+    private SpecificationInterface $keySpecification;
+    private SpecificationInterface $valueSpecification;
+    private array $values;
+    private ?int $size;
 
     /**
      * {@inheritdoc}

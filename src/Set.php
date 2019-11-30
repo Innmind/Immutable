@@ -7,9 +7,9 @@ use Innmind\Immutable\Exception\InvalidArgumentException;
 
 final class Set implements SetInterface
 {
-    private $type;
-    private $spec;
-    private $values;
+    private Str $type;
+    private SpecificationInterface $spec;
+    private Stream $values;
 
     /**
      * {@inheritdoc}

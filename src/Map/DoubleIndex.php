@@ -13,6 +13,7 @@ use Innmind\Immutable\{
     SetInterface,
     Set,
     Pair,
+    SpecificationInterface,
     Exception\InvalidArgumentException,
     Exception\LogicException,
     Exception\ElementNotFoundException,
@@ -24,13 +25,13 @@ use Innmind\Immutable\{
  */
 final class DoubleIndex implements MapInterface
 {
-    private $keyType;
-    private $valueType;
-    private $keySpecification;
-    private $valueSpecification;
-    private $keys;
-    private $values;
-    private $pairs;
+    private Str $keyType;
+    private Str $valueType;
+    private SpecificationInterface $keySpecification;
+    private SpecificationInterface $valueSpecification;
+    private Stream $keys;
+    private Stream $values;
+    private Stream $pairs;
 
     /**
      * {@inheritdoc}

@@ -16,7 +16,7 @@ use Innmind\Immutable\{
  */
 final class Map implements MapInterface
 {
-    private $implementation;
+    private MapInterface $implementation;
 
     /**
      * {@inheritdoc}
