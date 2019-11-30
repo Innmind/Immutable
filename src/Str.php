@@ -85,7 +85,6 @@ final class Str
     public function chunk(int $size = 1): Stream
     {
         $stream = new Stream(self::class);
-        $string = $this;
         $parts = \mb_str_split($this->value, $size, (string) $this->encoding());
 
         foreach ($parts as $value) {
