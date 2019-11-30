@@ -304,7 +304,7 @@ class DoubleIndexTest extends TestCase
         $k = $m->keys();
         $this->assertInstanceOf(SetInterface::class, $k);
         $this->assertSame('int', (string) $k->type());
-        $this->assertSame([0, 1, 2, 4], $k->toPrimitive());
+        $this->assertSame([0, 1, 2, 4], $k->toArray());
         $this->assertTrue($k->equals($m->keys()));
     }
 
@@ -320,7 +320,7 @@ class DoubleIndexTest extends TestCase
         $v = $m->values();
         $this->assertInstanceOf(StreamInterface::class, $v);
         $this->assertSame('int', (string) $v->type());
-        $this->assertSame([1, 2, 3, 5, 5], $v->toPrimitive());
+        $this->assertSame([1, 2, 3, 5, 5], $v->toArray());
         $this->assertTrue($v->equals($m->values()));
     }
 
@@ -343,10 +343,10 @@ class DoubleIndexTest extends TestCase
         $this->assertInstanceOf(DoubleIndex::class, $m2);
         $this->assertSame($m->keyType(), $m2->keyType());
         $this->assertSame($m->valueType(), $m2->valueType());
-        $this->assertSame([0, 1, 2, 4], $m->keys()->toPrimitive());
-        $this->assertSame([1, 2, 3, 5], $m->values()->toPrimitive());
-        $this->assertSame([10, 1, 12, 14], $m2->keys()->toPrimitive());
-        $this->assertSame([1, 4, 3, 5], $m2->values()->toPrimitive());
+        $this->assertSame([0, 1, 2, 4], $m->keys()->toArray());
+        $this->assertSame([1, 2, 3, 5], $m->values()->toArray());
+        $this->assertSame([10, 1, 12, 14], $m2->keys()->toArray());
+        $this->assertSame([1, 4, 3, 5], $m2->values()->toArray());
     }
 
     public function testThrowWhenTryingToModifyValueTypeInTheMap()
@@ -395,32 +395,32 @@ class DoubleIndexTest extends TestCase
 
         $m2 = $m->remove(12);
         $this->assertSame($m, $m2);
-        $this->assertSame([0, 1, 2, 3, 4], $m->keys()->toPrimitive());
-        $this->assertSame([1, 2, 3, 4, 5], $m->values()->toPrimitive());
+        $this->assertSame([0, 1, 2, 3, 4], $m->keys()->toArray());
+        $this->assertSame([1, 2, 3, 4, 5], $m->values()->toArray());
 
         $m2 = $m->remove(3);
         $this->assertNotSame($m, $m2);
         $this->assertInstanceOf(DoubleIndex::class, $m2);
-        $this->assertSame([0, 1, 2, 3, 4], $m->keys()->toPrimitive());
-        $this->assertSame([1, 2, 3, 4, 5], $m->values()->toPrimitive());
-        $this->assertSame([0, 1, 2, 4], $m2->keys()->toPrimitive());
-        $this->assertSame([1, 2, 3, 5], $m2->values()->toPrimitive());
+        $this->assertSame([0, 1, 2, 3, 4], $m->keys()->toArray());
+        $this->assertSame([1, 2, 3, 4, 5], $m->values()->toArray());
+        $this->assertSame([0, 1, 2, 4], $m2->keys()->toArray());
+        $this->assertSame([1, 2, 3, 5], $m2->values()->toArray());
 
         $m2 = $m->remove(4);
         $this->assertNotSame($m, $m2);
         $this->assertInstanceOf(DoubleIndex::class, $m2);
-        $this->assertSame([0, 1, 2, 3, 4], $m->keys()->toPrimitive());
-        $this->assertSame([1, 2, 3, 4, 5], $m->values()->toPrimitive());
-        $this->assertSame([0, 1, 2, 3], $m2->keys()->toPrimitive());
-        $this->assertSame([1, 2, 3, 4], $m2->values()->toPrimitive());
+        $this->assertSame([0, 1, 2, 3, 4], $m->keys()->toArray());
+        $this->assertSame([1, 2, 3, 4, 5], $m->values()->toArray());
+        $this->assertSame([0, 1, 2, 3], $m2->keys()->toArray());
+        $this->assertSame([1, 2, 3, 4], $m2->values()->toArray());
 
         $m2 = $m->remove(0);
         $this->assertNotSame($m, $m2);
         $this->assertInstanceOf(DoubleIndex::class, $m2);
-        $this->assertSame([0, 1, 2, 3, 4], $m->keys()->toPrimitive());
-        $this->assertSame([1, 2, 3, 4, 5], $m->values()->toPrimitive());
-        $this->assertSame([1, 2, 3, 4], $m2->keys()->toPrimitive());
-        $this->assertSame([2, 3, 4, 5], $m2->values()->toPrimitive());
+        $this->assertSame([0, 1, 2, 3, 4], $m->keys()->toArray());
+        $this->assertSame([1, 2, 3, 4, 5], $m->values()->toArray());
+        $this->assertSame([1, 2, 3, 4], $m2->keys()->toArray());
+        $this->assertSame([2, 3, 4, 5], $m2->values()->toArray());
     }
 
     public function testMerge()
@@ -440,12 +440,12 @@ class DoubleIndexTest extends TestCase
         $this->assertSame($m->keyType(), $m3->keyType());
         $this->assertSame($m->valueType(), $m3->valueType());
         $this->assertSame(4, $m3->size());
-        $this->assertSame([$s, $s2], $m->keys()->toPrimitive());
-        $this->assertSame([24, 42], $m->values()->toPrimitive());
-        $this->assertSame([$s3, $s2, $s4], $m2->keys()->toPrimitive());
-        $this->assertSame([24, 66, 42], $m2->values()->toPrimitive());
-        $this->assertSame([$s, $s2, $s3, $s4], $m3->keys()->toPrimitive());
-        $this->assertSame([24, 66, 24, 42], $m3->values()->toPrimitive());
+        $this->assertSame([$s, $s2], $m->keys()->toArray());
+        $this->assertSame([24, 42], $m->values()->toArray());
+        $this->assertSame([$s3, $s2, $s4], $m2->keys()->toArray());
+        $this->assertSame([24, 66, 42], $m2->values()->toArray());
+        $this->assertSame([$s, $s2, $s3, $s4], $m3->keys()->toArray());
+        $this->assertSame([24, 66, 24, 42], $m3->values()->toArray());
         $this->assertFalse($m3->equals($m2->merge($m)));
     }
 
@@ -476,7 +476,7 @@ class DoubleIndexTest extends TestCase
         $this->assertSame(MapInterface::class, (string) $p->valueType());
         $this->assertSame(
             [true, false],
-            $p->keys()->toPrimitive()
+            $p->keys()->toArray()
         );
         $this->assertSame('int', (string) $p->get(true)->keyType());
         $this->assertSame('int', (string) $p->get(true)->valueType());
@@ -484,19 +484,19 @@ class DoubleIndexTest extends TestCase
         $this->assertSame('int', (string) $p->get(false)->valueType());
         $this->assertSame(
             [1, 4],
-            $p->get(true)->keys()->toPrimitive()
+            $p->get(true)->keys()->toArray()
         );
         $this->assertSame(
             [2, 5],
-            $p->get(true)->values()->toPrimitive()
+            $p->get(true)->values()->toArray()
         );
         $this->assertSame(
             [0, 2, 3],
-            $p->get(false)->keys()->toPrimitive()
+            $p->get(false)->keys()->toArray()
         );
         $this->assertSame(
             [1, 3, 4],
-            $p->get(false)->values()->toPrimitive()
+            $p->get(false)->values()->toArray()
         );
     }
 
@@ -513,8 +513,8 @@ class DoubleIndexTest extends TestCase
         );
 
         $this->assertSame(2.625, $v);
-        $this->assertSame([4], $m->keys()->toPrimitive());
-        $this->assertSame([4], $m->values()->toPrimitive());
+        $this->assertSame([4], $m->keys()->toArray());
+        $this->assertSame([4], $m->values()->toArray());
     }
 
     public function testEmpty()

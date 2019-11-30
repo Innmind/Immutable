@@ -25,11 +25,10 @@ class StreamTest extends TestCase
 
         $this->assertInstanceOf(StreamInterface::class, $stream);
         $this->assertInstanceOf(SizeableInterface::class, $stream);
-        $this->assertInstanceOf(PrimitiveInterface::class, $stream);
         $this->assertInstanceOf(\Countable::class, $stream);
         $this->assertInstanceOf(\Iterator::class, $stream);
         $this->assertInstanceOf(\ArrayAccess::class, $stream);
-        $this->assertSame([], $stream->toPrimitive());
+        $this->assertSame([], $stream->toArray());
     }
 
     public function testOf()
@@ -169,9 +168,9 @@ class StreamTest extends TestCase
         $this->assertSame('int', (string) $a->type());
         $this->assertSame('int', (string) $b->type());
         $this->assertSame('int', (string) $c->type());
-        $this->assertSame([1, 2, 3], $a->toPrimitive());
-        $this->assertSame([3, 4, 5], $b->toPrimitive());
-        $this->assertSame([1, 2], $c->toPrimitive());
+        $this->assertSame([1, 2, 3], $a->toArray());
+        $this->assertSame([3, 4, 5], $b->toArray());
+        $this->assertSame([1, 2], $c->toArray());
     }
 
     public function testDistinct()
@@ -186,8 +185,8 @@ class StreamTest extends TestCase
         $this->assertNotSame($a, $b);
         $this->assertSame('int', (string) $a->type());
         $this->assertSame('int', (string) $b->type());
-        $this->assertSame([1, 1, 1], $a->toPrimitive());
-        $this->assertSame([1], $b->toPrimitive());
+        $this->assertSame([1, 1, 1], $a->toArray());
+        $this->assertSame([1], $b->toArray());
     }
 
     public function testDrop()
@@ -202,8 +201,8 @@ class StreamTest extends TestCase
         $this->assertNotSame($a, $b);
         $this->assertSame('int', (string) $a->type());
         $this->assertSame('int', (string) $b->type());
-        $this->assertSame([1, 3, 5], $a->toPrimitive());
-        $this->assertSame([5], $b->toPrimitive());
+        $this->assertSame([1, 3, 5], $a->toArray());
+        $this->assertSame([5], $b->toArray());
     }
 
     public function testDropEnd()
@@ -218,8 +217,8 @@ class StreamTest extends TestCase
         $this->assertNotSame($a, $b);
         $this->assertSame('int', (string) $a->type());
         $this->assertSame('int', (string) $b->type());
-        $this->assertSame([1, 3, 5], $a->toPrimitive());
-        $this->assertSame([1], $b->toPrimitive());
+        $this->assertSame([1, 3, 5], $a->toArray());
+        $this->assertSame([1], $b->toArray());
     }
 
     public function testEquals()
@@ -264,8 +263,8 @@ class StreamTest extends TestCase
         $this->assertNotSame($a, $b);
         $this->assertSame('int', (string) $a->type());
         $this->assertSame('int', (string) $b->type());
-        $this->assertSame([1, 2, 3, 4], $a->toPrimitive());
-        $this->assertSame([2, 4], $b->toPrimitive());
+        $this->assertSame([1, 2, 3, 4], $a->toArray());
+        $this->assertSame([2, 4], $b->toArray());
     }
 
     public function testForeach()
@@ -301,9 +300,9 @@ class StreamTest extends TestCase
         $this->assertSame('int', (string) $map->get(0)->type());
         $this->assertSame('int', (string) $map->get(1)->type());
         $this->assertSame('int', (string) $map->get(2)->type());
-        $this->assertSame([3], $map->get(0)->toPrimitive());
-        $this->assertSame([1, 4], $map->get(1)->toPrimitive());
-        $this->assertSame([2], $map->get(2)->toPrimitive());
+        $this->assertSame([3], $map->get(0)->toArray());
+        $this->assertSame([1, 4], $map->get(1)->toArray());
+        $this->assertSame([2], $map->get(2)->toArray());
     }
 
     public function testThrowWhenGroupingEmptyStream()
@@ -370,7 +369,7 @@ class StreamTest extends TestCase
 
         $this->assertInstanceOf(StreamInterface::class, $indices);
         $this->assertSame('int', (string) $indices->type());
-        $this->assertSame([0, 1, 2, 3], $indices->toPrimitive());
+        $this->assertSame([0, 1, 2, 3], $indices->toArray());
     }
 
     public function testEmptyIndices()
@@ -380,7 +379,7 @@ class StreamTest extends TestCase
 
         $this->assertInstanceOf(StreamInterface::class, $indices);
         $this->assertSame('int', (string) $indices->type());
-        $this->assertSame([], $indices->toPrimitive());
+        $this->assertSame([], $indices->toArray());
     }
 
     public function testMap()
@@ -398,8 +397,8 @@ class StreamTest extends TestCase
         $this->assertNotSame($a, $b);
         $this->assertSame('int', (string) $a->type());
         $this->assertSame('int', (string) $b->type());
-        $this->assertSame([1, 2, 3, 4], $a->toPrimitive());
-        $this->assertSame([1, 4, 9, 16], $b->toPrimitive());
+        $this->assertSame([1, 2, 3, 4], $a->toArray());
+        $this->assertSame([1, 4, 9, 16], $b->toArray());
     }
 
     public function testThrowWhenTryingToModifyValueTypeInMap()
@@ -427,8 +426,8 @@ class StreamTest extends TestCase
         $this->assertNotSame($a, $b);
         $this->assertSame('int', (string) $a->type());
         $this->assertSame('int', (string) $b->type());
-        $this->assertSame([1, 2], $a->toPrimitive());
-        $this->assertSame([1, 2, 0, 0], $b->toPrimitive());
+        $this->assertSame([1, 2], $a->toArray());
+        $this->assertSame([1, 2, 0, 0], $b->toArray());
     }
 
     public function testThrowWhenPaddingWithDifferentType()
@@ -454,8 +453,8 @@ class StreamTest extends TestCase
         $this->assertSame(StreamInterface::class, (string) $map->valueType());
         $this->assertSame('int', (string) $map->get(true)->type());
         $this->assertSame('int', (string) $map->get(false)->type());
-        $this->assertSame([2, 4], $map->get(true)->toPrimitive());
-        $this->assertSame([1, 3], $map->get(false)->toPrimitive());
+        $this->assertSame([2, 4], $map->get(true)->toArray());
+        $this->assertSame([1, 3], $map->get(false)->toArray());
     }
 
     public function testSlice()
@@ -471,8 +470,8 @@ class StreamTest extends TestCase
         $this->assertNotSame($a, $b);
         $this->assertSame('int', (string) $a->type());
         $this->assertSame('int', (string) $b->type());
-        $this->assertSame([1, 2, 3, 4], $a->toPrimitive());
-        $this->assertSame([2, 3], $b->toPrimitive());
+        $this->assertSame([1, 2, 3, 4], $a->toArray());
+        $this->assertSame([2, 3], $b->toArray());
     }
 
     public function testSplitAt()
@@ -488,11 +487,11 @@ class StreamTest extends TestCase
         $this->assertNotSame($a, $b);
         $this->assertSame('int', (string) $a->type());
         $this->assertSame(StreamInterface::class, (string) $b->type());
-        $this->assertSame([1, 2, 3, 4], $a->toPrimitive());
+        $this->assertSame([1, 2, 3, 4], $a->toArray());
         $this->assertSame('int', (string) $b->first()->type());
         $this->assertSame('int', (string) $b->last()->type());
-        $this->assertSame([1, 2], $b->first()->toPrimitive());
-        $this->assertSame([3, 4], $b->last()->toPrimitive());
+        $this->assertSame([1, 2], $b->first()->toArray());
+        $this->assertSame([3, 4], $b->last()->toArray());
     }
 
     public function testTake()
@@ -508,8 +507,8 @@ class StreamTest extends TestCase
         $this->assertNotSame($a, $b);
         $this->assertSame('int', (string) $a->type());
         $this->assertSame('int', (string) $b->type());
-        $this->assertSame([1, 2, 3, 4], $a->toPrimitive());
-        $this->assertSame([1, 2], $b->toPrimitive());
+        $this->assertSame([1, 2, 3, 4], $a->toArray());
+        $this->assertSame([1, 2], $b->toArray());
     }
 
     public function testTakeEnd()
@@ -525,8 +524,8 @@ class StreamTest extends TestCase
         $this->assertNotSame($a, $b);
         $this->assertSame('int', (string) $a->type());
         $this->assertSame('int', (string) $b->type());
-        $this->assertSame([1, 2, 3, 4], $a->toPrimitive());
-        $this->assertSame([3, 4], $b->toPrimitive());
+        $this->assertSame([1, 2, 3, 4], $a->toArray());
+        $this->assertSame([3, 4], $b->toArray());
     }
 
     public function testAppend()
@@ -545,9 +544,9 @@ class StreamTest extends TestCase
         $this->assertSame('int', (string) $a->type());
         $this->assertSame('int', (string) $b->type());
         $this->assertSame('int', (string) $c->type());
-        $this->assertSame([1, 2], $a->toPrimitive());
-        $this->assertSame([3, 4], $b->toPrimitive());
-        $this->assertSame([3, 4, 1, 2], $c->toPrimitive());
+        $this->assertSame([1, 2], $a->toArray());
+        $this->assertSame([3, 4], $b->toArray());
+        $this->assertSame([3, 4, 1, 2], $c->toArray());
     }
 
     public function testThrowWhenAppendingDifferentTypes()
@@ -574,9 +573,9 @@ class StreamTest extends TestCase
         $this->assertSame('int', (string) $a->type());
         $this->assertSame('int', (string) $b->type());
         $this->assertSame('int', (string) $c->type());
-        $this->assertSame([1, 2], $a->toPrimitive());
-        $this->assertSame([2, 3], $b->toPrimitive());
-        $this->assertSame([2], $c->toPrimitive());
+        $this->assertSame([1, 2], $a->toArray());
+        $this->assertSame([2, 3], $b->toArray());
+        $this->assertSame([2], $c->toArray());
     }
 
     public function testThrowWhenIntersectingDifferentTypes()
@@ -607,8 +606,8 @@ class StreamTest extends TestCase
         $this->assertNotSame($a, $b);
         $this->assertSame('int', (string) $a->type());
         $this->assertSame('int', (string) $b->type());
-        $this->assertSame([], $a->toPrimitive());
-        $this->assertSame([1], $b->toPrimitive());
+        $this->assertSame([], $a->toArray());
+        $this->assertSame([1], $b->toArray());
     }
 
     public function testThrowWhenAddingInvalidType()
@@ -634,8 +633,8 @@ class StreamTest extends TestCase
         $this->assertNotSame($a, $b);
         $this->assertSame('int', (string) $a->type());
         $this->assertSame('int', (string) $b->type());
-        $this->assertSame([1, 2, 3, 3, 4], $a->toPrimitive());
-        $this->assertSame([4, 3, 3, 2, 1], $b->toPrimitive());
+        $this->assertSame([1, 2, 3, 3, 4], $a->toArray());
+        $this->assertSame([4, 3, 3, 2, 1], $b->toArray());
     }
 
     public function testReduce()
@@ -665,8 +664,8 @@ class StreamTest extends TestCase
 
         $this->assertNotSame($stream, $stream2);
         $this->assertSame('int', (string) $stream2->type());
-        $this->assertSame([1, 2, 3], $stream->toPrimitive());
-        $this->assertSame([], $stream2->toPrimitive());
+        $this->assertSame([1, 2, 3], $stream->toArray());
+        $this->assertSame([], $stream2->toArray());
     }
 
     public function testReverse()
@@ -680,8 +679,8 @@ class StreamTest extends TestCase
 
         $this->assertInstanceOf(StreamInterface::class, $reverse);
         $this->assertNotSame($stream, $reverse);
-        $this->assertSame([1, 3, 4, 2], $stream->toPrimitive());
-        $this->assertSame([2, 4, 3, 1], $reverse->toPrimitive());
+        $this->assertSame([1, 3, 4, 2], $stream->toArray());
+        $this->assertSame([2, 4, 3, 1], $reverse->toArray());
     }
 
     public function testEmpty()

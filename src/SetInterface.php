@@ -8,7 +8,7 @@ namespace Innmind\Immutable;
  *
  * @template T
  */
-interface SetInterface extends SizeableInterface, PrimitiveInterface, \Countable, \Iterator
+interface SetInterface extends SizeableInterface, \Countable, \Iterator
 {
     /**
      * @param string $type Type T

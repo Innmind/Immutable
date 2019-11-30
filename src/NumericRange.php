@@ -3,7 +3,7 @@ declare(strict_types = 1);
 
 namespace Innmind\Immutable;
 
-class NumericRange implements PrimitiveInterface, \Iterator
+class NumericRange implements \Iterator
 {
     private $start;
     private $end;
@@ -35,14 +35,6 @@ class NumericRange implements PrimitiveInterface, \Iterator
         return $this->step;
     }
 
-    /**
-     * @return array<float>
-     */
-    public function toPrimitive(): array
-    {
-        return \range($this->start, $this->end, $this->step);
-    }
-
     public function current(): float
     {
         return $this->current;
@@ -67,6 +59,6 @@ class NumericRange implements PrimitiveInterface, \Iterator
 
     public function valid(): bool
     {
-        return $this->current < $this->end;
+        return $this->current <= $this->end;
     }
 }

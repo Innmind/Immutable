@@ -119,10 +119,7 @@ class Sequence implements SequenceInterface
         throw new LogicException('You can\'t modify a sequence');
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function toPrimitive(): array
+    public function toArray(): array
     {
         return $this->values;
     }
@@ -201,7 +198,7 @@ class Sequence implements SequenceInterface
      */
     public function equals(SequenceInterface $seq): bool
     {
-        return $this->values === $seq->toPrimitive();
+        return $this->values === $seq->toArray();
     }
 
     /**
@@ -414,7 +411,7 @@ class Sequence implements SequenceInterface
     public function append(SequenceInterface $seq): SequenceInterface
     {
         $self = new self;
-        $self->values = \array_merge($this->values, $seq->toPrimitive());
+        $self->values = \array_merge($this->values, $seq->toArray());
 
         return $self;
     }

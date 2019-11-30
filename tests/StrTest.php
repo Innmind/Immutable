@@ -20,9 +20,7 @@ class StrTest extends TestCase
     {
         $str = new S('foo');
 
-        $this->assertInstanceOf(PrimitiveInterface::class, $str);
         $this->assertInstanceOf(StringableInterface::class, $str);
-        $this->assertSame('foo', $str->toPrimitive());
         $this->assertSame('foo', (string) $str);
     }
 

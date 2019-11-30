@@ -10,7 +10,7 @@ use Innmind\Immutable\Exception\InvalidArgumentException;
  *
  * @template T
  */
-class Symbol implements PrimitiveInterface
+class Symbol
 {
     private $value;
 
@@ -31,7 +31,7 @@ class Symbol implements PrimitiveInterface
     /**
      * @return T
      */
-    public function toPrimitive()
+    public function value()
     {
         return $this->value;
     }

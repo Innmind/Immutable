@@ -16,11 +16,10 @@ class SymbolTest extends TestCase
     {
         $s = new Symbol('foo');
 
-        $this->assertInstanceOf(PrimitiveInterface::class, $s);
-        $this->assertSame('foo', $s->toPrimitive());
+        $this->assertSame('foo', $s->value());
         $this->assertSame('foo', (string) $s);
 
-        $this->assertSame(42, (new Symbol(42))->toPrimitive());
+        $this->assertSame(42, (new Symbol(42))->value());
     }
 
     public function testThrowWhenInvalidPrimitiveUsed()

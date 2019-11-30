@@ -15,12 +15,11 @@ class IntRangeTest extends TestCase
     {
         $range = new IntRange(0, 10, 1);
 
-        $this->assertInstanceOf(PrimitiveInterface::class, $range);
         $this->assertSame(0, $range->start());
         $this->assertSame(10, $range->end());
         $this->assertSame(1, $range->step());
         $values = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-        $this->assertSame($values, $range->toPrimitive());
+        $this->assertSame($values, \iterator_to_array($range));
 
         foreach ($range as $key => $value) {
             $this->assertSame($values[$key], $value);

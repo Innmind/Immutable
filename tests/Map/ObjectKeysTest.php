@@ -285,7 +285,7 @@ class ObjectKeysTest extends TestCase
         $k = $m->keys();
         $this->assertInstanceOf(SetInterface::class, $k);
         $this->assertSame('stdClass', (string) $k->type());
-        $this->assertSame([$a, $b, $c, $d], $k->toPrimitive());
+        $this->assertSame([$a, $b, $c, $d], $k->toArray());
         $this->assertTrue($k->equals($m->keys()));
     }
 
@@ -301,7 +301,7 @@ class ObjectKeysTest extends TestCase
         $v = $m->values();
         $this->assertInstanceOf(StreamInterface::class, $v);
         $this->assertSame('int', (string) $v->type());
-        $this->assertSame([1, 2, 3, 5, 5], $v->toPrimitive());
+        $this->assertSame([1, 2, 3, 5, 5], $v->toArray());
         $this->assertTrue($v->equals($m->values()));
     }
 
@@ -324,10 +324,10 @@ class ObjectKeysTest extends TestCase
         $this->assertInstanceOf(ObjectKeys::class, $m2);
         $this->assertSame($m->keyType(), $m2->keyType());
         $this->assertSame($m->valueType(), $m2->valueType());
-        $this->assertSame([$a, $b, $c, $d], $m->keys()->toPrimitive());
-        $this->assertSame([1, 2, 3, 4], $m->values()->toPrimitive());
-        $this->assertSame([$a, $b, $c, $d], $m2->keys()->toPrimitive());
-        $this->assertSame([1, 12, 9, 14], $m2->values()->toPrimitive());
+        $this->assertSame([$a, $b, $c, $d], $m->keys()->toArray());
+        $this->assertSame([1, 2, 3, 4], $m->values()->toArray());
+        $this->assertSame([$a, $b, $c, $d], $m2->keys()->toArray());
+        $this->assertSame([1, 12, 9, 14], $m2->values()->toArray());
     }
 
     public function testThrowWhenTryingToModifyValueTypeInTheMap()
@@ -376,32 +376,32 @@ class ObjectKeysTest extends TestCase
 
         $m2 = $m->remove(new \stdClass);
         $this->assertSame($m, $m2);
-        $this->assertSame([$a, $b, $c, $d, $e], $m->keys()->toPrimitive());
-        $this->assertSame([1, 2, 3, 4, 5], $m->values()->toPrimitive());
+        $this->assertSame([$a, $b, $c, $d, $e], $m->keys()->toArray());
+        $this->assertSame([1, 2, 3, 4, 5], $m->values()->toArray());
 
         $m2 = $m->remove($d);
         $this->assertNotSame($m, $m2);
         $this->assertInstanceOf(ObjectKeys::class, $m2);
-        $this->assertSame([$a, $b, $c, $d, $e], $m->keys()->toPrimitive());
-        $this->assertSame([1, 2, 3, 4, 5], $m->values()->toPrimitive());
-        $this->assertSame([$a, $b, $c, $e], $m2->keys()->toPrimitive());
-        $this->assertSame([1, 2, 3, 5], $m2->values()->toPrimitive());
+        $this->assertSame([$a, $b, $c, $d, $e], $m->keys()->toArray());
+        $this->assertSame([1, 2, 3, 4, 5], $m->values()->toArray());
+        $this->assertSame([$a, $b, $c, $e], $m2->keys()->toArray());
+        $this->assertSame([1, 2, 3, 5], $m2->values()->toArray());
 
         $m2 = $m->remove($e);
         $this->assertNotSame($m, $m2);
         $this->assertInstanceOf(ObjectKeys::class, $m2);
-        $this->assertSame([$a, $b, $c, $d, $e], $m->keys()->toPrimitive());
-        $this->assertSame([1, 2, 3, 4, 5], $m->values()->toPrimitive());
-        $this->assertSame([$a, $b, $c, $d], $m2->keys()->toPrimitive());
-        $this->assertSame([1, 2, 3, 4], $m2->values()->toPrimitive());
+        $this->assertSame([$a, $b, $c, $d, $e], $m->keys()->toArray());
+        $this->assertSame([1, 2, 3, 4, 5], $m->values()->toArray());
+        $this->assertSame([$a, $b, $c, $d], $m2->keys()->toArray());
+        $this->assertSame([1, 2, 3, 4], $m2->values()->toArray());
 
         $m2 = $m->remove($a);
         $this->assertNotSame($m, $m2);
         $this->assertInstanceOf(ObjectKeys::class, $m2);
-        $this->assertSame([$a, $b, $c, $d, $e], $m->keys()->toPrimitive());
-        $this->assertSame([1, 2, 3, 4, 5], $m->values()->toPrimitive());
-        $this->assertSame([$b, $c, $d, $e], $m2->keys()->toPrimitive());
-        $this->assertSame([2, 3, 4, 5], $m2->values()->toPrimitive());
+        $this->assertSame([$a, $b, $c, $d, $e], $m->keys()->toArray());
+        $this->assertSame([1, 2, 3, 4, 5], $m->values()->toArray());
+        $this->assertSame([$b, $c, $d, $e], $m2->keys()->toArray());
+        $this->assertSame([2, 3, 4, 5], $m2->values()->toArray());
     }
 
     public function testMerge()
@@ -421,12 +421,12 @@ class ObjectKeysTest extends TestCase
         $this->assertSame($m->keyType(), $m3->keyType());
         $this->assertSame($m->valueType(), $m3->valueType());
         $this->assertSame(4, $m3->size());
-        $this->assertSame([$s, $s2], $m->keys()->toPrimitive());
-        $this->assertSame([24, 42], $m->values()->toPrimitive());
-        $this->assertSame([$s3, $s2, $s4], $m2->keys()->toPrimitive());
-        $this->assertSame([24, 66, 42], $m2->values()->toPrimitive());
-        $this->assertSame([$s, $s2, $s3, $s4], $m3->keys()->toPrimitive());
-        $this->assertSame([24, 66, 24, 42], $m3->values()->toPrimitive());
+        $this->assertSame([$s, $s2], $m->keys()->toArray());
+        $this->assertSame([24, 42], $m->values()->toArray());
+        $this->assertSame([$s3, $s2, $s4], $m2->keys()->toArray());
+        $this->assertSame([24, 66, 42], $m2->values()->toArray());
+        $this->assertSame([$s, $s2, $s3, $s4], $m3->keys()->toArray());
+        $this->assertSame([24, 66, 24, 42], $m3->values()->toArray());
         $this->assertFalse($m3->equals($m2->merge($m)));
     }
 
@@ -457,7 +457,7 @@ class ObjectKeysTest extends TestCase
         $this->assertSame(MapInterface::class, (string) $p->valueType());
         $this->assertSame(
             [true, false],
-            $p->keys()->toPrimitive()
+            $p->keys()->toArray()
         );
         $this->assertSame('stdClass', (string) $p->get(true)->keyType());
         $this->assertSame('int', (string) $p->get(true)->valueType());
@@ -465,19 +465,19 @@ class ObjectKeysTest extends TestCase
         $this->assertSame('int', (string) $p->get(false)->valueType());
         $this->assertSame(
             [$b, $d],
-            $p->get(true)->keys()->toPrimitive()
+            $p->get(true)->keys()->toArray()
         );
         $this->assertSame(
             [2, 4],
-            $p->get(true)->values()->toPrimitive()
+            $p->get(true)->values()->toArray()
         );
         $this->assertSame(
             [$a, $c, $e],
-            $p->get(false)->keys()->toPrimitive()
+            $p->get(false)->keys()->toArray()
         );
         $this->assertSame(
             [1, 3, 5],
-            $p->get(false)->values()->toPrimitive()
+            $p->get(false)->values()->toArray()
         );
     }
 
@@ -494,8 +494,8 @@ class ObjectKeysTest extends TestCase
         );
 
         $this->assertSame(10.5, $v);
-        $this->assertSame([$a], $m->keys()->toPrimitive());
-        $this->assertSame([4], $m->values()->toPrimitive());
+        $this->assertSame([$a], $m->keys()->toArray());
+        $this->assertSame([4], $m->values()->toArray());
     }
 
     public function testEmpty()

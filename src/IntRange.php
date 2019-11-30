@@ -3,7 +3,7 @@ declare(strict_types = 1);
 
 namespace Innmind\Immutable;
 
-class IntRange implements PrimitiveInterface, \Iterator
+class IntRange implements \Iterator
 {
     private $start;
     private $end;
@@ -35,14 +35,6 @@ class IntRange implements PrimitiveInterface, \Iterator
         return $this->step;
     }
 
-    /**
-     * @return array<int>
-     */
-    public function toPrimitive(): array
-    {
-        return \range($this->start, $this->end, $this->step);
-    }
-
     public function current(): int
     {
         return $this->current;
@@ -67,6 +59,6 @@ class IntRange implements PrimitiveInterface, \Iterator
 
     public function valid(): bool
     {
-        return $this->current < $this->end;
+        return $this->current <= $this->end;
     }
 }

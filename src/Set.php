@@ -53,12 +53,9 @@ class Set implements SetInterface
         return $this->values->size();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function toPrimitive(): array
+    public function toArray(): array
     {
-        return $this->values->toPrimitive();
+        return $this->values->toArray();
     }
 
     /**

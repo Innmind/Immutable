@@ -24,7 +24,6 @@ class SetTest extends TestCase
 
         $this->assertInstanceOf(SetInterface::class, $s);
         $this->assertInstanceOf(SizeableInterface::class, $s);
-        $this->assertInstanceOf(PrimitiveInterface::class, $s);
         $this->assertInstanceOf(\Countable::class, $s);
         $this->assertInstanceOf(\Iterator::class, $s);
         $this->assertInstanceOf(Str::class, $s->type());
@@ -58,7 +57,7 @@ class SetTest extends TestCase
         $this->assertSame(2, $s->size());
         $s = $s->add(24);
         $this->assertSame(2, $s->size());
-        $this->assertSame([42, 24], $s->toPrimitive());
+        $this->assertSame([42, 24], $s->toArray());
     }
 
     public function testThrowWhenAddindInvalidElementType()
@@ -101,8 +100,8 @@ class SetTest extends TestCase
         $this->assertNotSame($s, $s2);
         $this->assertInstanceOf(Set::class, $s2);
         $this->assertSame($s->type(), $s2->type());
-        $this->assertSame([24, 42, 66], $s->toPrimitive());
-        $this->assertSame([42], $s2->toPrimitive());
+        $this->assertSame([24, 42, 66], $s->toArray());
+        $this->assertSame([42], $s2->toArray());
     }
 
     public function testThrowWhenIntersectingSetsOfDifferentTypes()
@@ -135,12 +134,12 @@ class SetTest extends TestCase
         $this->assertNotSame($s, $s2);
         $this->assertInstanceOf(Set::class, $s2);
         $this->assertSame($s->type(), $s2->type());
-        $this->assertSame([24, 42, 66, 90, 114], $s->toPrimitive());
-        $this->assertSame([24, 66, 90, 114], $s2->toPrimitive());
-        $this->assertSame([42, 66, 90, 114], $s->remove(24)->toPrimitive());
-        $this->assertSame([24, 42, 90, 114], $s->remove(66)->toPrimitive());
-        $this->assertSame([24, 42, 66, 114], $s->remove(90)->toPrimitive());
-        $this->assertSame([24, 42, 66, 90], $s->remove(114)->toPrimitive());
+        $this->assertSame([24, 42, 66, 90, 114], $s->toArray());
+        $this->assertSame([24, 66, 90, 114], $s2->toArray());
+        $this->assertSame([42, 66, 90, 114], $s->remove(24)->toArray());
+        $this->assertSame([24, 42, 90, 114], $s->remove(66)->toArray());
+        $this->assertSame([24, 42, 66, 114], $s->remove(90)->toArray());
+        $this->assertSame([24, 42, 66, 90], $s->remove(114)->toArray());
     }
 
     public function testDiff()
@@ -154,8 +153,8 @@ class SetTest extends TestCase
         $this->assertNotSame($s, $s2);
         $this->assertInstanceOf(Set::class, $s2);
         $this->assertSame($s->type(), $s2->type());
-        $this->assertSame([24, 42, 66], $s->toPrimitive());
-        $this->assertSame([24, 66], $s2->toPrimitive());
+        $this->assertSame([24, 42, 66], $s->toArray());
+        $this->assertSame([24, 66], $s2->toArray());
     }
 
     public function testThrowWhenDiffingSetsOfDifferentType()
@@ -213,8 +212,8 @@ class SetTest extends TestCase
         $this->assertNotSame($s, $s2);
         $this->assertInstanceOf(Set::class, $s2);
         $this->assertSame($s->type(), $s2->type());
-        $this->assertSame([1, 2, 3, 4], $s->toPrimitive());
-        $this->assertSame([2, 4], $s2->toPrimitive());
+        $this->assertSame([1, 2, 3, 4], $s->toArray());
+        $this->assertSame([2, 4], $s2->toArray());
     }
 
     public function testForeach()
@@ -248,9 +247,9 @@ class SetTest extends TestCase
         $this->assertSame(SetInterface::class, (string) $m->valueType());
         $this->assertSame('int', (string) $m->get(0)->type());
         $this->assertSame('int', (string) $m->get(1)->type());
-        $this->assertSame([1, 0], $m->keys()->toPrimitive());
-        $this->assertSame([1, 3], $m->get(1)->toPrimitive());
-        $this->assertSame([2, 4], $m->get(0)->toPrimitive());
+        $this->assertSame([1, 0], $m->keys()->toArray());
+        $this->assertSame([1, 3], $m->get(1)->toArray());
+        $this->assertSame([2, 4], $m->get(0)->toArray());
     }
 
     public function testMap()
@@ -267,8 +266,8 @@ class SetTest extends TestCase
         $this->assertNotSame($s, $s2);
         $this->assertInstanceOf(Set::class, $s2);
         $this->assertSame($s->type(), $s2->type());
-        $this->assertSame([1, 2, 3, 4], $s->toPrimitive());
-        $this->assertSame([1, 4, 9, 16], $s2->toPrimitive());
+        $this->assertSame([1, 2, 3, 4], $s->toArray());
+        $this->assertSame([1, 4, 9, 16], $s2->toArray());
     }
 
     public function testThrowWhenTryingToModifyValueTypeInMap()
@@ -297,13 +296,13 @@ class SetTest extends TestCase
         $this->assertInstanceOf(MapInterface::class, $s2);
         $this->assertSame('bool', (string) $s2->keyType());
         $this->assertSame(SetInterface::class, (string) $s2->valueType());
-        $this->assertSame([1, 2, 3, 4], $s->toPrimitive());
+        $this->assertSame([1, 2, 3, 4], $s->toArray());
         $this->assertInstanceOf(Set::class, $s2->get(true));
         $this->assertInstanceOf(Set::class, $s2->get(false));
         $this->assertSame($s->type(), $s2->get(true)->type());
         $this->assertSame($s->type(), $s2->get(false)->type());
-        $this->assertSame([2, 4], $s2->get(true)->toPrimitive());
-        $this->assertSame([1, 3], $s2->get(false)->toPrimitive());
+        $this->assertSame([2, 4], $s2->get(true)->toArray());
+        $this->assertSame([1, 3], $s2->get(false)->toArray());
     }
 
     public function testJoin()
@@ -316,7 +315,7 @@ class SetTest extends TestCase
 
         $s2 = $s->join(', ');
         $this->assertInstanceOf(Str::class, $s2);
-        $this->assertSame([1, 2, 3, 4], $s->toPrimitive());
+        $this->assertSame([1, 2, 3, 4], $s->toArray());
         $this->assertSame('1, 2, 3, 4', (string) $s2);
     }
 
@@ -333,8 +332,8 @@ class SetTest extends TestCase
         });
         $this->assertInstanceOf(StreamInterface::class, $s2);
         $this->assertSame('int', (string) $s2->type());
-        $this->assertSame([1, 2, 3, 4], $s->toPrimitive());
-        $this->assertSame([4, 3, 2, 1], $s2->toPrimitive());
+        $this->assertSame([1, 2, 3, 4], $s->toArray());
+        $this->assertSame([4, 3, 2, 1], $s2->toArray());
     }
 
     public function testMerge()
@@ -362,9 +361,9 @@ class SetTest extends TestCase
                         ->add(90)
                         ->add(114)
                 )
-                ->toPrimitive()
+                ->toArray()
         );
-        $this->assertSame([24, 42, 66], $s->toPrimitive());
+        $this->assertSame([24, 42, 66], $s->toArray());
         $this->assertSame($s->type(), $s->merge(new Set('int'))->type());
     }
 
@@ -391,7 +390,7 @@ class SetTest extends TestCase
         );
 
         $this->assertSame(1.75, $v);
-        $this->assertSame([4, 3, 2], $s->toPrimitive());
+        $this->assertSame([4, 3, 2], $s->toArray());
     }
 
     public function testVariableSet()
@@ -404,7 +403,7 @@ class SetTest extends TestCase
                 ->add(42.1)
                 ->add(true)
                 ->add([])
-                ->toPrimitive()
+                ->toArray()
         );
     }
 

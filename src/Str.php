@@ -9,7 +9,7 @@ use Innmind\Immutable\{
     Exception\LogicException
 };
 
-class Str implements PrimitiveInterface, StringableInterface
+class Str implements StringableInterface
 {
     private const PAD_RIGHT = STR_PAD_RIGHT;
     private const PAD_LEFT = STR_PAD_LEFT;
@@ -32,14 +32,6 @@ class Str implements PrimitiveInterface, StringableInterface
     public static function of(string $value, string $encoding = null): self
     {
         return new self($value, $encoding);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function toPrimitive(): string
-    {
-        return $this->value;
     }
 
     /**
@@ -251,7 +243,7 @@ class Str implements PrimitiveInterface, StringableInterface
      */
     public function shuffle(): self
     {
-        $parts = $this->chunk()->toPrimitive();
+        $parts = $this->chunk()->toArray();
         \shuffle($parts);
 
         return new self(\implode('', $parts), $this->encoding);
