@@ -13,7 +13,7 @@ use Innmind\Immutable\{
 /**
  * {@inheritdoc}
  */
-final class Sequence implements SequenceInterface
+final class Sequence implements \Countable
 {
     private array $values;
     private ?int $size;
@@ -31,9 +31,6 @@ final class Sequence implements SequenceInterface
         return $self;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function size(): int
     {
         return $this->size ?? $this->size = \count($this->values);
@@ -53,7 +50,11 @@ final class Sequence implements SequenceInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Return the element at the given index
+     *
+     * @throws OutOfBoundException
+     *
+     * @return mixed
      */
     public function get(int $index)
     {
@@ -65,7 +66,7 @@ final class Sequence implements SequenceInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Check the index exist
      */
     public function has(int $index): bool
     {
@@ -73,9 +74,9 @@ final class Sequence implements SequenceInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Return the diff between this sequence and another
      */
-    public function diff(SequenceInterface $seq): SequenceInterface
+    public function diff(self $seq): self
     {
         return $this->filter(static function($value) use ($seq): bool {
             return !$seq->contains($value);
@@ -83,13 +84,13 @@ final class Sequence implements SequenceInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Remove all duplicates from the sequence
      */
-    public function distinct(): SequenceInterface
+    public function distinct(): self
     {
         return $this->reduce(
             new self,
-            static function(SequenceInterface $values, $value): SequenceInterface {
+            static function(self $values, $value): self {
                 if ($values->contains($value)) {
                     return $values;
                 }
@@ -100,9 +101,9 @@ final class Sequence implements SequenceInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Remove the n first elements
      */
-    public function drop(int $size): SequenceInterface
+    public function drop(int $size): self
     {
         $self = new self;
         $self->values = \array_slice($this->values, $size);
@@ -111,9 +112,9 @@ final class Sequence implements SequenceInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Remove the n last elements
      */
-    public function dropEnd(int $size): SequenceInterface
+    public function dropEnd(int $size): self
     {
         $self = new self;
         $self->values = \array_slice($this->values, 0, $this->size() - $size);
@@ -122,17 +123,19 @@ final class Sequence implements SequenceInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Check if the two sequences are equal
      */
-    public function equals(SequenceInterface $seq): bool
+    public function equals(self $seq): bool
     {
         return $this->values === $seq->toArray();
     }
 
     /**
-     * {@inheritdoc}
+     * Return all elements that satisfy the given predicate
+     *
+     * @param callable(mixed): bool $predicate
      */
-    public function filter(callable $predicate): SequenceInterface
+    public function filter(callable $predicate): self
     {
         return new self(...\array_filter(
             $this->values,
@@ -141,9 +144,11 @@ final class Sequence implements SequenceInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Apply the given function to all elements of the sequence
+     *
+     * @param callable(mixed): void $function
      */
-    public function foreach(callable $function): SequenceInterface
+    public function foreach(callable $function): self
     {
         foreach ($this->values as $value) {
             $function($value);
@@ -153,7 +158,12 @@ final class Sequence implements SequenceInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Return a new map of pairs grouped by keys determined with the given
+     * discriminator function
+     *
+     * @param callable(mixed) $discriminator
+     *
+     * @return Map<mixed, self>
      */
     public function groupBy(callable $discriminator): Map
     {
@@ -169,7 +179,7 @@ final class Sequence implements SequenceInterface
             if ($map === null) {
                 $map = new Map(
                     Type::determine($key),
-                    SequenceInterface::class
+                    self::class
                 );
             }
 
@@ -187,7 +197,9 @@ final class Sequence implements SequenceInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Return the first element
+     *
+     * @return mixed
      */
     public function first()
     {
@@ -199,7 +211,9 @@ final class Sequence implements SequenceInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Return the last element
+     *
+     * @return mixed
      */
     public function last()
     {
@@ -211,7 +225,9 @@ final class Sequence implements SequenceInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Check if the sequence contains the given element
+     *
+     * @param mixed $element
      */
     public function contains($element): bool
     {
@@ -219,7 +235,11 @@ final class Sequence implements SequenceInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Return the index for the given element
+     *
+     * @param mixed $element
+     *
+     * @throws ElementNotFoundException
      */
     public function indexOf($element): int
     {
@@ -233,7 +253,9 @@ final class Sequence implements SequenceInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Return the list of indices
+     *
+     * @return Stream<int>
      */
     public function indices(): Stream
     {
@@ -245,9 +267,11 @@ final class Sequence implements SequenceInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Return a new sequence by applying the given function to all elements
+     *
+     * @param callable(mixed) $function
      */
-    public function map(callable $function): SequenceInterface
+    public function map(callable $function): self
     {
         $self = clone $this;
         $self->values = \array_map($function, $this->values);
@@ -256,9 +280,11 @@ final class Sequence implements SequenceInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Pad the sequence to a defined size with the given element
+     *
+     * @param mixed $element
      */
-    public function pad(int $size, $element): SequenceInterface
+    public function pad(int $size, $element): self
     {
         $self = new self;
         $self->values = \array_pad($this->values, $size, $element);
@@ -267,7 +293,11 @@ final class Sequence implements SequenceInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Return a sequence of 2 sequences partitioned according to the given predicate
+     *
+     * @param callable(mixed): bool $predicate
+     *
+     * @return Map<bool, self>
      */
     public function partition(callable $predicate): Map
     {
@@ -287,15 +317,12 @@ final class Sequence implements SequenceInterface
         $false = new self;
         $false->values = $falsy;
 
-        return Map::of('bool', SequenceInterface::class)
+        return Map::of('bool', self::class)
             (true, $true)
             (false, $false);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function slice(int $from, int $until): SequenceInterface
+    public function slice(int $from, int $until): self
     {
         $self = new self;
         $self->values = \array_slice(
@@ -308,35 +335,39 @@ final class Sequence implements SequenceInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Split the sequence in a sequence of 2 sequences splitted at the given position
+     *
+     * @throws OutOfBoundException
+     *
+     * @return Stream<self>
      */
     public function splitAt(int $index): Stream
     {
-        return (new Stream(SequenceInterface::class))
+        return (new Stream(self::class))
             ->add($this->slice(0, $index))
             ->add($this->slice($index, $this->size()));
     }
 
     /**
-     * {@inheritdoc}
+     * Return a sequence with the n first elements
      */
-    public function take(int $size): SequenceInterface
+    public function take(int $size): self
     {
         return $this->slice(0, $size);
     }
 
     /**
-     * {@inheritdoc}
+     * Return a sequence with the n last elements
      */
-    public function takeEnd(int $size): SequenceInterface
+    public function takeEnd(int $size): self
     {
         return $this->slice($this->size() - $size, $this->size());
     }
 
     /**
-     * {@inheritdoc}
+     * Append the given sequence to the current one
      */
-    public function append(SequenceInterface $seq): SequenceInterface
+    public function append(self $seq): self
     {
         $self = new self;
         $self->values = \array_merge($this->values, $seq->toArray());
@@ -345,9 +376,10 @@ final class Sequence implements SequenceInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Return a sequence with all elements from the current one that exist
+     * in the given one
      */
-    public function intersect(SequenceInterface $seq): SequenceInterface
+    public function intersect(self $seq): self
     {
         return $this->filter(static function($value) use ($seq): bool {
             return $seq->contains($value);
@@ -355,7 +387,7 @@ final class Sequence implements SequenceInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Concatenate all elements with the given separator
      */
     public function join(string $separator): Str
     {
@@ -363,9 +395,11 @@ final class Sequence implements SequenceInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Add the given element at the end of the sequence
+     *
+     * @param mixed $element
      */
-    public function add($element): SequenceInterface
+    public function add($element): self
     {
         $self = clone $this;
         $self->values[] = $element;
@@ -375,9 +409,11 @@ final class Sequence implements SequenceInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Sort the sequence in a different order
+     *
+     * @param callable(mixed, mixed): int $function
      */
-    public function sort(callable $function): SequenceInterface
+    public function sort(callable $function): self
     {
         $self = clone $this;
         \usort($self->values, $function);
@@ -386,7 +422,12 @@ final class Sequence implements SequenceInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Reduce the sequence to a single value
+     *
+     * @param mixed $carry
+     * @param callable(mixed, mixed) $reducer
+     *
+     * @return mixed
      */
     public function reduce($carry, callable $reducer)
     {
@@ -394,9 +435,11 @@ final class Sequence implements SequenceInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Return the same sequence but in reverse order
+     *
+     * @return self
      */
-    public function reverse(): SequenceInterface
+    public function reverse(): self
     {
         $self = clone $this;
         $self->values = \array_reverse($this->values);

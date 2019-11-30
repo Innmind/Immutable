@@ -5,9 +5,6 @@ namespace Tests\Innmind\Immutable;
 
 use Innmind\Immutable\{
     Sequence,
-    SequenceInterface,
-    SizeableInterface,
-    PrimitiveInterface,
     Str,
     Map,
     Stream,
@@ -24,8 +21,6 @@ class SequenceTest extends TestCase
     {
         $s = new Sequence(1);
 
-        $this->assertInstanceOf(SequenceInterface::class, $s);
-        $this->assertInstanceOf(SizeableInterface::class, $s);
         $this->assertInstanceOf(\Countable::class, $s);
         $this->assertSame([1], $s->toArray());
     }
@@ -184,7 +179,7 @@ class SequenceTest extends TestCase
         });
         $this->assertInstanceOf(Map::class, $m);
         $this->assertSame('int', (string) $m->keyType());
-        $this->assertSame(SequenceInterface::class, (string) $m->valueType());
+        $this->assertSame(Sequence::class, (string) $m->valueType());
         $this->assertSame(2, $m->size());
         $this->assertSame([1, 0], $m->keys()->toArray());
         $this->assertSame([1, 3], $m->get(1)->toArray());
@@ -303,7 +298,7 @@ class SequenceTest extends TestCase
         $this->assertNotSame($s, $s2);
         $this->assertInstanceOf(Map::class, $s2);
         $this->assertSame('bool', (string) $s2->keyType());
-        $this->assertSame(SequenceInterface::class, (string) $s2->valueType());
+        $this->assertSame(Sequence::class, (string) $s2->valueType());
         $this->assertSame([1, 2, 3, 4], $s->toArray());
         $this->assertSame(2, $s2->size());
         $this->assertSame([2, 4], $s2->get(true)->toArray());
@@ -328,7 +323,7 @@ class SequenceTest extends TestCase
         $s2 = $s->splitAt(3);
         $this->assertNotSame($s, $s2);
         $this->assertInstanceOf(Stream::class, $s2);
-        $this->assertSame(SequenceInterface::class, (string) $s2->type());
+        $this->assertSame(Sequence::class, (string) $s2->type());
         $this->assertSame([3, 1, 2, 4, 5, 6, 7], $s->toArray());
         $this->assertSame(2, $s2->size());
         $this->assertSame([3, 1, 2], $s2->get(0)->toArray());
@@ -447,7 +442,7 @@ class SequenceTest extends TestCase
         $sequence = new Sequence(1, 3, 4, 2);
         $reverse = $sequence->reverse();
 
-        $this->assertInstanceOf(SequenceInterface::class, $reverse);
+        $this->assertInstanceOf(Sequence::class, $reverse);
         $this->assertNotSame($sequence, $reverse);
         $this->assertSame([1, 3, 4, 2], $sequence->toArray());
         $this->assertSame([2, 4, 3, 1], $reverse->toArray());
