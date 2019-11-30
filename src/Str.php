@@ -94,10 +94,10 @@ class Str implements PrimitiveInterface, StringableInterface
     {
         $stream = new Stream(self::class);
         $string = $this;
+        $parts = \mb_str_split($this->value, $size, (string) $this->encoding());
 
-        while ($string->length() > 0) {
-            $stream = $stream->add($string->substring(0, $size));
-            $string = $string->substring($size);
+        foreach ($parts as $value) {
+            $stream = $stream->add(new self($value, $this->encoding));
         }
 
         return $stream;

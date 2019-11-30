@@ -79,6 +79,16 @@ class StrTest extends TestCase
         $this->assertSame('o', (string) $stream[1]);
         $this->assertSame('o', (string) $stream[2]);
 
+        $parts = S::of('🤩👍🤔', 'UTF-8')->split();
+
+        $this->assertSame('🤩', (string) $parts[0]);
+        $this->assertSame('👍', (string) $parts[1]);
+        $this->assertSame('🤔', (string) $parts[2]);
+        $this->assertNotSame(
+            '🤩',
+            (string) S::of('🤩👍🤔', 'ASCII')->split()[0]
+        );
+
         $stream = $str->split('');
         $this->assertInstanceOf(StreamInterface::class, $stream);
         $this->assertSame(S::class, (string) $stream->type());
