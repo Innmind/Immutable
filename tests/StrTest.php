@@ -20,7 +20,6 @@ class StrTest extends TestCase
     {
         $str = new S('foo');
 
-        $this->assertInstanceOf(StringableInterface::class, $str);
         $this->assertSame('foo', (string) $str);
     }
 
