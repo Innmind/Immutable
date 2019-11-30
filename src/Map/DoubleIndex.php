@@ -22,8 +22,8 @@ use Innmind\Immutable\{
  */
 final class DoubleIndex implements Implementation
 {
-    private Str $keyType;
-    private Str $valueType;
+    private string $keyType;
+    private string $valueType;
     private SpecificationInterface $keySpecification;
     private SpecificationInterface $valueSpecification;
     private Stream $keys;
@@ -37,8 +37,8 @@ final class DoubleIndex implements Implementation
     {
         $this->keySpecification = Type::of($keyType);
         $this->valueSpecification = Type::of($valueType);
-        $this->keyType = new Str($keyType);
-        $this->valueType = new Str($valueType);
+        $this->keyType = $keyType;
+        $this->valueType = $valueType;
         $this->keys = new Stream($keyType);
         $this->values = new Stream($valueType);
         $this->pairs = new Stream(Pair::class);
@@ -47,7 +47,7 @@ final class DoubleIndex implements Implementation
     /**
      * {@inheritdoc}
      */
-    public function keyType(): Str
+    public function keyType(): string
     {
         return $this->keyType;
     }
@@ -55,7 +55,7 @@ final class DoubleIndex implements Implementation
     /**
      * {@inheritdoc}
      */
-    public function valueType(): Str
+    public function valueType(): string
     {
         return $this->valueType;
     }
@@ -232,7 +232,7 @@ final class DoubleIndex implements Implementation
      */
     public function keys(): Set
     {
-        return Set::of((string) $this->keyType, ...$this->keys->toArray());
+        return Set::of($this->keyType, ...$this->keys->toArray());
     }
 
     /**
@@ -311,8 +311,8 @@ final class DoubleIndex implements Implementation
     public function merge(Implementation $map): Implementation
     {
         if (
-            !$this->keyType()->equals($map->keyType()) ||
-            !$this->valueType()->equals($map->valueType())
+            $this->keyType !== $map->keyType() ||
+            $this->valueType !== $map->valueType()
         ) {
             throw new InvalidArgumentException(
                 'The 2 maps does not reference the same types'
@@ -375,6 +375,6 @@ final class DoubleIndex implements Implementation
      */
     private function clearMap(): Map
     {
-        return Map::of((string) $this->keyType, (string) $this->valueType);
+        return Map::of($this->keyType, $this->valueType);
     }
 }

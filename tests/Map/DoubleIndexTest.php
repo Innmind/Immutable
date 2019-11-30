@@ -29,10 +29,8 @@ class DoubleIndexTest extends TestCase
         $this->assertInstanceOf(Map\Implementation::class, $m);
         $this->assertInstanceOf(SizeableInterface::class, $m);
         $this->assertInstanceOf(\Countable::class, $m);
-        $this->assertInstanceOf(Str::class, $m->keyType());
-        $this->assertInstanceOf(Str::class, $m->valueType());
-        $this->assertSame('int', (string) $m->keyType());
-        $this->assertSame('float', (string) $m->valueType());
+        $this->assertSame('int', $m->keyType());
+        $this->assertSame('float', $m->valueType());
     }
 
     public function testPut()
@@ -117,8 +115,8 @@ class DoubleIndexTest extends TestCase
         $this->assertInstanceOf(DoubleIndex::class, $m2);
         $this->assertSame(1, $m->size());
         $this->assertSame(0, $m2->size());
-        $this->assertSame('int', (string) $m2->keyType());
-        $this->assertSame('float', (string) $m2->valueType());
+        $this->assertSame('int', $m2->keyType());
+        $this->assertSame('float', $m2->valueType());
     }
 
     public function testEquals()
@@ -213,20 +211,20 @@ class DoubleIndexTest extends TestCase
         });
         $this->assertNotSame($m, $m2);
         $this->assertInstanceOf(Map::class, $m2);
-        $this->assertSame('int', (string) $m2->keyType());
-        $this->assertSame(Map::class, (string) $m2->valueType());
+        $this->assertSame('int', $m2->keyType());
+        $this->assertSame(Map::class, $m2->valueType());
         $this->assertTrue($m2->contains(0));
         $this->assertTrue($m2->contains(1));
         $this->assertTrue($m2->contains(2));
         $this->assertSame(2, $m2->get(0)->size());
         $this->assertSame(1, $m2->get(1)->size());
         $this->assertSame(1, $m2->get(2)->size());
-        $this->assertSame('int', (string) $m2->get(0)->keyType());
-        $this->assertSame('int', (string) $m2->get(0)->valueType());
-        $this->assertSame('int', (string) $m2->get(1)->keyType());
-        $this->assertSame('int', (string) $m2->get(1)->valueType());
-        $this->assertSame('int', (string) $m2->get(2)->keyType());
-        $this->assertSame('int', (string) $m2->get(2)->valueType());
+        $this->assertSame('int', $m2->get(0)->keyType());
+        $this->assertSame('int', $m2->get(0)->valueType());
+        $this->assertSame('int', $m2->get(1)->keyType());
+        $this->assertSame('int', $m2->get(1)->valueType());
+        $this->assertSame('int', $m2->get(2)->keyType());
+        $this->assertSame('int', $m2->get(2)->valueType());
         $this->assertSame(1, $m2->get(1)->get(0));
         $this->assertSame(2, $m2->get(0)->get(1));
         $this->assertSame(3, $m2->get(2)->get(2));
@@ -242,7 +240,7 @@ class DoubleIndexTest extends TestCase
 
         $k = $m->keys();
         $this->assertInstanceOf(Set::class, $k);
-        $this->assertSame('int', (string) $k->type());
+        $this->assertSame('int', $k->type());
         $this->assertSame([0, 1, 2, 4], $k->toArray());
         $this->assertTrue($k->equals($m->keys()));
     }
@@ -258,7 +256,7 @@ class DoubleIndexTest extends TestCase
 
         $v = $m->values();
         $this->assertInstanceOf(Stream::class, $v);
-        $this->assertSame('int', (string) $v->type());
+        $this->assertSame('int', $v->type());
         $this->assertSame([1, 2, 3, 5, 5], $v->toArray());
         $this->assertTrue($v->equals($m->values()));
     }
@@ -411,16 +409,16 @@ class DoubleIndexTest extends TestCase
 
         $this->assertInstanceOf(Map::class, $p);
         $this->assertNotSame($p, $m);
-        $this->assertSame('bool', (string) $p->keyType());
-        $this->assertSame(Map::class, (string) $p->valueType());
+        $this->assertSame('bool', $p->keyType());
+        $this->assertSame(Map::class, $p->valueType());
         $this->assertSame(
             [true, false],
             $p->keys()->toArray()
         );
-        $this->assertSame('int', (string) $p->get(true)->keyType());
-        $this->assertSame('int', (string) $p->get(true)->valueType());
-        $this->assertSame('int', (string) $p->get(false)->keyType());
-        $this->assertSame('int', (string) $p->get(false)->valueType());
+        $this->assertSame('int', $p->get(true)->keyType());
+        $this->assertSame('int', $p->get(true)->valueType());
+        $this->assertSame('int', $p->get(false)->keyType());
+        $this->assertSame('int', $p->get(false)->valueType());
         $this->assertSame(
             [1, 4],
             $p->get(true)->keys()->toArray()

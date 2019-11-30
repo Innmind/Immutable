@@ -14,13 +14,13 @@ use Innmind\Immutable\Exception\{
  */
 final class Stream implements \Countable
 {
-    private Str $type;
+    private string $type;
     private SpecificationInterface $spec;
     private Sequence $values;
 
     public function __construct(string $type)
     {
-        $this->type = new Str($type);
+        $this->type = $type;
         $this->spec = Type::of($type);
         $this->values = new Sequence;
     }
@@ -42,7 +42,7 @@ final class Stream implements \Countable
     /**
      * Type of the elements
      */
-    public function type(): Str
+    public function type(): string
     {
         return $this->type;
     }
@@ -212,7 +212,7 @@ final class Stream implements \Countable
             } else {
                 $map = $map->put(
                     $key,
-                    (new self((string) $this->type))->add($value)
+                    (new self($this->type))->add($value)
                 );
             }
         }
@@ -361,8 +361,8 @@ final class Stream implements \Countable
     {
         $stream = new self(self::class);
         $splitted = $this->values->splitAt($position);
-        $first = new self((string) $this->type);
-        $second = new self((string) $this->type);
+        $first = new self($this->type);
+        $second = new self($this->type);
         $first->values = $splitted->first();
         $second->values = $splitted->last();
 
@@ -525,7 +525,7 @@ final class Stream implements \Countable
      */
     private function validate(self $stream): void
     {
-        if (!$stream->type()->equals($this->type)) {
+        if ($stream->type() !== $this->type) {
             throw new InvalidArgumentException(
                 'The 2 streams does not reference the same type'
             );

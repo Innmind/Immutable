@@ -57,7 +57,7 @@ final class Map implements \Countable
     /**
      * Return the key type for this map
      */
-    public function keyType(): Str
+    public function keyType(): string
     {
         return $this->implementation->keyType();
     }
@@ -65,7 +65,7 @@ final class Map implements \Countable
     /**
      * Return the value type for this map
      */
-    public function valueType(): Str
+    public function valueType(): string
     {
         return $this->implementation->valueType();
     }

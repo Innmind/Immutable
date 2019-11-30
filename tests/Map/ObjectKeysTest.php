@@ -29,10 +29,8 @@ class ObjectKeysTest extends TestCase
         $this->assertInstanceOf(Map\Implementation::class, $m);
         $this->assertInstanceOf(SizeableInterface::class, $m);
         $this->assertInstanceOf(\Countable::class, $m);
-        $this->assertInstanceOf(Str::class, $m->keyType());
-        $this->assertInstanceOf(Str::class, $m->valueType());
-        $this->assertSame('stdClass', (string) $m->keyType());
-        $this->assertSame('float', (string) $m->valueType());
+        $this->assertSame('stdClass', $m->keyType());
+        $this->assertSame('float', $m->valueType());
     }
 
     public function testThrowWhenKeyNotAClass()
@@ -124,8 +122,8 @@ class ObjectKeysTest extends TestCase
         $this->assertInstanceOf(ObjectKeys::class, $m2);
         $this->assertSame(1, $m->size());
         $this->assertSame(0, $m2->size());
-        $this->assertSame('stdClass', (string) $m2->keyType());
-        $this->assertSame('float', (string) $m2->valueType());
+        $this->assertSame('stdClass', $m2->keyType());
+        $this->assertSame('float', $m2->valueType());
     }
 
     public function testEquals()
@@ -198,16 +196,16 @@ class ObjectKeysTest extends TestCase
         });
         $this->assertNotSame($m, $m2);
         $this->assertInstanceOf(Map::class, $m2);
-        $this->assertSame('int', (string) $m2->keyType());
-        $this->assertSame(Map::class, (string) $m2->valueType());
+        $this->assertSame('int', $m2->keyType());
+        $this->assertSame(Map::class, $m2->valueType());
         $this->assertTrue($m2->contains(0));
         $this->assertTrue($m2->contains(1));
         $this->assertSame(2, $m2->get(0)->size());
         $this->assertSame(2, $m2->get(1)->size());
-        $this->assertSame('stdClass', (string) $m2->get(0)->keyType());
-        $this->assertSame('int', (string) $m2->get(0)->valueType());
-        $this->assertSame('stdClass', (string) $m2->get(1)->keyType());
-        $this->assertSame('int', (string) $m2->get(1)->valueType());
+        $this->assertSame('stdClass', $m2->get(0)->keyType());
+        $this->assertSame('int', $m2->get(0)->valueType());
+        $this->assertSame('stdClass', $m2->get(1)->keyType());
+        $this->assertSame('int', $m2->get(1)->valueType());
         $this->assertSame(1, $m2->get(1)->get($a));
         $this->assertSame(2, $m2->get(0)->get($b));
         $this->assertSame(3, $m2->get(1)->get($c));
@@ -223,7 +221,7 @@ class ObjectKeysTest extends TestCase
 
         $k = $m->keys();
         $this->assertInstanceOf(Set::class, $k);
-        $this->assertSame('stdClass', (string) $k->type());
+        $this->assertSame('stdClass', $k->type());
         $this->assertSame([$a, $b, $c, $d], $k->toArray());
         $this->assertTrue($k->equals($m->keys()));
     }
@@ -239,7 +237,7 @@ class ObjectKeysTest extends TestCase
 
         $v = $m->values();
         $this->assertInstanceOf(Stream::class, $v);
-        $this->assertSame('int', (string) $v->type());
+        $this->assertSame('int', $v->type());
         $this->assertSame([1, 2, 3, 5, 5], $v->toArray());
         $this->assertTrue($v->equals($m->values()));
     }
@@ -392,16 +390,16 @@ class ObjectKeysTest extends TestCase
 
         $this->assertInstanceOf(Map::class, $p);
         $this->assertNotSame($p, $m);
-        $this->assertSame('bool', (string) $p->keyType());
-        $this->assertSame(Map::class, (string) $p->valueType());
+        $this->assertSame('bool', $p->keyType());
+        $this->assertSame(Map::class, $p->valueType());
         $this->assertSame(
             [true, false],
             $p->keys()->toArray()
         );
-        $this->assertSame('stdClass', (string) $p->get(true)->keyType());
-        $this->assertSame('int', (string) $p->get(true)->valueType());
-        $this->assertSame('stdClass', (string) $p->get(false)->keyType());
-        $this->assertSame('int', (string) $p->get(false)->valueType());
+        $this->assertSame('stdClass', $p->get(true)->keyType());
+        $this->assertSame('int', $p->get(true)->valueType());
+        $this->assertSame('stdClass', $p->get(false)->keyType());
+        $this->assertSame('int', $p->get(false)->valueType());
         $this->assertSame(
             [$b, $d],
             $p->get(true)->keys()->toArray()
@@ -445,6 +443,6 @@ class ObjectKeysTest extends TestCase
 
     public function testGenericObjectTypeAllowedAsKey()
     {
-        $this->assertSame('object', (string) (new ObjectKeys('object', 'int'))->keyType());
+        $this->assertSame('object', (new ObjectKeys('object', 'int'))->keyType());
     }
 }

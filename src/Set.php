@@ -7,7 +7,7 @@ use Innmind\Immutable\Exception\InvalidArgumentException;
 
 final class Set implements \Countable
 {
-    private Str $type;
+    private string $type;
     private SpecificationInterface $spec;
     private Stream $values;
 
@@ -16,7 +16,7 @@ final class Set implements \Countable
      */
     public function __construct(string $type)
     {
-        $this->type = new Str($type);
+        $this->type = $type;
         $this->spec = Type::of($type);
         $this->values = new Stream($type);
     }
@@ -32,7 +32,7 @@ final class Set implements \Countable
     /**
      * Return the type of this set
      */
-    public function type(): Str
+    public function type(): string
     {
         return $this->type;
     }
@@ -70,7 +70,7 @@ final class Set implements \Countable
 
         $newSet = clone $this;
         $newSet->values = $this->values->intersect(
-            Stream::of((string) $this->type, ...$set->toArray())
+            Stream::of($this->type, ...$set->toArray())
         );
 
         return $newSet;
@@ -144,7 +144,7 @@ final class Set implements \Countable
 
         $newSet = clone $this;
         $newSet->values = $this->values->diff(
-            Stream::of((string) $this->type, ...$set->toArray())
+            Stream::of($this->type, ...$set->toArray())
         );
 
         return $newSet;
@@ -206,7 +206,7 @@ final class Set implements \Countable
         $map = $this->values->groupBy($discriminator);
 
         return $map->reduce(
-            new Map((string) $map->keyType(), Set::class),
+            new Map($map->keyType(), Set::class),
             function(Map $carry, $key, Stream $values): Map {
                 $set = $this->clear();
                 $set->values = $values;
@@ -330,7 +330,7 @@ final class Set implements \Countable
      */
     private function validate(self $set): void
     {
-        if (!$set->type()->equals($this->type)) {
+        if ($set->type() !== $this->type) {
             throw new InvalidArgumentException(
                 'The 2 sets does not reference the same type'
             );

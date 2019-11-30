@@ -21,12 +21,12 @@ interface Implementation extends SizeableInterface, \Countable
     /**
      * Return the key type for this map
      */
-    public function keyType(): Str;
+    public function keyType(): string;
 
     /**
      * Return the value type for this map
      */
-    public function valueType(): Str;
+    public function valueType(): string;
 
     /**
      * Set a new key/value pair

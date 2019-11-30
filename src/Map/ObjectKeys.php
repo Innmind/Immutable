@@ -23,8 +23,8 @@ use Innmind\Immutable\{
  */
 final class ObjectKeys implements Implementation
 {
-    private Str $keyType;
-    private Str $valueType;
+    private string $keyType;
+    private string $valueType;
     private SpecificationInterface $keySpecification;
     private SpecificationInterface $valueSpecification;
     private \SplObjectStorage $values;
@@ -41,15 +41,15 @@ final class ObjectKeys implements Implementation
         }
 
         $this->valueSpecification = Type::of($valueType);
-        $this->keyType = new Str($keyType);
-        $this->valueType = new Str($valueType);
+        $this->keyType = $keyType;
+        $this->valueType = $valueType;
         $this->values = new \SplObjectStorage;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function keyType(): Str
+    public function keyType(): string
     {
         return $this->keyType;
     }
@@ -57,7 +57,7 @@ final class ObjectKeys implements Implementation
     /**
      * {@inheritdoc}
      */
-    public function valueType(): Str
+    public function valueType(): string
     {
         return $this->valueType;
     }
@@ -230,7 +230,7 @@ final class ObjectKeys implements Implementation
     public function keys(): Set
     {
         return $this->reduce(
-            Set::of((string) $this->keyType),
+            Set::of($this->keyType),
             static function(Set $keys, $key): Set {
                 return $keys->add($key);
             }
@@ -243,7 +243,7 @@ final class ObjectKeys implements Implementation
     public function values(): Stream
     {
         return $this->reduce(
-            Stream::of((string) $this->valueType),
+            Stream::of($this->valueType),
             static function(Stream $values, $key, $value): Stream {
                 return $values->add($value);
             }
@@ -313,8 +313,8 @@ final class ObjectKeys implements Implementation
     public function merge(Implementation $map): Implementation
     {
         if (
-            !$this->keyType()->equals($map->keyType()) ||
-            !$this->valueType()->equals($map->valueType())
+            $this->keyType !== $map->keyType() ||
+            $this->valueType !== $map->valueType()
         ) {
             throw new InvalidArgumentException(
                 'The 2 maps does not reference the same types'
@@ -380,6 +380,6 @@ final class ObjectKeys implements Implementation
      */
     private function clearMap(): Map
     {
-        return Map::of((string) $this->keyType, (string) $this->valueType);
+        return Map::of($this->keyType, $this->valueType);
     }
 }

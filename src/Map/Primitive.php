@@ -22,8 +22,8 @@ use Innmind\Immutable\{
  */
 final class Primitive implements Implementation
 {
-    private Str $keyType;
-    private Str $valueType;
+    private string $keyType;
+    private string $valueType;
     private SpecificationInterface $keySpecification;
     private SpecificationInterface $valueSpecification;
     private array $values;
@@ -41,15 +41,15 @@ final class Primitive implements Implementation
         }
 
         $this->valueSpecification = Type::of($valueType);
-        $this->keyType = new Str($keyType);
-        $this->valueType = new Str($valueType);
+        $this->keyType = $keyType;
+        $this->valueType = $valueType;
         $this->values = [];
     }
 
     /**
      * {@inheritdoc}
      */
-    public function keyType(): Str
+    public function keyType(): string
     {
         return $this->keyType;
     }
@@ -57,7 +57,7 @@ final class Primitive implements Implementation
     /**
      * {@inheritdoc}
      */
-    public function valueType(): Str
+    public function valueType(): string
     {
         return $this->valueType;
     }
@@ -219,7 +219,7 @@ final class Primitive implements Implementation
     public function keys(): Set
     {
         return Set::of(
-            (string) $this->keyType,
+            $this->keyType,
             ...\array_map(function($key) {
                 return $this->normalizeKey($key);
             }, \array_keys($this->values))
@@ -231,7 +231,7 @@ final class Primitive implements Implementation
      */
     public function values(): Stream
     {
-        return Stream::of((string) $this->valueType, ...\array_values($this->values));
+        return Stream::of($this->valueType, ...\array_values($this->values));
     }
 
     /**
@@ -295,8 +295,8 @@ final class Primitive implements Implementation
     public function merge(Implementation $map): Implementation
     {
         if (
-            !$this->keyType()->equals($map->keyType()) ||
-            !$this->valueType()->equals($map->valueType())
+            $this->keyType !== $map->keyType() ||
+            $this->valueType !== $map->valueType()
         ) {
             throw new InvalidArgumentException(
                 'The 2 maps does not reference the same types'
@@ -355,7 +355,7 @@ final class Primitive implements Implementation
 
     private function normalizeKey($value)
     {
-        if ((string) $this->keyType === 'string' && !\is_null($value)) {
+        if ($this->keyType === 'string' && !\is_null($value)) {
             return (string) $value;
         }
 
@@ -367,6 +367,6 @@ final class Primitive implements Implementation
      */
     private function clearMap(): Map
     {
-        return Map::of((string) $this->keyType, (string) $this->valueType);
+        return Map::of($this->keyType, $this->valueType);
     }
 }

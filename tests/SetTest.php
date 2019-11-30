@@ -20,8 +20,7 @@ class SetTest extends TestCase
         $s = new Set('int');
 
         $this->assertInstanceOf(\Countable::class, $s);
-        $this->assertInstanceOf(Str::class, $s->type());
-        $this->assertSame('int', (string) $s->type());
+        $this->assertSame('int', $s->type());
     }
 
     public function testOf()
@@ -215,10 +214,10 @@ class SetTest extends TestCase
             return $v % 2;
         });
         $this->assertInstanceOf(Map::class, $m);
-        $this->assertSame('int', (string) $m->keyType());
-        $this->assertSame(Set::class, (string) $m->valueType());
-        $this->assertSame('int', (string) $m->get(0)->type());
-        $this->assertSame('int', (string) $m->get(1)->type());
+        $this->assertSame('int', $m->keyType());
+        $this->assertSame(Set::class, $m->valueType());
+        $this->assertSame('int', $m->get(0)->type());
+        $this->assertSame('int', $m->get(1)->type());
         $this->assertSame([1, 0], $m->keys()->toArray());
         $this->assertSame([1, 3], $m->get(1)->toArray());
         $this->assertSame([2, 4], $m->get(0)->toArray());
@@ -266,8 +265,8 @@ class SetTest extends TestCase
         });
         $this->assertNotSame($s, $s2);
         $this->assertInstanceOf(Map::class, $s2);
-        $this->assertSame('bool', (string) $s2->keyType());
-        $this->assertSame(Set::class, (string) $s2->valueType());
+        $this->assertSame('bool', $s2->keyType());
+        $this->assertSame(Set::class, $s2->valueType());
         $this->assertSame([1, 2, 3, 4], $s->toArray());
         $this->assertInstanceOf(Set::class, $s2->get(true));
         $this->assertInstanceOf(Set::class, $s2->get(false));
@@ -303,7 +302,7 @@ class SetTest extends TestCase
             return $a < $b;
         });
         $this->assertInstanceOf(Stream::class, $s2);
-        $this->assertSame('int', (string) $s2->type());
+        $this->assertSame('int', $s2->type());
         $this->assertSame([1, 2, 3, 4], $s->toArray());
         $this->assertSame([4, 3, 2, 1], $s2->toArray());
     }
