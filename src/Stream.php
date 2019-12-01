@@ -39,6 +39,63 @@ final class Stream implements \Countable
         return $self;
     }
 
+    /**
+     * @param mixed $values
+     *
+     * @return self<mixed>
+     */
+    public static function mixed(...$values): self
+    {
+        $self = new self('mixed');
+        $self->values = new Sequence(...$values);
+
+        return $self;
+    }
+
+    /**
+     * @return self<int>
+     */
+    public static function ints(int ...$values): self
+    {
+        $self = new self('int');
+        $self->values = new Sequence(...$values);
+
+        return $self;
+    }
+
+    /**
+     * @return self<float>
+     */
+    public static function floats(float ...$values): self
+    {
+        $self = new self('float');
+        $self->values = new Sequence(...$values);
+
+        return $self;
+    }
+
+    /**
+     * @return self<string>
+     */
+    public static function strings(string ...$values): self
+    {
+        $self = new self('string');
+        $self->values = new Sequence(...$values);
+
+        return $self;
+    }
+
+    /**
+     * @return self<object>
+     */
+    public static function objects(object ...$values): self
+    {
+        $self = new self('object');
+        $self->values = new Sequence(...$values);
+
+        return $self;
+    }
+
     public function isOfType(string $type): bool
     {
         return $this->type === $type;

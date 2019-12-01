@@ -35,6 +35,54 @@ class SetTest extends TestCase
         );
     }
 
+    public function testMixed()
+    {
+        $set = Set::mixed(1, '2', 3, 1);
+
+        $this->assertInstanceOf(Set::class, $set);
+        $this->assertSame('mixed', $set->type());
+        $this->assertSame([1, '2', 3], $set->toArray());
+    }
+
+    public function testInts()
+    {
+        $set = Set::ints(1, 2, 3, 1);
+
+        $this->assertInstanceOf(Set::class, $set);
+        $this->assertSame('int', $set->type());
+        $this->assertSame([1, 2, 3], $set->toArray());
+    }
+
+    public function testFloats()
+    {
+        $set = Set::floats(1, 2, 3.2, 1);
+
+        $this->assertInstanceOf(Set::class, $set);
+        $this->assertSame('float', $set->type());
+        $this->assertSame([1.0, 2.0, 3.2], $set->toArray());
+    }
+
+    public function testStrings()
+    {
+        $set = Set::strings('1', '2', '3', '1');
+
+        $this->assertInstanceOf(Set::class, $set);
+        $this->assertSame('string', $set->type());
+        $this->assertSame(['1', '2', '3'], $set->toArray());
+    }
+
+    public function testObjects()
+    {
+        $a = new \stdClass;
+        $b = new \stdClass;
+        $c = new \stdClass;
+        $set = Set::objects($a, $b, $c, $a);
+
+        $this->assertInstanceOf(Set::class, $set);
+        $this->assertSame('object', $set->type());
+        $this->assertSame([$a, $b, $c], $set->toArray());
+    }
+
     public function testAdd()
     {
         $this->assertSame(0, (new Set('in'))->size());

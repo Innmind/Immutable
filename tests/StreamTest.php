@@ -36,6 +36,54 @@ class StreamTest extends TestCase
         );
     }
 
+    public function testMixed()
+    {
+        $stream = Stream::mixed(1, '2', 3);
+
+        $this->assertInstanceOf(Stream::class, $stream);
+        $this->assertSame('mixed', $stream->type());
+        $this->assertSame([1, '2', 3], $stream->toArray());
+    }
+
+    public function testInts()
+    {
+        $stream = Stream::ints(1, 2, 3);
+
+        $this->assertInstanceOf(Stream::class, $stream);
+        $this->assertSame('int', $stream->type());
+        $this->assertSame([1, 2, 3], $stream->toArray());
+    }
+
+    public function testFloats()
+    {
+        $stream = Stream::floats(1, 2, 3.2);
+
+        $this->assertInstanceOf(Stream::class, $stream);
+        $this->assertSame('float', $stream->type());
+        $this->assertSame([1.0, 2.0, 3.2], $stream->toArray());
+    }
+
+    public function testStrings()
+    {
+        $stream = Stream::strings('1', '2', '3');
+
+        $this->assertInstanceOf(Stream::class, $stream);
+        $this->assertSame('string', $stream->type());
+        $this->assertSame(['1', '2', '3'], $stream->toArray());
+    }
+
+    public function testObjects()
+    {
+        $a = new \stdClass;
+        $b = new \stdClass;
+        $c = new \stdClass;
+        $stream = Stream::objects($a, $b, $c);
+
+        $this->assertInstanceOf(Stream::class, $stream);
+        $this->assertSame('object', $stream->type());
+        $this->assertSame([$a, $b, $c], $stream->toArray());
+    }
+
     public function testType()
     {
         $type = (new Stream('int'))->type();

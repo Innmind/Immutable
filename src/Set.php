@@ -29,6 +29,61 @@ final class Set implements \Countable
         return $self;
     }
 
+    /**
+     * @return self<mixed>
+     */
+    public static function mixed(...$values): self
+    {
+        $self = new self('mixed');
+        $self->values = Stream::mixed(...$values)->distinct();
+
+        return $self;
+    }
+
+    /**
+     * @return self<int>
+     */
+    public static function ints(int ...$values): self
+    {
+        $self = new self('int');
+        $self->values = Stream::ints(...$values)->distinct();
+
+        return $self;
+    }
+
+    /**
+     * @return self<float>
+     */
+    public static function floats(float ...$values): self
+    {
+        $self = new self('float');
+        $self->values = Stream::floats(...$values)->distinct();
+
+        return $self;
+    }
+
+    /**
+     * @return self<string>
+     */
+    public static function strings(string ...$values): self
+    {
+        $self = new self('string');
+        $self->values = Stream::strings(...$values)->distinct();
+
+        return $self;
+    }
+
+    /**
+     * @return self<object>
+     */
+    public static function objects(object ...$values): self
+    {
+        $self = new self('object');
+        $self->values = Stream::objects(...$values)->distinct();
+
+        return $self;
+    }
+
     public function isOfType(string $type): bool
     {
         return $this->type === $type;
