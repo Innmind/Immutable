@@ -99,7 +99,7 @@ final class Primitive implements Implementation
     public function get($key)
     {
         if (!$this->contains($key)) {
-            throw new ElementNotFound;
+            throw new ElementNotFound($key);
         }
 
         return $this->values[$key];

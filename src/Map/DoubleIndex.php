@@ -108,7 +108,7 @@ final class DoubleIndex implements Implementation
     public function get($key)
     {
         if (!$this->keys->contains($key)) {
-            throw new ElementNotFound;
+            throw new ElementNotFound($key);
         }
 
         return $this->values->get(

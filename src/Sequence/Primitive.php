@@ -177,7 +177,7 @@ final class Primitive implements Implementation
         $index = \array_search($element, $this->values, true);
 
         if ($index === false) {
-            throw new ElementNotFound;
+            throw new ElementNotFound($element);
         }
 
         return $index;
