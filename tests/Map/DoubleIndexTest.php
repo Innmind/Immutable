@@ -9,7 +9,6 @@ use Innmind\Immutable\{
     Map,
     Pair,
     Str,
-    Symbol,
     Set,
     Sequence,
     Exception\LogicException,
@@ -356,13 +355,13 @@ class DoubleIndexTest extends TestCase
 
     public function testMerge()
     {
-        $m = (new DoubleIndex(Symbol::class, 'int'))
-            ->put($s = new Symbol('foo'), 24)
-            ->put($s2 = new Symbol('foo'), 42);
-        $m2 = (new DoubleIndex(Symbol::class, 'int'))
-            ->put($s3 = new Symbol('foo'), 24)
+        $m = (new DoubleIndex(\stdClass::class, 'int'))
+            ->put($s = new \stdClass, 24)
+            ->put($s2 = new \stdClass, 42);
+        $m2 = (new DoubleIndex(\stdClass::class, 'int'))
+            ->put($s3 = new \stdClass, 24)
             ->put($s2, 66)
-            ->put($s4 = new Symbol('bar'), 42);
+            ->put($s4 = new \stdClass, 42);
 
         $m3 = $m->merge($m2);
         $this->assertNotSame($m, $m3);
