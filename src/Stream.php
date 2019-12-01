@@ -6,7 +6,7 @@ namespace Innmind\Immutable;
 use Innmind\Immutable\Exception\{
     LogicException,
     GroupEmptySequenceException,
-    InvalidArgumentException
+    InvalidArgumentException,
 };
 
 /**
@@ -18,11 +18,11 @@ final class Stream implements \Countable
     private SpecificationInterface $spec;
     private Sequence $values;
 
-    public function __construct(string $type)
+    private function __construct(string $type)
     {
         $this->type = $type;
         $this->spec = Type::of($type);
-        $this->values = new Sequence;
+        $this->values = Sequence::of();
     }
 
     /**
@@ -31,7 +31,7 @@ final class Stream implements \Countable
     public static function of(string $type, ...$values): self
     {
         $self = new self($type);
-        $self->values = new Sequence(...$values);
+        $self->values = Sequence::of(...$values);
         $self->values->foreach(static function($element) use ($self): void {
             $self->spec->validate($element);
         });
@@ -47,7 +47,7 @@ final class Stream implements \Countable
     public static function mixed(...$values): self
     {
         $self = new self('mixed');
-        $self->values = new Sequence(...$values);
+        $self->values = Sequence::of(...$values);
 
         return $self;
     }
@@ -58,7 +58,7 @@ final class Stream implements \Countable
     public static function ints(int ...$values): self
     {
         $self = new self('int');
-        $self->values = new Sequence(...$values);
+        $self->values = Sequence::of(...$values);
 
         return $self;
     }
@@ -69,7 +69,7 @@ final class Stream implements \Countable
     public static function floats(float ...$values): self
     {
         $self = new self('float');
-        $self->values = new Sequence(...$values);
+        $self->values = Sequence::of(...$values);
 
         return $self;
     }
@@ -80,7 +80,7 @@ final class Stream implements \Countable
     public static function strings(string ...$values): self
     {
         $self = new self('string');
-        $self->values = new Sequence(...$values);
+        $self->values = Sequence::of(...$values);
 
         return $self;
     }
@@ -91,7 +91,7 @@ final class Stream implements \Countable
     public static function objects(object ...$values): self
     {
         $self = new self('object');
-        $self->values = new Sequence(...$values);
+        $self->values = Sequence::of(...$values);
 
         return $self;
     }
@@ -152,7 +152,7 @@ final class Stream implements \Countable
 
         $newStream = clone $this;
         $newStream->values = $this->values->diff(
-            new Sequence(...$stream->toArray())
+            Sequence::of(...$stream->toArray())
         );
 
         return $newStream;
@@ -207,7 +207,7 @@ final class Stream implements \Countable
         $this->validate($stream);
 
         return $this->values->equals(
-            new Sequence(...$stream->toArray())
+            Sequence::of(...$stream->toArray())
         );
     }
 
@@ -260,7 +260,7 @@ final class Stream implements \Countable
             $key = $discriminator($value);
 
             if ($map === null) {
-                $map = new Map(
+                $map = Map::of(
                     Type::determine($key),
                     self::class
                 );
@@ -390,9 +390,9 @@ final class Stream implements \Countable
         }
 
         $true = $this->clear();
-        $true->values = new Sequence(...$truthy);
+        $true->values = Sequence::of(...$truthy);
         $false = $this->clear();
-        $false->values = new Sequence(...$falsy);
+        $false->values = Sequence::of(...$falsy);
 
         return Map::of('bool', self::class)
             (true, $true)
@@ -470,7 +470,7 @@ final class Stream implements \Countable
 
         $self = clone $this;
         $self->values = $this->values->append(
-            new Sequence(...$stream->toArray())
+            Sequence::of(...$stream->toArray())
         );
 
         return $self;
@@ -490,7 +490,7 @@ final class Stream implements \Countable
 
         $self = clone $this;
         $self->values = $this->values->intersect(
-            new Sequence(...$stream->toArray())
+            Sequence::of(...$stream->toArray())
         );
 
         return $self;
@@ -501,7 +501,7 @@ final class Stream implements \Countable
      */
     public function join(string $separator): Str
     {
-        return new Str((string) $this->values->join($separator));
+        return Str::of((string) $this->values->join($separator));
     }
 
     /**
@@ -575,7 +575,7 @@ final class Stream implements \Countable
     public function clear(): self
     {
         $self = clone $this;
-        $self->values = new Sequence;
+        $self->values = Sequence::of();
 
         return $self;
     }

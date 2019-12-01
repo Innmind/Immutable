@@ -18,7 +18,7 @@ final class Sequence implements \Countable
     private array $values;
     private ?int $size;
 
-    public function __construct(...$values)
+    private function __construct(...$values)
     {
         $this->values = $values;
     }
@@ -175,7 +175,7 @@ final class Sequence implements \Countable
             $key = $discriminator($value);
 
             if ($map === null) {
-                $map = new Map(
+                $map = Map::of(
                     Type::determine($key),
                     self::class
                 );
@@ -341,7 +341,7 @@ final class Sequence implements \Countable
      */
     public function splitAt(int $index): Stream
     {
-        return (new Stream(self::class))
+        return Stream::of(self::class)
             ->add($this->slice(0, $index))
             ->add($this->slice($index, $this->size()));
     }
@@ -389,7 +389,7 @@ final class Sequence implements \Countable
      */
     public function join(string $separator): Str
     {
-        return new Str(\implode($separator, $this->values));
+        return Str::of(\implode($separator, $this->values));
     }
 
     /**

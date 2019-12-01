@@ -17,7 +17,7 @@ class SetTest extends TestCase
 {
     public function testInterface()
     {
-        $s = new Set('int');
+        $s = Set::of('int');
 
         $this->assertInstanceOf(\Countable::class, $s);
         $this->assertSame('int', $s->type());
@@ -27,7 +27,7 @@ class SetTest extends TestCase
     {
         $this->assertTrue(
             Set::of('int', 1, 1, 2, 3)->equals(
-                (new Set('int'))
+                Set::of('int')
                     ->add(1)
                     ->add(2)
                     ->add(3)
@@ -85,9 +85,9 @@ class SetTest extends TestCase
 
     public function testAdd()
     {
-        $this->assertSame(0, (new Set('in'))->size());
+        $this->assertSame(0, Set::of('in')->size());
 
-        $s = (new Set('int'))->add(42);
+        $s = Set::of('int')->add(42);
 
         $this->assertSame(1, $s->size());
         $this->assertSame(1, $s->count());
@@ -110,17 +110,17 @@ class SetTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
 
-        (new Set('int'))->add(42.0);
+        Set::of('int')->add(42.0);
     }
 
     public function testIntersect()
     {
-        $s = (new Set('int'))
+        $s = Set::of('int')
             ->add(24)
             ->add(42)
             ->add(66);
 
-        $s2 = $s->intersect((new Set('int'))->add(42));
+        $s2 = $s->intersect(Set::of('int')->add(42));
         $this->assertNotSame($s, $s2);
         $this->assertInstanceOf(Set::class, $s2);
         $this->assertSame($s->type(), $s2->type());
@@ -133,12 +133,12 @@ class SetTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The 2 sets does not reference the same type');
 
-        (new Set('int'))->intersect(new Set('float'));
+        Set::of('int')->intersect(Set::of('float'));
     }
 
     public function testContains()
     {
-        $s = new Set('int');
+        $s = Set::of('int');
 
         $this->assertFalse($s->contains(42));
         $s = $s->add(42);
@@ -147,7 +147,7 @@ class SetTest extends TestCase
 
     public function testRemove()
     {
-        $s = (new Set('int'))
+        $s = Set::of('int')
             ->add(24)
             ->add(42)
             ->add(66)
@@ -168,12 +168,12 @@ class SetTest extends TestCase
 
     public function testDiff()
     {
-        $s = (new Set('int'))
+        $s = Set::of('int')
             ->add(24)
             ->add(42)
             ->add(66);
 
-        $s2 = $s->diff((new Set('int'))->add(42));
+        $s2 = $s->diff(Set::of('int')->add(42));
         $this->assertNotSame($s, $s2);
         $this->assertInstanceOf(Set::class, $s2);
         $this->assertSame($s->type(), $s2->type());
@@ -186,28 +186,28 @@ class SetTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The 2 sets does not reference the same type');
 
-        (new Set('int'))->diff(new Set('float'));
+        Set::of('int')->diff(Set::of('float'));
     }
 
     public function testEquals()
     {
-        $s = (new Set('int'))
+        $s = Set::of('int')
             ->add(24)
             ->add(42)
             ->add(66);
 
         $this->assertTrue(
             $s->equals(
-                (new Set('int'))
+                Set::of('int')
                     ->add(24)
                     ->add(66)
                     ->add(42)
             )
         );
-        $this->assertTrue(Set::of('int')->equals(new Set('int')));
+        $this->assertTrue(Set::of('int')->equals(Set::of('int')));
         $this->assertFalse(
             $s->equals(
-                (new Set('int'))
+                Set::of('int')
                     ->add(24)
                     ->add(66)
             )
@@ -219,12 +219,12 @@ class SetTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The 2 sets does not reference the same type');
 
-        (new Set('int'))->equals(new Set('float'));
+        Set::of('int')->equals(Set::of('float'));
     }
 
     public function testFilter()
     {
-        $s = (new Set('int'))
+        $s = Set::of('int')
             ->add(1)
             ->add(2)
             ->add(3)
@@ -242,7 +242,7 @@ class SetTest extends TestCase
 
     public function testForeach()
     {
-        $s = (new Set('int'))
+        $s = Set::of('int')
             ->add(1)
             ->add(2)
             ->add(3)
@@ -257,7 +257,7 @@ class SetTest extends TestCase
 
     public function testGroupBy()
     {
-        $s = (new Set('int'))
+        $s = Set::of('int')
             ->add(1)
             ->add(2)
             ->add(3)
@@ -278,7 +278,7 @@ class SetTest extends TestCase
 
     public function testMap()
     {
-        $s = (new Set('int'))
+        $s = Set::of('int')
             ->add(1)
             ->add(2)
             ->add(3)
@@ -298,7 +298,7 @@ class SetTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
 
-        (new Set('int'))
+        Set::of('int')
             ->add(1)
             ->map(function(int $value) {
                 return (string) $value;
@@ -307,7 +307,7 @@ class SetTest extends TestCase
 
     public function testPartition()
     {
-        $s = (new Set('int'))
+        $s = Set::of('int')
             ->add(1)
             ->add(2)
             ->add(3)
@@ -331,7 +331,7 @@ class SetTest extends TestCase
 
     public function testJoin()
     {
-        $s = (new Set('int'))
+        $s = Set::of('int')
             ->add(1)
             ->add(2)
             ->add(3)
@@ -345,7 +345,7 @@ class SetTest extends TestCase
 
     public function testSort()
     {
-        $s = (new Set('int'))
+        $s = Set::of('int')
             ->add(1)
             ->add(2)
             ->add(3)
@@ -362,7 +362,7 @@ class SetTest extends TestCase
 
     public function testMerge()
     {
-        $s = (new Set('int'))
+        $s = Set::of('int')
             ->add(24)
             ->add(42)
             ->add(66);
@@ -370,7 +370,7 @@ class SetTest extends TestCase
         $this->assertTrue(
             $s
                 ->merge(
-                    (new Set('int'))
+                    Set::of('int')
                         ->add(24)
                         ->add(42)
                         ->add(66)
@@ -381,14 +381,14 @@ class SetTest extends TestCase
             [24, 42, 66, 90, 114],
             $s
                 ->merge(
-                    (new Set('int'))
+                    Set::of('int')
                         ->add(90)
                         ->add(114)
                 )
                 ->toArray()
         );
         $this->assertSame([24, 42, 66], $s->toArray());
-        $this->assertSame($s->type(), $s->merge(new Set('int'))->type());
+        $this->assertSame($s->type(), $s->merge(Set::of('int'))->type());
     }
 
     public function testThrowWhenMergingSetsOfDifferentType()
@@ -396,12 +396,12 @@ class SetTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The 2 sets does not reference the same type');
 
-        (new Set('int'))->merge(new Set('float'));
+        Set::of('int')->merge(Set::of('float'));
     }
 
     public function testReduce()
     {
-        $s = (new Set('int'))
+        $s = Set::of('int')
             ->add(4)
             ->add(3)
             ->add(2);
@@ -421,7 +421,7 @@ class SetTest extends TestCase
     {
         $this->assertSame(
             ['foo', 42, 42.1, true, []],
-            (new Set('variable'))
+            Set::of('variable')
                 ->add('foo')
                 ->add(42)
                 ->add(42.1)

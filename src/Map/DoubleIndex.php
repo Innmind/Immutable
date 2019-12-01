@@ -39,9 +39,9 @@ final class DoubleIndex implements Implementation
         $this->valueSpecification = Type::of($valueType);
         $this->keyType = $keyType;
         $this->valueType = $valueType;
-        $this->keys = new Stream($keyType);
-        $this->values = new Stream($valueType);
-        $this->pairs = new Stream(Pair::class);
+        $this->keys = Stream::of($keyType);
+        $this->values = Stream::of($valueType);
+        $this->pairs = Stream::of(Pair::class);
     }
 
     /**
@@ -199,7 +199,7 @@ final class DoubleIndex implements Implementation
             $key = $discriminator($pair->key(), $pair->value());
 
             if ($map === null) {
-                $map = new Map(
+                $map = Map::of(
                     Type::determine($key),
                     Map::class
                 );

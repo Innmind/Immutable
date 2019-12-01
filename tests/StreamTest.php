@@ -18,7 +18,7 @@ class StreamTest extends TestCase
 {
     public function testInterface()
     {
-        $stream = new Stream('int');
+        $stream = Stream::of('int');
 
         $this->assertInstanceOf(\Countable::class, $stream);
         $this->assertSame([], $stream->toArray());
@@ -28,7 +28,7 @@ class StreamTest extends TestCase
     {
         $this->assertTrue(
             Stream::of('int', 1, 2, 3)->equals(
-                (new Stream('int'))
+                Stream::of('int')
                     ->add(1)
                     ->add(2)
                     ->add(3)
@@ -86,7 +86,7 @@ class StreamTest extends TestCase
 
     public function testType()
     {
-        $type = (new Stream('int'))->type();
+        $type = Stream::of('int')->type();
 
         $this->assertSame('int', $type);
     }
@@ -95,7 +95,7 @@ class StreamTest extends TestCase
     {
         $this->assertSame(
             2,
-            (new Stream('int'))
+            Stream::of('int')
                 ->add(1)
                 ->add(2)
                 ->size()
@@ -106,7 +106,7 @@ class StreamTest extends TestCase
     {
         $this->assertCount(
             2,
-            (new Stream('int'))
+            Stream::of('int')
                 ->add(1)
                 ->add(2)
         );
@@ -116,7 +116,7 @@ class StreamTest extends TestCase
     {
         $this->assertSame(
             1,
-            (new Stream('int'))->add(1)->get(0)
+            Stream::of('int')->add(1)->get(0)
         );
     }
 
@@ -124,16 +124,16 @@ class StreamTest extends TestCase
     {
         $this->expectException(OutOfBoundException::class);
 
-        (new Stream('int'))->get(0);
+        Stream::of('int')->get(0);
     }
 
     public function testDiff()
     {
-        $a = (new Stream('int'))
+        $a = Stream::of('int')
             ->add(1)
             ->add(2)
             ->add(3);
-        $b = (new Stream('int'))
+        $b = Stream::of('int')
             ->add(3)
             ->add(4)
             ->add(5);
@@ -152,7 +152,7 @@ class StreamTest extends TestCase
 
     public function testDistinct()
     {
-        $a = (new Stream('int'))
+        $a = Stream::of('int')
             ->add(1)
             ->add(1)
             ->add(1);
@@ -168,7 +168,7 @@ class StreamTest extends TestCase
 
     public function testDrop()
     {
-        $a = (new Stream('int'))
+        $a = Stream::of('int')
             ->add(1)
             ->add(3)
             ->add(5);
@@ -184,7 +184,7 @@ class StreamTest extends TestCase
 
     public function testDropEnd()
     {
-        $a = (new Stream('int'))
+        $a = Stream::of('int')
             ->add(1)
             ->add(3)
             ->add(5);
@@ -200,14 +200,14 @@ class StreamTest extends TestCase
 
     public function testEquals()
     {
-        $a = (new Stream('int'))
+        $a = Stream::of('int')
             ->add(1)
             ->add(3)
             ->add(5);
-        $b = (new Stream('int'))
+        $b = Stream::of('int')
             ->add(1)
             ->add(5);
-        $c = (new Stream('int'))
+        $c = Stream::of('int')
             ->add(1)
             ->add(3)
             ->add(5);
@@ -222,12 +222,12 @@ class StreamTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The 2 streams does not reference the same type');
 
-        (new Stream('int'))->equals(new Stream('stdClass'));
+        Stream::of('int')->equals(Stream::of('stdClass'));
     }
 
     public function testFilter()
     {
-        $a = (new Stream('int'))
+        $a = Stream::of('int')
             ->add(1)
             ->add(2)
             ->add(3)
@@ -247,7 +247,7 @@ class StreamTest extends TestCase
     public function testForeach()
     {
         $sum = 0;
-        $stream = (new Stream('int'))
+        $stream = Stream::of('int')
             ->add(1)
             ->add(2)
             ->add(3)
@@ -261,7 +261,7 @@ class StreamTest extends TestCase
 
     public function testGroupBy()
     {
-        $stream = (new Stream('int'))
+        $stream = Stream::of('int')
             ->add(1)
             ->add(2)
             ->add(3)
@@ -286,12 +286,12 @@ class StreamTest extends TestCase
     {
         $this->expectException(GroupEmptySequenceException::class);
 
-        (new Stream('int'))->groupBy(function() {});
+        Stream::of('int')->groupBy(function() {});
     }
 
     public function testFirst()
     {
-        $stream = (new Stream('int'))
+        $stream = Stream::of('int')
             ->add(1)
             ->add(2)
             ->add(3)
@@ -302,7 +302,7 @@ class StreamTest extends TestCase
 
     public function testLast()
     {
-        $stream = (new Stream('int'))
+        $stream = Stream::of('int')
             ->add(1)
             ->add(2)
             ->add(3)
@@ -313,7 +313,7 @@ class StreamTest extends TestCase
 
     public function testContains()
     {
-        $stream = (new Stream('int'))
+        $stream = Stream::of('int')
             ->add(1)
             ->add(2)
             ->add(3)
@@ -325,7 +325,7 @@ class StreamTest extends TestCase
 
     public function testIndexOf()
     {
-        $stream = (new Stream('int'))
+        $stream = Stream::of('int')
             ->add(1)
             ->add(2)
             ->add(3)
@@ -337,7 +337,7 @@ class StreamTest extends TestCase
 
     public function testIndices()
     {
-        $stream = (new Stream('int'))
+        $stream = Stream::of('int')
             ->add(1)
             ->add(2)
             ->add(3)
@@ -351,7 +351,7 @@ class StreamTest extends TestCase
 
     public function testEmptyIndices()
     {
-        $stream = new Stream('int');
+        $stream = Stream::of('int');
         $indices = $stream->indices();
 
         $this->assertInstanceOf(Stream::class, $indices);
@@ -361,7 +361,7 @@ class StreamTest extends TestCase
 
     public function testMap()
     {
-        $a = (new Stream('int'))
+        $a = Stream::of('int')
             ->add(1)
             ->add(2)
             ->add(3)
@@ -382,7 +382,7 @@ class StreamTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
 
-        (new Stream('int'))
+        Stream::of('int')
             ->add(1)
             ->add(2)
             ->add(3)
@@ -394,7 +394,7 @@ class StreamTest extends TestCase
 
     public function testPad()
     {
-        $a = (new Stream('int'))
+        $a = Stream::of('int')
             ->add(1)
             ->add(2);
         $b = $a->pad(4, 0);
@@ -411,12 +411,12 @@ class StreamTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
 
-        (new Stream('int'))->pad(2, '0');
+        Stream::of('int')->pad(2, '0');
     }
 
     public function testPartition()
     {
-        $map = (new Stream('int'))
+        $map = Stream::of('int')
             ->add(1)
             ->add(2)
             ->add(3)
@@ -436,7 +436,7 @@ class StreamTest extends TestCase
 
     public function testSlice()
     {
-        $a = (new Stream('int'))
+        $a = Stream::of('int')
             ->add(1)
             ->add(2)
             ->add(3)
@@ -453,7 +453,7 @@ class StreamTest extends TestCase
 
     public function testSplitAt()
     {
-        $a = (new Stream('int'))
+        $a = Stream::of('int')
             ->add(1)
             ->add(2)
             ->add(3)
@@ -473,7 +473,7 @@ class StreamTest extends TestCase
 
     public function testTake()
     {
-        $a = (new Stream('int'))
+        $a = Stream::of('int')
             ->add(1)
             ->add(2)
             ->add(3)
@@ -490,7 +490,7 @@ class StreamTest extends TestCase
 
     public function testTakeEnd()
     {
-        $a = (new Stream('int'))
+        $a = Stream::of('int')
             ->add(1)
             ->add(2)
             ->add(3)
@@ -507,10 +507,10 @@ class StreamTest extends TestCase
 
     public function testAppend()
     {
-        $a = (new Stream('int'))
+        $a = Stream::of('int')
             ->add(1)
             ->add(2);
-        $b = (new Stream('int'))
+        $b = Stream::of('int')
             ->add(3)
             ->add(4);
         $c = $b->append($a);
@@ -531,15 +531,15 @@ class StreamTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The 2 streams does not reference the same type');
 
-        (new Stream('int'))->append(new Stream('stdClass'));
+        Stream::of('int')->append(Stream::of('stdClass'));
     }
 
     public function testIntersect()
     {
-        $a = (new Stream('int'))
+        $a = Stream::of('int')
             ->add(1)
             ->add(2);
-        $b = (new Stream('int'))
+        $b = Stream::of('int')
             ->add(2)
             ->add(3);
         $c = $b->intersect($a);
@@ -560,12 +560,12 @@ class StreamTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The 2 streams does not reference the same type');
 
-        (new Stream('int'))->intersect(new Stream('stdClass'));
+        Stream::of('int')->intersect(Stream::of('stdClass'));
     }
 
     public function testJoin()
     {
-        $str = (new Stream('int'))
+        $str = Stream::of('int')
             ->add(1)
             ->add(2)
             ->join(', ');
@@ -576,7 +576,7 @@ class StreamTest extends TestCase
 
     public function testAdd()
     {
-        $a = new Stream('int');
+        $a = Stream::of('int');
         $b = $a->add(1);
 
         $this->assertInstanceOf(Stream::class, $b);
@@ -596,12 +596,12 @@ class StreamTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
 
-        (new Stream('int'))->add(4.2);
+        Stream::of('int')->add(4.2);
     }
 
     public function testSort()
     {
-        $a = (new Stream('int'))
+        $a = Stream::of('int')
             ->add(1)
             ->add(2)
             ->add(3)
@@ -621,7 +621,7 @@ class StreamTest extends TestCase
 
     public function testReduce()
     {
-        $value = (new Stream('int'))
+        $value = Stream::of('int')
             ->add(1)
             ->add(2)
             ->add(3)
@@ -638,7 +638,7 @@ class StreamTest extends TestCase
 
     public function testClear()
     {
-        $stream = (new Stream('int'))
+        $stream = Stream::of('int')
             ->add(1)
             ->add(2)
             ->add(3);
@@ -652,7 +652,7 @@ class StreamTest extends TestCase
 
     public function testReverse()
     {
-        $stream = (new Stream('int'))
+        $stream = Stream::of('int')
             ->add(1)
             ->add(3)
             ->add(4)

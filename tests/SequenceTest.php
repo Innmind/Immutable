@@ -19,7 +19,7 @@ class SequenceTest extends TestCase
 {
     public function testInterface()
     {
-        $s = new Sequence(1);
+        $s = Sequence::of(1);
 
         $this->assertInstanceOf(\Countable::class, $s);
         $this->assertSame([1], $s->toArray());
@@ -27,39 +27,39 @@ class SequenceTest extends TestCase
 
     public function testOf()
     {
-        $this->assertTrue(Sequence::of(1, 2, 3)->equals(new Sequence(1, 2, 3)));
+        $this->assertTrue(Sequence::of(1, 2, 3)->equals(Sequence::of(1, 2, 3)));
     }
 
     public function testSize()
     {
-        $this->assertSame(0, (new Sequence)->size());
-        $this->assertSame(0, (new Sequence)->count());
-        $this->assertSame(2, (new Sequence('foo', 42))->size());
-        $this->assertSame(2, (new Sequence('foo', 42))->count());
+        $this->assertSame(0, Sequence::of()->size());
+        $this->assertSame(0, Sequence::of()->count());
+        $this->assertSame(2, Sequence::of('foo', 42)->size());
+        $this->assertSame(2, Sequence::of('foo', 42)->count());
     }
 
     public function testGet()
     {
-        $this->assertSame(3, (new Sequence(1, 2, 3))->get(2));
+        $this->assertSame(3, Sequence::of(1, 2, 3)->get(2));
     }
 
     public function testThrowWhenGettingUnknownIndex()
     {
         $this->expectException(OutOfBoundException::class);
 
-        (new Sequence)->get(0);
+        Sequence::of()->get(0);
     }
 
     public function testHas()
     {
-        $this->assertFalse((new Sequence)->has(0));
-        $this->assertTrue((new Sequence(1))->has(0));
+        $this->assertFalse(Sequence::of()->has(0));
+        $this->assertTrue(Sequence::of(1)->has(0));
     }
 
     public function testDiff()
     {
-        $s = new Sequence(1, 2, 3, 4);
-        $s2 = new Sequence(1, 3);
+        $s = Sequence::of(1, 2, 3, 4);
+        $s2 = Sequence::of(1, 3);
 
         $s3 = $s->diff($s2);
         $this->assertNotSame($s, $s3);
@@ -76,8 +76,8 @@ class SequenceTest extends TestCase
         $bar = new \stdClass;
         $baz = new \stdClass;
 
-        $s = new Sequence($foo, $bar, $baz, $bar);
-        $s2 = new Sequence($bar);
+        $s = Sequence::of($foo, $bar, $baz, $bar);
+        $s2 = Sequence::of($bar);
 
         $s3 = $s->diff($s2);
         $this->assertNotSame($s, $s3);
@@ -90,7 +90,7 @@ class SequenceTest extends TestCase
 
     public function testDistinct()
     {
-        $s = new Sequence(1, 2, 2, 3);
+        $s = Sequence::of(1, 2, 2, 3);
 
         $s2 = $s->distinct();
         $this->assertNotSame($s, $s2);
@@ -105,7 +105,7 @@ class SequenceTest extends TestCase
         $bar = new \stdClass;
         $baz = new \stdClass;
 
-        $s = new Sequence($foo, $bar, $foo, $baz);
+        $s = Sequence::of($foo, $bar, $foo, $baz);
 
         $s2 = $s->distinct();
         $this->assertNotSame($s, $s2);
@@ -116,7 +116,7 @@ class SequenceTest extends TestCase
 
     public function testDrop()
     {
-        $s = new Sequence(1, 2, 3);
+        $s = Sequence::of(1, 2, 3);
 
         $s2 = $s->drop(2);
         $this->assertNotSame($s, $s2);
@@ -127,7 +127,7 @@ class SequenceTest extends TestCase
 
     public function testDropEnd()
     {
-        $s = new Sequence(1, 2, 3, 4);
+        $s = Sequence::of(1, 2, 3, 4);
 
         $s2 = $s->dropEnd(2);
         $this->assertNotSame($s, $s2);
@@ -138,15 +138,15 @@ class SequenceTest extends TestCase
 
     public function testEquals()
     {
-        $s = new Sequence(1, 2, 3, 4);
+        $s = Sequence::of(1, 2, 3, 4);
 
-        $this->assertTrue($s->equals(new Sequence(1, 2, 3, 4)));
-        $this->assertFalse($s->equals(new Sequence(1, 2, 3)));
+        $this->assertTrue($s->equals(Sequence::of(1, 2, 3, 4)));
+        $this->assertFalse($s->equals(Sequence::of(1, 2, 3)));
     }
 
     public function testFilter()
     {
-        $s = new Sequence(1, 2, 3, 4);
+        $s = Sequence::of(1, 2, 3, 4);
 
         $s2 = $s->filter(function ($v) {
             return $v % 2 === 0;
@@ -160,7 +160,7 @@ class SequenceTest extends TestCase
 
     public function testForeach()
     {
-        $s = new Sequence(1, 2, 3, 4);
+        $s = Sequence::of(1, 2, 3, 4);
         $count = 0;
 
         $s->foreach(function ($v) use (&$count) {
@@ -172,7 +172,7 @@ class SequenceTest extends TestCase
 
     public function testGroupBy()
     {
-        $s = new Sequence(1, 2, 3, 4);
+        $s = Sequence::of(1, 2, 3, 4);
 
         $m = $s->groupBy(function(int $v) {
             return $v % 2;
@@ -190,12 +190,12 @@ class SequenceTest extends TestCase
     {
         $this->expectException(GroupEmptySequenceException::class);
 
-        (new Sequence)->groupBy(function() {});
+        Sequence::of()->groupBy(function() {});
     }
 
     public function testFirst()
     {
-        $s = new Sequence(1, 2, 3);
+        $s = Sequence::of(1, 2, 3);
 
         $this->assertSame(1, $s->first());
     }
@@ -204,12 +204,12 @@ class SequenceTest extends TestCase
     {
         $this->expectException(OutOfBoundException::class);
 
-        (new Sequence)->first();
+        Sequence::of()->first();
     }
 
     public function testLast()
     {
-        $s = new Sequence(1, 2, 3);
+        $s = Sequence::of(1, 2, 3);
 
         $this->assertSame(3, $s->last());
     }
@@ -218,12 +218,12 @@ class SequenceTest extends TestCase
     {
         $this->expectException(OutOfBoundException::class);
 
-        (new Sequence)->last();
+        Sequence::of()->last();
     }
 
     public function testContains()
     {
-        $s = new Sequence(1, 2, 3);
+        $s = Sequence::of(1, 2, 3);
 
         $this->assertTrue($s->contains(3));
         $this->assertFalse($s->contains('3'));
@@ -231,7 +231,7 @@ class SequenceTest extends TestCase
 
     public function testIndexOf()
     {
-        $s = new Sequence(1, 2, 3, new \stdClass, $o = new \stdClass);
+        $s = Sequence::of(1, 2, 3, new \stdClass, $o = new \stdClass);
 
         $this->assertSame(0, $s->indexOf(1));
         $this->assertSame(1, $s->indexOf(2));
@@ -243,12 +243,12 @@ class SequenceTest extends TestCase
     {
         $this->expectException(ElementNotFoundException::class);
 
-        (new Sequence)->indexOf(1);
+        Sequence::of()->indexOf(1);
     }
 
     public function testIndices()
     {
-        $indices = (new Sequence(1, 2, 3))->indices();
+        $indices = Sequence::of(1, 2, 3)->indices();
 
         $this->assertInstanceOf(Stream::class, $indices);
         $this->assertSame('int', (string) $indices->type());
@@ -266,7 +266,7 @@ class SequenceTest extends TestCase
 
     public function testMap()
     {
-        $s = new Sequence(1, 2, 3);
+        $s = Sequence::of(1, 2, 3);
 
         $s2 = $s->map(function ($v) {
             return $v**2;
@@ -279,7 +279,7 @@ class SequenceTest extends TestCase
 
     public function testPad()
     {
-        $s = new Sequence;
+        $s = Sequence::of();
 
         $s2 = $s->pad(2, null);
         $this->assertNotSame($s, $s2);
@@ -290,7 +290,7 @@ class SequenceTest extends TestCase
 
     public function testPartition()
     {
-        $s = new Sequence(1, 2, 3, 4);
+        $s = Sequence::of(1, 2, 3, 4);
 
         $s2 = $s->partition(function ($v) {
             return $v % 2 === 0;
@@ -307,7 +307,7 @@ class SequenceTest extends TestCase
 
     public function testSlice()
     {
-        $s = new Sequence(1, 2, 3, 4, 5, 6, 7);
+        $s = Sequence::of(1, 2, 3, 4, 5, 6, 7);
 
         $s2 = $s->slice(2, 5);
         $this->assertNotSame($s, $s2);
@@ -318,7 +318,7 @@ class SequenceTest extends TestCase
 
     public function testSplitAt()
     {
-        $s = new Sequence(3, 1, 2, 4, 5, 6, 7);
+        $s = Sequence::of(3, 1, 2, 4, 5, 6, 7);
 
         $s2 = $s->splitAt(3);
         $this->assertNotSame($s, $s2);
@@ -332,7 +332,7 @@ class SequenceTest extends TestCase
 
     public function testTake()
     {
-        $s = new Sequence(3, 1, 2, 4, 5, 6, 7);
+        $s = Sequence::of(3, 1, 2, 4, 5, 6, 7);
 
         $s2 = $s->take(4);
         $this->assertNotSame($s, $s2);
@@ -343,7 +343,7 @@ class SequenceTest extends TestCase
 
     public function testTakeEnd()
     {
-        $s = new Sequence(3, 1, 2, 4, 5, 6, 7);
+        $s = Sequence::of(3, 1, 2, 4, 5, 6, 7);
 
         $s2 = $s->takeEnd(4);
         $this->assertNotSame($s, $s2);
@@ -354,9 +354,9 @@ class SequenceTest extends TestCase
 
     public function testAppend()
     {
-        $s = new Sequence(1, 2);
+        $s = Sequence::of(1, 2);
 
-        $s2 = $s->append(new Sequence(2, 3));
+        $s2 = $s->append(Sequence::of(2, 3));
         $this->assertNotSame($s, $s2);
         $this->assertInstanceOf(Sequence::class, $s2);
         $this->assertSame([1, 2], $s->toArray());
@@ -365,9 +365,9 @@ class SequenceTest extends TestCase
 
     public function testIntersect()
     {
-        $s = new Sequence(1, 2, 3, 4);
+        $s = Sequence::of(1, 2, 3, 4);
 
-        $s2 = $s->intersect(new Sequence(2, 3, 5));
+        $s2 = $s->intersect(Sequence::of(2, 3, 5));
         $this->assertNotSame($s, $s2);
         $this->assertInstanceOf(Sequence::class, $s2);
         $this->assertSame([1, 2, 3, 4], $s->toArray());
@@ -380,9 +380,9 @@ class SequenceTest extends TestCase
         $bar = new \stdClass;
         $baz = new \stdClass;
 
-        $s = new Sequence($foo, $bar, $baz);
+        $s = Sequence::of($foo, $bar, $baz);
 
-        $s2 = $s->intersect(new Sequence($bar, new \stdClass));
+        $s2 = $s->intersect(Sequence::of($bar, new \stdClass));
         $this->assertNotSame($s, $s2);
         $this->assertInstanceOf(Sequence::class, $s2);
         $this->assertSame([$foo, $bar, $baz], $s->toArray());
@@ -391,7 +391,7 @@ class SequenceTest extends TestCase
 
     public function testJoin()
     {
-        $s = new Sequence(1, 2, 3);
+        $s = Sequence::of(1, 2, 3);
 
         $s2 = $s->join(', ');
         $this->assertInstanceOf(Str::class, $s2);
@@ -400,7 +400,7 @@ class SequenceTest extends TestCase
 
     public function testAdd()
     {
-        $s = new Sequence(1);
+        $s = Sequence::of(1);
 
         $s2 = $s->add(-1);
         $this->assertNotSame($s, $s2);
@@ -411,7 +411,7 @@ class SequenceTest extends TestCase
 
     public function testSort()
     {
-        $s = new Sequence(4, 3, 2, 1);
+        $s = Sequence::of(4, 3, 2, 1);
 
         $s2 = $s->sort(function(int $a, int $b) {
             return $a > $b;
@@ -424,7 +424,7 @@ class SequenceTest extends TestCase
 
     public function testReduce()
     {
-        $s = new Sequence(4, 3, 2, 1);
+        $s = Sequence::of(4, 3, 2, 1);
 
         $v = $s->reduce(
             42,
@@ -439,7 +439,7 @@ class SequenceTest extends TestCase
 
     public function testReverse()
     {
-        $sequence = new Sequence(1, 3, 4, 2);
+        $sequence = Sequence::of(1, 3, 4, 2);
         $reverse = $sequence->reverse();
 
         $this->assertInstanceOf(Sequence::class, $reverse);

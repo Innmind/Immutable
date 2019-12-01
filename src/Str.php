@@ -23,7 +23,7 @@ final class Str
     private string $value;
     private ?string $encoding;
 
-    public function __construct(string $value, string $encoding = null)
+    private function __construct(string $value, string $encoding = null)
     {
         $this->value = $value;
         $this->encoding = $encoding;
@@ -68,7 +68,7 @@ final class Str
         }
 
         $parts = \explode($delimiter, $this->value);
-        $stream = new Stream(self::class);
+        $stream = Stream::of(self::class);
 
         foreach ($parts as $part) {
             $stream = $stream->add(new self($part, $this->encoding));
@@ -84,7 +84,7 @@ final class Str
      */
     public function chunk(int $size = 1): Stream
     {
-        $stream = new Stream(self::class);
+        $stream = Stream::of(self::class);
         $parts = \mb_str_split($this->value, $size, (string) $this->encoding());
 
         foreach ($parts as $value) {
@@ -281,7 +281,7 @@ final class Str
     public function words(string $charlist = ''): Map
     {
         $words = \str_word_count($this->value, 2, $charlist);
-        $map = new Map('int', self::class);
+        $map = Map::of('int', self::class);
 
         foreach ($words as $position => $word) {
             $map = $map->put($position, new self($word, $this->encoding));
@@ -298,7 +298,7 @@ final class Str
     public function pregSplit(string $regex, int $limit = -1): Stream
     {
         $strings = \preg_split($regex, $this->value, $limit);
-        $stream = new Stream(self::class);
+        $stream = Stream::of(self::class);
 
         foreach ($strings as $string) {
             $stream = $stream->add(new self($string, $this->encoding));

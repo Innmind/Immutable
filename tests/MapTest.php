@@ -22,7 +22,7 @@ class MapTest extends TestCase
 {
     public function testInterface()
     {
-        $m = new Map('int', 'float');
+        $m = Map::of('int', 'float');
 
         $this->assertInstanceOf(\Countable::class, $m);
         $this->assertSame('int', $m->keyType());
@@ -35,7 +35,7 @@ class MapTest extends TestCase
 
         $this->assertTrue(
             $map->equals(
-                (new Map('int', 'float'))
+                Map::of('int', 'float')
                     ->put(1, 1.1)
                     ->put(2, 2.1)
             )
@@ -44,7 +44,7 @@ class MapTest extends TestCase
 
     public function testEmptyOf()
     {
-        $this->assertTrue(Map::of('int', 'int')->equals(new Map('int', 'int')));
+        $this->assertTrue(Map::of('int', 'int')->equals(Map::of('int', 'int')));
     }
 
     public function testThrowWhenDifferentSizes()
@@ -57,7 +57,7 @@ class MapTest extends TestCase
 
     public function testPut()
     {
-        $m = new Map('int', 'int');
+        $m = Map::of('int', 'int');
 
         $this->assertSame(0, $m->size());
         $m2 = $m->put(42, 42);
@@ -65,7 +65,7 @@ class MapTest extends TestCase
         $this->assertSame(0, $m->size());
         $this->assertSame(1, $m2->size());
 
-        $m = new Map('int', 'int');
+        $m = Map::of('int', 'int');
         $m = $m
             ->put(23, 24)
             ->put(41, 42)
@@ -96,14 +96,14 @@ class MapTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
 
-        (new Map('int', 'int'))->put(42, 42.0);
+        Map::of('int', 'int')->put(42, 42.0);
     }
 
     public function testThrowWhenKeyDoesntMatchType()
     {
         $this->expectException(InvalidArgumentException::class);
 
-        $m = new Map('int', 'int');
+        $m = Map::of('int', 'int');
         $m->put('24', 42);
     }
 
@@ -111,13 +111,13 @@ class MapTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
 
-        $m = new Map('int', 'int');
+        $m = Map::of('int', 'int');
         $m->put(24, 42.0);
     }
 
     public function testGet()
     {
-        $m = new Map('int', 'int');
+        $m = Map::of('int', 'int');
         $m = $m->put(23, 24);
 
         $this->assertSame(24, $m->get(23));
@@ -127,12 +127,12 @@ class MapTest extends TestCase
     {
         $this->expectException(ElementNotFoundException::class);
 
-        (new Map('int', 'int'))->get(24);
+        Map::of('int', 'int')->get(24);
     }
 
     public function testContains()
     {
-        $m = new Map('int', 'int');
+        $m = Map::of('int', 'int');
         $m = $m->put(23, 24);
 
         $this->assertFalse($m->contains(24));
@@ -141,7 +141,7 @@ class MapTest extends TestCase
 
     public function testClear()
     {
-        $m = new Map('int', 'float');
+        $m = Map::of('int', 'float');
         $m = $m->put(24, 42.0);
 
         $m2 = $m->clear();
@@ -155,38 +155,38 @@ class MapTest extends TestCase
 
     public function testEquals()
     {
-        $m = (new Map('int', 'int'))->put(24, 42);
-        $m2 = (new Map('int', 'int'))->put(24, 42);
+        $m = Map::of('int', 'int')->put(24, 42);
+        $m2 = Map::of('int', 'int')->put(24, 42);
 
         $this->assertTrue($m->equals($m2));
         $this->assertFalse($m->equals($m2->put(65, 66)));
         $this->assertFalse($m->equals($m2->put(24, 24)));
         $this->assertFalse(
-            (new Map('string', 'string'))
+            Map::of('string', 'string')
                 ->put('foo_res', 'res')
                 ->put('foo_bar_res', 'res')
                 ->equals(
-                    (new Map('string', 'string'))
+                    Map::of('string', 'string')
                         ->put('foo_res', 'res')
                         ->put('bar_res', 'res')
                 )
         );
 
-        $m = (new Map('int', 'int'))
+        $m = Map::of('int', 'int')
             ->put(24, 42)
             ->put(42, 24);
-        $m2 = (new Map('int', 'int'))
+        $m2 = Map::of('int', 'int')
             ->put(42, 24)
             ->put(24, 42);
 
         $this->assertTrue($m->equals($m2));
 
-        $this->assertTrue((new Map('int', 'int'))->equals(new Map('int', 'int')));
+        $this->assertTrue(Map::of('int', 'int')->equals(Map::of('int', 'int')));
     }
 
     public function testFilter()
     {
-        $m = (new Map('int', 'int'))
+        $m = Map::of('int', 'int')
             ->put(0, 1)
             ->put(1, 2)
             ->put(2, 3)
@@ -210,7 +210,7 @@ class MapTest extends TestCase
 
     public function testForeach()
     {
-        $m = (new Map('int', 'int'))
+        $m = Map::of('int', 'int')
             ->put(0, 1)
             ->put(1, 2)
             ->put(2, 3)
@@ -229,12 +229,12 @@ class MapTest extends TestCase
     {
         $this->expectException(GroupEmptyMapException::class);
 
-        (new Map('int', 'int'))->groupBy(function() {});
+        Map::of('int', 'int')->groupBy(function() {});
     }
 
     public function testGroupBy()
     {
-        $m = (new Map('int', 'int'))
+        $m = Map::of('int', 'int')
             ->put(0, 1)
             ->put(1, 2)
             ->put(2, 3)
@@ -266,7 +266,7 @@ class MapTest extends TestCase
     }
     public function testKeys()
     {
-        $m = (new Map('int', 'int'))
+        $m = Map::of('int', 'int')
             ->put(0, 1)
             ->put(1, 2)
             ->put(2, 3)
@@ -281,7 +281,7 @@ class MapTest extends TestCase
 
     public function testValues()
     {
-        $m = (new Map('int', 'int'))
+        $m = Map::of('int', 'int')
             ->put(0, 1)
             ->put(1, 2)
             ->put(2, 3)
@@ -297,7 +297,7 @@ class MapTest extends TestCase
 
     public function testMap()
     {
-        $m = (new Map('int', 'int'))
+        $m = Map::of('int', 'int')
             ->put(0, 1)
             ->put(1, 2)
             ->put(2, 3)
@@ -324,7 +324,7 @@ class MapTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
 
-        (new Map('int', 'int'))
+        Map::of('int', 'int')
             ->put(1, 2)
             ->map(function(int $key, int $value) {
                 return (string) $value;
@@ -335,7 +335,7 @@ class MapTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
 
-        (new Map('int', 'int'))
+        Map::of('int', 'int')
             ->put(1, 2)
             ->map(function(int $key, int $value) {
                 return new Pair((string) $key, $value);
@@ -344,7 +344,7 @@ class MapTest extends TestCase
 
     public function testJoin()
     {
-        $m = (new Map('int', 'int'))
+        $m = Map::of('int', 'int')
             ->put(0, 1)
             ->put(1, 2)
             ->put(2, 3)
@@ -357,7 +357,7 @@ class MapTest extends TestCase
 
     public function testRemove()
     {
-        $m = (new Map('int', 'int'))
+        $m = Map::of('int', 'int')
             ->put(0, 1)
             ->put(1, 2)
             ->put(2, 3)
@@ -396,10 +396,10 @@ class MapTest extends TestCase
 
     public function testMerge()
     {
-        $m = (new Map(Symbol::class, 'int'))
+        $m = Map::of(Symbol::class, 'int')
             ->put($s = new Symbol('foo'), 24)
             ->put($s2 = new Symbol('foo'), 42);
-        $m2 = (new Map(Symbol::class, 'int'))
+        $m2 = Map::of(Symbol::class, 'int')
             ->put($s3 = new Symbol('foo'), 24)
             ->put($s2, 66)
             ->put($s4 = new Symbol('bar'), 42);
@@ -420,17 +420,17 @@ class MapTest extends TestCase
         $this->assertFalse($m3->equals($m2->merge($m)));
     }
 
-    public function testThrowWhenMergingSetsOfDifferentType()
+    public function testThrowWhenMergingMapsOfDifferentType()
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The 2 maps does not reference the same types');
 
-        (new Map('int', 'int'))->merge(new Map('float', 'int'));
+        Map::of('int', 'int')->merge(Map::of('float', 'int'));
     }
 
     public function testPartition()
     {
-        $m = (new Map('int', 'int'))
+        $m = Map::of('int', 'int')
             ->put(0, 1)
             ->put(1, 2)
             ->put(2, 3)
@@ -473,7 +473,7 @@ class MapTest extends TestCase
 
     public function testReduce()
     {
-        $m = (new Map('int', 'int'))
+        $m = Map::of('int', 'int')
             ->put(4, 4);
 
         $v = $m->reduce(

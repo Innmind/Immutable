@@ -191,7 +191,7 @@ final class Primitive implements Implementation
             $key = $discriminator($this->normalizeKey($k), $v);
 
             if ($map === null) {
-                $map = new Map(
+                $map = Map::of(
                     Type::determine($key),
                     Map::class
                 );

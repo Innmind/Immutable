@@ -50,12 +50,12 @@ final class RegExp
             throw new RegexException('', \preg_last_error());
         }
 
-        $map = new Map('scalar', Str::class);
+        $map = Map::of('scalar', Str::class);
 
         foreach ($matches as $key => $match) {
             $map = $map->put(
                 $key,
-                new Str(
+                Str::of(
                     (string) $match,
                     (string) $string->encoding()
                 )

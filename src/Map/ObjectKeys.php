@@ -202,7 +202,7 @@ final class ObjectKeys implements Implementation
             $key = $discriminator($k, $v);
 
             if ($map === null) {
-                $map = new Map(
+                $map = Map::of(
                     Type::determine($key),
                     Map::class
                 );

@@ -14,11 +14,11 @@ final class Set implements \Countable
     /**
      * {@inheritdoc}
      */
-    public function __construct(string $type)
+    private function __construct(string $type)
     {
         $this->type = $type;
         $this->spec = Type::of($type);
-        $this->values = new Stream($type);
+        $this->values = Stream::of($type);
     }
 
     public static function of(string $type, ...$values): self
@@ -284,7 +284,7 @@ final class Set implements \Countable
         $map = $this->values->groupBy($discriminator);
 
         return $map->reduce(
-            new Map($map->keyType(), Set::class),
+            Map::of($map->keyType(), Set::class),
             function(Map $carry, $key, Stream $values): Map {
                 $set = $this->clear();
                 $set->values = $values;

@@ -21,7 +21,7 @@ final class Map implements \Countable
     private string $keyType;
     private string $valueType;
 
-    public function __construct(string $keyType, string $valueType)
+    private function __construct(string $keyType, string $valueType)
     {
         $type = Type::of($keyType);
 
