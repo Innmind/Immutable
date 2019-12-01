@@ -310,15 +310,6 @@ final class DoubleIndex implements Implementation
      */
     public function merge(Implementation $map): Implementation
     {
-        if (
-            $this->keyType !== $map->keyType() ||
-            $this->valueType !== $map->valueType()
-        ) {
-            throw new InvalidArgumentException(
-                'The 2 maps does not reference the same types'
-            );
-        }
-
         return $map->reduce(
             $this,
             function(self $carry, $key, $value): self {

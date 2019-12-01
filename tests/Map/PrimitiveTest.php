@@ -397,14 +397,6 @@ class PrimitiveTest extends TestCase
         $this->assertFalse($m3->equals($m2->merge($m)));
     }
 
-    public function testThrowWhenMergingSetsOfDifferentType()
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The 2 maps does not reference the same types');
-
-        (new Primitive('int', 'int'))->merge(new Primitive('string', 'int'));
-    }
-
     public function testPartition()
     {
         $m = (new Primitive('int', 'int'))

@@ -384,14 +384,6 @@ class DoubleIndexTest extends TestCase
         $this->assertFalse($m3->equals($m2->merge($m)));
     }
 
-    public function testThrowWhenMergingSetsOfDifferentType()
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The 2 maps does not reference the same types');
-
-        (new DoubleIndex('int', 'int'))->merge(new DoubleIndex('float', 'int'));
-    }
-
     public function testPartition()
     {
         $m = (new DoubleIndex('int', 'int'))
