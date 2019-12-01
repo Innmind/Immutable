@@ -313,6 +313,8 @@ final class Stream implements \Countable
      */
     public function contains($element): bool
     {
+        ($this->validate)($element, 1);
+
         return $this->values->contains($element);
     }
 
@@ -325,6 +327,8 @@ final class Stream implements \Countable
      */
     public function indexOf($element): int
     {
+        ($this->validate)($element, 1);
+
         return $this->values->indexOf($element);
     }
 

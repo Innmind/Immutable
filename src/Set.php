@@ -180,6 +180,8 @@ final class Set implements \Countable
      */
     public function contains($element): bool
     {
+        ($this->validate)($element, 1);
+
         return $this->values->contains($element);
     }
 
@@ -192,6 +194,8 @@ final class Set implements \Countable
      */
     public function remove($element): self
     {
+        ($this->validate)($element, 1);
+
         if (!$this->contains($element)) {
             return $this;
         }

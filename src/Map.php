@@ -19,6 +19,8 @@ final class Map implements \Countable
     private Map\Implementation $implementation;
     private string $keyType;
     private string $valueType;
+    private ValidateArgument $validateKey;
+    private ValidateArgument $validateValue;
 
     private function __construct(string $keyType, string $valueType)
     {
@@ -34,6 +36,8 @@ final class Map implements \Countable
 
         $this->keyType = $keyType;
         $this->valueType = $valueType;
+        $this->validateKey = $type;
+        $this->validateValue = Type::of($valueType);
     }
 
     public static function of(
@@ -102,6 +106,9 @@ final class Map implements \Countable
      */
     public function put($key, $value): self
     {
+        ($this->validateKey)($key, 1);
+        ($this->validateValue)($value, 2);
+
         $map = clone $this;
         $map->implementation = $this->implementation->put($key, $value);
 
@@ -140,6 +147,8 @@ final class Map implements \Countable
      */
     public function get($key)
     {
+        ($this->validateKey)($key, 1);
+
         return $this->implementation->get($key);
     }
 
@@ -150,6 +159,8 @@ final class Map implements \Countable
      */
     public function contains($key): bool
     {
+        ($this->validateKey)($key, 1);
+
         return $this->implementation->contains($key);
     }
 
@@ -272,6 +283,8 @@ final class Map implements \Countable
      */
     public function remove($key): self
     {
+        ($this->validateKey)($key, 1);
+
         $map = clone $this;
         $map->implementation = $this->implementation->remove($key);
 
