@@ -13,7 +13,7 @@ use Innmind\Immutable\{
     Sequence,
     Exception\LogicException,
     Exception\ElementNotFoundException,
-    Exception\GroupEmptyMapException
+    Exception\CannotGroupEmptyStructure,
 };
 use PHPUnit\Framework\TestCase;
 
@@ -229,7 +229,7 @@ class MapTest extends TestCase
 
     public function testThrowWhenGroupingAnEmptyMap()
     {
-        $this->expectException(GroupEmptyMapException::class);
+        $this->expectException(CannotGroupEmptyStructure::class);
 
         Map::of('int', 'int')->groupBy(function() {});
     }

@@ -3,6 +3,8 @@ declare(strict_types = 1);
 
 namespace Innmind\Immutable;
 
+use Innmind\Immutable\Exception\CannotGroupEmptyStructure;
+
 final class Set implements \Countable
 {
     private string $type;
@@ -259,6 +261,8 @@ final class Set implements \Countable
      * discriminator function
      *
      * @param callable(T) $discriminator
+     *
+     * @throws CannotGroupEmptyStructure
      *
      * @return Map<mixed, self<T>>
      */

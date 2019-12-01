@@ -5,7 +5,7 @@ namespace Innmind\Immutable;
 
 use Innmind\Immutable\Exception\{
     LogicException,
-    GroupEmptySequenceException,
+    CannotGroupEmptyStructure,
 };
 
 /**
@@ -249,7 +249,7 @@ final class Sequence implements \Countable
      *
      * @param callable(T) $discriminator
      *
-     * @throws GroupEmptySequenceException
+     * @throws CannotGroupEmptyStructure
      *
      * @return Map<mixed, self<T>>
      */

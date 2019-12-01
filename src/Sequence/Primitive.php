@@ -12,7 +12,7 @@ use Innmind\Immutable\{
     Exception\OutOfBoundException,
     Exception\LogicException,
     Exception\ElementNotFoundException,
-    Exception\GroupEmptySequenceException
+    Exception\CannotGroupEmptyStructure,
 };
 
 final class Primitive implements Implementation
@@ -121,7 +121,7 @@ final class Primitive implements Implementation
     public function groupBy(callable $discriminator): Map
     {
         if ($this->size() === 0) {
-            throw new GroupEmptySequenceException;
+            throw new CannotGroupEmptyStructure;
         }
 
         $map = null;

@@ -7,7 +7,7 @@ use Innmind\Immutable\{
     Specification\ClassType,
     Exception\LogicException,
     Exception\ElementNotFoundException,
-    Exception\GroupEmptyMapException
+    Exception\CannotGroupEmptyStructure,
 };
 
 /**
@@ -221,6 +221,8 @@ final class Map implements \Countable
      * discriminator function
      *
      * @param callable(T, S) $discriminator
+     *
+     * @throws CannotGroupEmptyStructure
      *
      * @return self<mixed, self<T, S>>
      */

@@ -8,6 +8,7 @@ use Innmind\Immutable\{
     Sequence,
     Set,
     Str,
+    Exception\CannotGroupEmptyStructure,
 };
 
 /**
@@ -99,6 +100,8 @@ interface Implementation extends \Countable
      * discriminator function
      *
      * @param callable(T) $discriminator
+     *
+     * @throws CannotGroupEmptyStructure
      *
      * @return Map<mixed, Set<T>>
      */

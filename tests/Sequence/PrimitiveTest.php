@@ -10,7 +10,7 @@ use Innmind\Immutable\{
     Sequence,
     Str,
     Exception\OutOfBoundException,
-    Exception\GroupEmptySequenceException,
+    Exception\CannotGroupEmptyStructure,
     Exception\ElementNotFoundException,
 };
 use PHPUnit\Framework\TestCase;
@@ -130,7 +130,7 @@ class PrimitiveTest extends TestCase
 
     public function testThrowWhenTryingToGroupEmptySequence()
     {
-        $this->expectException(GroupEmptySequenceException::class);
+        $this->expectException(CannotGroupEmptyStructure::class);
 
         (new Primitive('int'))->groupBy(fn($i) => $i);
     }

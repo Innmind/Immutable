@@ -8,7 +8,7 @@ use Innmind\Immutable\{
     Sequence,
     Str,
     Exception\LogicException,
-    Exception\GroupEmptySequenceException,
+    Exception\CannotGroupEmptyStructure,
     Exception\InvalidArgumentException,
 };
 
@@ -95,7 +95,7 @@ interface Implementation extends \Countable
      *
      * @param callable(T) $discriminator
      *
-     * @throws GroupEmptySequenceException
+     * @throws CannotGroupEmptyStructure
      *
      * @return Map<mixed, Sequence<T>>
      */

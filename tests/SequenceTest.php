@@ -9,7 +9,7 @@ use Innmind\Immutable\{
     Map,
     Exception\OutOfBoundException,
     Exception\LogicException,
-    Exception\GroupEmptySequenceException
+    Exception\CannotGroupEmptyStructure,
 };
 use PHPUnit\Framework\TestCase;
 
@@ -283,7 +283,7 @@ class SequenceTest extends TestCase
 
     public function testThrowWhenGroupingEmptySequence()
     {
-        $this->expectException(GroupEmptySequenceException::class);
+        $this->expectException(CannotGroupEmptyStructure::class);
 
         Sequence::of('int')->groupBy(function() {});
     }

@@ -13,7 +13,7 @@ use Innmind\Immutable\{
     ValidateArgument,
     Exception\LogicException,
     Exception\ElementNotFoundException,
-    Exception\GroupEmptyMapException
+    Exception\CannotGroupEmptyStructure,
 };
 
 /**
@@ -181,7 +181,7 @@ final class Primitive implements Implementation
     public function groupBy(callable $discriminator): Map
     {
         if ($this->size() === 0) {
-            throw new GroupEmptyMapException;
+            throw new CannotGroupEmptyStructure;
         }
 
         $map = null;
