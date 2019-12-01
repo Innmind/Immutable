@@ -314,10 +314,6 @@ final class Str
      */
     public function matches(string $regex): bool
     {
-        if (\func_num_args() !== 1) {
-            throw new LogicException('Offset is no longer supported');
-        }
-
         return RegExp::of($regex)->matches($this);
     }
 
