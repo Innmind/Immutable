@@ -522,6 +522,24 @@ final class Stream implements \Countable
     }
 
     /**
+     * Alias for add method in order to have a syntax similar to a true tuple
+     * when constructing the stream
+     *
+     * Example:
+     * <code>
+     * Stream::of('int')(1)(3)
+     * </code>
+     *
+     * @param T $element
+     *
+     * @return self<T>
+     */
+    public function __invoke($element): self
+    {
+        return $this->add($element);
+    }
+
+    /**
      * Sort the stream in a different order
      *
      * @param callable(T, T): int $function

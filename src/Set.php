@@ -158,6 +158,24 @@ final class Set implements \Countable
     }
 
     /**
+     * Alias for add method in order to have a syntax similar to a true tuple
+     * when constructing the set
+     *
+     * Example:
+     * <code>
+     * Set::of('int')(1)(3)
+     * </code>
+     *
+     * @param T $element
+     *
+     * @return self<T>
+     */
+    public function __invoke($element): self
+    {
+        return $this->add($element);
+    }
+
+    /**
      * Check if the set contains the given element
      *
      * @param T $element

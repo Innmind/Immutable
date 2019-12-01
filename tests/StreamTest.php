@@ -585,6 +585,11 @@ class StreamTest extends TestCase
         $this->assertSame('int', $b->type());
         $this->assertSame([], $a->toArray());
         $this->assertSame([1], $b->toArray());
+
+        $this->assertSame(
+            [1, 2, 3],
+            Stream::ints(1)(2)(3)->toArray(),
+        );
     }
 
     public function testThrowWhenAddingInvalidType()

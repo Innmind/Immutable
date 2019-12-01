@@ -99,6 +99,11 @@ class SetTest extends TestCase
         $s = $s->add(24);
         $this->assertSame(2, $s->size());
         $this->assertSame([42, 24], $s->toArray());
+
+        $this->assertSame(
+            [1, 2, 3],
+            Set::ints(1)(2)(3)->toArray(),
+        );
     }
 
     public function testThrowWhenAddindInvalidElementType()
