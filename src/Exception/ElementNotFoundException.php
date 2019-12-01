@@ -3,6 +3,6 @@ declare(strict_types = 1);
 
 namespace Innmind\Immutable\Exception;
 
-class ElementNotFoundException extends InvalidArgumentException implements ExceptionInterface
+class ElementNotFoundException extends InvalidArgumentException implements Exception
 {
 }
