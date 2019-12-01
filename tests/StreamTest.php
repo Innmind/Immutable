@@ -219,8 +219,8 @@ class StreamTest extends TestCase
 
     public function testThrowWhenTryingToTestEqualityForDifferentTypes()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The 2 streams does not reference the same type');
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage('Argument 1 must be of type Stream<int>, Stream<stdClass> given');
 
         Stream::of('int')->equals(Stream::of('stdClass'));
     }
@@ -528,8 +528,8 @@ class StreamTest extends TestCase
 
     public function testThrowWhenAppendingDifferentTypes()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The 2 streams does not reference the same type');
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage('Argument 1 must be of type Stream<int>, Stream<stdClass> given');
 
         Stream::of('int')->append(Stream::of('stdClass'));
     }
@@ -557,8 +557,8 @@ class StreamTest extends TestCase
 
     public function testThrowWhenIntersectingDifferentTypes()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The 2 streams does not reference the same type');
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage('Argument 1 must be of type Stream<int>, Stream<stdClass> given');
 
         Stream::of('int')->intersect(Stream::of('stdClass'));
     }

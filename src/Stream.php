@@ -148,7 +148,7 @@ final class Stream implements \Countable
      */
     public function diff(self $stream): self
     {
-        $this->validate($stream);
+        assertStream($this->type, $stream, 1);
 
         $newStream = clone $this;
         $newStream->values = $this->values->diff(
@@ -204,7 +204,7 @@ final class Stream implements \Countable
      */
     public function equals(self $stream): bool
     {
-        $this->validate($stream);
+        assertStream($this->type, $stream, 1);
 
         return $this->values->equals(
             Sequence::of(...$stream->toArray())
@@ -466,7 +466,7 @@ final class Stream implements \Countable
      */
     public function append(self $stream): self
     {
-        $this->validate($stream);
+        assertStream($this->type, $stream, 1);
 
         $self = clone $this;
         $self->values = $this->values->append(
@@ -486,7 +486,7 @@ final class Stream implements \Countable
      */
     public function intersect(self $stream): self
     {
-        $this->validate($stream);
+        assertStream($this->type, $stream, 1);
 
         $self = clone $this;
         $self->values = $this->values->intersect(
@@ -596,19 +596,5 @@ final class Stream implements \Countable
     public function empty(): bool
     {
         return $this->values->empty();
-    }
-
-    /**
-     * Make sure the stream is compatible with the current one
-     *
-     * @throws InvalidArgumentException
-     */
-    private function validate(self $stream): void
-    {
-        if (!$stream->isOfType($this->type)) {
-            throw new InvalidArgumentException(
-                'The 2 streams does not reference the same type'
-            );
-        }
     }
 }

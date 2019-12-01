@@ -153,6 +153,14 @@ class MapTest extends TestCase
         $this->assertSame('float', $m2->valueType());
     }
 
+    public function testThrowWhenTryingToCheckIfMapsOfDifferentTypesAreEqual()
+    {
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage('Argument 1 must be of type Map<int, int>');
+
+        Map::of('int', 'int')->equals(Map::of('float', 'int'));
+    }
+
     public function testEquals()
     {
         $m = Map::of('int', 'int')->put(24, 42);
@@ -422,8 +430,8 @@ class MapTest extends TestCase
 
     public function testThrowWhenMergingMapsOfDifferentType()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The 2 maps does not reference the same types');
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage('Argument 1 must be of type Map<int, int>');
 
         Map::of('int', 'int')->merge(Map::of('float', 'int'));
     }

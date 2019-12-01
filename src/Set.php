@@ -126,7 +126,7 @@ final class Set implements \Countable
      */
     public function intersect(self $set): self
     {
-        $this->validate($set);
+        assertSet($this->type, $set, 1);
 
         $newSet = clone $this;
         $newSet->values = $this->values->intersect(
@@ -218,7 +218,7 @@ final class Set implements \Countable
      */
     public function diff(self $set): self
     {
-        $this->validate($set);
+        assertSet($this->type, $set, 1);
 
         $newSet = clone $this;
         $newSet->values = $this->values->diff(
@@ -235,7 +235,7 @@ final class Set implements \Countable
      */
     public function equals(self $set): bool
     {
-        $this->validate($set);
+        assertSet($this->type, $set, 1);
 
         if ($this->size() !== $set->size()) {
             return false;
@@ -360,7 +360,7 @@ final class Set implements \Countable
      */
     public function merge(self $set): self
     {
-        $this->validate($set);
+        assertSet($this->type, $set, 1);
 
         return $set->reduce(
             $this,
@@ -399,19 +399,5 @@ final class Set implements \Countable
     public function empty(): bool
     {
         return $this->values->empty();
-    }
-
-    /**
-     * Make sure the set is compatible with the current one
-     *
-     * @throws InvalidArgumentException
-     */
-    private function validate(self $set): void
-    {
-        if (!$set->isOfType($this->type)) {
-            throw new InvalidArgumentException(
-                'The 2 sets does not reference the same type'
-            );
-        }
     }
 }

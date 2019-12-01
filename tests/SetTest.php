@@ -130,8 +130,8 @@ class SetTest extends TestCase
 
     public function testThrowWhenIntersectingSetsOfDifferentTypes()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The 2 sets does not reference the same type');
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage('Argument 1 must be of type Set<int>, Set<float> given');
 
         Set::of('int')->intersect(Set::of('float'));
     }
@@ -183,8 +183,8 @@ class SetTest extends TestCase
 
     public function testThrowWhenDiffingSetsOfDifferentType()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The 2 sets does not reference the same type');
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage('Argument 1 must be of type Set<int>, Set<float> given');
 
         Set::of('int')->diff(Set::of('float'));
     }
@@ -216,8 +216,8 @@ class SetTest extends TestCase
 
     public function testThrowWhenCheckingEqualityBetweenSetsOfDifferentType()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The 2 sets does not reference the same type');
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage('Argument 1 must be of type Set<int>, Set<float> given');
 
         Set::of('int')->equals(Set::of('float'));
     }
@@ -393,8 +393,8 @@ class SetTest extends TestCase
 
     public function testThrowWhenMergingSetsOfDifferentType()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The 2 sets does not reference the same type');
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage('Argument 1 must be of type Set<int>, Set<float> given');
 
         Set::of('int')->merge(Set::of('float'));
     }

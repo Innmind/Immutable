@@ -174,6 +174,8 @@ final class Map implements \Countable
      */
     public function equals(self $map): bool
     {
+        assertMap($this->keyType, $this->valueType, $map, 1);
+
         return $this->implementation->equals($map->implementation);
     }
 
@@ -286,6 +288,8 @@ final class Map implements \Countable
      */
     public function merge(self $map): self
     {
+        assertMap($this->keyType, $this->valueType, $map, 1);
+
         $self = clone $this;
         $self->implementation = $this->implementation->merge($map->implementation);
 
