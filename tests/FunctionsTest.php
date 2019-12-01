@@ -22,7 +22,7 @@ class FunctionsTest extends TestCase
         $this->assertNull(assertSet('string', Set::of('string')));
 
         $this->expectException(\TypeError::class);
-        $this->expectExceptionMessage('Argument 42 must be of type Set<string>');
+        $this->expectExceptionMessage('Argument 42 must be of type Set<string>, Set<int> given');
 
         assertSet('string', Set::of('int'), 42);
     }
@@ -32,7 +32,7 @@ class FunctionsTest extends TestCase
         $this->assertNull(assertStream('string', Stream::of('string')));
 
         $this->expectException(\TypeError::class);
-        $this->expectExceptionMessage('Argument 42 must be of type Stream<string>');
+        $this->expectExceptionMessage('Argument 42 must be of type Stream<string>, Stream<int> given');
 
         assertStream('string', Stream::of('int'), 42);
     }
@@ -42,7 +42,7 @@ class FunctionsTest extends TestCase
         $this->assertNull(assertMap('string', 'int', Map::of('string', 'int')));
 
         $this->expectException(\TypeError::class);
-        $this->expectExceptionMessage('Argument 42 must be of type Map<string, int>');
+        $this->expectExceptionMessage('Argument 42 must be of type Map<string, int>, Map<string, string> given');
 
         assertMap('string', 'int', Map::of('string', 'string'), 42);
     }
