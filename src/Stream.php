@@ -9,19 +9,19 @@ use Innmind\Immutable\Exception\{
 };
 
 /**
- * {@inheritdoc}
+ * @template T
  */
 final class Stream implements \Countable
 {
     private string $type;
     private ValidateArgument $validate;
-    private Sequence $values;
+    private Stream\Implementation $implementation;
 
     private function __construct(string $type)
     {
         $this->type = $type;
         $this->validate = Type::of($type);
-        $this->values = Sequence::of();
+        $this->implementation = new Stream\Primitive($type);
     }
 
     /**
@@ -30,8 +30,8 @@ final class Stream implements \Countable
     public static function of(string $type, ...$values): self
     {
         $self = new self($type);
-        $self->values = Sequence::of(...$values);
-        $self->values->reduce(
+        $self->implementation = new Stream\Primitive($type, ...$values);
+        $self->implementation->reduce(
             1,
             static function(int $position, $element) use ($self): int {
                 ($self->validate)($element, $position);
@@ -51,7 +51,7 @@ final class Stream implements \Countable
     public static function mixed(...$values): self
     {
         $self = new self('mixed');
-        $self->values = Sequence::of(...$values);
+        $self->implementation = new Stream\Primitive('mixed', ...$values);
 
         return $self;
     }
@@ -62,7 +62,7 @@ final class Stream implements \Countable
     public static function ints(int ...$values): self
     {
         $self = new self('int');
-        $self->values = Sequence::of(...$values);
+        $self->implementation = new Stream\Primitive('int', ...$values);
 
         return $self;
     }
@@ -73,7 +73,7 @@ final class Stream implements \Countable
     public static function floats(float ...$values): self
     {
         $self = new self('float');
-        $self->values = Sequence::of(...$values);
+        $self->implementation = new Stream\Primitive('float', ...$values);
 
         return $self;
     }
@@ -84,7 +84,7 @@ final class Stream implements \Countable
     public static function strings(string ...$values): self
     {
         $self = new self('string');
-        $self->values = Sequence::of(...$values);
+        $self->implementation = new Stream\Primitive('string', ...$values);
 
         return $self;
     }
@@ -95,7 +95,7 @@ final class Stream implements \Countable
     public static function objects(object ...$values): self
     {
         $self = new self('object');
-        $self->values = Sequence::of(...$values);
+        $self->implementation = new Stream\Primitive('object', ...$values);
 
         return $self;
     }
@@ -115,7 +115,7 @@ final class Stream implements \Countable
 
     public function size(): int
     {
-        return $this->values->size();
+        return $this->implementation->size();
     }
 
     /**
@@ -123,12 +123,15 @@ final class Stream implements \Countable
      */
     public function count(): int
     {
-        return $this->values->size();
+        return $this->implementation->size();
     }
 
+    /**
+     * @return list<T>
+     */
     public function toArray(): array
     {
-        return $this->values->toArray();
+        return $this->implementation->toArray();
     }
 
     /**
@@ -140,7 +143,7 @@ final class Stream implements \Countable
      */
     public function get(int $index)
     {
-        return $this->values->get($index);
+        return $this->implementation->get($index);
     }
 
     /**
@@ -154,12 +157,12 @@ final class Stream implements \Countable
     {
         assertStream($this->type, $stream, 1);
 
-        $newStream = clone $this;
-        $newStream->values = $this->values->diff(
-            Sequence::of(...$stream->toArray())
+        $self = clone $this;
+        $self->implementation = $this->implementation->diff(
+            $stream->implementation
         );
 
-        return $newStream;
+        return $self;
     }
 
     /**
@@ -170,7 +173,7 @@ final class Stream implements \Countable
     public function distinct(): self
     {
         $stream = clone $this;
-        $stream->values = $this->values->distinct();
+        $stream->implementation = $this->implementation->distinct();
 
         return $stream;
     }
@@ -183,7 +186,7 @@ final class Stream implements \Countable
     public function drop(int $size): self
     {
         $stream = clone $this;
-        $stream->values = $this->values->drop($size);
+        $stream->implementation = $this->implementation->drop($size);
 
         return $stream;
     }
@@ -196,7 +199,7 @@ final class Stream implements \Countable
     public function dropEnd(int $size): self
     {
         $stream = clone $this;
-        $stream->values = $this->values->dropEnd($size);
+        $stream->implementation = $this->implementation->dropEnd($size);
 
         return $stream;
     }
@@ -210,8 +213,8 @@ final class Stream implements \Countable
     {
         assertStream($this->type, $stream, 1);
 
-        return $this->values->equals(
-            Sequence::of(...$stream->toArray())
+        return $this->implementation->equals(
+            $stream->implementation
         );
     }
 
@@ -225,7 +228,7 @@ final class Stream implements \Countable
     public function filter(callable $predicate): self
     {
         $stream = clone $this;
-        $stream->values = $this->values->filter($predicate);
+        $stream->implementation = $this->implementation->filter($predicate);
 
         return $stream;
     }
@@ -234,12 +237,10 @@ final class Stream implements \Countable
      * Apply the given function to all elements of the stream
      *
      * @param callable(T): void $function
-     *
-     * @return self<T>
      */
     public function foreach(callable $function): void
     {
-        $this->values->foreach($function);
+        $this->implementation->foreach($function);
     }
 
     /**
@@ -254,36 +255,7 @@ final class Stream implements \Countable
      */
     public function groupBy(callable $discriminator): Map
     {
-        if ($this->size() === 0) {
-            throw new GroupEmptySequenceException;
-        }
-
-        $map = null;
-
-        foreach ($this->values->toArray() as $value) {
-            $key = $discriminator($value);
-
-            if ($map === null) {
-                $map = Map::of(
-                    Type::determine($key),
-                    self::class
-                );
-            }
-
-            if ($map->contains($key)) {
-                $map = $map->put(
-                    $key,
-                    $map->get($key)->add($value)
-                );
-            } else {
-                $map = $map->put(
-                    $key,
-                    (new self($this->type))->add($value)
-                );
-            }
-        }
-
-        return $map;
+        return $this->implementation->groupBy($discriminator);
     }
 
     /**
@@ -293,7 +265,7 @@ final class Stream implements \Countable
      */
     public function first()
     {
-        return $this->values->first();
+        return $this->implementation->first();
     }
 
     /**
@@ -303,7 +275,7 @@ final class Stream implements \Countable
      */
     public function last()
     {
-        return $this->values->last();
+        return $this->implementation->last();
     }
 
     /**
@@ -315,7 +287,7 @@ final class Stream implements \Countable
     {
         ($this->validate)($element, 1);
 
-        return $this->values->contains($element);
+        return $this->implementation->contains($element);
     }
 
     /**
@@ -329,7 +301,7 @@ final class Stream implements \Countable
     {
         ($this->validate)($element, 1);
 
-        return $this->values->indexOf($element);
+        return $this->implementation->indexOf($element);
     }
 
     /**
@@ -339,7 +311,10 @@ final class Stream implements \Countable
      */
     public function indices(): self
     {
-        return $this->values->indices();
+        $self = new self('int');
+        $self->implementation = $this->implementation->indices();
+
+        return $self;
     }
 
     /**
@@ -352,15 +327,7 @@ final class Stream implements \Countable
     public function map(callable $function): self
     {
         $self = clone $this;
-        $self->values = $this->values->map($function);
-        $self->values->reduce(
-            1,
-            function(int $position, $element): int {
-                ($this->validate)($element, $position);
-
-                return ++$position;
-            }
-        );
+        $self->implementation = $this->implementation->map($function);
 
         return $self;
     }
@@ -377,7 +344,7 @@ final class Stream implements \Countable
         ($this->validate)($element, 2);
 
         $stream = clone $this;
-        $stream->values = $this->values->pad($size, $element);
+        $stream->implementation = $this->implementation->pad($size, $element);
 
         return $stream;
     }
@@ -391,25 +358,7 @@ final class Stream implements \Countable
      */
     public function partition(callable $predicate): Map
     {
-        $truthy = [];
-        $falsy = [];
-
-        foreach ($this->values->toArray() as $value) {
-            if ($predicate($value) === true) {
-                $truthy[] = $value;
-            } else {
-                $falsy[] = $value;
-            }
-        }
-
-        $true = $this->clear();
-        $true->values = Sequence::of(...$truthy);
-        $false = $this->clear();
-        $false->values = Sequence::of(...$falsy);
-
-        return Map::of('bool', self::class)
-            (true, $true)
-            (false, $false);
+        return $this->implementation->partition($predicate);
     }
 
     /**
@@ -420,7 +369,7 @@ final class Stream implements \Countable
     public function slice(int $from, int $until): self
     {
         $stream = clone $this;
-        $stream->values = $this->values->slice($from, $until);
+        $stream->implementation = $this->implementation->slice($from, $until);
 
         return $stream;
     }
@@ -434,14 +383,7 @@ final class Stream implements \Countable
      */
     public function splitAt(int $position): self
     {
-        $stream = new self(self::class);
-        $splitted = $this->values->splitAt($position);
-        $first = new self($this->type);
-        $second = new self($this->type);
-        $first->values = $splitted->first();
-        $second->values = $splitted->last();
-
-        return $stream->add($first)->add($second);
+        return $this->implementation->splitAt($position);
     }
 
     /**
@@ -452,7 +394,7 @@ final class Stream implements \Countable
     public function take(int $size): self
     {
         $stream = clone $this;
-        $stream->values = $this->values->take($size);
+        $stream->implementation = $this->implementation->take($size);
 
         return $stream;
     }
@@ -465,7 +407,7 @@ final class Stream implements \Countable
     public function takeEnd(int $size): self
     {
         $stream = clone $this;
-        $stream->values = $this->values->takeEnd($size);
+        $stream->implementation = $this->implementation->takeEnd($size);
 
         return $stream;
     }
@@ -482,8 +424,8 @@ final class Stream implements \Countable
         assertStream($this->type, $stream, 1);
 
         $self = clone $this;
-        $self->values = $this->values->append(
-            Sequence::of(...$stream->toArray())
+        $self->implementation = $this->implementation->append(
+            $stream->implementation
         );
 
         return $self;
@@ -502,8 +444,8 @@ final class Stream implements \Countable
         assertStream($this->type, $stream, 1);
 
         $self = clone $this;
-        $self->values = $this->values->intersect(
-            Sequence::of(...$stream->toArray())
+        $self->implementation = $this->implementation->intersect(
+            $stream->implementation
         );
 
         return $self;
@@ -514,7 +456,7 @@ final class Stream implements \Countable
      */
     public function join(string $separator): Str
     {
-        return Str::of((string) $this->values->join($separator));
+        return $this->implementation->join($separator);
     }
 
     /**
@@ -529,7 +471,7 @@ final class Stream implements \Countable
         ($this->validate)($element, 1);
 
         $stream = clone $this;
-        $stream->values = $this->values->add($element);
+        $stream->implementation = $this->implementation->add($element);
 
         return $stream;
     }
@@ -562,7 +504,7 @@ final class Stream implements \Countable
     public function sort(callable $function): self
     {
         $stream = clone $this;
-        $stream->values = $this->values->sort($function);
+        $stream->implementation = $this->implementation->sort($function);
 
         return $stream;
     }
@@ -577,7 +519,7 @@ final class Stream implements \Countable
      */
     public function reduce($carry, callable $reducer)
     {
-        return $this->values->reduce($carry, $reducer);
+        return $this->implementation->reduce($carry, $reducer);
     }
 
     /**
@@ -588,7 +530,7 @@ final class Stream implements \Countable
     public function clear(): self
     {
         $self = clone $this;
-        $self->values = Sequence::of();
+        $self->implementation = new Stream\Primitive($this->type);
 
         return $self;
     }
@@ -601,13 +543,13 @@ final class Stream implements \Countable
     public function reverse(): self
     {
         $self = clone $this;
-        $self->values = $this->values->reverse();
+        $self->implementation = $this->implementation->reverse();
 
         return $self;
     }
 
     public function empty(): bool
     {
-        return $this->values->empty();
+        return $this->implementation->empty();
     }
 }
