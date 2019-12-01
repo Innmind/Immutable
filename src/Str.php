@@ -432,6 +432,7 @@ final class Str
                 return $part->ucfirst();
             })
             ->join('')
+            ->lcfirst()
             ->toEncoding((string) $this->encoding());
     }
 

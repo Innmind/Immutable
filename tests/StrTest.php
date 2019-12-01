@@ -732,7 +732,7 @@ class StrTest extends TestCase
         $this->assertInstanceOf(S::class, $str2);
         $this->assertNotSame($str, $str2);
         $this->assertSame('foo_bar baz', (string) $str);
-        $this->assertSame('FooBarBaz', (string) $str2);
+        $this->assertSame('fooBarBaz', (string) $str2);
     }
 
     public function testAppend()
