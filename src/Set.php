@@ -7,7 +7,7 @@ final class Set implements \Countable
 {
     private string $type;
     private ValidateArgument $validate;
-    private Sequence $values;
+    private Set\Implementation $implementation;
 
     /**
      * {@inheritdoc}
@@ -16,13 +16,13 @@ final class Set implements \Countable
     {
         $this->type = $type;
         $this->validate = Type::of($type);
-        $this->values = Sequence::of($type);
+        $this->implementation = new Set\Primitive($type);
     }
 
     public static function of(string $type, ...$values): self
     {
         $self = new self($type);
-        $self->values = Sequence::of($type, ...$values)->distinct();
+        $self->implementation = new Set\Primitive($type, ...$values);
 
         return $self;
     }
@@ -33,7 +33,7 @@ final class Set implements \Countable
     public static function mixed(...$values): self
     {
         $self = new self('mixed');
-        $self->values = Sequence::mixed(...$values)->distinct();
+        $self->implementation = new Set\Primitive('mixed', ...$values);
 
         return $self;
     }
@@ -44,7 +44,7 @@ final class Set implements \Countable
     public static function ints(int ...$values): self
     {
         $self = new self('int');
-        $self->values = Sequence::ints(...$values)->distinct();
+        $self->implementation = new Set\Primitive('int', ...$values);
 
         return $self;
     }
@@ -55,7 +55,7 @@ final class Set implements \Countable
     public static function floats(float ...$values): self
     {
         $self = new self('float');
-        $self->values = Sequence::floats(...$values)->distinct();
+        $self->implementation = new Set\Primitive('float', ...$values);
 
         return $self;
     }
@@ -66,7 +66,7 @@ final class Set implements \Countable
     public static function strings(string ...$values): self
     {
         $self = new self('string');
-        $self->values = Sequence::strings(...$values)->distinct();
+        $self->implementation = new Set\Primitive('string', ...$values);
 
         return $self;
     }
@@ -77,7 +77,7 @@ final class Set implements \Countable
     public static function objects(object ...$values): self
     {
         $self = new self('object');
-        $self->values = Sequence::objects(...$values)->distinct();
+        $self->implementation = new Set\Primitive('object', ...$values);
 
         return $self;
     }
@@ -97,7 +97,7 @@ final class Set implements \Countable
 
     public function size(): int
     {
-        return $this->values->size();
+        return $this->implementation->size();
     }
 
     /**
@@ -105,12 +105,12 @@ final class Set implements \Countable
      */
     public function count(): int
     {
-        return $this->values->size();
+        return $this->implementation->size();
     }
 
     public function toArray(): array
     {
-        return $this->values->toArray();
+        return $this->implementation->toArray();
     }
 
     /**
@@ -127,8 +127,8 @@ final class Set implements \Countable
         assertSet($this->type, $set, 1);
 
         $newSet = clone $this;
-        $newSet->values = $this->values->intersect(
-            Sequence::of($this->type, ...$set->toArray())
+        $newSet->implementation = $this->implementation->intersect(
+            $set->implementation
         );
 
         return $newSet;
@@ -145,14 +145,10 @@ final class Set implements \Countable
     {
         ($this->validate)($element, 1);
 
-        if ($this->contains($element)) {
-            return $this;
-        }
+        $self = clone $this;
+        $self->implementation = $this->implementation->add($element);
 
-        $set = clone $this;
-        $set->values = $this->values->add($element);
-
-        return $set;
+        return $self;
     }
 
     /**
@@ -182,7 +178,7 @@ final class Set implements \Countable
     {
         ($this->validate)($element, 1);
 
-        return $this->values->contains($element);
+        return $this->implementation->contains($element);
     }
 
     /**
@@ -196,19 +192,10 @@ final class Set implements \Countable
     {
         ($this->validate)($element, 1);
 
-        if (!$this->contains($element)) {
-            return $this;
-        }
+        $self = clone $this;
+        $self->implementation = $this->implementation->remove($element);
 
-        $index = $this->values->indexOf($element);
-        $set = clone $this;
-        $set->values = $this
-            ->values
-            ->clear()
-            ->append($this->values->slice(0, $index))
-            ->append($this->values->slice($index + 1, $this->size()));
-
-        return $set;
+        return $self;
     }
 
     /**
@@ -222,12 +209,12 @@ final class Set implements \Countable
     {
         assertSet($this->type, $set, 1);
 
-        $newSet = clone $this;
-        $newSet->values = $this->values->diff(
-            Sequence::of($this->type, ...$set->toArray())
+        $self = clone $this;
+        $self->implementation = $this->implementation->diff(
+            $set->implementation
         );
 
-        return $newSet;
+        return $self;
     }
 
     /**
@@ -239,11 +226,7 @@ final class Set implements \Countable
     {
         assertSet($this->type, $set, 1);
 
-        if ($this->size() !== $set->size()) {
-            return false;
-        }
-
-        return $this->intersect($set)->size() === $this->size();
+        return $this->implementation->equals($set->implementation);
     }
 
     /**
@@ -256,7 +239,7 @@ final class Set implements \Countable
     public function filter(callable $predicate): self
     {
         $set = clone $this;
-        $set->values = $this->values->filter($predicate);
+        $set->implementation = $this->implementation->filter($predicate);
 
         return $set;
     }
@@ -265,12 +248,10 @@ final class Set implements \Countable
      * Apply the given function to all elements of the set
      *
      * @param callable(T): void $function
-     *
-     * @return self<T>
      */
     public function foreach(callable $function): void
     {
-        $this->values->foreach($function);
+        $this->implementation->foreach($function);
     }
 
     /**
@@ -283,17 +264,7 @@ final class Set implements \Countable
      */
     public function groupBy(callable $discriminator): Map
     {
-        $map = $this->values->groupBy($discriminator);
-
-        return $map->reduce(
-            Map::of($map->keyType(), Set::class),
-            function(Map $carry, $key, Sequence $values): Map {
-                $set = $this->clear();
-                $set->values = $values;
-
-                return $carry->put($key, $set);
-            }
-        );
+        return $this->implementation->groupBy($discriminator);
     }
 
     /**
@@ -305,12 +276,10 @@ final class Set implements \Countable
      */
     public function map(callable $function): self
     {
-        return $this->reduce(
-            $this->clear(),
-            function(self $carry, $value) use ($function): self {
-                return $carry->add($function($value));
-            }
-        );
+        $self = $this->clear();
+        $self->implementation = $this->implementation->map($function);
+
+        return $self;
     }
 
     /**
@@ -322,15 +291,7 @@ final class Set implements \Countable
      */
     public function partition(callable $predicate): Map
     {
-        $truthy = $this->clear();
-        $falsy = $this->clear();
-        $partitions = $this->values->partition($predicate);
-        $truthy->values = $partitions->get(true);
-        $falsy->values = $partitions->get(false);
-
-        return Map::of('bool', Set::class)
-            (true, $truthy)
-            (false, $falsy);
+        return $this->implementation->partition($predicate);
     }
 
     /**
@@ -338,7 +299,7 @@ final class Set implements \Countable
      */
     public function join(string $separator): Str
     {
-        return $this->values->join($separator);
+        return $this->implementation->join($separator);
     }
 
     /**
@@ -350,7 +311,7 @@ final class Set implements \Countable
      */
     public function sort(callable $function): Sequence
     {
-        return $this->values->sort($function);
+        return $this->implementation->sort($function);
     }
 
     /**
@@ -364,12 +325,12 @@ final class Set implements \Countable
     {
         assertSet($this->type, $set, 1);
 
-        return $set->reduce(
-            $this,
-            function(self $carry, $value): self {
-                return $carry->add($value);
-            }
+        $self = clone $this;
+        $self->implementation = $this->implementation->merge(
+            $set->implementation
         );
+
+        return $self;
     }
 
     /**
@@ -382,7 +343,7 @@ final class Set implements \Countable
      */
     public function reduce($carry, callable $reducer)
     {
-        return $this->values->reduce($carry, $reducer);
+        return $this->implementation->reduce($carry, $reducer);
     }
 
     /**
@@ -393,13 +354,13 @@ final class Set implements \Countable
     public function clear(): self
     {
         $self = clone $this;
-        $self->values = $this->values->clear();
+        $self->implementation = $this->implementation->clear();
 
         return $self;
     }
 
     public function empty(): bool
     {
-        return $this->values->empty();
+        return $this->implementation->empty();
     }
 }
