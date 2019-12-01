@@ -7,7 +7,7 @@ use Innmind\Immutable\{
     Map,
     Type,
     Str,
-    Stream,
+    Sequence,
     Set,
     Pair,
     ValidateArgument,
@@ -25,9 +25,9 @@ final class DoubleIndex implements Implementation
     private string $valueType;
     private ValidateArgument $validateKey;
     private ValidateArgument $validateValue;
-    private Stream $keys;
-    private Stream $values;
-    private Stream $pairs;
+    private Sequence $keys;
+    private Sequence $values;
+    private Sequence $pairs;
 
     /**
      * {@inheritdoc}
@@ -38,9 +38,9 @@ final class DoubleIndex implements Implementation
         $this->validateValue = Type::of($valueType);
         $this->keyType = $keyType;
         $this->valueType = $valueType;
-        $this->keys = Stream::of($keyType);
-        $this->values = Stream::of($valueType);
-        $this->pairs = Stream::of(Pair::class);
+        $this->keys = Sequence::of($keyType);
+        $this->values = Sequence::of($valueType);
+        $this->pairs = Sequence::of(Pair::class);
     }
 
     /**
@@ -237,7 +237,7 @@ final class DoubleIndex implements Implementation
     /**
      * {@inheritdoc}
      */
-    public function values(): Stream
+    public function values(): Sequence
     {
         return $this->values;
     }

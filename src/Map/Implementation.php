@@ -7,7 +7,7 @@ use Innmind\Immutable\{
     Map,
     Str,
     Set,
-    Stream,
+    Sequence,
 };
 
 /**
@@ -107,9 +107,9 @@ interface Implementation extends \Countable
     /**
      * Return all values
      *
-     * @return Stream<S>
+     * @return Sequence<S>
      */
-    public function values(): Stream;
+    public function values(): Sequence;
 
     /**
      * Apply the given function on all elements and return a new map

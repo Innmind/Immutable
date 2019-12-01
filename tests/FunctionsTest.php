@@ -5,12 +5,12 @@ namespace Tests\Innmind\Immutable;
 
 use function Innmind\Immutable\{
     assertSet,
-    assertStream,
+    assertSequence,
     assertMap
 };
 use Innmind\Immutable\{
     Set,
-    Stream,
+    Sequence,
     Map
 };
 use PHPUnit\Framework\TestCase;
@@ -27,14 +27,14 @@ class FunctionsTest extends TestCase
         assertSet('string', Set::of('int'), 42);
     }
 
-    public function testAssertStream()
+    public function testAssertSequence()
     {
-        $this->assertNull(assertStream('string', Stream::of('string'), 42));
+        $this->assertNull(assertSequence('string', Sequence::of('string'), 42));
 
         $this->expectException(\TypeError::class);
-        $this->expectExceptionMessage('Argument 42 must be of type Stream<string>, Stream<int> given');
+        $this->expectExceptionMessage('Argument 42 must be of type Sequence<string>, Sequence<int> given');
 
-        assertStream('string', Stream::of('int'), 42);
+        assertSequence('string', Sequence::of('int'), 42);
     }
 
     public function testAssertMap()

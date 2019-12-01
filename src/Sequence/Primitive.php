@@ -1,11 +1,11 @@
 <?php
 declare(strict_types = 1);
 
-namespace Innmind\Immutable\Stream;
+namespace Innmind\Immutable\Sequence;
 
 use Innmind\Immutable\{
     Map,
-    Stream,
+    Sequence,
     Str,
     Type,
     ValidateArgument,
@@ -58,10 +58,10 @@ final class Primitive implements Implementation
         return $this->values[$index];
     }
 
-    public function diff(Implementation $stream): self
+    public function diff(Implementation $sequence): self
     {
-        return $this->filter(static function($value) use ($stream): bool {
-            return !$stream->contains($value);
+        return $this->filter(static function($value) use ($sequence): bool {
+            return !$sequence->contains($value);
         });
     }
 
@@ -95,9 +95,9 @@ final class Primitive implements Implementation
         return $self;
     }
 
-    public function equals(Implementation $stream): bool
+    public function equals(Implementation $sequence): bool
     {
-        return $this->values === $stream->toArray();
+        return $this->values === $sequence->toArray();
     }
 
     public function filter(callable $predicate): self
@@ -132,7 +132,7 @@ final class Primitive implements Implementation
             if ($map === null) {
                 $map = Map::of(
                     Type::determine($key),
-                    Stream::class
+                    Sequence::class
                 );
             }
 
@@ -142,7 +142,7 @@ final class Primitive implements Implementation
                     $map->get($key)->add($value)
                 );
             } else {
-                $map = $map->put($key, Stream::of($this->type, $value));
+                $map = $map->put($key, Sequence::of($this->type, $value));
             }
         }
 
@@ -228,10 +228,10 @@ final class Primitive implements Implementation
             }
         }
 
-        $true = Stream::of($this->type, ...$truthy);
-        $false = Stream::of($this->type, ...$falsy);
+        $true = Sequence::of($this->type, ...$truthy);
+        $false = Sequence::of($this->type, ...$falsy);
 
-        return Map::of('bool', Stream::class)
+        return Map::of('bool', Sequence::class)
             (true, $true)
             (false, $false);
     }
@@ -248,11 +248,11 @@ final class Primitive implements Implementation
         return $self;
     }
 
-    public function splitAt(int $index): Stream
+    public function splitAt(int $index): Sequence
     {
-        return Stream::of(Stream::class)
-            ->add(Stream::of($this->type, ...$this->slice(0, $index)->toArray()))
-            ->add(Stream::of($this->type, ...$this->slice($index, $this->size())->toArray()));
+        return Sequence::of(Sequence::class)
+            ->add(Sequence::of($this->type, ...$this->slice(0, $index)->toArray()))
+            ->add(Sequence::of($this->type, ...$this->slice($index, $this->size())->toArray()));
     }
 
     public function take(int $size): self
@@ -265,18 +265,18 @@ final class Primitive implements Implementation
         return $this->slice($this->size() - $size, $this->size());
     }
 
-    public function append(Implementation $stream): self
+    public function append(Implementation $sequence): self
     {
         $self = $this->clear();
-        $self->values = \array_merge($this->values, $stream->toArray());
+        $self->values = \array_merge($this->values, $sequence->toArray());
 
         return $self;
     }
 
-    public function intersect(Implementation $stream): self
+    public function intersect(Implementation $sequence): self
     {
-        return $this->filter(static function($value) use ($stream): bool {
-            return $stream->contains($value);
+        return $this->filter(static function($value) use ($sequence): bool {
+            return $sequence->contains($value);
         });
     }
 

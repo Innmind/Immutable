@@ -59,39 +59,39 @@ final class Str
     /**
      * Split the string into a collection of ones
      *
-     * @return Stream<self>
+     * @return Sequence<self>
      */
-    public function split(string $delimiter = null): Stream
+    public function split(string $delimiter = null): Sequence
     {
         if (\is_null($delimiter) || $delimiter === '') {
             return $this->chunk();
         }
 
         $parts = \explode($delimiter, $this->value);
-        $stream = Stream::of(self::class);
+        $sequence = Sequence::of(self::class);
 
         foreach ($parts as $part) {
-            $stream = $stream->add(new self($part, $this->encoding));
+            $sequence = $sequence->add(new self($part, $this->encoding));
         }
 
-        return $stream;
+        return $sequence;
     }
 
     /**
      * Returns a collection of the string splitted by the given chunk size
      *
-     * @return Stream<self>
+     * @return Sequence<self>
      */
-    public function chunk(int $size = 1): Stream
+    public function chunk(int $size = 1): Sequence
     {
-        $stream = Stream::of(self::class);
+        $sequence = Sequence::of(self::class);
         $parts = \mb_str_split($this->value, $size, (string) $this->encoding());
 
         foreach ($parts as $value) {
-            $stream = $stream->add(new self($value, $this->encoding));
+            $sequence = $sequence->add(new self($value, $this->encoding));
         }
 
-        return $stream;
+        return $sequence;
     }
 
     /**
@@ -293,18 +293,18 @@ final class Str
     /**
      * Split the string using a regular expression
      *
-     * @return Stream<self>
+     * @return Sequence<self>
      */
-    public function pregSplit(string $regex, int $limit = -1): Stream
+    public function pregSplit(string $regex, int $limit = -1): Sequence
     {
         $strings = \preg_split($regex, $this->value, $limit);
-        $stream = Stream::of(self::class);
+        $sequence = Sequence::of(self::class);
 
         foreach ($strings as $string) {
-            $stream = $stream->add(new self($string, $this->encoding));
+            $sequence = $sequence->add(new self($string, $this->encoding));
         }
 
-        return $stream;
+        return $sequence;
     }
 
     /**

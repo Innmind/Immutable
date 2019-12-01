@@ -7,7 +7,7 @@ use Innmind\Immutable\{
     Map,
     Type,
     Str,
-    Stream,
+    Sequence,
     Set,
     Pair,
     ValidateArgument,
@@ -228,9 +228,9 @@ final class Primitive implements Implementation
     /**
      * {@inheritdoc}
      */
-    public function values(): Stream
+    public function values(): Sequence
     {
-        return Stream::of($this->valueType, ...\array_values($this->values));
+        return Sequence::of($this->valueType, ...\array_values($this->values));
     }
 
     /**

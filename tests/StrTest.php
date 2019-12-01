@@ -7,7 +7,7 @@ use Innmind\Immutable\{
     Str as S,
     PrimitiveInterface,
     StringableInterface,
-    Stream,
+    Sequence,
     Map,
     Exception\SubstringException,
     Exception\RegexException
@@ -63,18 +63,18 @@ class StrTest extends TestCase
     {
         $str = S::of('foo');
 
-        $stream = $str->split();
-        $this->assertInstanceOf(Stream::class, $stream);
-        $this->assertSame(S::class, (string) $stream->type());
-        $this->assertCount(3, $stream);
+        $sequence = $str->split();
+        $this->assertInstanceOf(Sequence::class, $sequence);
+        $this->assertSame(S::class, (string) $sequence->type());
+        $this->assertCount(3, $sequence);
 
-        foreach ($stream as $part) {
+        foreach ($sequence as $part) {
             $this->assertInstanceOf(S::class, $part);
         }
 
-        $this->assertSame('f', (string) $stream->get(0));
-        $this->assertSame('o', (string) $stream->get(1));
-        $this->assertSame('o', (string) $stream->get(2));
+        $this->assertSame('f', (string) $sequence->get(0));
+        $this->assertSame('o', (string) $sequence->get(1));
+        $this->assertSame('o', (string) $sequence->get(2));
 
         $parts = S::of('🤩👍🤔', 'UTF-8')->split();
 
@@ -86,32 +86,32 @@ class StrTest extends TestCase
             (string) S::of('🤩👍🤔', 'ASCII')->split()->get(0)
         );
 
-        $stream = $str->split('');
-        $this->assertInstanceOf(Stream::class, $stream);
-        $this->assertSame(S::class, (string) $stream->type());
-        $this->assertCount(3, $stream);
+        $sequence = $str->split('');
+        $this->assertInstanceOf(Sequence::class, $sequence);
+        $this->assertSame(S::class, (string) $sequence->type());
+        $this->assertCount(3, $sequence);
 
-        foreach ($stream as $part) {
+        foreach ($sequence as $part) {
             $this->assertInstanceOf(S::class, $part);
         }
 
-        $this->assertSame('f', (string) $stream->get(0));
-        $this->assertSame('o', (string) $stream->get(1));
-        $this->assertSame('o', (string) $stream->get(2));
+        $this->assertSame('f', (string) $sequence->get(0));
+        $this->assertSame('o', (string) $sequence->get(1));
+        $this->assertSame('o', (string) $sequence->get(2));
 
         $str = S::of('f|o|o');
-        $stream = $str->split('|');
-        $this->assertInstanceOf(Stream::class, $stream);
-        $this->assertSame(S::class, (string) $stream->type());
-        $this->assertCount(3, $stream);
+        $sequence = $str->split('|');
+        $this->assertInstanceOf(Sequence::class, $sequence);
+        $this->assertSame(S::class, (string) $sequence->type());
+        $this->assertCount(3, $sequence);
 
-        foreach ($stream as $part) {
+        foreach ($sequence as $part) {
             $this->assertInstanceOf(S::class, $part);
         }
 
-        $this->assertSame('f', (string) $stream->get(0));
-        $this->assertSame('o', (string) $stream->get(1));
-        $this->assertSame('o', (string) $stream->get(2));
+        $this->assertSame('f', (string) $sequence->get(0));
+        $this->assertSame('o', (string) $sequence->get(1));
+        $this->assertSame('o', (string) $sequence->get(2));
     }
 
     public function testSplitOnZeroString()
@@ -179,15 +179,15 @@ class StrTest extends TestCase
     {
         $str = S::of('foobarbaz');
 
-        $stream = $str->chunk(4);
-        $this->assertInstanceOf(Stream::class, $stream);
-        $this->assertSame(S::class, (string) $stream->type());
-        $this->assertInstanceOf(S::class, $stream->get(0));
-        $this->assertInstanceOf(S::class, $stream->get(1));
-        $this->assertInstanceOf(S::class, $stream->get(2));
-        $this->assertSame('foob', (string) $stream->get(0));
-        $this->assertSame('arba', (string) $stream->get(1));
-        $this->assertSame('z', (string) $stream->get(2));
+        $sequence = $str->chunk(4);
+        $this->assertInstanceOf(Sequence::class, $sequence);
+        $this->assertSame(S::class, (string) $sequence->type());
+        $this->assertInstanceOf(S::class, $sequence->get(0));
+        $this->assertInstanceOf(S::class, $sequence->get(1));
+        $this->assertInstanceOf(S::class, $sequence->get(2));
+        $this->assertSame('foob', (string) $sequence->get(0));
+        $this->assertSame('arba', (string) $sequence->get(1));
+        $this->assertSame('z', (string) $sequence->get(2));
     }
 
     public function testChunkUtf8ManipulatedAsAscii()
@@ -527,7 +527,7 @@ class StrTest extends TestCase
         $str = S::of('hypertext language, programming');
 
         $c = $str->pregSplit('/[\s,]+/');
-        $this->assertInstanceOf(Stream::class, $c);
+        $this->assertInstanceOf(Sequence::class, $c);
         $this->assertSame(S::class, (string) $c->type());
         $this->assertSame('hypertext', (string) $c->get(0));
         $this->assertSame('language', (string) $c->get(1));

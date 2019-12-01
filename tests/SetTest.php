@@ -8,7 +8,7 @@ use Innmind\Immutable\{
     Map,
     SequenceInterface,
     Str,
-    Stream,
+    Sequence,
 };
 use PHPUnit\Framework\TestCase;
 
@@ -355,7 +355,7 @@ class SetTest extends TestCase
         $s2 = $s->sort(function(int $a, int $b) {
             return $a < $b;
         });
-        $this->assertInstanceOf(Stream::class, $s2);
+        $this->assertInstanceOf(Sequence::class, $s2);
         $this->assertSame('int', $s2->type());
         $this->assertSame([1, 2, 3, 4], $s->toArray());
         $this->assertSame([4, 3, 2, 1], $s2->toArray());

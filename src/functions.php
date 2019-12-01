@@ -26,9 +26,9 @@ function assertMap(string $key, string $value, Map $map, int $position): void
 /**
  * @throws TypeError
  */
-function assertStream(string $type, Stream $stream, int $position): void
+function assertSequence(string $type, Sequence $stream, int $position): void
 {
     if (!$stream->isOfType($type)) {
-        throw new \TypeError("Argument $position must be of type Stream<$type>, Stream<{$stream->type()}> given");
+        throw new \TypeError("Argument $position must be of type Sequence<$type>, Sequence<{$stream->type()}> given");
     }
 }

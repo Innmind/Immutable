@@ -242,9 +242,9 @@ final class Map implements \Countable
     /**
      * Return all values
      *
-     * @return Stream<S>
+     * @return Sequence<S>
      */
-    public function values(): Stream
+    public function values(): Sequence
     {
         return $this->implementation->values();
     }

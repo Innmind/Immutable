@@ -10,7 +10,7 @@ use Innmind\Immutable\{
     Pair,
     Str,
     Set,
-    Stream,
+    Sequence,
     Exception\LogicException,
     Exception\ElementNotFoundException,
     Exception\GroupEmptyMapException
@@ -260,7 +260,7 @@ class PrimitiveTest extends TestCase
             ->put(5, 5);
 
         $v = $m->values();
-        $this->assertInstanceOf(Stream::class, $v);
+        $this->assertInstanceOf(Sequence::class, $v);
         $this->assertSame('int', $v->type());
         $this->assertSame([1, 2, 3, 5, 5], $v->toArray());
         $this->assertTrue($v->equals($m->values()));

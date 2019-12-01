@@ -7,7 +7,7 @@ final class Set implements \Countable
 {
     private string $type;
     private ValidateArgument $validate;
-    private Stream $values;
+    private Sequence $values;
 
     /**
      * {@inheritdoc}
@@ -16,13 +16,13 @@ final class Set implements \Countable
     {
         $this->type = $type;
         $this->validate = Type::of($type);
-        $this->values = Stream::of($type);
+        $this->values = Sequence::of($type);
     }
 
     public static function of(string $type, ...$values): self
     {
         $self = new self($type);
-        $self->values = Stream::of($type, ...$values)->distinct();
+        $self->values = Sequence::of($type, ...$values)->distinct();
 
         return $self;
     }
@@ -33,7 +33,7 @@ final class Set implements \Countable
     public static function mixed(...$values): self
     {
         $self = new self('mixed');
-        $self->values = Stream::mixed(...$values)->distinct();
+        $self->values = Sequence::mixed(...$values)->distinct();
 
         return $self;
     }
@@ -44,7 +44,7 @@ final class Set implements \Countable
     public static function ints(int ...$values): self
     {
         $self = new self('int');
-        $self->values = Stream::ints(...$values)->distinct();
+        $self->values = Sequence::ints(...$values)->distinct();
 
         return $self;
     }
@@ -55,7 +55,7 @@ final class Set implements \Countable
     public static function floats(float ...$values): self
     {
         $self = new self('float');
-        $self->values = Stream::floats(...$values)->distinct();
+        $self->values = Sequence::floats(...$values)->distinct();
 
         return $self;
     }
@@ -66,7 +66,7 @@ final class Set implements \Countable
     public static function strings(string ...$values): self
     {
         $self = new self('string');
-        $self->values = Stream::strings(...$values)->distinct();
+        $self->values = Sequence::strings(...$values)->distinct();
 
         return $self;
     }
@@ -77,7 +77,7 @@ final class Set implements \Countable
     public static function objects(object ...$values): self
     {
         $self = new self('object');
-        $self->values = Stream::objects(...$values)->distinct();
+        $self->values = Sequence::objects(...$values)->distinct();
 
         return $self;
     }
@@ -128,7 +128,7 @@ final class Set implements \Countable
 
         $newSet = clone $this;
         $newSet->values = $this->values->intersect(
-            Stream::of($this->type, ...$set->toArray())
+            Sequence::of($this->type, ...$set->toArray())
         );
 
         return $newSet;
@@ -224,7 +224,7 @@ final class Set implements \Countable
 
         $newSet = clone $this;
         $newSet->values = $this->values->diff(
-            Stream::of($this->type, ...$set->toArray())
+            Sequence::of($this->type, ...$set->toArray())
         );
 
         return $newSet;
@@ -287,7 +287,7 @@ final class Set implements \Countable
 
         return $map->reduce(
             Map::of($map->keyType(), Set::class),
-            function(Map $carry, $key, Stream $values): Map {
+            function(Map $carry, $key, Sequence $values): Map {
                 $set = $this->clear();
                 $set->values = $values;
 
@@ -346,9 +346,9 @@ final class Set implements \Countable
      *
      * @param callable(T, T): int $function
      *
-     * @return Stream<T>
+     * @return Sequence<T>
      */
-    public function sort(callable $function): Stream
+    public function sort(callable $function): Sequence
     {
         return $this->values->sort($function);
     }

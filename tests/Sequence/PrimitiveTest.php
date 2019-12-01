@@ -1,13 +1,13 @@
 <?php
 declare(strict_types = 1);
 
-namespace Tests\Innmind\Immutable\Stream;
+namespace Tests\Innmind\Immutable\Sequence;
 
 use Innmind\Immutable\{
-    Stream\Primitive,
-    Stream\Implementation,
+    Sequence\Primitive,
+    Sequence\Implementation,
     Map,
-    Stream,
+    Sequence,
     Str,
     Exception\OutOfBoundException,
     Exception\GroupEmptySequenceException,
@@ -116,11 +116,11 @@ class PrimitiveTest extends TestCase
 
     public function testForeach()
     {
-        $stream = new Primitive('int', 1, 2, 3, 4);
+        $sequence = new Primitive('int', 1, 2, 3, 4);
         $calls = 0;
         $sum = 0;
 
-        $this->assertNull($stream->foreach(function($i) use (&$calls, &$sum) {
+        $this->assertNull($sequence->foreach(function($i) use (&$calls, &$sum) {
             ++$calls;
             $sum += $i;
         }));
@@ -128,7 +128,7 @@ class PrimitiveTest extends TestCase
         $this->assertSame(10, $sum);
     }
 
-    public function testThrowWhenTryingToGroupEmptyStream()
+    public function testThrowWhenTryingToGroupEmptySequence()
     {
         $this->expectException(GroupEmptySequenceException::class);
 
@@ -137,12 +137,12 @@ class PrimitiveTest extends TestCase
 
     public function testGroupBy()
     {
-        $stream = new Primitive('int', 1, 2, 3, 4);
-        $groups = $stream->groupBy(fn($i) => $i % 2);
+        $sequence = new Primitive('int', 1, 2, 3, 4);
+        $groups = $sequence->groupBy(fn($i) => $i % 2);
 
-        $this->assertSame([1, 2, 3, 4], $stream->toArray());
+        $this->assertSame([1, 2, 3, 4], $sequence->toArray());
         $this->assertInstanceOf(Map::class, $groups);
-        $this->assertTrue($groups->isOfType('int', Stream::class));
+        $this->assertTrue($groups->isOfType('int', Sequence::class));
         $this->assertCount(2, $groups);
         $this->assertTrue($groups->get(0)->isOfType('int'));
         $this->assertTrue($groups->get(1)->isOfType('int'));
@@ -150,14 +150,14 @@ class PrimitiveTest extends TestCase
         $this->assertSame([1, 3], $groups->get(1)->toArray());
     }
 
-    public function testThrowWhenTryingToAccessFirstElementOnEmptyStream()
+    public function testThrowWhenTryingToAccessFirstElementOnEmptySequence()
     {
         $this->expectException(OutOfBoundException::class);
 
         (new Primitive('int'))->first();
     }
 
-    public function testThrowWhenTryingToAccessLastElementOnEmptyStream()
+    public function testThrowWhenTryingToAccessLastElementOnEmptySequence()
     {
         $this->expectException(OutOfBoundException::class);
 
@@ -176,18 +176,18 @@ class PrimitiveTest extends TestCase
 
     public function testContains()
     {
-        $stream = new Primitive('int', 1, 2, 3);
+        $sequence = new Primitive('int', 1, 2, 3);
 
-        $this->assertTrue($stream->contains(2));
-        $this->assertFalse($stream->contains(4));
+        $this->assertTrue($sequence->contains(2));
+        $this->assertFalse($sequence->contains(4));
     }
 
     public function testIndexOf()
     {
-        $stream = new Primitive('int', 1, 2, 4);
+        $sequence = new Primitive('int', 1, 2, 4);
 
-        $this->assertSame(1, $stream->indexOf(2));
-        $this->assertSame(2, $stream->indexOf(4));
+        $this->assertSame(1, $sequence->indexOf(2));
+        $this->assertSame(2, $sequence->indexOf(4));
     }
 
     public function testThrowWhenTryingToAccessIndexOfUnknownValue()
@@ -208,7 +208,7 @@ class PrimitiveTest extends TestCase
         $this->assertSame([0, 1], $b->toArray());
     }
 
-    public function testIndicesOnEmptyStream()
+    public function testIndicesOnEmptySequence()
     {
         $a = new Primitive('string');
         $b = $a->indices();
@@ -252,12 +252,12 @@ class PrimitiveTest extends TestCase
 
     public function testPartition()
     {
-        $stream = new Primitive('int', 1, 2, 3, 4);
-        $partition = $stream->partition(fn($i) => $i % 2 === 0);
+        $sequence = new Primitive('int', 1, 2, 3, 4);
+        $partition = $sequence->partition(fn($i) => $i % 2 === 0);
 
-        $this->assertSame([1, 2, 3, 4], $stream->toArray());
+        $this->assertSame([1, 2, 3, 4], $sequence->toArray());
         $this->assertInstanceOf(Map::class, $partition);
-        $this->assertTrue($partition->isOfType('bool', Stream::class));
+        $this->assertTrue($partition->isOfType('bool', Sequence::class));
         $this->assertCount(2, $partition);
         $this->assertTrue($partition->get(true)->isOfType('int'));
         $this->assertTrue($partition->get(false)->isOfType('int'));
@@ -277,12 +277,12 @@ class PrimitiveTest extends TestCase
 
     public function testSplitAt()
     {
-        $stream = new Primitive('int', 2, 3, 4, 5);
-        $parts = $stream->splitAt(2);
+        $sequence = new Primitive('int', 2, 3, 4, 5);
+        $parts = $sequence->splitAt(2);
 
-        $this->assertSame([2, 3, 4, 5], $stream->toArray());
-        $this->assertInstanceOf(Stream::class, $parts);
-        $this->assertTrue($parts->isOfType(Stream::class));
+        $this->assertSame([2, 3, 4, 5], $sequence->toArray());
+        $this->assertInstanceOf(Sequence::class, $parts);
+        $this->assertTrue($parts->isOfType(Sequence::class));
         $this->assertCount(2, $parts);
         $this->assertTrue($parts->first()->isOfType('int'));
         $this->assertTrue($parts->last()->isOfType('int'));
@@ -336,8 +336,8 @@ class PrimitiveTest extends TestCase
 
     public function testJoin()
     {
-        $stream = new Primitive('int', 1, 2);
-        $str = $stream->join('|');
+        $sequence = new Primitive('int', 1, 2);
+        $str = $sequence->join('|');
 
         $this->assertInstanceOf(Str::class, $str);
         $this->assertSame('1|2', (string) $str);
@@ -365,9 +365,9 @@ class PrimitiveTest extends TestCase
 
     public function testReduce()
     {
-        $stream = new Primitive('int', 1, 2, 3, 4);
+        $sequence = new Primitive('int', 1, 2, 3, 4);
 
-        $this->assertSame(10, $stream->reduce(0, fn($sum, $i) => $sum + $i));
+        $this->assertSame(10, $sequence->reduce(0, fn($sum, $i) => $sum + $i));
     }
 
     public function testClear()

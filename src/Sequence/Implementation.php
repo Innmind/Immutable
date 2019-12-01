@@ -1,11 +1,11 @@
 <?php
 declare(strict_types = 1);
 
-namespace Innmind\Immutable\Stream;
+namespace Innmind\Immutable\Sequence;
 
 use Innmind\Immutable\{
     Map,
-    Stream,
+    Sequence,
     Str,
     Exception\LogicException,
     Exception\GroupEmptySequenceException,
@@ -35,16 +35,16 @@ interface Implementation extends \Countable
     public function get(int $index);
 
     /**
-     * Return the diff between this stream and another
+     * Return the diff between this sequence and another
      *
-     * @param self<T> $stream
+     * @param self<T> $sequence
      *
      * @return self<T>
      */
-    public function diff(self $stream): self;
+    public function diff(self $sequence): self;
 
     /**
-     * Remove all duplicates from the stream
+     * Remove all duplicates from the sequence
      *
      * @return self<T>
      */
@@ -65,11 +65,11 @@ interface Implementation extends \Countable
     public function dropEnd(int $size): self;
 
     /**
-     * Check if the two streams are equal
+     * Check if the two sequences are equal
      *
-     * @param self<T> $stream
+     * @param self<T> $sequence
      */
-    public function equals(self $stream): bool;
+    public function equals(self $sequence): bool;
 
     /**
      * Return all elements that satisfy the given predicate
@@ -81,7 +81,7 @@ interface Implementation extends \Countable
     public function filter(callable $predicate): self;
 
     /**
-     * Apply the given function to all elements of the stream
+     * Apply the given function to all elements of the sequence
      *
      * @param callable(T): void $function
      *
@@ -97,7 +97,7 @@ interface Implementation extends \Countable
      *
      * @throws GroupEmptySequenceException
      *
-     * @return Map<mixed, Stream<T>>
+     * @return Map<mixed, Sequence<T>>
      */
     public function groupBy(callable $discriminator): Map;
 
@@ -116,7 +116,7 @@ interface Implementation extends \Countable
     public function last();
 
     /**
-     * Check if the stream contains the given element
+     * Check if the sequence contains the given element
      *
      * @param T $element
      */
@@ -139,7 +139,7 @@ interface Implementation extends \Countable
     public function indices(): self;
 
     /**
-     * Return a new stream by applying the given function to all elements
+     * Return a new sequence by applying the given function to all elements
      *
      * @param callable(T): T $function
      *
@@ -148,7 +148,7 @@ interface Implementation extends \Countable
     public function map(callable $function): self;
 
     /**
-     * Pad the stream to a defined size with the given element
+     * Pad the sequence to a defined size with the given element
      *
      * @param T $element
      *
@@ -157,62 +157,62 @@ interface Implementation extends \Countable
     public function pad(int $size, $element): self;
 
     /**
-     * Return a stream of 2 streams partitioned according to the given predicate
+     * Return a sequence of 2 sequences partitioned according to the given predicate
      *
      * @param callable(T): bool $predicate
      *
-     * @return Map<bool, Stream<T>>
+     * @return Map<bool, Sequence<T>>
      */
     public function partition(callable $predicate): Map;
 
     /**
-     * Slice the stream
+     * Slice the sequence
      *
      * @return self<T>
      */
     public function slice(int $from, int $until): self;
 
     /**
-     * Split the stream in a stream of 2 streams splitted at the given position
+     * Split the sequence in a sequence of 2 sequences splitted at the given position
      *
      * @throws OutOfBoundException
      *
-     * @return Stream<Stream<T>>
+     * @return Sequence<Sequence<T>>
      */
-    public function splitAt(int $position): Stream;
+    public function splitAt(int $position): Sequence;
 
     /**
-     * Return a stream with the n first elements
+     * Return a sequence with the n first elements
      *
      * @return self<T>
      */
     public function take(int $size): self;
 
     /**
-     * Return a stream with the n last elements
+     * Return a sequence with the n last elements
      *
      * @return self<T>
      */
     public function takeEnd(int $size): self;
 
     /**
-     * Append the given stream to the current one
+     * Append the given sequence to the current one
      *
-     * @param self<T> $stream
+     * @param self<T> $sequence
      *
      * @return self<T>
      */
-    public function append(self $stream): self;
+    public function append(self $sequence): self;
 
     /**
-     * Return a stream with all elements from the current one that exist
+     * Return a sequence with all elements from the current one that exist
      * in the given one
      *
-     * @param self<T> $stream
+     * @param self<T> $sequence
      *
      * @return self<T>
      */
-    public function intersect(self $stream): self;
+    public function intersect(self $sequence): self;
 
     /**
      * Concatenate all elements with the given separator
@@ -220,7 +220,7 @@ interface Implementation extends \Countable
     public function join(string $separator): Str;
 
     /**
-     * Add the given element at the end of the stream
+     * Add the given element at the end of the sequence
      *
      * @param T $element
      *
@@ -229,7 +229,7 @@ interface Implementation extends \Countable
     public function add($element): self;
 
     /**
-     * Sort the stream in a different order
+     * Sort the sequence in a different order
      *
      * @param callable(T, T): int $function
      *
@@ -238,7 +238,7 @@ interface Implementation extends \Countable
     public function sort(callable $function): self;
 
     /**
-     * Reduce the stream to a single value
+     * Reduce the sequence to a single value
      *
      * @param mixed $carry
      * @param callable(mixed, T) $reducer
@@ -255,7 +255,7 @@ interface Implementation extends \Countable
     public function clear(): self;
 
     /**
-     * Return the same stream but in reverse order
+     * Return the same sequence but in reverse order
      *
      * @return self<T>
      */

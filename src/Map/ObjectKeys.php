@@ -7,7 +7,7 @@ use Innmind\Immutable\{
     Map,
     Type,
     Str,
-    Stream,
+    Sequence,
     Set,
     Pair,
     ValidateArgument,
@@ -239,11 +239,11 @@ final class ObjectKeys implements Implementation
     /**
      * {@inheritdoc}
      */
-    public function values(): Stream
+    public function values(): Sequence
     {
         return $this->reduce(
-            Stream::of($this->valueType),
-            static function(Stream $values, $key, $value): Stream {
+            Sequence::of($this->valueType),
+            static function(Sequence $values, $key, $value): Sequence {
                 return $values->add($value);
             }
         );
