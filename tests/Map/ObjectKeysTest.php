@@ -13,7 +13,6 @@ use Innmind\Immutable\{
     Set,
     Stream,
     Exception\LogicException,
-    Exception\InvalidArgumentException,
     Exception\ElementNotFoundException,
     Exception\GroupEmptyMapException
 };
@@ -63,24 +62,19 @@ class ObjectKeysTest extends TestCase
         $this->assertSame(4, $m->size());
     }
 
-    public function testThrowWhenInvalidType()
-    {
-        $this->expectException(InvalidArgumentException::class);
-
-        (new ObjectKeys('stdClass', 'int'))->put(new \stdClass, 42.0);
-    }
-
     public function testThrowWhenKeyDoesntMatchType()
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage('Argument 1 must be of type stdClass, string given');
 
         $m = new ObjectKeys('stdClass', 'int');
-        $m->put(new \stdClass, '42');
+        $m->put('stdClass', 42);
     }
 
     public function testThrowWhenValueDoesntMatchType()
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage('Argument 2 must be of type int, float given');
 
         $m = new ObjectKeys('stdClass', 'int');
         $m->put(new \stdClass, 42.0);
@@ -267,7 +261,8 @@ class ObjectKeysTest extends TestCase
 
     public function testThrowWhenTryingToModifyValueTypeInTheMap()
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage('Argument 2 must be of type int, string given');
 
         (new ObjectKeys('stdClass', 'int'))
             ->put(new \stdClass, 2)
@@ -278,7 +273,8 @@ class ObjectKeysTest extends TestCase
 
     public function testThrowWhenTryingToModifyKeyTypeInTheMap()
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage('Argument 1 must be of type stdClass, int given');
 
         (new ObjectKeys('stdClass', 'int'))
             ->put(new \stdClass, 2)

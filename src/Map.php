@@ -5,7 +5,6 @@ namespace Innmind\Immutable;
 
 use Innmind\Immutable\{
     Specification\ClassType,
-    Exception\InvalidArgumentException,
     Exception\LogicException,
     Exception\ElementNotFoundException,
     Exception\GroupEmptyMapException

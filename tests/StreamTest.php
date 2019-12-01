@@ -9,7 +9,6 @@ use Innmind\Immutable\{
     Map,
     Exception\OutOfBoundException,
     Exception\LogicException,
-    Exception\InvalidArgumentException,
     Exception\GroupEmptySequenceException
 };
 use PHPUnit\Framework\TestCase;
@@ -380,7 +379,8 @@ class StreamTest extends TestCase
 
     public function testThrowWhenTryingToModifyValueTypeInMap()
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage('Argument 1 must be of type int, string given');
 
         Stream::of('int')
             ->add(1)
@@ -409,7 +409,8 @@ class StreamTest extends TestCase
 
     public function testThrowWhenPaddingWithDifferentType()
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage('Argument 2 must be of type int, string given');
 
         Stream::of('int')->pad(2, '0');
     }
@@ -594,7 +595,8 @@ class StreamTest extends TestCase
 
     public function testThrowWhenAddingInvalidType()
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage('Argument 1 must be of type int, float given');
 
         Stream::of('int')->add(4.2);
     }

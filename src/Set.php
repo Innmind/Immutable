@@ -3,12 +3,10 @@ declare(strict_types = 1);
 
 namespace Innmind\Immutable;
 
-use Innmind\Immutable\Exception\InvalidArgumentException;
-
 final class Set implements \Countable
 {
     private string $type;
-    private SpecificationInterface $spec;
+    private ValidateArgument $validate;
     private Stream $values;
 
     /**
@@ -17,7 +15,7 @@ final class Set implements \Countable
     private function __construct(string $type)
     {
         $this->type = $type;
-        $this->spec = Type::of($type);
+        $this->validate = Type::of($type);
         $this->values = Stream::of($type);
     }
 
@@ -145,7 +143,7 @@ final class Set implements \Countable
      */
     public function add($element): self
     {
-        $this->spec->validate($element);
+        ($this->validate)($element, 1);
 
         if ($this->contains($element)) {
             return $this;

@@ -3,25 +3,21 @@ declare(strict_types = 1);
 
 namespace Innmind\Immutable;
 
-use Innmind\Immutable\{
-    Specification\PrimitiveType,
-    Specification\ClassType,
-    Specification\VariableType,
-    Specification\MixedType,
-    Specification\NullableType,
-    Specification\UnionType
+use Innmind\Immutable\ValidateArgument\{
+    PrimitiveType,
+    ClassType,
+    VariableType,
+    MixedType,
+    NullableType,
+    UnionType
 };
 
 final class Type
 {
     /**
      * Build the appropriate specification for the given type
-     *
-     * @param string $type
-     *
-     * @return SpecificationInterface
      */
-    public static function of(string $type): SpecificationInterface
+    public static function of(string $type): ValidateArgument
     {
         if ($type === '?null') {
             throw new \ParseError('\'null\' type is already nullable');
@@ -91,7 +87,7 @@ final class Type
         }
     }
 
-    private static function ofPrimitive(string $type): SpecificationInterface
+    private static function ofPrimitive(string $type): ValidateArgument
     {
         if (\function_exists('is_'.$type)) {
             return new PrimitiveType($type);

@@ -1,11 +1,11 @@
 <?php
 declare(strict_types = 1);
 
-namespace Tests\Innmind\Immutable\Specification;
+namespace Tests\Innmind\Immutable\ValidateArgument;
 
 use Innmind\Immutable\{
-    Specification\NullableType,
-    SpecificationInterface
+    ValidateArgument\NullableType,
+    ValidateArgument,
 };
 use PHPUnit\Framework\TestCase;
 
@@ -14,35 +14,35 @@ class NullableTypeTest extends TestCase
     public function testInterface()
     {
         $type = new NullableType(
-            $this->createMock(SpecificationInterface::class)
+            $this->createMock(ValidateArgument::class)
         );
 
-        $this->assertInstanceOf(SpecificationInterface::class, $type);
+        $this->assertInstanceOf(ValidateArgument::class, $type);
     }
 
     public function testDoesntThrowWhenValueIsNull()
     {
         $type = new NullableType(
-            $inner = $this->createMock(SpecificationInterface::class)
+            $inner = $this->createMock(ValidateArgument::class)
         );
         $inner
             ->expects($this->never())
-            ->method('validate');
+            ->method('__invoke');
 
-        $this->assertNull($type->validate(null));
+        $this->assertNull($type(null, 1));
     }
 
     public function testUseUnderlyingTypeWhenValueIsNotNull()
     {
         $type = new NullableType(
-            $inner = $this->createMock(SpecificationInterface::class)
+            $inner = $this->createMock(ValidateArgument::class)
         );
         $value = new \stdClass;
         $inner
             ->expects($this->once())
-            ->method('validate')
-            ->with($value);
+            ->method('__invoke')
+            ->with($value, 1);
 
-        $this->assertNull($type->validate($value));
+        $this->assertNull($type($value, 1));
     }
 }

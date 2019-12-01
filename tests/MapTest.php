@@ -12,7 +12,6 @@ use Innmind\Immutable\{
     Set,
     Stream,
     Exception\LogicException,
-    Exception\InvalidArgumentException,
     Exception\ElementNotFoundException,
     Exception\GroupEmptyMapException
 };
@@ -92,16 +91,10 @@ class MapTest extends TestCase
         $this->assertTrue($map->equals($expected));
     }
 
-    public function testThrowWhenInvalidType()
-    {
-        $this->expectException(InvalidArgumentException::class);
-
-        Map::of('int', 'int')->put(42, 42.0);
-    }
-
     public function testThrowWhenKeyDoesntMatchType()
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage('Argument 1 must be of type int, string given');
 
         $m = Map::of('int', 'int');
         $m->put('24', 42);
@@ -109,7 +102,8 @@ class MapTest extends TestCase
 
     public function testThrowWhenValueDoesntMatchType()
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage('Argument 2 must be of type int, float given');
 
         $m = Map::of('int', 'int');
         $m->put(24, 42.0);
@@ -330,7 +324,8 @@ class MapTest extends TestCase
 
     public function testTrhowWhenTryingToModifyValueTypeInTheMap()
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage('Argument 2 must be of type int, string given');
 
         Map::of('int', 'int')
             ->put(1, 2)
@@ -341,7 +336,8 @@ class MapTest extends TestCase
 
     public function testTrhowWhenTryingToModifyKeyTypeInTheMap()
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage('Argument 1 must be of type int, string given');
 
         Map::of('int', 'int')
             ->put(1, 2)

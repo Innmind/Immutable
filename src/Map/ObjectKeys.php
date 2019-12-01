@@ -10,9 +10,8 @@ use Innmind\Immutable\{
     Stream,
     Set,
     Pair,
-    SpecificationInterface,
-    Specification\ClassType,
-    Exception\InvalidArgumentException,
+    ValidateArgument,
+    ValidateArgument\ClassType,
     Exception\LogicException,
     Exception\ElementNotFoundException,
     Exception\GroupEmptyMapException
@@ -25,8 +24,8 @@ final class ObjectKeys implements Implementation
 {
     private string $keyType;
     private string $valueType;
-    private SpecificationInterface $keySpecification;
-    private SpecificationInterface $valueSpecification;
+    private ValidateArgument $validateKey;
+    private ValidateArgument $validateValue;
     private \SplObjectStorage $values;
 
     /**
@@ -34,13 +33,13 @@ final class ObjectKeys implements Implementation
      */
     public function __construct(string $keyType, string $valueType)
     {
-        $this->keySpecification = Type::of($keyType);
+        $this->validateKey = Type::of($keyType);
 
-        if (!$this->keySpecification instanceof ClassType && $keyType !== 'object') {
+        if (!$this->validateKey instanceof ClassType && $keyType !== 'object') {
             throw new LogicException;
         }
 
-        $this->valueSpecification = Type::of($valueType);
+        $this->validateValue = Type::of($valueType);
         $this->keyType = $keyType;
         $this->valueType = $valueType;
         $this->values = new \SplObjectStorage;
@@ -83,8 +82,8 @@ final class ObjectKeys implements Implementation
      */
     public function put($key, $value): Implementation
     {
-        $this->keySpecification->validate($key);
-        $this->valueSpecification->validate($value);
+        ($this->validateKey)($key, 1);
+        ($this->validateValue)($value, 2);
 
         $map = clone $this;
         $map->values = clone $this->values;
@@ -263,7 +262,7 @@ final class ObjectKeys implements Implementation
             $return = $function($k, $v);
 
             if ($return instanceof Pair) {
-                $this->keySpecification->validate($return->key());
+                ($this->validateKey)($return->key(), 1);
 
                 $key = $return->key();
                 $value = $return->value();
@@ -272,7 +271,7 @@ final class ObjectKeys implements Implementation
                 $value = $return;
             }
 
-            $this->valueSpecification->validate($value);
+            ($this->validateValue)($value, 2);
 
             $map->values[$key] = $value;
         }

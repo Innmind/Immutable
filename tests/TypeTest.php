@@ -5,12 +5,12 @@ namespace Tests\Innmind\Immutable;
 
 use Innmind\Immutable\{
     Type,
-    Specification\PrimitiveType,
-    Specification\VariableType,
-    Specification\MixedType,
-    Specification\ClassType,
-    Specification\NullableType,
-    Specification\UnionType
+    ValidateArgument\PrimitiveType,
+    ValidateArgument\VariableType,
+    ValidateArgument\MixedType,
+    ValidateArgument\ClassType,
+    ValidateArgument\NullableType,
+    ValidateArgument\UnionType
 };
 use PHPUnit\Framework\TestCase;
 
@@ -38,17 +38,17 @@ class TypeTest extends TestCase
         $this->assertInstanceOf(NullableType::class, Type::of('?stdClass'));
         $this->assertInstanceOf(UnionType::class, Type::of('int|stdClass'));
 
-        $this->assertNull(Type::of('?string')->validate('foo'));
-        $this->assertNull(Type::of('?int')->validate(42));
-        $this->assertNull(Type::of('?float')->validate(2.4));
-        $this->assertNull(Type::of('?array')->validate([]));
-        $this->assertNull(Type::of('?bool')->validate(true));
-        $this->assertNull(Type::of('?object')->validate(new \stdClass));
-        $this->assertNull(Type::of('?variable')->validate(false));
-        $this->assertNull(Type::of('?stdClass')->validate(new \stdClass));
-        $this->assertNull(Type::of('int|stdClass')->validate(new \stdClass));
-        $this->assertNull(Type::of('int|stdClass')->validate(42));
-        $this->assertNull(Type::of('int|stdClass|bool')->validate(true));
+        $this->assertNull(Type::of('?string')('foo', 1));
+        $this->assertNull(Type::of('?int')(42, 1));
+        $this->assertNull(Type::of('?float')(2.4, 1));
+        $this->assertNull(Type::of('?array')([], 1));
+        $this->assertNull(Type::of('?bool')(true, 1));
+        $this->assertNull(Type::of('?object')(new \stdClass, 1));
+        $this->assertNull(Type::of('?variable')(false, 1));
+        $this->assertNull(Type::of('?stdClass')(new \stdClass, 1));
+        $this->assertNull(Type::of('int|stdClass')(new \stdClass, 1));
+        $this->assertNull(Type::of('int|stdClass')(42, 1));
+        $this->assertNull(Type::of('int|stdClass|bool')(true, 1));
     }
 
     public function testTypeOfNullableNullIsNotAccepted()

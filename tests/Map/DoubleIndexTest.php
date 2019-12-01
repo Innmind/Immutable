@@ -12,7 +12,6 @@ use Innmind\Immutable\{
     Symbol,
     Set,
     Stream,
-    Exception\InvalidArgumentException,
     Exception\LogicException,
     Exception\ElementNotFoundException,
     Exception\GroupEmptyMapException
@@ -56,16 +55,10 @@ class DoubleIndexTest extends TestCase
         $this->assertSame(4, $m->size());
     }
 
-    public function testThrowWhenInvalidType()
-    {
-        $this->expectException(InvalidArgumentException::class);
-
-        (new DoubleIndex('int', 'int'))->put(42, 42.0);
-    }
-
     public function testThrowWhenKeyDoesntMatchType()
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage('Argument 1 must be of type int, string given');
 
         $m = new DoubleIndex('int', 'int');
         $m->put('24', 42);
@@ -73,7 +66,8 @@ class DoubleIndexTest extends TestCase
 
     public function testThrowWhenValueDoesntMatchType()
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage('Argument 2 must be of type int, float given');
 
         $m = new DoubleIndex('int', 'int');
         $m->put(24, 42.0);
@@ -286,7 +280,8 @@ class DoubleIndexTest extends TestCase
 
     public function testThrowWhenTryingToModifyValueTypeInTheMap()
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage('Argument 2 must be of type int, string given');
 
         (new DoubleIndex('int', 'int'))
             ->put(1, 2)
@@ -297,7 +292,8 @@ class DoubleIndexTest extends TestCase
 
     public function testThrowWhenTryingToModifyKeyTypeInTheMap()
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage('Argument 1 must be of type int, string given');
 
         (new DoubleIndex('int', 'int'))
             ->put(1, 2)

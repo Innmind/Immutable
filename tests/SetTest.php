@@ -9,7 +9,6 @@ use Innmind\Immutable\{
     SequenceInterface,
     Str,
     Stream,
-    Exception\InvalidArgumentException
 };
 use PHPUnit\Framework\TestCase;
 
@@ -108,7 +107,8 @@ class SetTest extends TestCase
 
     public function testThrowWhenAddindInvalidElementType()
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage('Argument 1 must be of type int, float given');
 
         Set::of('int')->add(42.0);
     }
@@ -296,7 +296,8 @@ class SetTest extends TestCase
 
     public function testThrowWhenTryingToModifyValueTypeInMap()
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage('Argument 1 must be of type int, string given');
 
         Set::of('int')
             ->add(1)

@@ -6,7 +6,6 @@ namespace Innmind\Immutable;
 use Innmind\Immutable\Exception\{
     LogicException,
     GroupEmptySequenceException,
-    InvalidArgumentException,
 };
 
 /**
@@ -15,13 +14,13 @@ use Innmind\Immutable\Exception\{
 final class Stream implements \Countable
 {
     private string $type;
-    private SpecificationInterface $spec;
+    private ValidateArgument $validate;
     private Sequence $values;
 
     private function __construct(string $type)
     {
         $this->type = $type;
-        $this->spec = Type::of($type);
+        $this->validate = Type::of($type);
         $this->values = Sequence::of();
     }
 
@@ -32,9 +31,14 @@ final class Stream implements \Countable
     {
         $self = new self($type);
         $self->values = Sequence::of(...$values);
-        $self->values->foreach(static function($element) use ($self): void {
-            $self->spec->validate($element);
-        });
+        $self->values->reduce(
+            1,
+            static function(int $position, $element) use ($self): int {
+                ($self->validate)($element, $position);
+
+                return ++$position;
+            }
+        );
 
         return $self;
     }
@@ -345,9 +349,14 @@ final class Stream implements \Countable
     {
         $self = clone $this;
         $self->values = $this->values->map($function);
-        $self->values->foreach(function($element): void {
-            $this->spec->validate($element);
-        });
+        $self->values->reduce(
+            1,
+            function(int $position, $element): int {
+                ($this->validate)($element, $position);
+
+                return ++$position;
+            }
+        );
 
         return $self;
     }
@@ -361,7 +370,7 @@ final class Stream implements \Countable
      */
     public function pad(int $size, $element): self
     {
-        $this->spec->validate($element);
+        ($this->validate)($element, 2);
 
         $stream = clone $this;
         $stream->values = $this->values->pad($size, $element);
@@ -513,7 +522,7 @@ final class Stream implements \Countable
      */
     public function add($element): self
     {
-        $this->spec->validate($element);
+        ($this->validate)($element, 1);
 
         $stream = clone $this;
         $stream->values = $this->values->add($element);

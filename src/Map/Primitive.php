@@ -10,8 +10,7 @@ use Innmind\Immutable\{
     Stream,
     Set,
     Pair,
-    SpecificationInterface,
-    Exception\InvalidArgumentException,
+    ValidateArgument,
     Exception\LogicException,
     Exception\ElementNotFoundException,
     Exception\GroupEmptyMapException
@@ -24,8 +23,8 @@ final class Primitive implements Implementation
 {
     private string $keyType;
     private string $valueType;
-    private SpecificationInterface $keySpecification;
-    private SpecificationInterface $valueSpecification;
+    private ValidateArgument $validateKey;
+    private ValidateArgument $validateValue;
     private array $values;
     private ?int $size;
 
@@ -34,13 +33,13 @@ final class Primitive implements Implementation
      */
     public function __construct(string $keyType, string $valueType)
     {
-        $this->keySpecification = Type::of($keyType);
+        $this->validateKey = Type::of($keyType);
 
         if (!in_array($keyType, ['int', 'integer', 'string'], true)) {
             throw new LogicException;
         }
 
-        $this->valueSpecification = Type::of($valueType);
+        $this->validateValue = Type::of($valueType);
         $this->keyType = $keyType;
         $this->valueType = $valueType;
         $this->values = [];
@@ -83,8 +82,8 @@ final class Primitive implements Implementation
      */
     public function put($key, $value): Implementation
     {
-        $this->keySpecification->validate($key);
-        $this->valueSpecification->validate($value);
+        ($this->validateKey)($key, 1);
+        ($this->validateValue)($value, 2);
 
         $map = clone $this;
         $map->size = null;
@@ -245,7 +244,7 @@ final class Primitive implements Implementation
             $return = $function($this->normalizeKey($k), $v);
 
             if ($return instanceof Pair) {
-                $this->keySpecification->validate($return->key());
+                ($this->validateKey)($return->key(), 1);
 
                 $key = $return->key();
                 $value = $return->value();
@@ -254,7 +253,7 @@ final class Primitive implements Implementation
                 $value = $return;
             }
 
-            $this->valueSpecification->validate($value);
+            ($this->validateValue)($value, 2);
 
             $map->values[$key] = $value;
         }

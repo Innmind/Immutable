@@ -10,8 +10,7 @@ use Innmind\Immutable\{
     Stream,
     Set,
     Pair,
-    SpecificationInterface,
-    Exception\InvalidArgumentException,
+    ValidateArgument,
     Exception\LogicException,
     Exception\ElementNotFoundException,
     Exception\GroupEmptyMapException
@@ -24,8 +23,8 @@ final class DoubleIndex implements Implementation
 {
     private string $keyType;
     private string $valueType;
-    private SpecificationInterface $keySpecification;
-    private SpecificationInterface $valueSpecification;
+    private ValidateArgument $validateKey;
+    private ValidateArgument $validateValue;
     private Stream $keys;
     private Stream $values;
     private Stream $pairs;
@@ -35,8 +34,8 @@ final class DoubleIndex implements Implementation
      */
     public function __construct(string $keyType, string $valueType)
     {
-        $this->keySpecification = Type::of($keyType);
-        $this->valueSpecification = Type::of($valueType);
+        $this->validateKey = Type::of($keyType);
+        $this->validateValue = Type::of($valueType);
         $this->keyType = $keyType;
         $this->valueType = $valueType;
         $this->keys = Stream::of($keyType);
@@ -81,8 +80,8 @@ final class DoubleIndex implements Implementation
      */
     public function put($key, $value): Implementation
     {
-        $this->keySpecification->validate($key);
-        $this->valueSpecification->validate($value);
+        ($this->validateKey)($key, 1);
+        ($this->validateValue)($value, 2);
 
         $map = clone $this;
 

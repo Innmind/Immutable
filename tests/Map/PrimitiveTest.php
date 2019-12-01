@@ -12,7 +12,6 @@ use Innmind\Immutable\{
     Set,
     Stream,
     Exception\LogicException,
-    Exception\InvalidArgumentException,
     Exception\ElementNotFoundException,
     Exception\GroupEmptyMapException
 };
@@ -69,16 +68,10 @@ class PrimitiveTest extends TestCase
         $this->assertSame(4, $m->size());
     }
 
-    public function testThrowWhenInvalidType()
-    {
-        $this->expectException(InvalidArgumentException::class);
-
-        (new Primitive('int', 'int'))->put(42, 42.0);
-    }
-
     public function testThrowWhenKeyDoesntMatchType()
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage('Argument 1 must be of type int, string given');
 
         $m = new Primitive('int', 'int');
         $m->put('24', 42);
@@ -86,7 +79,8 @@ class PrimitiveTest extends TestCase
 
     public function testThrowWhenValueDoesntMatchType()
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage('Argument 2 must be of type int, float given');
 
         $m = new Primitive('int', 'int');
         $m->put(24, 42.0);
@@ -299,7 +293,8 @@ class PrimitiveTest extends TestCase
 
     public function testThrowWhenTryingToModifyValueTypeInTheMap()
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage('Argument 2 must be of type int, string given');
 
         (new Primitive('int', 'int'))
             ->put(1, 2)
@@ -310,7 +305,8 @@ class PrimitiveTest extends TestCase
 
     public function testThrowWhenTryingToModifyKeyTypeInTheMap()
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage('Argument 1 must be of type int, string given');
 
         (new Primitive('int', 'int'))
             ->put(1, 2)
