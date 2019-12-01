@@ -11,7 +11,7 @@ use Innmind\Immutable\{
     Str,
     Exception\OutOfBoundException,
     Exception\CannotGroupEmptyStructure,
-    Exception\ElementNotFoundException,
+    Exception\ElementNotFound,
 };
 use PHPUnit\Framework\TestCase;
 
@@ -192,7 +192,7 @@ class PrimitiveTest extends TestCase
 
     public function testThrowWhenTryingToAccessIndexOfUnknownValue()
     {
-        $this->expectException(ElementNotFoundException::class);
+        $this->expectException(ElementNotFound::class);
 
         (new Primitive('int'))->indexOf(1);
     }

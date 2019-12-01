@@ -12,7 +12,7 @@ use Innmind\Immutable\{
     Pair,
     ValidateArgument,
     Exception\LogicException,
-    Exception\ElementNotFoundException,
+    Exception\ElementNotFound,
     Exception\CannotGroupEmptyStructure,
 };
 
@@ -99,7 +99,7 @@ final class Primitive implements Implementation
     public function get($key)
     {
         if (!$this->contains($key)) {
-            throw new ElementNotFoundException;
+            throw new ElementNotFound;
         }
 
         return $this->values[$key];

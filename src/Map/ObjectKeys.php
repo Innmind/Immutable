@@ -13,7 +13,7 @@ use Innmind\Immutable\{
     ValidateArgument,
     ValidateArgument\ClassType,
     Exception\LogicException,
-    Exception\ElementNotFoundException,
+    Exception\ElementNotFound,
     Exception\CannotGroupEmptyStructure,
 };
 
@@ -99,7 +99,7 @@ final class ObjectKeys implements Implementation
     public function get($key)
     {
         if (!$this->contains($key)) {
-            throw new ElementNotFoundException;
+            throw new ElementNotFound;
         }
 
         return $this->values->offsetGet($key);

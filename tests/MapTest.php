@@ -12,7 +12,7 @@ use Innmind\Immutable\{
     Set,
     Sequence,
     Exception\LogicException,
-    Exception\ElementNotFoundException,
+    Exception\ElementNotFound,
     Exception\CannotGroupEmptyStructure,
 };
 use PHPUnit\Framework\TestCase;
@@ -119,7 +119,7 @@ class MapTest extends TestCase
 
     public function testThrowWhenGettingUnknownKey()
     {
-        $this->expectException(ElementNotFoundException::class);
+        $this->expectException(ElementNotFound::class);
 
         Map::of('int', 'int')->get(24);
     }

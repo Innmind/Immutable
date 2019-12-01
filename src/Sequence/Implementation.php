@@ -9,7 +9,7 @@ use Innmind\Immutable\{
     Str,
     Exception\LogicException,
     Exception\CannotGroupEmptyStructure,
-    Exception\InvalidArgumentException,
+    Exception\ElementNotFound,
 };
 
 /**
@@ -127,7 +127,7 @@ interface Implementation extends \Countable
      *
      * @param T $element
      *
-     * @throws ElementNotFoundException
+     * @throws ElementNotFound
      */
     public function indexOf($element): int;
 

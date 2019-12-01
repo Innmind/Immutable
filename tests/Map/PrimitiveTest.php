@@ -12,7 +12,7 @@ use Innmind\Immutable\{
     Set,
     Sequence,
     Exception\LogicException,
-    Exception\ElementNotFoundException,
+    Exception\ElementNotFound,
     Exception\CannotGroupEmptyStructure,
 };
 use PHPUnit\Framework\TestCase;
@@ -96,7 +96,7 @@ class PrimitiveTest extends TestCase
 
     public function testThrowWhenGettingUnknownKey()
     {
-        $this->expectException(ElementNotFoundException::class);
+        $this->expectException(ElementNotFound::class);
 
         (new Primitive('int', 'int'))->get(24);
     }

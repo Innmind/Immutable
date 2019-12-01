@@ -9,6 +9,7 @@ use Innmind\Immutable\{
     Set,
     Sequence,
     Exception\CannotGroupEmptyStructure,
+    Exception\ElementNotFound,
 };
 
 /**
@@ -45,7 +46,7 @@ interface Implementation extends \Countable
      *
      * @param T $key
      *
-     * @throws ElementNotFoundException
+     * @throws ElementNotFound
      *
      * @return S
      */

@@ -13,7 +13,7 @@ use Innmind\Immutable\{
     Set,
     Sequence,
     Exception\LogicException,
-    Exception\ElementNotFoundException,
+    Exception\ElementNotFound,
     Exception\CannotGroupEmptyStructure,
 };
 use PHPUnit\Framework\TestCase;
@@ -90,7 +90,7 @@ class ObjectKeysTest extends TestCase
 
     public function testThrowWhenGettingUnknownKey()
     {
-        $this->expectException(ElementNotFoundException::class);
+        $this->expectException(ElementNotFound::class);
 
         (new ObjectKeys('stdClass', 'int'))->get(new \stdClass);
     }

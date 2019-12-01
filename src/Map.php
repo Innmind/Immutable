@@ -6,7 +6,7 @@ namespace Innmind\Immutable;
 use Innmind\Immutable\{
     Specification\ClassType,
     Exception\LogicException,
-    Exception\ElementNotFoundException,
+    Exception\ElementNotFound,
     Exception\CannotGroupEmptyStructure,
 };
 
@@ -141,7 +141,7 @@ final class Map implements \Countable
      *
      * @param T $key
      *
-     * @throws ElementNotFoundException
+     * @throws ElementNotFound
      *
      * @return S
      */

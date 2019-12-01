@@ -11,7 +11,7 @@ use Innmind\Immutable\{
     ValidateArgument,
     Exception\OutOfBoundException,
     Exception\LogicException,
-    Exception\ElementNotFoundException,
+    Exception\ElementNotFound,
     Exception\CannotGroupEmptyStructure,
 };
 
@@ -177,7 +177,7 @@ final class Primitive implements Implementation
         $index = \array_search($element, $this->values, true);
 
         if ($index === false) {
-            throw new ElementNotFoundException;
+            throw new ElementNotFound;
         }
 
         return $index;

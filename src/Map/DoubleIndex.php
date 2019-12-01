@@ -12,7 +12,7 @@ use Innmind\Immutable\{
     Pair,
     ValidateArgument,
     Exception\LogicException,
-    Exception\ElementNotFoundException,
+    Exception\ElementNotFound,
     Exception\CannotGroupEmptyStructure,
 };
 
@@ -108,7 +108,7 @@ final class DoubleIndex implements Implementation
     public function get($key)
     {
         if (!$this->keys->contains($key)) {
-            throw new ElementNotFoundException;
+            throw new ElementNotFound;
         }
 
         return $this->values->get(

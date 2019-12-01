@@ -6,6 +6,7 @@ namespace Innmind\Immutable;
 use Innmind\Immutable\Exception\{
     LogicException,
     CannotGroupEmptyStructure,
+    ElementNotFound,
 };
 
 /**
@@ -295,7 +296,7 @@ final class Sequence implements \Countable
      *
      * @param T $element
      *
-     * @throws ElementNotFoundException
+     * @throws ElementNotFound
      */
     public function indexOf($element): int
     {
