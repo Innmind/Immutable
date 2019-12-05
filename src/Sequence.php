@@ -19,11 +19,11 @@ final class Sequence implements \Countable
     private ValidateArgument $validate;
     private Sequence\Implementation $implementation;
 
-    private function __construct(string $type)
+    private function __construct(string $type, Sequence\Implementation $implementation)
     {
         $this->type = $type;
         $this->validate = Type::of($type);
-        $this->implementation = new Sequence\Primitive($type);
+        $this->implementation = $implementation;
     }
 
     /**
@@ -33,8 +33,7 @@ final class Sequence implements \Countable
      */
     public static function of(string $type, ...$values): self
     {
-        $self = new self($type);
-        $self->implementation = new Sequence\Primitive($type, ...$values);
+        $self = new self($type, new Sequence\Primitive($type, ...$values));
         $self->implementation->reduce(
             1,
             static function(int $position, $element) use ($self): int {
@@ -55,8 +54,7 @@ final class Sequence implements \Countable
     public static function mixed(...$values): self
     {
         /** @var self<mixed> */
-        $self = new self('mixed');
-        $self->implementation = new Sequence\Primitive('mixed', ...$values);
+        $self = new self('mixed', new Sequence\Primitive('mixed', ...$values));
 
         return $self;
     }
@@ -67,8 +65,7 @@ final class Sequence implements \Countable
     public static function ints(int ...$values): self
     {
         /** @var self<int> */
-        $self = new self('int');
-        $self->implementation = new Sequence\Primitive('int', ...$values);
+        $self = new self('int', new Sequence\Primitive('int', ...$values));
 
         return $self;
     }
@@ -79,8 +76,7 @@ final class Sequence implements \Countable
     public static function floats(float ...$values): self
     {
         /** @var self<float> */
-        $self = new self('float');
-        $self->implementation = new Sequence\Primitive('float', ...$values);
+        $self = new self('float', new Sequence\Primitive('float', ...$values));
 
         return $self;
     }
@@ -91,8 +87,7 @@ final class Sequence implements \Countable
     public static function strings(string ...$values): self
     {
         /** @var self<string> */
-        $self = new self('string');
-        $self->implementation = new Sequence\Primitive('string', ...$values);
+        $self = new self('string', new Sequence\Primitive('string', ...$values));
 
         return $self;
     }
@@ -103,8 +98,7 @@ final class Sequence implements \Countable
     public static function objects(object ...$values): self
     {
         /** @var self<object> */
-        $self = new self('object');
-        $self->implementation = new Sequence\Primitive('object', ...$values);
+        $self = new self('object', new Sequence\Primitive('object', ...$values));
 
         return $self;
     }
@@ -326,8 +320,7 @@ final class Sequence implements \Countable
     public function indices(): self
     {
         /** @var self<int> */
-        $self = new self('int');
-        $self->implementation = $this->implementation->indices();
+        $self = new self('int', $this->implementation->indices());
 
         return $self;
     }

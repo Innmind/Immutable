@@ -17,11 +17,11 @@ final class Set implements \Countable
     /**
      * {@inheritdoc}
      */
-    private function __construct(string $type)
+    private function __construct(string $type, Set\Implementation $implementation)
     {
         $this->type = $type;
         $this->validate = Type::of($type);
-        $this->implementation = new Set\Primitive($type);
+        $this->implementation = $implementation;
     }
 
     /**
@@ -31,8 +31,7 @@ final class Set implements \Countable
      */
     public static function of(string $type, ...$values): self
     {
-        $self = new self($type);
-        $self->implementation = new Set\Primitive($type, ...$values);
+        $self = new self($type, new Set\Primitive($type, ...$values));
 
         return $self;
     }
@@ -45,8 +44,7 @@ final class Set implements \Countable
     public static function mixed(...$values): self
     {
         /** @var self<mixed> */
-        $self = new self('mixed');
-        $self->implementation = new Set\Primitive('mixed', ...$values);
+        $self = new self('mixed', new Set\Primitive('mixed', ...$values));
 
         return $self;
     }
@@ -57,8 +55,7 @@ final class Set implements \Countable
     public static function ints(int ...$values): self
     {
         /** @var self<int> */
-        $self = new self('int');
-        $self->implementation = new Set\Primitive('int', ...$values);
+        $self = new self('int', new Set\Primitive('int', ...$values));
 
         return $self;
     }
@@ -69,8 +66,7 @@ final class Set implements \Countable
     public static function floats(float ...$values): self
     {
         /** @var self<float> */
-        $self = new self('float');
-        $self->implementation = new Set\Primitive('float', ...$values);
+        $self = new self('float', new Set\Primitive('float', ...$values));
 
         return $self;
     }
@@ -81,8 +77,7 @@ final class Set implements \Countable
     public static function strings(string ...$values): self
     {
         /** @var self<string> */
-        $self = new self('string');
-        $self->implementation = new Set\Primitive('string', ...$values);
+        $self = new self('string', new Set\Primitive('string', ...$values));
 
         return $self;
     }
@@ -93,8 +88,7 @@ final class Set implements \Countable
     public static function objects(object ...$values): self
     {
         /** @var self<object> */
-        $self = new self('object');
-        $self->implementation = new Set\Primitive('object', ...$values);
+        $self = new self('object', new Set\Primitive('object', ...$values));
 
         return $self;
     }
