@@ -439,10 +439,13 @@ class SetTest extends TestCase
         $this->assertFalse(Set::of('int', 1)->empty());
     }
 
-    public function toSetOf()
+    public function testToSetOf()
     {
         $sequence = Set::ints(1, 2, 3);
-        $set = $sequence->toSetOf('string|int', fn($i) => yield (string) $i && yield $i);
+        $set = $sequence->toSetOf('string|int', function($i) {
+            yield (string) $i;
+            yield $i;
+        });
 
         $this->assertInstanceOf(Set::class, $set);
         $this->assertSame(
