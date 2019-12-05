@@ -15,6 +15,7 @@ use Innmind\Immutable\{
     Exception\ElementNotFound,
     Exception\CannotGroupEmptyStructure,
 };
+use function Innmind\Immutable\unwrap;
 use PHPUnit\Framework\TestCase;
 
 class DoubleIndexTest extends TestCase
@@ -443,5 +444,22 @@ class DoubleIndexTest extends TestCase
     {
         $this->assertTrue((new DoubleIndex('int', 'int'))->empty());
         $this->assertFalse((new DoubleIndex('int', 'int'))->put(1, 2)->empty());
+    }
+
+    public function testToSetOf()
+    {
+        $map = (new DoubleIndex('int', 'int'))
+            ->put(1, 2)
+            ->put(3, 4);
+        $set = $map->toSetOf('int', function($k, $v) {
+            yield $k;
+            yield $v;
+        });
+
+        $this->assertInstanceOf(Set::class, $set);
+        $this->assertSame(
+            [1, 2, 3, 4],
+            unwrap($set),
+        );
     }
 }

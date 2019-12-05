@@ -412,6 +412,32 @@ final class ObjectKeys implements Implementation
     }
 
     /**
+     * @template ST
+     *
+     * @param callable(T, S): \Generator<ST> $mapper
+     *
+     * @return Set<ST>
+     */
+    public function toSetOf(string $type, callable $mapper): Set
+    {
+        /** @var Set<ST> */
+        $set = Set::of($type);
+
+        foreach ($this->values as $k) {
+            /** @var T $key */
+            $key = $k;
+            /** @var S $v */
+            $v = $this->values[$k];
+
+            foreach ($mapper($key, $v) as $newValue) {
+                $set = ($set)($newValue);
+            }
+        }
+
+        return $set;
+    }
+
+    /**
      * @return Map<T, S>
      */
     private function clearMap(): Map

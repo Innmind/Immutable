@@ -561,4 +561,16 @@ final class Sequence implements \Countable
     {
         return $this->implementation->empty();
     }
+
+    /**
+     * @template ST
+     *
+     * @param callable(T): \Generator<ST> $mapper
+     *
+     * @return Set<ST>
+     */
+    public function toSetOf(string $type, callable $mapper): Set
+    {
+        return $this->implementation->toSetOf($type, $mapper);
+    }
 }

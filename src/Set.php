@@ -376,4 +376,16 @@ final class Set implements \Countable
     {
         return $this->implementation->empty();
     }
+
+    /**
+     * @template ST
+     *
+     * @param callable(T): \Generator<ST> $mapper
+     *
+     * @return self<ST>
+     */
+    public function toSetOf(string $type, callable $mapper): self
+    {
+        return $this->implementation->toSetOf($type, $mapper);
+    }
 }

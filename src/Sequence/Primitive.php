@@ -7,6 +7,7 @@ use Innmind\Immutable\{
     Map,
     Sequence,
     Str,
+    Set,
     Type,
     ValidateArgument,
     Exception\OutOfBoundException,
@@ -469,6 +470,28 @@ final class Primitive implements Implementation
     public function empty(): bool
     {
         return !$this->has(0);
+    }
+
+    /**
+     * @template ST
+     *
+     * @param callable(T): \Generator<ST> $mapper
+     *
+     * @return Set<ST>
+     */
+    public function toSetOf(string $type, callable $mapper): Set
+    {
+        /** @var Set<ST> */
+        $set = Set::of($type);
+
+        foreach ($this->values as $value) {
+            /** @var ST $newValue */
+            foreach ($mapper($value) as $newValue) {
+                $set = ($set)($newValue);
+            }
+        }
+
+        return $set;
     }
 
     private function has(int $index): bool

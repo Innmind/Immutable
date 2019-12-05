@@ -6,11 +6,13 @@ namespace Tests\Innmind\Immutable;
 use Innmind\Immutable\{
     Sequence,
     Str,
+    Set,
     Map,
     Exception\OutOfBoundException,
     Exception\LogicException,
     Exception\CannotGroupEmptyStructure,
 };
+use function Innmind\Immutable\unwrap;
 use PHPUnit\Framework\TestCase;
 
 class SequenceTest extends TestCase
@@ -671,5 +673,17 @@ class SequenceTest extends TestCase
     {
         $this->assertTrue(Sequence::of('int')->empty());
         $this->assertFalse(Sequence::of('int', 1)->empty());
+    }
+
+    public function toSetOf()
+    {
+        $sequence = Sequence::ints(1, 2, 3);
+        $set = $sequence->toSetOf('string|int', fn($i) => yield (string) $i && yield $i);
+
+        $this->assertInstanceOf(Set::class, $set);
+        $this->assertSame(
+            ['1', 1, '2', 2, '3', 3],
+            unwrap($set),
+        );
     }
 }

@@ -172,4 +172,13 @@ interface Implementation extends \Countable
     public function reduce($carry, callable $reducer);
 
     public function empty(): bool;
+
+    /**
+     * @template ST
+     *
+     * @param callable(T, S): \Generator<ST> $mapper
+     *
+     * @return Set<ST>
+     */
+    public function toSetOf(string $type, callable $mapper): Set;
 }

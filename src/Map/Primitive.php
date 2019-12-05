@@ -399,6 +399,27 @@ final class Primitive implements Implementation
     }
 
     /**
+     * @template ST
+     *
+     * @param callable(T, S): \Generator<ST> $mapper
+     *
+     * @return Set<ST>
+     */
+    public function toSetOf(string $type, callable $mapper): Set
+    {
+        /** @var Set<ST> */
+        $set = Set::of($type);
+
+        foreach ($this->values as $key => $value) {
+            foreach ($mapper($key, $value) as $newValue) {
+                $set = ($set)($newValue);
+            }
+        }
+
+        return $set;
+    }
+
+    /**
      * @return Map<T, S>
      */
     private function clearMap(): Map

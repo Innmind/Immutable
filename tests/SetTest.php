@@ -10,6 +10,7 @@ use Innmind\Immutable\{
     Str,
     Sequence,
 };
+use function Innmind\Immutable\unwrap;
 use PHPUnit\Framework\TestCase;
 
 class SetTest extends TestCase
@@ -436,5 +437,17 @@ class SetTest extends TestCase
     {
         $this->assertTrue(Set::of('int')->empty());
         $this->assertFalse(Set::of('int', 1)->empty());
+    }
+
+    public function toSetOf()
+    {
+        $sequence = Set::ints(1, 2, 3);
+        $set = $sequence->toSetOf('string|int', fn($i) => yield (string) $i && yield $i);
+
+        $this->assertInstanceOf(Set::class, $set);
+        $this->assertSame(
+            ['1', 1, '2', 2, '3', 3],
+            unwrap($set),
+        );
     }
 }

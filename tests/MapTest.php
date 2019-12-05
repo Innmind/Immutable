@@ -14,6 +14,7 @@ use Innmind\Immutable\{
     Exception\ElementNotFound,
     Exception\CannotGroupEmptyStructure,
 };
+use function Innmind\Immutable\unwrap;
 use PHPUnit\Framework\TestCase;
 
 class MapTest extends TestCase
@@ -489,5 +490,22 @@ class MapTest extends TestCase
         $this->assertSame(2.625, $v);
         $this->assertSame([4], $m->keys()->toArray());
         $this->assertSame([4], $m->values()->toArray());
+    }
+
+    public function testToSetOf()
+    {
+        $map = Map::of('int', 'int')
+            (1, 2)
+            (3, 4);
+        $set = $map->toSetOf('int', function($k, $v) {
+            yield $k;
+            yield $v;
+        });
+
+        $this->assertInstanceOf(Set::class, $set);
+        $this->assertSame(
+            [1, 2, 3, 4],
+            unwrap($set),
+        );
     }
 }

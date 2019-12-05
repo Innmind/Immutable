@@ -11,6 +11,7 @@ use Innmind\Immutable\{
     Str,
     Sequence,
 };
+use function Innmind\Immutable\unwrap;
 use PHPUnit\Framework\TestCase;
 
 class PrimitiveTest extends TestCase
@@ -232,5 +233,17 @@ class PrimitiveTest extends TestCase
     {
         $this->assertTrue((new Primitive('int'))->empty());
         $this->assertFalse((new Primitive('int', 1))->empty());
+    }
+
+    public function toSetOf()
+    {
+        $sequence = new Primitive('int', 1, 2, 3);
+        $set = $sequence->toSetOf('string|int', fn($i) => yield (string) $i && yield $i);
+
+        $this->assertInstanceOf(Set::class, $set);
+        $this->assertSame(
+            ['1', 1, '2', 2, '3', 3],
+            unwrap($set),
+        );
     }
 }

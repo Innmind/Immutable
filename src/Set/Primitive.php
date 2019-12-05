@@ -304,4 +304,16 @@ final class Primitive implements Implementation
     {
         return $this->values->empty();
     }
+
+    /**
+     * @template ST
+     *
+     * @param callable(T): \Generator<ST> $mapper
+     *
+     * @return Set<ST>
+     */
+    public function toSetOf(string $type, callable $mapper): Set
+    {
+        return $this->values->toSetOf($type, $mapper);
+    }
 }

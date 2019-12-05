@@ -15,6 +15,7 @@ use Innmind\Immutable\{
     Exception\ElementNotFound,
     Exception\CannotGroupEmptyStructure,
 };
+use function Innmind\Immutable\unwrap;
 
 /**
  * @template T
@@ -379,6 +380,27 @@ final class DoubleIndex implements Implementation
     public function empty(): bool
     {
         return $this->pairs->empty();
+    }
+
+    /**
+     * @template ST
+     *
+     * @param callable(T, S): \Generator<ST> $mapper
+     *
+     * @return Set<ST>
+     */
+    public function toSetOf(string $type, callable $mapper): Set
+    {
+        /** @var Set<ST> */
+        $set = Set::of($type);
+
+        foreach (unwrap($this->pairs) as $pair) {
+            foreach ($mapper($pair->key(), $pair->value()) as $newValue) {
+                $set = ($set)($newValue);
+            }
+        }
+
+        return $set;
     }
 
     /**

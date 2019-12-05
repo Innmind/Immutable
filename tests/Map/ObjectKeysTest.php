@@ -15,6 +15,7 @@ use Innmind\Immutable\{
     Exception\ElementNotFound,
     Exception\CannotGroupEmptyStructure,
 };
+use function Innmind\Immutable\unwrap;
 use PHPUnit\Framework\TestCase;
 
 class ObjectKeysTest extends TestCase
@@ -429,5 +430,19 @@ class ObjectKeysTest extends TestCase
     public function testGenericObjectTypeAllowedAsKey()
     {
         $this->assertSame('object', (new ObjectKeys('object', 'int'))->keyType());
+    }
+
+    public function testToSetOf()
+    {
+        $map = (new ObjectKeys('object', 'int'))
+            ->put(new \stdClass, 2)
+            ->put(new \stdClass, 4);
+        $set = $map->toSetOf('int', fn($k, $v) => yield $v);
+
+        $this->assertInstanceOf(Set::class, $set);
+        $this->assertSame(
+            [2, 4],
+            unwrap($set),
+        );
     }
 }

@@ -15,6 +15,7 @@ use Innmind\Immutable\{
     Exception\ElementNotFound,
     Exception\CannotGroupEmptyStructure,
 };
+use function Innmind\Immutable\unwrap;
 use PHPUnit\Framework\TestCase;
 
 class PrimitiveTest extends TestCase
@@ -470,5 +471,22 @@ class PrimitiveTest extends TestCase
         });
         $this->assertSame('foo', $map->get('1'));
         $this->assertSame(['1'], $map->keys()->toArray());
+    }
+
+    public function testToSetOf()
+    {
+        $map = (new Primitive('int', 'int'))
+            ->put(1, 2)
+            ->put(3, 4);
+        $set = $map->toSetOf('int', function($k, $v) {
+            yield $k;
+            yield $v;
+        });
+
+        $this->assertInstanceOf(Set::class, $set);
+        $this->assertSame(
+            [1, 2, 3, 4],
+            unwrap($set),
+        );
     }
 }

@@ -167,4 +167,13 @@ interface Implementation extends \Countable
      */
     public function clear(): self;
     public function empty(): bool;
+
+    /**
+     * @template ST
+     *
+     * @param callable(T): \Generator<ST> $mapper
+     *
+     * @return Set<ST>
+     */
+    public function toSetOf(string $type, callable $mapper): Set;
 }
