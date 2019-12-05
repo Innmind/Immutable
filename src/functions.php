@@ -4,7 +4,7 @@ declare(strict_types = 1);
 namespace Innmind\Immutable;
 
 /**
- * @throws TypeError
+ * @throws \TypeError
  */
 function assertSet(string $type, Set $set, int $position): void
 {
@@ -14,7 +14,7 @@ function assertSet(string $type, Set $set, int $position): void
 }
 
 /**
- * @throws TypeError
+ * @throws \TypeError
  */
 function assertMap(string $key, string $value, Map $map, int $position): void
 {
@@ -24,7 +24,7 @@ function assertMap(string $key, string $value, Map $map, int $position): void
 }
 
 /**
- * @throws TypeError
+ * @throws \TypeError
  */
 function assertSequence(string $type, Sequence $stream, int $position): void
 {

@@ -10,14 +10,21 @@ use Innmind\Immutable\{
     Type,
     ValidateArgument,
     Str,
+    Exception\CannotGroupEmptyStructure,
 };
 
+/**
+ * @template T
+ */
 final class Primitive implements Implementation
 {
     private string $type;
     private ValidateArgument $validate;
     private Sequence $values;
 
+    /**
+     * @param T $values
+     */
     public function __construct(string $type, ...$values)
     {
         $this->type = $type;
@@ -48,11 +55,19 @@ final class Primitive implements Implementation
         return $this->values->size();
     }
 
+    /**
+     * @return list<T>
+     */
     public function toArray(): array
     {
         return $this->values->toArray();
     }
 
+    /**
+     * @param Implementation<T> $set
+     *
+     * @return self<T>
+     */
     public function intersect(Implementation $set): self
     {
         $self = $this->clear();
@@ -63,6 +78,11 @@ final class Primitive implements Implementation
         return $self;
     }
 
+    /**
+     * @param T $element
+     *
+     * @return self<T>
+     */
     public function add($element): self
     {
         if ($this->contains($element)) {
@@ -75,11 +95,19 @@ final class Primitive implements Implementation
         return $set;
     }
 
+    /**
+     * @param T $element
+     */
     public function contains($element): bool
     {
         return $this->values->contains($element);
     }
 
+    /**
+     * @param T $element
+     *
+     * @return self<T>
+     */
     public function remove($element): self
     {
         if (!$this->contains($element)) {
@@ -97,6 +125,11 @@ final class Primitive implements Implementation
         return $set;
     }
 
+    /**
+     * @param Implementation<T> $set
+     *
+     * @return self<T>
+     */
     public function diff(Implementation $set): self
     {
         $self = clone $this;
@@ -107,6 +140,9 @@ final class Primitive implements Implementation
         return $self;
     }
 
+    /**
+     * @param Implementation<T> $set
+     */
     public function equals(Implementation $set): bool
     {
         if ($this->size() !== $set->size()) {
@@ -116,6 +152,11 @@ final class Primitive implements Implementation
         return $this->intersect($set)->size() === $this->size();
     }
 
+    /**
+     * @param callable(T): bool $predicate
+     *
+     * @return self<T>
+     */
     public function filter(callable $predicate): self
     {
         $set = clone $this;
@@ -124,15 +165,31 @@ final class Primitive implements Implementation
         return $set;
     }
 
+    /**
+     * @param callable(T): void $function
+     */
     public function foreach(callable $function): void
     {
         $this->values->foreach($function);
     }
 
+    /**
+     * @template D
+     * @param callable(T): D $discriminator
+     *
+     * @throws CannotGroupEmptyStructure
+     *
+     * @return Map<D, Set<T>>
+     */
     public function groupBy(callable $discriminator): Map
     {
+        /** @var Map<D, Sequence<T>> */
         $map = $this->values->groupBy($discriminator);
 
+        /**
+         * @psalm-suppress MixedReturnTypeCoercion
+         * @var Map<D, Set<T>>
+         */
         return $map->reduce(
             Map::of($map->keyType(), Set::class),
             function(Map $carry, $key, Sequence $values): Map {
@@ -144,13 +201,23 @@ final class Primitive implements Implementation
         );
     }
 
+    /**
+     * @param callable(T): T $function
+     *
+     * @return self<T>
+     */
     public function map(callable $function): self
     {
+        /**
+         * @psalm-suppress MissingClosureParamType
+         * @psalm-suppress MissingClosureReturnType
+         */
         $function = function($value) use ($function) {
-            $value = $function($value);
-            ($this->validate)($value, 1);
+            /** @var T $value */
+            $returned = $function($value);
+            ($this->validate)($returned, 1);
 
-            return $value;
+            return $returned;
         };
 
         return $this->reduce(
@@ -161,13 +228,26 @@ final class Primitive implements Implementation
         );
     }
 
+    /**
+     * @param callable(T): bool $predicate
+     *
+     * @return Map<bool, Set<T>>
+     */
     public function partition(callable $predicate): Map
     {
         $partitions = $this->values->partition($predicate);
+        /** @var Set<T> */
+        $truthy = Set::of($this->type, ...$partitions->get(true)->toArray());
+        /** @var Set<T> */
+        $falsy = Set::of($this->type, ...$partitions->get(false)->toArray());
 
+        /**
+         * @psalm-suppress InvalidScalarArgument
+         * @psalm-suppress InvalidArgument
+         */
         return Map::of('bool', Set::class)
-            (true, Set::of($this->type, ...$partitions->get(true)->toArray()))
-            (false, Set::of($this->type, ...$partitions->get(false)->toArray()));
+            (true, $truthy)
+            (false, $falsy);
     }
 
     public function join(string $separator): Str
@@ -175,11 +255,21 @@ final class Primitive implements Implementation
         return $this->values->join($separator);
     }
 
+    /**
+     * @param callable(T, T): int $function
+     *
+     * @return Sequence<T>
+     */
     public function sort(callable $function): Sequence
     {
         return $this->values->sort($function);
     }
 
+    /**
+     * @param Implementation<T> $set
+     *
+     * @return self<T>
+     */
     public function merge(Implementation $set): self
     {
         return $set->reduce(
@@ -190,11 +280,21 @@ final class Primitive implements Implementation
         );
     }
 
+    /**
+     * @template R
+     * @param R $carry
+     * @param callable(R, T): R $reducer
+     *
+     * @return R
+     */
     public function reduce($carry, callable $reducer)
     {
         return $this->values->reduce($carry, $reducer);
     }
 
+    /**
+     * @return self<T>
+     */
     public function clear(): self
     {
         return new self($this->type);

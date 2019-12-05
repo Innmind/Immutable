@@ -10,6 +10,7 @@ use Innmind\Immutable\{
     Exception\LogicException,
     Exception\CannotGroupEmptyStructure,
     Exception\ElementNotFound,
+    Exception\OutOfBoundException,
 };
 
 /**
@@ -84,8 +85,6 @@ interface Implementation extends \Countable
      * Apply the given function to all elements of the sequence
      *
      * @param callable(T): void $function
-     *
-     * @return self<T>
      */
     public function foreach(callable $function): void;
 
@@ -93,11 +92,12 @@ interface Implementation extends \Countable
      * Return a new map of pairs grouped by keys determined with the given
      * discriminator function
      *
-     * @param callable(T) $discriminator
+     * @template D
+     * @param callable(T): D $discriminator
      *
      * @throws CannotGroupEmptyStructure
      *
-     * @return Map<mixed, Sequence<T>>
+     * @return Map<D, Sequence<T>>
      */
     public function groupBy(callable $discriminator): Map;
 
@@ -240,10 +240,11 @@ interface Implementation extends \Countable
     /**
      * Reduce the sequence to a single value
      *
-     * @param mixed $carry
-     * @param callable(mixed, T) $reducer
+     * @template R
+     * @param R $carry
+     * @param callable(R, T): R $reducer
      *
-     * @return mixed
+     * @return R
      */
     public function reduce($carry, callable $reducer);
 

@@ -15,18 +15,26 @@ use Innmind\Immutable\{
     Exception\CannotGroupEmptyStructure,
 };
 
+/**
+ * @template T
+ */
 final class Primitive implements Implementation
 {
     private string $type;
     private ValidateArgument $validate;
+    /** @var list<T> */
     private array $values;
     private ?int $size;
 
+    /**
+     * @param T $values
+     */
     public function __construct(string $type, ...$values)
     {
         $this->type = $type;
         $this->validate = Type::of($type);
         $this->values = $values;
+        $this->size = null;
     }
 
     public function type(): string
@@ -49,6 +57,11 @@ final class Primitive implements Implementation
         return $this->values;
     }
 
+    /**
+     * @throws OutOfBoundException
+     *
+     * @return T
+     */
     public function get(int $index)
     {
         if (!$this->has($index)) {
@@ -58,13 +71,22 @@ final class Primitive implements Implementation
         return $this->values[$index];
     }
 
+    /**
+     * @param Implementation<T> $sequence
+     *
+     * @return self<T>
+     */
     public function diff(Implementation $sequence): self
     {
         return $this->filter(static function($value) use ($sequence): bool {
+            /** @var T $value */
             return !$sequence->contains($value);
         });
     }
 
+    /**
+     * @return self<T>
+     */
     public function distinct(): self
     {
         return $this->reduce(
@@ -79,6 +101,9 @@ final class Primitive implements Implementation
         );
     }
 
+    /**
+     * @return self<T>
+     */
     public function drop(int $size): self
     {
         $self = $this->clear();
@@ -87,6 +112,9 @@ final class Primitive implements Implementation
         return $self;
     }
 
+    /**
+     * @return self<T>
+     */
     public function dropEnd(int $size): self
     {
         $self = $this->clear();
@@ -95,11 +123,19 @@ final class Primitive implements Implementation
         return $self;
     }
 
+    /**
+     * @param Implementation<T> $sequence
+     */
     public function equals(Implementation $sequence): bool
     {
         return $this->values === $sequence->toArray();
     }
 
+    /**
+     * @param callable(T): bool $predicate
+     *
+     * @return self<T>
+     */
     public function filter(callable $predicate): self
     {
         $self = $this->clear();
@@ -111,6 +147,9 @@ final class Primitive implements Implementation
         return $self;
     }
 
+    /**
+     * @param callable(T): void $function
+     */
     public function foreach(callable $function): void
     {
         foreach ($this->values as $value) {
@@ -118,60 +157,78 @@ final class Primitive implements Implementation
         }
     }
 
+    /**
+     * @template D
+     * @param callable(T): D $discriminator
+     *
+     * @throws CannotGroupEmptyStructure
+     *
+     * @return Map<D, Sequence<T>>
+     */
     public function groupBy(callable $discriminator): Map
     {
         if ($this->size() === 0) {
             throw new CannotGroupEmptyStructure;
         }
 
-        $map = null;
+        $groups = null;
 
         foreach ($this->values as $value) {
             $key = $discriminator($value);
 
-            if ($map === null) {
-                $map = Map::of(
+            if ($groups === null) {
+                /** @var Map<D, Sequence<T>> */
+                $groups = Map::of(
                     Type::determine($key),
                     Sequence::class
                 );
             }
 
-            if ($map->contains($key)) {
-                $map = $map->put(
-                    $key,
-                    $map->get($key)->add($value)
-                );
+            if ($groups->contains($key)) {
+                /** @var Sequence<T> */
+                $group = $groups->get($key);
+                /** @var Sequence<T> */
+                $group = $group->add($value);
+
+                $groups = $groups->put($key, $group);
             } else {
-                $map = $map->put($key, Sequence::of($this->type, $value));
+                $groups = $groups->put($key, Sequence::of($this->type, $value));
             }
         }
 
-        return $map;
+        /** @var Map<D, Sequence<T>> */
+        return $groups;
     }
 
+    /**
+     * @return T
+     */
     public function first()
     {
-        if ($this->size() === 0) {
-            throw new OutOfBoundException;
-        }
-
-        return $this->values[0];
+        return $this->get(0);
     }
 
+    /**
+     * @return T
+     */
     public function last()
     {
-        if ($this->size() === 0) {
-            throw new OutOfBoundException;
-        }
-
-        return $this->values[$this->size() - 1];
+        return $this->get($this->size() - 1);
     }
 
+    /**
+     * @param T $element
+     */
     public function contains($element): bool
     {
         return \in_array($element, $this->values, true);
     }
 
+    /**
+     * @param T $element
+     *
+     * @throws ElementNotFound
+     */
     public function indexOf($element): int
     {
         $index = \array_search($element, $this->values, true);
@@ -183,22 +240,39 @@ final class Primitive implements Implementation
         return $index;
     }
 
+    /**
+     * @psalm-suppress LessSpecificImplementedReturnType Don't why it complains
+     *
+     * @return self<int>
+     */
     public function indices(): self
     {
         if ($this->size() === 0) {
+            /** @var self<int> */
             return new self('int');
         }
 
+        /** @var self<int> */
         return new self('int', ...\range(0, $this->size() - 1));
     }
 
+    /**
+     * @param callable(T): T $function
+     *
+     * @return self<T>
+     */
     public function map(callable $function): self
     {
+        /**
+         * @psalm-suppress MissingClosureParamType
+         * @psalm-suppress MissingClosureReturnType
+         */
         $function = function($value) use ($function) {
-            $value = $function($value);
-            ($this->validate)($value, 1);
+            /** @var T $value */
+            $returned = $function($value);
+            ($this->validate)($returned, 1);
 
-            return $value;
+            return $returned;
         };
 
         $self = clone $this;
@@ -207,6 +281,11 @@ final class Primitive implements Implementation
         return $self;
     }
 
+    /**
+     * @param T $element
+     *
+     * @return self<T>
+     */
     public function pad(int $size, $element): self
     {
         $self = $this->clear();
@@ -215,9 +294,16 @@ final class Primitive implements Implementation
         return $self;
     }
 
+    /**
+     * @param callable(T): bool $predicate
+     *
+     * @return Map<bool, Sequence<T>>
+     */
     public function partition(callable $predicate): Map
     {
+        /** @var list<T> */
         $truthy = [];
+        /** @var list<T> */
         $falsy = [];
 
         foreach ($this->values as $value) {
@@ -228,14 +314,23 @@ final class Primitive implements Implementation
             }
         }
 
+        /** @var Sequence<T> */
         $true = Sequence::of($this->type, ...$truthy);
+        /** @var Sequence<T> */
         $false = Sequence::of($this->type, ...$falsy);
 
+        /**
+         * @psalm-suppress InvalidScalarArgument
+         * @psalm-suppress InvalidArgument
+         */
         return Map::of('bool', Sequence::class)
             (true, $true)
             (false, $false);
     }
 
+    /**
+     * @return self<T>
+     */
     public function slice(int $from, int $until): self
     {
         $self = $this->clear();
@@ -248,34 +343,61 @@ final class Primitive implements Implementation
         return $self;
     }
 
+    /**
+     * @throws OutOfBoundException
+     *
+     * @return Sequence<Sequence<T>>
+     */
     public function splitAt(int $index): Sequence
     {
-        return Sequence::of(Sequence::class)
-            ->add(Sequence::of($this->type, ...$this->slice(0, $index)->toArray()))
-            ->add(Sequence::of($this->type, ...$this->slice($index, $this->size())->toArray()));
+        /** @var Sequence<T> */
+        $first = Sequence::of($this->type, ...$this->slice(0, $index)->toArray());
+        /** @var Sequence<T> */
+        $second = Sequence::of($this->type, ...$this->slice($index, $this->size())->toArray());
+
+        /** @var Sequence<Sequence<T>> */
+        return Sequence::of(Sequence::class, $first, $second);
     }
 
+    /**
+     * @return self<T>
+     */
     public function take(int $size): self
     {
         return $this->slice(0, $size);
     }
 
+    /**
+     * @return self<T>
+     */
     public function takeEnd(int $size): self
     {
         return $this->slice($this->size() - $size, $this->size());
     }
 
+    /**
+     * @param Implementation<T> $sequence
+     *
+     * @return self<T>
+     */
     public function append(Implementation $sequence): self
     {
         $self = $this->clear();
+        /** @var list<T> */
         $self->values = \array_merge($this->values, $sequence->toArray());
 
         return $self;
     }
 
+    /**
+     * @param Implementation<T> $sequence
+     *
+     * @return self<T>
+     */
     public function intersect(Implementation $sequence): self
     {
         return $this->filter(static function($value) use ($sequence): bool {
+            /** @var T $value */
             return $sequence->contains($value);
         });
     }
@@ -285,6 +407,11 @@ final class Primitive implements Implementation
         return Str::of(\implode($separator, $this->values));
     }
 
+    /**
+     * @param T $element
+     *
+     * @return self<T>
+     */
     public function add($element): self
     {
         $self = clone $this;
@@ -294,6 +421,11 @@ final class Primitive implements Implementation
         return $self;
     }
 
+    /**
+     * @param callable(T, T): int $function
+     *
+     * @return self<T>
+     */
     public function sort(callable $function): self
     {
         $self = clone $this;
@@ -302,16 +434,30 @@ final class Primitive implements Implementation
         return $self;
     }
 
+    /**
+     * @template R
+     * @param R $carry
+     * @param callable(R, T): R $reducer
+     *
+     * @return R
+     */
     public function reduce($carry, callable $reducer)
     {
+        /** @var R */
         return \array_reduce($this->values, $reducer, $carry);
     }
 
+    /**
+     * @return self<T>
+     */
     public function clear(): Implementation
     {
         return new self($this->type);
     }
 
+    /**
+     * @return self<T>
+     */
     public function reverse(): self
     {
         $self = clone $this;

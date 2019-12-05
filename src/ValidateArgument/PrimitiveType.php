@@ -10,12 +10,14 @@ use Innmind\Immutable\{
 
 final class PrimitiveType implements ValidateArgument
 {
-    private $function;
-    private $type;
+    private \Closure $function;
+    private string $type;
 
     public function __construct(string $type)
     {
-        $this->function = 'is_'.$type;
+        /** @var callable */
+        $functionName = 'is_'.$type;
+        $this->function = \Closure::fromCallable($functionName);
         $this->type = $type;
     }
 
@@ -24,7 +26,7 @@ final class PrimitiveType implements ValidateArgument
      */
     public function __invoke($value, int $position): void
     {
-        if (call_user_func($this->function, $value) === false) {
+        if (($this->function)($value) === false) {
             $given = Type::determine($value);
 
             throw new \TypeError("Argument $position must be of type {$this->type}, $given given");

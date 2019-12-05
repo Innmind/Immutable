@@ -26,6 +26,9 @@ final class RegExp
         return new self($pattern);
     }
 
+    /**
+     * @throws RegexException
+     */
     public function matches(Str $string): bool
     {
         $value = \preg_match($this->pattern, (string) $string);
@@ -39,6 +42,8 @@ final class RegExp
 
 
     /**
+     * @throws RegexException
+     *
      * @return Map<scalar, Str>
      */
     public function capture(Str $string): Map
@@ -50,6 +55,7 @@ final class RegExp
             throw new RegexException('', \preg_last_error());
         }
 
+        /** @var Map<scalar, Str> */
         $map = Map::of('scalar', Str::class);
 
         foreach ($matches as $key => $match) {

@@ -17,7 +17,8 @@ use Innmind\Immutable\{
 };
 
 /**
- * {@inheritdoc}
+ * @template T
+ * @template S
  */
 final class DoubleIndex implements Implementation
 {
@@ -25,13 +26,13 @@ final class DoubleIndex implements Implementation
     private string $valueType;
     private ValidateArgument $validateKey;
     private ValidateArgument $validateValue;
+    /** @var Sequence<T> */
     private Sequence $keys;
+    /** @var Sequence<S> */
     private Sequence $values;
+    /** @var Sequence<Pair<T, S>> */
     private Sequence $pairs;
 
-    /**
-     * {@inheritdoc}
-     */
     public function __construct(string $keyType, string $valueType)
     {
         $this->validateKey = Type::of($keyType);
@@ -40,45 +41,37 @@ final class DoubleIndex implements Implementation
         $this->valueType = $valueType;
         $this->keys = Sequence::of($keyType);
         $this->values = Sequence::of($valueType);
+        /** @var Sequence<Pair<T, S>> */
         $this->pairs = Sequence::of(Pair::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function keyType(): string
     {
         return $this->keyType;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function valueType(): string
     {
         return $this->valueType;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function size(): int
     {
         return $this->keys->size();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function count(): int
     {
         return $this->keys->count();
     }
 
     /**
-     * {@inheritdoc}
+     * @param T $key
+     * @param S $value
+     *
+     * @return self<T, S>
      */
-    public function put($key, $value): Implementation
+    public function put($key, $value): self
     {
         ($this->validateKey)($key, 1);
         ($this->validateValue)($value, 2);
@@ -90,12 +83,15 @@ final class DoubleIndex implements Implementation
             $map->values = $this->values->take($index)
                 ->add($value)
                 ->append($this->values->drop($index + 1));
+            /** @var Sequence<Pair<T, S>> */
             $map->pairs = $this->pairs->take($index)
                 ->add(new Pair($key, $value))
                 ->append($this->pairs->drop($index + 1));
         } else {
+            /** @var Sequence<T> */
             $map->keys = $this->keys->add($key);
             $map->values = $this->values->add($value);
+            /** @var Sequence<Pair<T, S>> */
             $map->pairs = $this->pairs->add(new Pair($key, $value));
         }
 
@@ -103,7 +99,11 @@ final class DoubleIndex implements Implementation
     }
 
     /**
-     * {@inheritdoc}
+     * @param T $key
+     *
+     * @throws ElementNotFound
+     *
+     * @return S
      */
     public function get($key)
     {
@@ -117,7 +117,7 @@ final class DoubleIndex implements Implementation
     }
 
     /**
-     * {@inheritdoc}
+     * @param T $key
      */
     public function contains($key): bool
     {
@@ -125,9 +125,9 @@ final class DoubleIndex implements Implementation
     }
 
     /**
-     * {@inheritdoc}
+     * @return self<T, S>
      */
-    public function clear(): Implementation
+    public function clear(): self
     {
         $map = clone $this;
         $map->keys = $this->keys->clear();
@@ -138,7 +138,7 @@ final class DoubleIndex implements Implementation
     }
 
     /**
-     * {@inheritdoc}
+     * @param Implementation<T, S> $map
      */
     public function equals(Implementation $map): bool
     {
@@ -156,16 +156,24 @@ final class DoubleIndex implements Implementation
     }
 
     /**
-     * {@inheritdoc}
+     * @param callable(T, S): bool $predicate
+     *
+     * @return self<T, S>
      */
-    public function filter(callable $predicate): Implementation
+    public function filter(callable $predicate): self
     {
         $map = $this->clear();
 
         foreach ($this->pairs->toArray() as $pair) {
             if ($predicate($pair->key(), $pair->value()) === true) {
+                /** @psalm-suppress MixedArgumentTypeCoercion */
                 $map->keys = $map->keys->add($pair->key());
+                /** @psalm-suppress MixedArgumentTypeCoercion */
                 $map->values = $map->values->add($pair->value());
+                /**
+                 * @psalm-suppress MixedArgumentTypeCoercion
+                 * @var Sequence<Pair<T, S>>
+                 */
                 $map->pairs = $map->pairs->add($pair);
             }
         }
@@ -174,7 +182,7 @@ final class DoubleIndex implements Implementation
     }
 
     /**
-     * {@inheritdoc}
+     * @param callable(T, S): void $function
      */
     public function foreach(callable $function): void
     {
@@ -184,7 +192,12 @@ final class DoubleIndex implements Implementation
     }
 
     /**
-     * {@inheritdoc}
+     * @template D
+     * @param callable(T, S): D $discriminator
+     *
+     * @throws CannotGroupEmptyStructure
+     *
+     * @return Map<D, Map<T, S>>
      */
     public function groupBy(callable $discriminator): Map
     {
@@ -192,42 +205,46 @@ final class DoubleIndex implements Implementation
             throw new CannotGroupEmptyStructure;
         }
 
-        $map = null;
+        $groups = null;
 
         foreach ($this->pairs->toArray() as $pair) {
             $key = $discriminator($pair->key(), $pair->value());
 
-            if ($map === null) {
-                $map = Map::of(
+            if ($groups === null) {
+                /** @var Map<D, Map<T, S>> */
+                $groups = Map::of(
                     Type::determine($key),
                     Map::class
                 );
             }
 
-            if ($map->contains($key)) {
-                $map = $map->put(
-                    $key,
-                    $map->get($key)->put(
-                        $pair->key(),
-                        $pair->value()
-                    )
+            if ($groups->contains($key)) {
+                /** @var Map<T, S> */
+                $group = $groups->get($key);
+                /** @var Map<T, S> */
+                $group = $group->put(
+                    $pair->key(),
+                    $pair->value(),
                 );
+
+                $groups = $groups->put($key, $group);
             } else {
-                $map = $map->put(
-                    $key,
-                    $this->clearMap()->put(
-                        $pair->key(),
-                        $pair->value()
-                    )
+                /** @var Map<T, S> */
+                $group = $this->clearMap()->put(
+                    $pair->key(),
+                    $pair->value()
                 );
+
+                $groups = $groups->put($key, $group);
             }
         }
 
-        return $map;
+        /** @var Map<D, Map<T, S>> */
+        return $groups;
     }
 
     /**
-     * {@inheritdoc}
+     * @return Set<T>
      */
     public function keys(): Set
     {
@@ -235,7 +252,7 @@ final class DoubleIndex implements Implementation
     }
 
     /**
-     * {@inheritdoc}
+     * @return Sequence<S>
      */
     public function values(): Sequence
     {
@@ -243,9 +260,11 @@ final class DoubleIndex implements Implementation
     }
 
     /**
-     * {@inheritdoc}
+     * @param callable(T, S): (S|Pair<T, S>) $function
+     *
+     * @return self<T, S>
      */
-    public function map(callable $function): Implementation
+    public function map(callable $function): self
     {
         $map = $this->clear();
 
@@ -256,7 +275,9 @@ final class DoubleIndex implements Implementation
             );
 
             if ($return instanceof Pair) {
+                /** @var T */
                 $key = $return->key();
+                /** @var S */
                 $value = $return->value();
             } else {
                 $key = $pair->key();
@@ -269,16 +290,15 @@ final class DoubleIndex implements Implementation
         return $map;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function join(string $separator): Str
     {
         return $this->values->join($separator);
     }
 
     /**
-     * {@inheritdoc}
+     * @param T $key
+     *
+     * @return self<T, S>
      */
     public function remove($key): Implementation
     {
@@ -296,6 +316,7 @@ final class DoubleIndex implements Implementation
             ->values
             ->slice(0, $index)
             ->append($this->values->slice($index + 1, $this->values->size()));
+        /** @var Sequence<Pair<T, S>> */
         $map->pairs = $this
             ->pairs
             ->slice(0, $index)
@@ -305,9 +326,11 @@ final class DoubleIndex implements Implementation
     }
 
     /**
-     * {@inheritdoc}
+     * @param Implementation<T, S> $map
+     *
+     * @return self<T, S>
      */
-    public function merge(Implementation $map): Implementation
+    public function merge(Implementation $map): self
     {
         return $map->reduce(
             $this,
@@ -318,7 +341,9 @@ final class DoubleIndex implements Implementation
     }
 
     /**
-     * {@inheritdoc}
+     * @param callable(T, S): bool $predicate
+     *
+     * @return Map<bool, Map<T, S>>
      */
     public function partition(callable $predicate): Map
     {
@@ -338,13 +363,21 @@ final class DoubleIndex implements Implementation
             }
         }
 
+        /**
+         * @psalm-suppress InvalidScalarArgument
+         * @psalm-suppress InvalidArgument
+         */
         return Map::of('bool', Map::class)
             (true, $truthy)
             (false, $falsy);
     }
 
     /**
-     * {@inheritdoc}
+     * @template R
+     * @param R $carry
+     * @param callable(R, T, S): R $reducer
+     *
+     * @return R
      */
     public function reduce($carry, callable $reducer)
     {

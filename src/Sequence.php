@@ -7,6 +7,7 @@ use Innmind\Immutable\Exception\{
     LogicException,
     CannotGroupEmptyStructure,
     ElementNotFound,
+    OutOfBoundException,
 };
 
 /**
@@ -27,6 +28,8 @@ final class Sequence implements \Countable
 
     /**
      * @param T $values
+     *
+     * @return self<T>
      */
     public static function of(string $type, ...$values): self
     {
@@ -51,6 +54,7 @@ final class Sequence implements \Countable
      */
     public static function mixed(...$values): self
     {
+        /** @var self<mixed> */
         $self = new self('mixed');
         $self->implementation = new Sequence\Primitive('mixed', ...$values);
 
@@ -62,6 +66,7 @@ final class Sequence implements \Countable
      */
     public static function ints(int ...$values): self
     {
+        /** @var self<int> */
         $self = new self('int');
         $self->implementation = new Sequence\Primitive('int', ...$values);
 
@@ -73,6 +78,7 @@ final class Sequence implements \Countable
      */
     public static function floats(float ...$values): self
     {
+        /** @var self<float> */
         $self = new self('float');
         $self->implementation = new Sequence\Primitive('float', ...$values);
 
@@ -84,6 +90,7 @@ final class Sequence implements \Countable
      */
     public static function strings(string ...$values): self
     {
+        /** @var self<string> */
         $self = new self('string');
         $self->implementation = new Sequence\Primitive('string', ...$values);
 
@@ -95,6 +102,7 @@ final class Sequence implements \Countable
      */
     public static function objects(object ...$values): self
     {
+        /** @var self<object> */
         $self = new self('object');
         $self->implementation = new Sequence\Primitive('object', ...$values);
 
@@ -132,6 +140,7 @@ final class Sequence implements \Countable
      */
     public function toArray(): array
     {
+        /** @var list<T> */
         return $this->implementation->toArray();
     }
 
@@ -144,6 +153,7 @@ final class Sequence implements \Countable
      */
     public function get(int $index)
     {
+        /** @var T */
         return $this->implementation->get($index);
     }
 
@@ -248,11 +258,12 @@ final class Sequence implements \Countable
      * Return a new map of pairs grouped by keys determined with the given
      * discriminator function
      *
-     * @param callable(T) $discriminator
+     * @template D
+     * @param callable(T): D $discriminator
      *
      * @throws CannotGroupEmptyStructure
      *
-     * @return Map<mixed, self<T>>
+     * @return Map<D, self<T>>
      */
     public function groupBy(callable $discriminator): Map
     {
@@ -266,6 +277,7 @@ final class Sequence implements \Countable
      */
     public function first()
     {
+        /** @var T */
         return $this->implementation->first();
     }
 
@@ -276,6 +288,7 @@ final class Sequence implements \Countable
      */
     public function last()
     {
+        /** @var T */
         return $this->implementation->last();
     }
 
@@ -312,6 +325,7 @@ final class Sequence implements \Countable
      */
     public function indices(): self
     {
+        /** @var self<int> */
         $self = new self('int');
         $self->implementation = $this->implementation->indices();
 
@@ -513,10 +527,11 @@ final class Sequence implements \Countable
     /**
      * Reduce the sequence to a single value
      *
-     * @param mixed $carry
-     * @param callable(mixed, T) $reducer
+     * @template R
+     * @param R $carry
+     * @param callable(R, T): R $reducer
      *
-     * @return mixed
+     * @return R
      */
     public function reduce($carry, callable $reducer)
     {

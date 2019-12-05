@@ -45,6 +45,7 @@ final class Str
     public function encoding(): self
     {
         if (\is_null($this->encoding)) {
+            /** @var string */
             $this->encoding = \mb_internal_encoding();
         }
 
@@ -68,6 +69,7 @@ final class Str
         }
 
         $parts = \explode($delimiter, $this->value);
+        /** @var Sequence<self> */
         $sequence = Sequence::of(self::class);
 
         foreach ($parts as $part) {
@@ -84,7 +86,9 @@ final class Str
      */
     public function chunk(int $size = 1): Sequence
     {
+        /** @var Sequence<self> */
         $sequence = Sequence::of(self::class);
+        /** @var list<string> */
         $parts = \mb_str_split($this->value, $size, (string) $this->encoding());
 
         foreach ($parts as $value) {
@@ -280,7 +284,9 @@ final class Str
      */
     public function words(string $charlist = ''): Map
     {
+        /** @var list<string> */
         $words = \str_word_count($this->value, 2, $charlist);
+        /** @var Map<int, self> */
         $map = Map::of('int', self::class);
 
         foreach ($words as $position => $word) {
@@ -298,6 +304,7 @@ final class Str
     public function pregSplit(string $regex, int $limit = -1): Sequence
     {
         $strings = \preg_split($regex, $this->value, $limit);
+        /** @var Sequence<self> */
         $sequence = Sequence::of(self::class);
 
         foreach ($strings as $string) {
@@ -310,7 +317,7 @@ final class Str
     /**
      * Check if the string match the given regular expression
      *
-     * @throws Exception If the regex failed
+     * @throws RegexException If the regex failed
      */
     public function matches(string $regex): bool
     {
@@ -320,7 +327,7 @@ final class Str
     /**
      * Return a collection of the elements matching the regex
      *
-     * @throws Exception If the regex failed
+     * @throws RegexException If the regex failed
      *
      * @return Map<scalar, self>
      */
@@ -332,7 +339,7 @@ final class Str
     /**
      * Replace part of the string by using a regular expression
      *
-     * @throws Exception If the regex failed
+     * @throws RegexException If the regex failed
      */
     public function pregReplace(
         string $regex,
@@ -390,7 +397,7 @@ final class Str
     /**
      * Return a formatted string
      */
-    public function sprintf(...$values): self
+    public function sprintf(string ...$values): self
     {
         return new self(\sprintf($this->value, ...$values), $this->encoding);
     }

@@ -10,7 +10,7 @@ use Innmind\Immutable\{
 
 final class ClassType implements ValidateArgument
 {
-    private $class;
+    private string $class;
 
     public function __construct(string $class)
     {

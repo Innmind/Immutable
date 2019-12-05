@@ -17,9 +17,7 @@ class ElementNotFound extends InvalidArgumentException implements Exception
                 $message = "object($class)#$id";
                 break;
 
-            case 'int':
             case 'integer':
-            case 'float':
             case 'string':
             case 'double':
                 $message = (string) $value;

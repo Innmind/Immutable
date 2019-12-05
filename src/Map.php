@@ -4,7 +4,7 @@ declare(strict_types = 1);
 namespace Innmind\Immutable;
 
 use Innmind\Immutable\{
-    Specification\ClassType,
+    ValidateArgument\ClassType,
     Exception\LogicException,
     Exception\ElementNotFound,
     Exception\CannotGroupEmptyStructure,
@@ -25,21 +25,25 @@ final class Map implements \Countable
     private function __construct(string $keyType, string $valueType)
     {
         $type = Type::of($keyType);
+        $this->implementation = new Map\DoubleIndex($keyType, $valueType);
+        $this->keyType = $keyType;
+        $this->valueType = $valueType;
+        $this->validateKey = $type;
+        $this->validateValue = Type::of($valueType);
 
         if ($type instanceof ClassType || $keyType === 'object') {
             $this->implementation = new Map\ObjectKeys($keyType, $valueType);
         } else if (\in_array($keyType, ['int', 'integer', 'string'], true)) {
             $this->implementation = new Map\Primitive($keyType, $valueType);
-        } else {
-            $this->implementation = new Map\DoubleIndex($keyType, $valueType);
         }
-
-        $this->keyType = $keyType;
-        $this->valueType = $valueType;
-        $this->validateKey = $type;
-        $this->validateValue = Type::of($valueType);
     }
 
+    /**
+     * @param list<T> $keys
+     * @param list<S> $values
+     *
+     * @return self<T, S>
+     */
     public static function of(
         string $key,
         string $value,
@@ -149,6 +153,7 @@ final class Map implements \Countable
     {
         ($this->validateKey)($key, 1);
 
+        /** @var S */
         return $this->implementation->get($key);
     }
 
@@ -208,8 +213,6 @@ final class Map implements \Countable
      * Run the given function for each element of the map
      *
      * @param callable(T, S): void $function
-     *
-     * @return self<T, S>
      */
     public function foreach(callable $function): void
     {
@@ -220,11 +223,12 @@ final class Map implements \Countable
      * Return a new map of pairs' sequences grouped by keys determined with the given
      * discriminator function
      *
-     * @param callable(T, S) $discriminator
+     * @template D
+     * @param callable(T, S): D $discriminator
      *
      * @throws CannotGroupEmptyStructure
      *
-     * @return self<mixed, self<T, S>>
+     * @return self<D, self<T, S>>
      */
     public function groupBy(callable $discriminator): self
     {
@@ -256,7 +260,7 @@ final class Map implements \Countable
      *
      * Keys can't be modified
      *
-     * @param callable(T, S): S|Pair<T, S> $function
+     * @param callable(T, S): (S|Pair<T, S>) $function
      *
      * @return self<T, S>
      */
@@ -325,10 +329,11 @@ final class Map implements \Countable
     /**
      * Reduce the map to a single value
      *
-     * @param mixed $carry
-     * @param callable(mixed, T, S) $reducer
+     * @template R
+     * @param R $carry
+     * @param callable(R, T, S): R $reducer
      *
-     * @return mixed
+     * @return R
      */
     public function reduce($carry, callable $reducer)
     {

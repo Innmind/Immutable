@@ -99,11 +99,12 @@ interface Implementation extends \Countable
      * Return a new map of pairs grouped by keys determined with the given
      * discriminator function
      *
-     * @param callable(T) $discriminator
+     * @template D
+     * @param callable(T): D $discriminator
      *
      * @throws CannotGroupEmptyStructure
      *
-     * @return Map<mixed, Set<T>>
+     * @return Map<D, Set<T>>
      */
     public function groupBy(callable $discriminator): Map;
 
@@ -151,10 +152,11 @@ interface Implementation extends \Countable
     /**
      * Reduce the set to a single value
      *
-     * @param mixed $carry
-     * @param callable(mixed, T) $reducer
+     * @template R
+     * @param R $carry
+     * @param callable(R, T): R $reducer
      *
-     * @return mixed
+     * @return R
      */
     public function reduce($carry, callable $reducer);
 

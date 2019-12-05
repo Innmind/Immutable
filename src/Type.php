@@ -34,16 +34,17 @@ final class Type
         }
 
         if ($type->contains('|')) {
-            return new UnionType(
-                ...$type->split('|')->reduce(
-                    [],
-                    static function(array $types, Str $type): array {
-                        $types[] = self::of((string) $type);
+            /** @var list<ValidateArgument> */
+            $types = $type->split('|')->reduce(
+                [],
+                static function(array $types, Str $type): array {
+                    $types[] = self::of((string) $type);
 
-                        return $types;
-                    }
-                )
+                    return $types;
+                }
             );
+
+            return new UnionType(...$types);
         }
 
         if ($type->startsWith('?')) {

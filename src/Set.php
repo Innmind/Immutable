@@ -5,6 +5,9 @@ namespace Innmind\Immutable;
 
 use Innmind\Immutable\Exception\CannotGroupEmptyStructure;
 
+/**
+ * @template T
+ */
 final class Set implements \Countable
 {
     private string $type;
@@ -21,6 +24,11 @@ final class Set implements \Countable
         $this->implementation = new Set\Primitive($type);
     }
 
+    /**
+     * @param T $values
+     *
+     * @return self<T>
+     */
     public static function of(string $type, ...$values): self
     {
         $self = new self($type);
@@ -30,10 +38,13 @@ final class Set implements \Countable
     }
 
     /**
+     * @param mixed $values
+     *
      * @return self<mixed>
      */
     public static function mixed(...$values): self
     {
+        /** @var self<mixed> */
         $self = new self('mixed');
         $self->implementation = new Set\Primitive('mixed', ...$values);
 
@@ -45,6 +56,7 @@ final class Set implements \Countable
      */
     public static function ints(int ...$values): self
     {
+        /** @var self<int> */
         $self = new self('int');
         $self->implementation = new Set\Primitive('int', ...$values);
 
@@ -56,6 +68,7 @@ final class Set implements \Countable
      */
     public static function floats(float ...$values): self
     {
+        /** @var self<float> */
         $self = new self('float');
         $self->implementation = new Set\Primitive('float', ...$values);
 
@@ -67,6 +80,7 @@ final class Set implements \Countable
      */
     public static function strings(string ...$values): self
     {
+        /** @var self<string> */
         $self = new self('string');
         $self->implementation = new Set\Primitive('string', ...$values);
 
@@ -78,6 +92,7 @@ final class Set implements \Countable
      */
     public static function objects(object ...$values): self
     {
+        /** @var self<object> */
         $self = new self('object');
         $self->implementation = new Set\Primitive('object', ...$values);
 
@@ -119,8 +134,6 @@ final class Set implements \Countable
      * Intersect this set with the given one
      *
      * @param self<T> $set
-     *
-     * @throws InvalidArgumentException If the sets are not of the same type
      *
      * @return self<T>
      */
@@ -260,11 +273,12 @@ final class Set implements \Countable
      * Return a new map of pairs grouped by keys determined with the given
      * discriminator function
      *
-     * @param callable(T) $discriminator
+     * @template D
+     * @param callable(T): D $discriminator
      *
      * @throws CannotGroupEmptyStructure
      *
-     * @return Map<mixed, self<T>>
+     * @return Map<D, self<T>>
      */
     public function groupBy(callable $discriminator): Map
     {
@@ -340,10 +354,11 @@ final class Set implements \Countable
     /**
      * Reduce the set to a single value
      *
-     * @param mixed $carry
-     * @param callable(mixed, T) $reducer
+     * @template R
+     * @param R $carry
+     * @param callable(R, T): R $reducer
      *
-     * @return mixed
+     * @return R
      */
     public function reduce($carry, callable $reducer)
     {

@@ -7,7 +7,7 @@ use Innmind\Immutable\ValidateArgument;
 
 final class NullableType implements ValidateArgument
 {
-    private $validate;
+    private ValidateArgument $validate;
 
     public function __construct(ValidateArgument $validate)
     {

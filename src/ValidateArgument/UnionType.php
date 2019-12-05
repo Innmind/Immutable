@@ -10,17 +10,15 @@ use Innmind\Immutable\{
 
 final class UnionType implements ValidateArgument
 {
-    private $types;
+    /** @var list<ValidateArgument> */
+    private array $types;
 
     public function __construct(
         ValidateArgument $first,
         ValidateArgument $second,
         ValidateArgument ...$rest
     ) {
-        \array_unshift($rest, $second);
-        \array_unshift($rest, $first);
-
-        $this->types = $rest;
+        $this->types = [$first, $second, ...$rest];
     }
 
     /**

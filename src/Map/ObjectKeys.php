@@ -18,7 +18,8 @@ use Innmind\Immutable\{
 };
 
 /**
- * {@inheritdoc}
+ * @template T
+ * @template S
  */
 final class ObjectKeys implements Implementation
 {
@@ -28,9 +29,6 @@ final class ObjectKeys implements Implementation
     private ValidateArgument $validateValue;
     private \SplObjectStorage $values;
 
-    /**
-     * {@inheritdoc}
-     */
     public function __construct(string $keyType, string $valueType)
     {
         $this->validateKey = Type::of($keyType);
@@ -45,25 +43,16 @@ final class ObjectKeys implements Implementation
         $this->values = new \SplObjectStorage;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function keyType(): string
     {
         return $this->keyType;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function valueType(): string
     {
         return $this->valueType;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function size(): int
     {
         return $this->values->count();
@@ -78,7 +67,10 @@ final class ObjectKeys implements Implementation
     }
 
     /**
-     * {@inheritdoc}
+     * @param T $key
+     * @param S $value
+     *
+     * @return self<T, S>
      */
     public function put($key, $value): Implementation
     {
@@ -87,6 +79,7 @@ final class ObjectKeys implements Implementation
 
         $map = clone $this;
         $map->values = clone $this->values;
+        /** @psalm-suppress MixedArgumentTypeCoercion */
         $map->values[$key] = $value;
         $map->values->rewind();
 
@@ -94,7 +87,11 @@ final class ObjectKeys implements Implementation
     }
 
     /**
-     * {@inheritdoc}
+     * @param T $key
+     *
+     * @throws ElementNotFound
+     *
+     * @return S
      */
     public function get($key)
     {
@@ -102,11 +99,15 @@ final class ObjectKeys implements Implementation
             throw new ElementNotFound($key);
         }
 
+        /**
+         * @psalm-suppress MixedArgumentTypeCoercion
+         * @var S
+         */
         return $this->values->offsetGet($key);
     }
 
     /**
-     * {@inheritdoc}
+     * @param T $key
      */
     public function contains($key): bool
     {
@@ -114,13 +115,14 @@ final class ObjectKeys implements Implementation
             return false;
         }
 
+        /** @psalm-suppress MixedArgumentTypeCoercion */
         return $this->values->offsetExists($key);
     }
 
     /**
-     * {@inheritdoc}
+     * @return self<T, S>
      */
-    public function clear(): Implementation
+    public function clear(): self
     {
         $map = clone $this;
         $map->values = new \SplObjectStorage;
@@ -129,7 +131,7 @@ final class ObjectKeys implements Implementation
     }
 
     /**
-     * {@inheritdoc}
+     * @param Implementation<T, S> $map
      */
     public function equals(Implementation $map): bool
     {
@@ -138,13 +140,16 @@ final class ObjectKeys implements Implementation
         }
 
         foreach ($this->values as $k) {
+            /** @var T $key */
+            $key = $k;
+            /** @var S $v */
             $v = $this->values[$k];
 
-            if (!$map->contains($k)) {
+            if (!$map->contains($key)) {
                 return false;
             }
 
-            if ($map->get($k) !== $v) {
+            if ($map->get($key) !== $v) {
                 return false;
             }
         }
@@ -153,16 +158,21 @@ final class ObjectKeys implements Implementation
     }
 
     /**
-     * {@inheritdoc}
+     * @param callable(T, S): bool $predicate
+     *
+     * @return self<T, S>
      */
-    public function filter(callable $predicate): Implementation
+    public function filter(callable $predicate): self
     {
         $map = $this->clear();
 
         foreach ($this->values as $k) {
+            /** @var T $key */
+            $key = $k;
+            /** @var S $v */
             $v = $this->values[$k];
 
-            if ($predicate($k, $v) === true) {
+            if ($predicate($key, $v) === true) {
                 $map->values[$k] = $v;
             }
         }
@@ -173,19 +183,27 @@ final class ObjectKeys implements Implementation
     }
 
     /**
-     * {@inheritdoc}
+     * @param callable(T, S): void $function
      */
     public function foreach(callable $function): void
     {
         foreach ($this->values as $k) {
+            /** @var T $key */
+            $key = $k;
+            /** @var S $v */
             $v = $this->values[$k];
 
-            $function($k, $v);
+            $function($key, $v);
         }
     }
 
     /**
-     * {@inheritdoc}
+     * @template D
+     * @param callable(T, S): D $discriminator
+     *
+     * @throws CannotGroupEmptyStructure
+     *
+     * @return Map<D, Map<T, S>>
      */
     public function groupBy(callable $discriminator): Map
     {
@@ -193,42 +211,50 @@ final class ObjectKeys implements Implementation
             throw new CannotGroupEmptyStructure;
         }
 
-        $map = null;
+        $groups = null;
 
         foreach ($this->values as $k) {
+            /** @var T $key */
+            $key = $k;
+            /** @var S $v */
             $v = $this->values[$k];
 
-            $key = $discriminator($k, $v);
+            $discriminant = $discriminator($key, $v);
 
-            if ($map === null) {
-                $map = Map::of(
-                    Type::determine($key),
+            if ($groups === null) {
+                /** @var Map<D, Map<T, S>> */
+                $groups = Map::of(
+                    Type::determine($discriminant),
                     Map::class
                 );
             }
 
-            if ($map->contains($key)) {
-                $map = $map->put(
-                    $key,
-                    $map->get($key)->put($k, $v)
-                );
+            if ($groups->contains($discriminant)) {
+                /** @var Map<T, S> */
+                $group = $groups->get($discriminant);
+                /** @var Map<T, S> */
+                $group = $group->put($key, $v);
+
+                $groups = $groups->put($discriminant, $group);
             } else {
-                $map = $map->put(
-                    $key,
-                    $this->clearMap()->put($k, $v)
-                );
+                /** @var Map<T, S> */
+                $group = $this->clearMap()->put($key, $v);
+
+                $groups = $groups->put($discriminant, $group);
             }
         }
 
-        return $map;
+        /** @var Map<D, Map<T, S>> */
+        return $groups;
     }
 
     /**
-     * {@inheritdoc}
+     * @return Set<T>
      */
     public function keys(): Set
     {
         return $this->reduce(
+            /** @var Set<T> */
             Set::of($this->keyType),
             static function(Set $keys, $key): Set {
                 return $keys->add($key);
@@ -237,11 +263,12 @@ final class ObjectKeys implements Implementation
     }
 
     /**
-     * {@inheritdoc}
+     * @return Sequence<S>
      */
     public function values(): Sequence
     {
         return $this->reduce(
+            /** @var Sequence<S> */
             Sequence::of($this->valueType),
             static function(Sequence $values, $key, $value): Sequence {
                 return $values->add($value);
@@ -250,21 +277,28 @@ final class ObjectKeys implements Implementation
     }
 
     /**
-     * {@inheritdoc}
+     * @param callable(T, S): (S|Pair<T, S>) $function
+     *
+     * @return self<T, S>
      */
-    public function map(callable $function): Implementation
+    public function map(callable $function): self
     {
         $map = $this->clear();
 
         foreach ($this->values as $k) {
+            /** @var T */
+            $key = $k;
+            /** @var S */
             $v = $this->values[$k];
 
-            $return = $function($k, $v);
+            $return = $function($key, $v);
 
             if ($return instanceof Pair) {
                 ($this->validateKey)($return->key(), 1);
 
+                /** @var object */
                 $key = $return->key();
+                /** @var S */
                 $value = $return->value();
             } else {
                 $key = $k;
@@ -281,18 +315,17 @@ final class ObjectKeys implements Implementation
         return $map;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function join(string $separator): Str
     {
         return $this->values()->join($separator);
     }
 
     /**
-     * {@inheritdoc}
+     * @param T $key
+     *
+     * @return self<T, S>
      */
-    public function remove($key): Implementation
+    public function remove($key): self
     {
         if (!$this->contains($key)) {
             return $this;
@@ -300,6 +333,7 @@ final class ObjectKeys implements Implementation
 
         $map = clone $this;
         $map->values = clone $this->values;
+        /** @psalm-suppress MixedArgumentTypeCoercion */
         $map->values->detach($key);
         $map->values->rewind();
 
@@ -307,10 +341,13 @@ final class ObjectKeys implements Implementation
     }
 
     /**
-     * {@inheritdoc}
+     * @param Implementation<T, S> $map
+     *
+     * @return self<T, S>
      */
-    public function merge(Implementation $map): Implementation
+    public function merge(Implementation $map): self
     {
+        /** @var self<T, S> */
         return $map->reduce(
             $this,
             function(self $carry, $key, $value): self {
@@ -320,7 +357,9 @@ final class ObjectKeys implements Implementation
     }
 
     /**
-     * {@inheritdoc}
+     * @param callable(T, S): bool $predicate
+     *
+     * @return Map<bool, Map<T, S>>
      */
     public function partition(callable $predicate): Map
     {
@@ -328,31 +367,45 @@ final class ObjectKeys implements Implementation
         $falsy = $this->clearMap();
 
         foreach ($this->values as $k) {
+            /** @var T $key */
+            $key = $k;
+            /** @var S $v */
             $v = $this->values[$k];
 
-            $return = $predicate($k, $v);
+            $return = $predicate($key, $v);
 
             if ($return === true) {
-                $truthy = $truthy->put($k, $v);
+                $truthy = $truthy->put($key, $v);
             } else {
-                $falsy = $falsy->put($k, $v);
+                $falsy = $falsy->put($key, $v);
             }
         }
 
+        /**
+         * @psalm-suppress InvalidScalarArgument
+         * @psalm-suppress InvalidArgument
+         */
         return Map::of('bool', Map::class)
             (true, $truthy)
             (false, $falsy);
     }
 
     /**
-     * {@inheritdoc}
+     * @template R
+     * @param R $carry
+     * @param callable(R, T, S): R $reducer
+     *
+     * @return R
      */
     public function reduce($carry, callable $reducer)
     {
         foreach ($this->values as $k) {
+            /** @var T $key */
+            $key = $k;
+            /** @var S $v */
             $v = $this->values[$k];
 
-            $carry = $reducer($carry, $k, $v);
+            $carry = $reducer($carry, $key, $v);
         }
 
         return $carry;

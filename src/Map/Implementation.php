@@ -8,6 +8,7 @@ use Innmind\Immutable\{
     Str,
     Set,
     Sequence,
+    Pair,
     Exception\CannotGroupEmptyStructure,
     Exception\ElementNotFound,
 };
@@ -93,11 +94,12 @@ interface Implementation extends \Countable
      * Return a new map of pairs' sequences grouped by keys determined with the given
      * discriminator function
      *
-     * @param callable(T, S) $discriminator
+     * @template D
+     * @param callable(T, S): D $discriminator
      *
      * @throws CannotGroupEmptyStructure
      *
-     * @return Map<mixed, Map<T, S>>
+     * @return Map<D, Map<T, S>>
      */
     public function groupBy(callable $discriminator): Map;
 
@@ -120,7 +122,7 @@ interface Implementation extends \Countable
      *
      * Keys can't be modified
      *
-     * @param callable(T, S): S|Pair<T, S> $function
+     * @param callable(T, S): (S|Pair<T, S>) $function
      *
      * @return self<T, S>
      */
@@ -161,10 +163,11 @@ interface Implementation extends \Countable
     /**
      * Reduce the map to a single value
      *
-     * @param mixed $carry
-     * @param callable(mixed, T, S) $reducer
+     * @template R
+     * @param R $carry
+     * @param callable(R, T, S): R $reducer
      *
-     * @return mixed
+     * @return R
      */
     public function reduce($carry, callable $reducer);
 

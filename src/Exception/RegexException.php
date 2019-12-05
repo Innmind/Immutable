@@ -12,7 +12,7 @@ class RegexException extends \Exception implements Exception
     const BAD_UTF8_OFFSET_ERROR = 5;
     const JIT_STACKLIMIT_ERROR = 6;
 
-    public function __construct($message = '', $code = 0)
+    public function __construct(string $message = '', int $code = 0)
     {
         if ($message === '') {
             switch ($code) {
