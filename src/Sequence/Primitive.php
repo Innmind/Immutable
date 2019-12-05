@@ -180,7 +180,7 @@ final class Primitive implements Implementation
                 /** @var Map<D, Sequence<T>> */
                 $groups = Map::of(
                     Type::determine($key),
-                    Sequence::class
+                    Sequence::class,
                 );
             }
 
@@ -188,11 +188,11 @@ final class Primitive implements Implementation
                 /** @var Sequence<T> */
                 $group = $groups->get($key);
                 /** @var Sequence<T> */
-                $group = $group->add($value);
+                $group = ($group)($value);
 
-                $groups = $groups->put($key, $group);
+                $groups = ($groups)($key, $group);
             } else {
-                $groups = $groups->put($key, Sequence::of($this->type, $value));
+                $groups = ($groups)($key, Sequence::of($this->type, $value));
             }
         }
 

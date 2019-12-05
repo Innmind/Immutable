@@ -89,10 +89,10 @@ final class DoubleIndex implements Implementation
                 ->append($this->pairs->drop($index + 1));
         } else {
             /** @var Sequence<T> */
-            $map->keys = $this->keys->add($key);
-            $map->values = $this->values->add($value);
+            $map->keys = ($this->keys)($key);
+            $map->values = ($this->values)($value);
             /** @var Sequence<Pair<T, S>> */
-            $map->pairs = $this->pairs->add(new Pair($key, $value));
+            $map->pairs = ($this->pairs)(new Pair($key, $value));
         }
 
         return $map;
@@ -167,14 +167,14 @@ final class DoubleIndex implements Implementation
         foreach ($this->pairs->toArray() as $pair) {
             if ($predicate($pair->key(), $pair->value()) === true) {
                 /** @psalm-suppress MixedArgumentTypeCoercion */
-                $map->keys = $map->keys->add($pair->key());
+                $map->keys = ($map->keys)($pair->key());
                 /** @psalm-suppress MixedArgumentTypeCoercion */
-                $map->values = $map->values->add($pair->value());
+                $map->values = ($map->values)($pair->value());
                 /**
                  * @psalm-suppress MixedArgumentTypeCoercion
                  * @var Sequence<Pair<T, S>>
                  */
-                $map->pairs = $map->pairs->add($pair);
+                $map->pairs = ($map->pairs)($pair);
             }
         }
 
@@ -214,7 +214,7 @@ final class DoubleIndex implements Implementation
                 /** @var Map<D, Map<T, S>> */
                 $groups = Map::of(
                     Type::determine($key),
-                    Map::class
+                    Map::class,
                 );
             }
 
@@ -222,20 +222,14 @@ final class DoubleIndex implements Implementation
                 /** @var Map<T, S> */
                 $group = $groups->get($key);
                 /** @var Map<T, S> */
-                $group = $group->put(
-                    $pair->key(),
-                    $pair->value(),
-                );
+                $group = ($group)($pair->key(), $pair->value());
 
-                $groups = $groups->put($key, $group);
+                $groups = ($groups)($key, $group);
             } else {
                 /** @var Map<T, S> */
-                $group = $this->clearMap()->put(
-                    $pair->key(),
-                    $pair->value()
-                );
+                $group = $this->clearMap()($pair->key(), $pair->value());
 
-                $groups = $groups->put($key, $group);
+                $groups = ($groups)($key, $group);
             }
         }
 
@@ -269,10 +263,7 @@ final class DoubleIndex implements Implementation
         $map = $this->clear();
 
         foreach ($this->pairs->toArray() as $pair) {
-            $return = $function(
-                $pair->key(),
-                $pair->value()
-            );
+            $return = $function($pair->key(), $pair->value());
 
             if ($return instanceof Pair) {
                 /** @var T */
@@ -351,15 +342,12 @@ final class DoubleIndex implements Implementation
         $falsy = $this->clearMap();
 
         foreach ($this->pairs->toArray() as $pair) {
-            $return = $predicate(
-                $pair->key(),
-                $pair->value()
-            );
+            $return = $predicate($pair->key(), $pair->value());
 
             if ($return === true) {
-                $truthy = $truthy->put($pair->key(), $pair->value());
+                $truthy = ($truthy)($pair->key(), $pair->value());
             } else {
-                $falsy = $falsy->put($pair->key(), $pair->value());
+                $falsy = ($falsy)($pair->key(), $pair->value());
             }
         }
 

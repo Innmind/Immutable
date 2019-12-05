@@ -59,7 +59,7 @@ final class RegExp
         $map = Map::of('scalar', Str::class);
 
         foreach ($matches as $key => $match) {
-            $map = $map->put(
+            $map = ($map)(
                 $key,
                 Str::of(
                     (string) $match,

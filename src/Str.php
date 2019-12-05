@@ -73,7 +73,7 @@ final class Str
         $sequence = Sequence::of(self::class);
 
         foreach ($parts as $part) {
-            $sequence = $sequence->add(new self($part, $this->encoding));
+            $sequence = ($sequence)(new self($part, $this->encoding));
         }
 
         return $sequence;
@@ -92,7 +92,7 @@ final class Str
         $parts = \mb_str_split($this->value, $size, (string) $this->encoding());
 
         foreach ($parts as $value) {
-            $sequence = $sequence->add(new self($value, $this->encoding));
+            $sequence = ($sequence)(new self($value, $this->encoding));
         }
 
         return $sequence;
@@ -290,7 +290,7 @@ final class Str
         $map = Map::of('int', self::class);
 
         foreach ($words as $position => $word) {
-            $map = $map->put($position, new self($word, $this->encoding));
+            $map = ($map)($position, new self($word, $this->encoding));
         }
 
         return $map;
@@ -308,7 +308,7 @@ final class Str
         $sequence = Sequence::of(self::class);
 
         foreach ($strings as $string) {
-            $sequence = $sequence->add(new self($string, $this->encoding));
+            $sequence = ($sequence)(new self($string, $this->encoding));
         }
 
         return $sequence;

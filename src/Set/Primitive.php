@@ -90,7 +90,7 @@ final class Primitive implements Implementation
         }
 
         $set = clone $this;
-        $set->values = $this->values->add($element);
+        $set->values = ($this->values)($element);
 
         return $set;
     }
@@ -193,7 +193,7 @@ final class Primitive implements Implementation
         return $map->reduce(
             Map::of($map->keyType(), Set::class),
             function(Map $carry, $key, Sequence $values): Map {
-                return $carry->put(
+                return ($carry)(
                     $key,
                     Set::of($this->type, ...$values->toArray()),
                 );

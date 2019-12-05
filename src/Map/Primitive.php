@@ -201,7 +201,7 @@ final class Primitive implements Implementation
                 /** @var Map<D, Map<T, S>> */
                 $groups = Map::of(
                     Type::determine($discriminant),
-                    Map::class
+                    Map::class,
                 );
             }
 
@@ -209,14 +209,14 @@ final class Primitive implements Implementation
                 /** @var Map<T, S> */
                 $group = $groups->get($discriminant);
                 /** @var Map<T, S> */
-                $group = $group->put($key, $value);
+                $group = ($group)($key, $value);
 
-                $groups = $groups->put($discriminant, $group);
+                $groups = ($groups)($discriminant, $group);
             } else {
                 /** @var Map<T, S> */
-                $group = $this->clearMap()->put($key, $value);
+                $group = $this->clearMap()($key, $value);
 
-                $groups = $groups->put($discriminant, $group);
+                $groups = ($groups)($discriminant, $group);
             }
         }
 
@@ -342,9 +342,9 @@ final class Primitive implements Implementation
             $return = $predicate($this->normalizeKey($k), $v);
 
             if ($return === true) {
-                $truthy = $truthy->put($k, $v);
+                $truthy = ($truthy)($k, $v);
             } else {
-                $falsy = $falsy->put($k, $v);
+                $falsy = ($falsy)($k, $v);
             }
         }
 

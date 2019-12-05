@@ -225,7 +225,7 @@ final class ObjectKeys implements Implementation
                 /** @var Map<D, Map<T, S>> */
                 $groups = Map::of(
                     Type::determine($discriminant),
-                    Map::class
+                    Map::class,
                 );
             }
 
@@ -233,14 +233,14 @@ final class ObjectKeys implements Implementation
                 /** @var Map<T, S> */
                 $group = $groups->get($discriminant);
                 /** @var Map<T, S> */
-                $group = $group->put($key, $v);
+                $group = ($group)($key, $v);
 
-                $groups = $groups->put($discriminant, $group);
+                $groups = ($groups)($discriminant, $group);
             } else {
                 /** @var Map<T, S> */
-                $group = $this->clearMap()->put($key, $v);
+                $group = $this->clearMap()($key, $v);
 
-                $groups = $groups->put($discriminant, $group);
+                $groups = ($groups)($discriminant, $group);
             }
         }
 
@@ -254,10 +254,9 @@ final class ObjectKeys implements Implementation
     public function keys(): Set
     {
         return $this->reduce(
-            /** @var Set<T> */
             Set::of($this->keyType),
             static function(Set $keys, $key): Set {
-                return $keys->add($key);
+                return ($keys)($key);
             }
         );
     }
@@ -268,10 +267,9 @@ final class ObjectKeys implements Implementation
     public function values(): Sequence
     {
         return $this->reduce(
-            /** @var Sequence<S> */
             Sequence::of($this->valueType),
             static function(Sequence $values, $key, $value): Sequence {
-                return $values->add($value);
+                return ($values)($value);
             }
         );
     }
@@ -375,9 +373,9 @@ final class ObjectKeys implements Implementation
             $return = $predicate($key, $v);
 
             if ($return === true) {
-                $truthy = $truthy->put($key, $v);
+                $truthy = ($truthy)($key, $v);
             } else {
-                $falsy = $falsy->put($key, $v);
+                $falsy = ($falsy)($key, $v);
             }
         }
 
