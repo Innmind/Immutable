@@ -204,7 +204,7 @@ final class ObjectKeys implements Implementation
      */
     public function groupBy(callable $discriminator): Map
     {
-        if ($this->size() === 0) {
+        if ($this->empty()) {
             throw new CannotGroupEmptyStructure;
         }
 

@@ -168,7 +168,7 @@ final class Primitive implements Implementation
      */
     public function groupBy(callable $discriminator): Map
     {
-        if ($this->size() === 0) {
+        if ($this->empty()) {
             throw new CannotGroupEmptyStructure;
         }
 
@@ -248,7 +248,7 @@ final class Primitive implements Implementation
      */
     public function indices(): self
     {
-        if ($this->size() === 0) {
+        if ($this->empty()) {
             /** @var self<int> */
             return new self('int');
         }

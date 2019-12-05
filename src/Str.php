@@ -365,7 +365,7 @@ final class Str
      */
     public function substring(int $start, int $length = null): self
     {
-        if ($this->length() === 0) {
+        if ($this->empty()) {
             return $this;
         }
 
