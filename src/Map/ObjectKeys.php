@@ -81,7 +81,6 @@ final class ObjectKeys implements Implementation
         $map->values = clone $this->values;
         /** @psalm-suppress MixedArgumentTypeCoercion */
         $map->values[$key] = $value;
-        $map->values->rewind();
 
         return $map;
     }
@@ -176,8 +175,6 @@ final class ObjectKeys implements Implementation
                 $map->values[$k] = $v;
             }
         }
-
-        $map->values->rewind();
 
         return $map;
     }
@@ -307,8 +304,6 @@ final class ObjectKeys implements Implementation
 
             $map->values[$key] = $value;
         }
-
-        $map->values->rewind();
 
         return $map;
     }
