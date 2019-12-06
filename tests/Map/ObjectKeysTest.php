@@ -283,19 +283,6 @@ class ObjectKeysTest extends TestCase
             });
     }
 
-    public function testJoin()
-    {
-        $m = (new ObjectKeys('stdClass', 'int'))
-            ->put(new \stdClass, 1)
-            ->put(new \stdClass, 2)
-            ->put(new \stdClass, 3)
-            ->put(new \stdClass, 5);
-
-        $s = $m->join(', ');
-        $this->assertInstanceOf(Str::class, $s);
-        $this->assertSame('1, 2, 3, 5', (string) $s);
-    }
-
     public function testRemove()
     {
         $m = (new ObjectKeys('stdClass', 'int'))

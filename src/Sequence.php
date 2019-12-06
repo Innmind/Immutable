@@ -451,14 +451,6 @@ final class Sequence implements \Countable
     }
 
     /**
-     * Concatenate all elements with the given separator
-     */
-    public function join(string $separator): Str
-    {
-        return $this->implementation->join($separator);
-    }
-
-    /**
      * Add the given element at the end of the sequence
      *
      * @param T $element

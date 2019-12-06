@@ -302,14 +302,6 @@ final class Set implements \Countable
     }
 
     /**
-     * Concatenate all elements with the given separator
-     */
-    public function join(string $separator): Str
-    {
-        return $this->implementation->join($separator);
-    }
-
-    /**
      * Return a sequence sorted with the given function
      *
      * @param callable(T, T): int $function

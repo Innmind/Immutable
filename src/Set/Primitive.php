@@ -251,11 +251,6 @@ final class Primitive implements Implementation
             (false, $falsy);
     }
 
-    public function join(string $separator): Str
-    {
-        return $this->values->join($separator);
-    }
-
     /**
      * @param callable(T, T): int $function
      *

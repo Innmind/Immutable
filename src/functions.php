@@ -35,6 +35,29 @@ function unwrap($structure): array
 }
 
 /**
+ * Concatenate all elements with the given separator
+ *
+ * @param Set<string>|Sequence<string> $structure
+ */
+function join(string $separator, $structure): Str
+{
+    /** @psalm-suppress DocblockTypeContradiction */
+    if (!$structure instanceof Set && !$structure instanceof Sequence) {
+        $given = Type::determine($structure);
+
+        throw new \TypeError("Argument 2 must be of type Set|Sequence, $given given");
+    }
+
+    if ($structure instanceof Set) {
+        assertSet('string', $structure, 2);
+    } else {
+        assertSequence('string', $structure, 2);
+    }
+
+    return Str::of(\implode($separator, unwrap($structure)));
+}
+
+/**
  * @throws \TypeError
  */
 function assertSet(string $type, Set $set, int $position): void

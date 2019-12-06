@@ -316,19 +316,6 @@ class PrimitiveTest extends TestCase
             });
     }
 
-    public function testJoin()
-    {
-        $m = (new Primitive('int', 'int'))
-            ->put(0, 1)
-            ->put(1, 2)
-            ->put(2, 3)
-            ->put(4, 5);
-
-        $s = $m->join(', ');
-        $this->assertInstanceOf(Str::class, $s);
-        $this->assertSame('1, 2, 3, 5', (string) $s);
-    }
-
     public function testRemove()
     {
         $m = (new Primitive('int', 'int'))

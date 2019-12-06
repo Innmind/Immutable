@@ -129,11 +129,6 @@ interface Implementation extends \Countable
     public function map(callable $function): self;
 
     /**
-     * Concatenate all elements with the given separator
-     */
-    public function join(string $separator): Str;
-
-    /**
      * Remove the element with the given key
      *
      * @param T $key

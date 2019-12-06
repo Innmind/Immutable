@@ -126,9 +126,15 @@ final class Str
             return $this;
         }
 
-        return $this
+        /**
+         * @psalm-suppress InvalidArgument
+         * @var Sequence<string>
+         */
+        $parts = $this
             ->split($search)
-            ->join($replacement);
+            ->toSequenceOf('string', fn($v) => yield (string) $v);
+
+        return join($replacement, $parts);
     }
 
     /**
@@ -184,10 +190,16 @@ final class Str
      */
     public function reverse(): self
     {
-        return $this
+        /**
+         * @psalm-suppress InvalidArgument
+         * @var Sequence<string>
+         */
+        $parts = $this
             ->chunk()
             ->reverse()
-            ->join('');
+            ->toSequenceOf('string', fn($v) => yield (string) $v);
+
+        return join('', $parts);
     }
 
     /**
@@ -429,12 +441,18 @@ final class Str
      */
     public function camelize(): self
     {
-        return $this
+        /**
+         * @psalm-suppress InvalidArgument
+         * @var Sequence<string>
+         */
+        $words = $this
             ->pregSplit('/_| /')
             ->map(function(self $part) {
                 return $part->ucfirst();
             })
-            ->join('')
+            ->toSequenceOf('string', fn($v) => yield (string) $v);
+
+        return join('', $words)
             ->lcfirst()
             ->toEncoding((string) $this->encoding());
     }

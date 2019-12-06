@@ -330,20 +330,6 @@ class SetTest extends TestCase
         $this->assertSame([1, 3], unwrap($s2->get(false)));
     }
 
-    public function testJoin()
-    {
-        $s = Set::of('int')
-            ->add(1)
-            ->add(2)
-            ->add(3)
-            ->add(4);
-
-        $s2 = $s->join(', ');
-        $this->assertInstanceOf(Str::class, $s2);
-        $this->assertSame([1, 2, 3, 4], unwrap($s));
-        $this->assertSame('1, 2, 3, 4', (string) $s2);
-    }
-
     public function testSort()
     {
         $s = Set::of('int')

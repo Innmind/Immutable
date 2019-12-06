@@ -273,14 +273,6 @@ final class Map implements \Countable
     }
 
     /**
-     * Concatenate all elements with the given separator
-     */
-    public function join(string $separator): Str
-    {
-        return $this->implementation->join($separator);
-    }
-
-    /**
      * Remove the element with the given key
      *
      * @param T $key

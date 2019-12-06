@@ -180,16 +180,6 @@ class PrimitiveTest extends TestCase
         $this->assertSame([1, 3], unwrap($groups->get(false)));
     }
 
-    public function testJoin()
-    {
-        $set = new Primitive('int', 1, 2, 3, 4);
-        $str = $set->join('|');
-
-        $this->assertSame([1, 2, 3, 4], $set->toArray());
-        $this->assertInstanceOf(Str::class, $str);
-        $this->assertSame('1|2|3|4', (string) $str);
-    }
-
     public function testSort()
     {
         $set = new Primitive('int', 1, 4, 3, 2);

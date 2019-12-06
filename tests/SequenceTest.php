@@ -566,17 +566,6 @@ class SequenceTest extends TestCase
         Sequence::of('int')->intersect(Sequence::of('stdClass'));
     }
 
-    public function testJoin()
-    {
-        $str = Sequence::of('int')
-            ->add(1)
-            ->add(2)
-            ->join(', ');
-
-        $this->assertInstanceOf(Str::class, $str);
-        $this->assertSame('1, 2', (string) $str);
-    }
-
     public function testAdd()
     {
         $a = Sequence::of('int');

@@ -308,11 +308,6 @@ final class ObjectKeys implements Implementation
         return $map;
     }
 
-    public function join(string $separator): Str
-    {
-        return $this->values()->join($separator);
-    }
-
     /**
      * @param T $key
      *

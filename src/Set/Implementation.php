@@ -127,11 +127,6 @@ interface Implementation extends \Countable
     public function partition(callable $predicate): Map;
 
     /**
-     * Concatenate all elements with the given separator
-     */
-    public function join(string $separator): Str;
-
-    /**
      * Return a sequence sorted with the given function
      *
      * @param callable(T, T): int $function
