@@ -516,6 +516,30 @@ final class Primitive implements Implementation
         return $set;
     }
 
+
+
+    /**
+     * @template MT
+     * @template MS
+     *
+     * @param callable(T): \Generator<MT, MS> $mapper
+     *
+     * @return Map<MT, MS>
+     */
+    public function toMapOf(string $key, string $value, callable $mapper): Map
+    {
+        /** @var Map<MT, MS> */
+        $map = Map::of($key, $value);
+
+        foreach ($this->values as $value) {
+            foreach ($mapper($value) as $newKey => $newValue) {
+                $map = ($map)($newKey, $newValue);
+            }
+        }
+
+        return $map;
+    }
+
     private function has(int $index): bool
     {
         return \array_key_exists($index, $this->values);

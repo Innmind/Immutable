@@ -463,6 +463,35 @@ final class ObjectKeys implements Implementation
         return $set;
     }
 
+
+
+    /**
+     * @template MT
+     * @template MS
+     *
+     * @param callable(T, S): \Generator<MT, MS> $mapper
+     *
+     * @return Map<MT, MS>
+     */
+    public function toMapOf(string $key, string $value, callable $mapper): Map
+    {
+        /** @var Map<MT, MS> */
+        $map = Map::of($key, $value);
+
+        foreach ($this->values as $k) {
+            /** @var T $key */
+            $key = $k;
+            /** @var S $v */
+            $v = $this->values[$k];
+
+            foreach ($mapper($key, $v) as $newKey => $newValue) {
+                $map = ($map)($newKey, $newValue);
+            }
+        }
+
+        return $map;
+    }
+
     /**
      * @return Map<T, S>
      */

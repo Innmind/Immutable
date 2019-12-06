@@ -508,4 +508,17 @@ class MapTest extends TestCase
             unwrap($set),
         );
     }
+
+    public function testToMapOf()
+    {
+        $map = Map::of('int', 'int')
+            (1, 2)
+            (3, 4);
+        $map = $map->toMapOf('string', 'int', fn($i, $j) => yield (string) $j => $i);
+
+        $this->assertInstanceOf(Map::class, $map);
+        $this->assertCount(2, $map);
+        $this->assertSame(1, $map->get('2'));
+        $this->assertSame(3, $map->get('4'));
+    }
 }

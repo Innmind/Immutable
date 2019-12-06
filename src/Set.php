@@ -395,4 +395,19 @@ final class Set implements \Countable
     {
         return $this->implementation->toSetOf($type, $mapper);
     }
+
+
+
+    /**
+     * @template MT
+     * @template MS
+     *
+     * @param callable(T): \Generator<MT, MS> $mapper
+     *
+     * @return Map<MT, MS>
+     */
+    public function toMapOf(string $key, string $value, callable $mapper): Map
+    {
+        return $this->implementation->toMapOf($key, $value, $mapper);
+    }
 }

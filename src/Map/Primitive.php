@@ -441,6 +441,28 @@ final class Primitive implements Implementation
     }
 
     /**
+     * @template MT
+     * @template MS
+     *
+     * @param callable(T, S): \Generator<MT, MS> $mapper
+     *
+     * @return Map<MT, MS>
+     */
+    public function toMapOf(string $key, string $value, callable $mapper): Map
+    {
+        /** @var Map<MT, MS> */
+        $map = Map::of($key, $value);
+
+        foreach ($this->values as $key => $value) {
+            foreach ($mapper($key, $value) as $newKey => $newValue) {
+                $map = ($map)($newKey, $newValue);
+            }
+        }
+
+        return $map;
+    }
+
+    /**
      * @return Map<T, S>
      */
     private function clearMap(): Map

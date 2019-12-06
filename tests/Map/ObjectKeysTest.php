@@ -459,4 +459,17 @@ class ObjectKeysTest extends TestCase
             unwrap($set),
         );
     }
+
+    public function testToMapOf()
+    {
+        $map = (new ObjectKeys('object', 'int'))
+            ->put($a = new \stdClass, 2)
+            ->put($b = new \stdClass, 4);
+        $map = $map->toMapOf('int', 'object', fn($i, $j) => yield $j => $i);
+
+        $this->assertInstanceOf(Map::class, $map);
+        $this->assertCount(2, $map);
+        $this->assertSame($a, $map->get(2));
+        $this->assertSame($b, $map->get(4));
+    }
 }

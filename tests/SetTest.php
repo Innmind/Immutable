@@ -464,4 +464,16 @@ class SetTest extends TestCase
             unwrap($set),
         );
     }
+
+    public function testToMapOf()
+    {
+        $set = Set::ints(1, 2, 3);
+        $map = $set->toMapOf('string', 'int', fn($i) => yield (string) $i => $i);
+
+        $this->assertInstanceOf(Map::class, $map);
+        $this->assertCount(3, $map);
+        $this->assertSame(1, $map->get('1'));
+        $this->assertSame(2, $map->get('2'));
+        $this->assertSame(3, $map->get('3'));
+    }
 }

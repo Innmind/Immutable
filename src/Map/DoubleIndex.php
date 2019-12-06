@@ -425,6 +425,28 @@ final class DoubleIndex implements Implementation
     }
 
     /**
+     * @template MT
+     * @template MS
+     *
+     * @param callable(T, S): \Generator<MT, MS> $mapper
+     *
+     * @return Map<MT, MS>
+     */
+    public function toMapOf(string $key, string $value, callable $mapper): Map
+    {
+        /** @var Map<MT, MS> */
+        $map = Map::of($key, $value);
+
+        foreach (unwrap($this->pairs) as $pair) {
+            foreach ($mapper($pair->key(), $pair->value()) as $newKey => $newValue) {
+                $map = ($map)($newKey, $newValue);
+            }
+        }
+
+        return $map;
+    }
+
+    /**
      * @return Map<T, S>
      */
     private function clearMap(): Map

@@ -185,4 +185,14 @@ interface Implementation extends \Countable
      * @return Set<ST>
      */
     public function toSetOf(string $type, callable $mapper): Set;
+
+    /**
+     * @template MT
+     * @template MS
+     *
+     * @param callable(T): \Generator<MT, MS> $mapper
+     *
+     * @return Map<MT, MS>
+     */
+    public function toMapOf(string $key, string $value, callable $mapper): Map;
 }
