@@ -31,7 +31,7 @@ final class RegExp
      */
     public function matches(Str $string): bool
     {
-        $value = \preg_match($this->pattern, (string) $string);
+        $value = \preg_match($this->pattern, $string->toString());
 
         if ($value === false) {
             throw new RegexException('', \preg_last_error());
@@ -49,7 +49,7 @@ final class RegExp
     public function capture(Str $string): Map
     {
         $matches = [];
-        $value = \preg_match($this->pattern, (string) $string, $matches);
+        $value = \preg_match($this->pattern, $string->toString(), $matches);
 
         if ($value === false) {
             throw new RegexException('', \preg_last_error());
@@ -63,7 +63,7 @@ final class RegExp
                 $key,
                 Str::of(
                     (string) $match,
-                    (string) $string->encoding()
+                    $string->encoding()->toString()
                 )
             );
         }
@@ -71,7 +71,7 @@ final class RegExp
         return $map;
     }
 
-    public function __toString(): string
+    public function toString(): string
     {
         return $this->pattern;
     }

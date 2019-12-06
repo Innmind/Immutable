@@ -38,7 +38,7 @@ final class Type
             $types = $type->split('|')->reduce(
                 [],
                 static function(array $types, Str $type): array {
-                    $types[] = self::of((string) $type);
+                    $types[] = self::of($type->toString());
 
                     return $types;
                 }
@@ -49,11 +49,11 @@ final class Type
 
         if ($type->startsWith('?')) {
             return new NullableType(
-                self::ofPrimitive((string) $type->drop(1))
+                self::ofPrimitive($type->drop(1)->toString())
             );
         }
 
-        return self::ofPrimitive((string) $type);
+        return self::ofPrimitive($type->toString());
     }
 
     /**

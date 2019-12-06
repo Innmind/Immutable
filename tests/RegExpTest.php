@@ -17,7 +17,7 @@ class RegExpTest extends TestCase
     {
         $regexp = new RegExp('/foo/');
 
-        $this->assertSame('/foo/', (string) $regexp);
+        $this->assertSame('/foo/', $regexp->toString());
     }
 
     public function testOf()
@@ -25,7 +25,7 @@ class RegExpTest extends TestCase
         $regexp = RegExp::of('/foo/');
 
         $this->assertInstanceOf(RegExp::class, $regexp);
-        $this->assertSame('/foo/', (string) $regexp);
+        $this->assertSame('/foo/', $regexp->toString());
     }
 
     public function testThrowWhenInvalidRegexp()
@@ -50,8 +50,8 @@ class RegExpTest extends TestCase
         $map = $regexp->capture(Str::of('foo123bar'));
 
         $this->assertInstanceOf(Map::class, $map);
-        $this->assertSame('scalar', (string) $map->keyType());
-        $this->assertSame(Str::class, (string) $map->valueType());
-        $this->assertSame('1', (string) $map->get('i'));
+        $this->assertSame('scalar', $map->keyType());
+        $this->assertSame(Str::class, $map->valueType());
+        $this->assertSame('1', $map->get('i')->toString());
     }
 }

@@ -103,7 +103,7 @@ class FunctionsTest extends TestCase
         $str = join('|', Set::of('string', '1', '2', '3'));
 
         $this->assertInstanceOf(Str::class, $str);
-        $this->assertSame('1|2|3', (string) $str);
+        $this->assertSame('1|2|3', $str->toString());
     }
 
     public function testJoinSequence()
@@ -111,6 +111,6 @@ class FunctionsTest extends TestCase
         $str = join('|', Sequence::of('string', '1', '2', '3'));
 
         $this->assertInstanceOf(Str::class, $str);
-        $this->assertSame('1|2|3', (string) $str);
+        $this->assertSame('1|2|3', $str->toString());
     }
 }

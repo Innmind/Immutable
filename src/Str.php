@@ -37,7 +37,7 @@ final class Str
     /**
      * {@inheritdoc}
      */
-    public function __toString(): string
+    public function toString(): string
     {
         return $this->value;
     }
@@ -89,7 +89,7 @@ final class Str
         /** @var Sequence<self> */
         $sequence = Sequence::of(self::class);
         /** @var list<string> */
-        $parts = \mb_str_split($this->value, $size, (string) $this->encoding());
+        $parts = \mb_str_split($this->value, $size, $this->encoding()->toString());
 
         foreach ($parts as $value) {
             $sequence = ($sequence)(new self($value, $this->encoding));
@@ -105,7 +105,7 @@ final class Str
      */
     public function position(string $needle, int $offset = 0): int
     {
-        $position = \mb_strpos($this->value, $needle, $offset, (string) $this->encoding());
+        $position = \mb_strpos($this->value, $needle, $offset, $this->encoding()->toString());
 
         if ($position === false) {
             throw new SubstringException(\sprintf(
@@ -132,7 +132,7 @@ final class Str
          */
         $parts = $this
             ->split($search)
-            ->toSequenceOf('string', fn($v) => yield (string) $v);
+            ->toSequenceOf('string', fn($v) => yield $v->toString());
 
         return join($replacement, $parts);
     }
@@ -144,7 +144,7 @@ final class Str
      */
     public function str(string $delimiter): self
     {
-        $sub = \mb_strstr($this->value, $delimiter, false, (string) $this->encoding());
+        $sub = \mb_strstr($this->value, $delimiter, false, $this->encoding()->toString());
 
         if ($sub === false) {
             throw new SubstringException(\sprintf(
@@ -177,7 +177,7 @@ final class Str
      */
     public function length(): int
     {
-        return \mb_strlen($this->value, (string) $this->encoding());
+        return \mb_strlen($this->value, $this->encoding()->toString());
     }
 
     public function empty(): bool
@@ -197,9 +197,9 @@ final class Str
         $parts = $this
             ->chunk()
             ->reverse()
-            ->toSequenceOf('string', fn($v) => yield (string) $v);
+            ->toSequenceOf('string', fn($v) => yield $v->toString());
 
-        return join('', $parts)->toEncoding((string) $this->encoding());
+        return join('', $parts)->toEncoding($this->encoding()->toString());
     }
 
     /**
@@ -258,7 +258,12 @@ final class Str
      */
     public function shuffle(): self
     {
-        $parts = unwrap($this->chunk());
+        /** @psalm-suppress InvalidArgument */
+        $parts = unwrap(
+            $this
+                ->chunk()
+                ->toSequenceOf('string', fn($v) => yield $v->toString())
+        );
         \shuffle($parts);
 
         return new self(\implode('', $parts), $this->encoding);
@@ -381,7 +386,7 @@ final class Str
             return $this;
         }
 
-        $sub = \mb_substr($this->value, $start, $length, (string) $this->encoding());
+        $sub = \mb_substr($this->value, $start, $length, $this->encoding()->toString());
 
         return new self($sub, $this->encoding);
     }
@@ -422,7 +427,7 @@ final class Str
         return $this
             ->substring(0, 1)
             ->toUpper()
-            ->append((string) $this->substring(1));
+            ->append($this->substring(1)->toString());
     }
 
     /**
@@ -433,7 +438,7 @@ final class Str
         return $this
             ->substring(0, 1)
             ->toLower()
-            ->append((string) $this->substring(1));
+            ->append($this->substring(1)->toString());
     }
 
     /**
@@ -450,11 +455,11 @@ final class Str
             ->map(function(self $part) {
                 return $part->ucfirst();
             })
-            ->toSequenceOf('string', fn($v) => yield (string) $v);
+            ->toSequenceOf('string', fn($v) => yield $v->toString());
 
         return join('', $words)
             ->lcfirst()
-            ->toEncoding((string) $this->encoding());
+            ->toEncoding($this->encoding()->toString());
     }
 
     /**
@@ -462,7 +467,7 @@ final class Str
      */
     public function append(string $string): self
     {
-        return new self((string) $this.$string, $this->encoding);
+        return new self($this->value.$string, $this->encoding);
     }
 
     /**
@@ -470,7 +475,7 @@ final class Str
      */
     public function prepend(string $string): self
     {
-        return new self($string.(string) $this, $this->encoding);
+        return new self($string.$this->value, $this->encoding);
     }
 
     /**
@@ -478,7 +483,7 @@ final class Str
      */
     public function equals(self $string): bool
     {
-        return (string) $this === (string) $string;
+        return $this->toString() === $string->toString();
     }
 
     /**
@@ -487,7 +492,7 @@ final class Str
     public function trim(string $mask = null): self
     {
         return new self(
-            $mask === null ? \trim((string) $this) : \trim((string) $this, $mask),
+            $mask === null ? \trim($this->value) : \trim($this->value, $mask),
             $this->encoding
         );
     }
@@ -498,7 +503,7 @@ final class Str
     public function rightTrim(string $mask = null): self
     {
         return new self(
-            $mask === null ? \rtrim((string) $this) : \rtrim((string) $this, $mask),
+            $mask === null ? \rtrim($this->value) : \rtrim($this->value, $mask),
             $this->encoding
         );
     }
@@ -509,7 +514,7 @@ final class Str
     public function leftTrim(string $mask = null): self
     {
         return new self(
-            $mask === null ? \ltrim((string) $this) : \ltrim((string) $this, $mask),
+            $mask === null ? \ltrim($this->value) : \ltrim($this->value, $mask),
             $this->encoding
         );
     }
@@ -553,7 +558,7 @@ final class Str
             return true;
         }
 
-        return (string) $this->takeEnd(self::of($value, $this->encoding)->length()) === $value;
+        return $this->takeEnd(self::of($value, $this->encoding)->length())->toString() === $value;
     }
 
     /**
@@ -561,7 +566,7 @@ final class Str
      */
     public function pregQuote(string $delimiter = ''): self
     {
-        return new self(\preg_quote((string) $this, $delimiter), $this->encoding);
+        return new self(\preg_quote($this->value, $delimiter), $this->encoding);
     }
 
     /**
