@@ -593,18 +593,18 @@ class StrTest extends TestCase
 
         $matches = $str->capture('~(?<lang>([a-zA-Z0-9]+(-[a-zA-Z0-9]+)*|\*))(; ?q=(?<quality>\d+(\.\d+)?))?~');
         $this->assertInstanceOf(Map::class, $matches);
-        $this->assertSame('scalar', (string) $matches->keyType());
-        $this->assertSame(S::class, (string) $matches->valueType());
+        $this->assertSame('scalar', $matches->keyType());
+        $this->assertSame(S::class, $matches->valueType());
         $this->assertCount(9, $matches);
-        $this->assertSame('en;q=0.7', (string) $matches->get(0));
-        $this->assertSame('en', (string) $matches->get(1));
-        $this->assertSame('en', (string) $matches->get(2));
-        $this->assertSame('', (string) $matches->get(3));
-        $this->assertSame('en', (string) $matches->get('lang'));
-        $this->assertSame(';q=0.7', (string) $matches->get(4));
-        $this->assertSame('0.7', (string) $matches->get(5));
-        $this->assertSame('0.7', (string) $matches->get('quality'));
-        $this->assertSame('.7', (string) $matches->get(6));
+        $this->assertSame('en;q=0.7', $matches->get(0)->toString());
+        $this->assertSame('en', $matches->get(1)->toString());
+        $this->assertSame('en', $matches->get(2)->toString());
+        $this->assertSame('', $matches->get(3)->toString());
+        $this->assertSame('en', $matches->get('lang')->toString());
+        $this->assertSame(';q=0.7', $matches->get(4)->toString());
+        $this->assertSame('0.7', $matches->get(5)->toString());
+        $this->assertSame('0.7', $matches->get('quality')->toString());
+        $this->assertSame('.7', $matches->get(6)->toString());
     }
 
     public function testThrowWhenGettingMatchesInvalidRegex()
