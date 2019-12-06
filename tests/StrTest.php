@@ -12,7 +12,10 @@ use Innmind\Immutable\{
     Exception\SubstringException,
     Exception\RegexException
 };
-use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\{
+    TestCase,
+    ExpectationFailedException,
+};
 
 class StrTest extends TestCase
 {
@@ -441,7 +444,12 @@ class StrTest extends TestCase
     {
         $str = S::of('🙏');
 
-        $this->assertSame('🙏', (string) $str->shuffle());
+        try {
+            $this->assertSame('🙏 ', (string) $str->shuffle());
+        } catch (ExpectationFailedException $e) {
+            // sometimes it shuffles to the same order so the tests fails
+            $this->assertSame('🙏', (string) $str->shuffle());
+        }
         $this->assertNotSame(
             '🙏',
             (string) $str->toEncoding('ASCII')->shuffle()
