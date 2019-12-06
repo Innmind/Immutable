@@ -485,7 +485,6 @@ final class Primitive implements Implementation
         $sequence = Sequence::of($type);
 
         foreach ($this->values as $value) {
-            /** @var ST $newValue */
             foreach ($mapper($value) as $newValue) {
                 $sequence = ($sequence)($newValue);
             }
@@ -507,7 +506,6 @@ final class Primitive implements Implementation
         $set = Set::of($type);
 
         foreach ($this->values as $value) {
-            /** @var ST $newValue */
             foreach ($mapper($value) as $newValue) {
                 $set = ($set)($newValue);
             }
