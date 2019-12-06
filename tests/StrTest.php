@@ -368,6 +368,18 @@ class StrTest extends TestCase
         );
     }
 
+    public function testReverseKeepTheGivenEncoding()
+    {
+        $this->assertSame(
+            'UTF-8',
+            (string) S::of('foo')->reverse()->encoding(),
+        );
+        $this->assertSame(
+            'ASCII',
+            (string) S::of('foo', 'ASCII')->reverse()->encoding(),
+        );
+    }
+
     public function testPad()
     {
         $str = S::of('foo');

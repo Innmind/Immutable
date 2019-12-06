@@ -199,7 +199,7 @@ final class Str
             ->reverse()
             ->toSequenceOf('string', fn($v) => yield (string) $v);
 
-        return join('', $parts);
+        return join('', $parts)->toEncoding((string) $this->encoding());
     }
 
     /**
