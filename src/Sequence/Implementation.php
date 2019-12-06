@@ -216,11 +216,6 @@ interface Implementation extends \Countable
     public function intersect(self $sequence): self;
 
     /**
-     * Concatenate all elements with the given separator
-     */
-    public function join(string $separator): Str;
-
-    /**
      * Add the given element at the end of the sequence
      *
      * @param T $element

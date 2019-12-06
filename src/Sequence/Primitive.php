@@ -403,11 +403,6 @@ final class Primitive implements Implementation
         });
     }
 
-    public function join(string $separator): Str
-    {
-        return Str::of(\implode($separator, $this->values));
-    }
-
     /**
      * @param T $element
      *

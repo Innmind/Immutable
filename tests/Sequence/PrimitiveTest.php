@@ -336,15 +336,6 @@ class PrimitiveTest extends TestCase
         $this->assertSame([2], $c->toArray());
     }
 
-    public function testJoin()
-    {
-        $sequence = new Primitive('int', 1, 2);
-        $str = $sequence->join('|');
-
-        $this->assertInstanceOf(Str::class, $str);
-        $this->assertSame('1|2', (string) $str);
-    }
-
     public function testAdd()
     {
         $a = new Primitive('int', 1);
