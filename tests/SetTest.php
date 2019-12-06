@@ -6,7 +6,6 @@ namespace Tests\Innmind\Immutable;
 use Innmind\Immutable\{
     Set,
     Map,
-    SequenceInterface,
     Str,
     Sequence,
 };
@@ -436,10 +435,25 @@ class SetTest extends TestCase
         $this->assertFalse(Set::of('int', 1)->empty());
     }
 
+    public function testToSequenceOf()
+    {
+        $set = Set::ints(1, 2, 3);
+        $sequence = $set->toSequenceOf('string|int', function($i) {
+            yield (string) $i;
+            yield $i;
+        });
+
+        $this->assertInstanceOf(Sequence::class, $sequence);
+        $this->assertSame(
+            ['1', 1, '2', 2, '3', 3],
+            unwrap($sequence),
+        );
+    }
+
     public function testToSetOf()
     {
-        $sequence = Set::ints(1, 2, 3);
-        $set = $sequence->toSetOf('string|int', function($i) {
+        $set = Set::ints(1, 2, 3);
+        $set = $set->toSetOf('string|int', function($i) {
             yield (string) $i;
             yield $i;
         });

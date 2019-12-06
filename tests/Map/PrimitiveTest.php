@@ -473,6 +473,23 @@ class PrimitiveTest extends TestCase
         $this->assertSame(['1'], unwrap($map->keys()));
     }
 
+    public function testToSequenceOf()
+    {
+        $map = (new Primitive('int', 'int'))
+            ->put(1, 2)
+            ->put(3, 4);
+        $sequence = $map->toSequenceOf('int', function($k, $v) {
+            yield $k;
+            yield $v;
+        });
+
+        $this->assertInstanceOf(Sequence::class, $sequence);
+        $this->assertSame(
+            [1, 2, 3, 4],
+            unwrap($sequence),
+        );
+    }
+
     public function testToSetOf()
     {
         $map = (new Primitive('int', 'int'))

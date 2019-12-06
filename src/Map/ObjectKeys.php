@@ -416,6 +416,32 @@ final class ObjectKeys implements Implementation
      *
      * @param callable(T, S): \Generator<ST> $mapper
      *
+     * @return Sequence<ST>
+     */
+    public function toSequenceOf(string $type, callable $mapper): Sequence
+    {
+        /** @var Sequence<ST> */
+        $sequence = Sequence::of($type);
+
+        foreach ($this->values as $k) {
+            /** @var T $key */
+            $key = $k;
+            /** @var S $v */
+            $v = $this->values[$k];
+
+            foreach ($mapper($key, $v) as $newValue) {
+                $sequence = ($sequence)($newValue);
+            }
+        }
+
+        return $sequence;
+    }
+
+    /**
+     * @template ST
+     *
+     * @param callable(T, S): \Generator<ST> $mapper
+     *
      * @return Set<ST>
      */
     public function toSetOf(string $type, callable $mapper): Set

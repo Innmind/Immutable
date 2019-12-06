@@ -432,6 +432,20 @@ class ObjectKeysTest extends TestCase
         $this->assertSame('object', (new ObjectKeys('object', 'int'))->keyType());
     }
 
+    public function testToSequenceOf()
+    {
+        $map = (new ObjectKeys('object', 'int'))
+            ->put(new \stdClass, 2)
+            ->put(new \stdClass, 4);
+        $sequence = $map->toSequenceOf('int', fn($k, $v) => yield $v);
+
+        $this->assertInstanceOf(Sequence::class, $sequence);
+        $this->assertSame(
+            [2, 4],
+            unwrap($sequence),
+        );
+    }
+
     public function testToSetOf()
     {
         $map = (new ObjectKeys('object', 'int'))

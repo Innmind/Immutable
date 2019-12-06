@@ -377,6 +377,18 @@ final class Set implements \Countable
      *
      * @param callable(T): \Generator<ST> $mapper
      *
+     * @return Sequence<ST>
+     */
+    public function toSequenceOf(string $type, callable $mapper): Sequence
+    {
+        return $this->implementation->toSequenceOf($type, $mapper);
+    }
+
+    /**
+     * @template ST
+     *
+     * @param callable(T): \Generator<ST> $mapper
+     *
      * @return self<ST>
      */
     public function toSetOf(string $type, callable $mapper): self

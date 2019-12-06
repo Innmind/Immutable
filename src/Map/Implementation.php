@@ -178,6 +178,15 @@ interface Implementation extends \Countable
      *
      * @param callable(T, S): \Generator<ST> $mapper
      *
+     * @return Sequence<ST>
+     */
+    public function toSequenceOf(string $type, callable $mapper): Sequence;
+
+    /**
+     * @template ST
+     *
+     * @param callable(T, S): \Generator<ST> $mapper
+     *
      * @return Set<ST>
      */
     public function toSetOf(string $type, callable $mapper): Set;

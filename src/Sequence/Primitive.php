@@ -477,6 +477,28 @@ final class Primitive implements Implementation
      *
      * @param callable(T): \Generator<ST> $mapper
      *
+     * @return Sequence<ST>
+     */
+    public function toSequenceOf(string $type, callable $mapper): Sequence
+    {
+        /** @var Sequence<ST> */
+        $sequence = Sequence::of($type);
+
+        foreach ($this->values as $value) {
+            /** @var ST $newValue */
+            foreach ($mapper($value) as $newValue) {
+                $sequence = ($sequence)($newValue);
+            }
+        }
+
+        return $sequence;
+    }
+
+    /**
+     * @template ST
+     *
+     * @param callable(T): \Generator<ST> $mapper
+     *
      * @return Set<ST>
      */
     public function toSetOf(string $type, callable $mapper): Set

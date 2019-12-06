@@ -235,10 +235,25 @@ class PrimitiveTest extends TestCase
         $this->assertFalse((new Primitive('int', 1))->empty());
     }
 
+    public function testToSequenceOf()
+    {
+        $set = new Primitive('int', 1, 2, 3);
+        $sequence = $set->toSequenceOf('string|int', function($i) {
+            yield (string) $i;
+            yield $i;
+        });
+
+        $this->assertInstanceOf(Sequence::class, $sequence);
+        $this->assertSame(
+            ['1', 1, '2', 2, '3', 3],
+            unwrap($sequence),
+        );
+    }
+
     public function testToSetOf()
     {
-        $sequence = new Primitive('int', 1, 2, 3);
-        $set = $sequence->toSetOf('string|int', function($i) {
+        $set = new Primitive('int', 1, 2, 3);
+        $set = $set->toSetOf('string|int', function($i) {
             yield (string) $i;
             yield $i;
         });

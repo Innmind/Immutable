@@ -387,6 +387,27 @@ final class DoubleIndex implements Implementation
      *
      * @param callable(T, S): \Generator<ST> $mapper
      *
+     * @return Sequence<ST>
+     */
+    public function toSequenceOf(string $type, callable $mapper): Sequence
+    {
+        /** @var Sequence<ST> */
+        $sequence = Sequence::of($type);
+
+        foreach (unwrap($this->pairs) as $pair) {
+            foreach ($mapper($pair->key(), $pair->value()) as $newValue) {
+                $sequence = ($sequence)($newValue);
+            }
+        }
+
+        return $sequence;
+    }
+
+    /**
+     * @template ST
+     *
+     * @param callable(T, S): \Generator<ST> $mapper
+     *
      * @return Set<ST>
      */
     public function toSetOf(string $type, callable $mapper): Set
