@@ -119,11 +119,6 @@ final class Set implements \Countable
         return $this->implementation->size();
     }
 
-    public function toArray(): array
-    {
-        return $this->implementation->toArray();
-    }
-
     /**
      * Intersect this set with the given one
      *

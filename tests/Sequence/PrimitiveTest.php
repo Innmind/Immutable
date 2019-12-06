@@ -148,8 +148,8 @@ class PrimitiveTest extends TestCase
         $this->assertCount(2, $groups);
         $this->assertTrue($groups->get(0)->isOfType('int'));
         $this->assertTrue($groups->get(1)->isOfType('int'));
-        $this->assertSame([2, 4], $groups->get(0)->toArray());
-        $this->assertSame([1, 3], $groups->get(1)->toArray());
+        $this->assertSame([2, 4], unwrap($groups->get(0)));
+        $this->assertSame([1, 3], unwrap($groups->get(1)));
     }
 
     public function testThrowWhenTryingToAccessFirstElementOnEmptySequence()
@@ -263,8 +263,8 @@ class PrimitiveTest extends TestCase
         $this->assertCount(2, $partition);
         $this->assertTrue($partition->get(true)->isOfType('int'));
         $this->assertTrue($partition->get(false)->isOfType('int'));
-        $this->assertSame([2, 4], $partition->get(true)->toArray());
-        $this->assertSame([1, 3], $partition->get(false)->toArray());
+        $this->assertSame([2, 4], unwrap($partition->get(true)));
+        $this->assertSame([1, 3], unwrap($partition->get(false)));
     }
 
     public function testSlice()
@@ -288,8 +288,8 @@ class PrimitiveTest extends TestCase
         $this->assertCount(2, $parts);
         $this->assertTrue($parts->first()->isOfType('int'));
         $this->assertTrue($parts->last()->isOfType('int'));
-        $this->assertSame([2, 3], $parts->first()->toArray());
-        $this->assertSame([4, 5], $parts->last()->toArray());
+        $this->assertSame([2, 3], unwrap($parts->first()));
+        $this->assertSame([4, 5], unwrap($parts->last()));
     }
 
     public function testTake()

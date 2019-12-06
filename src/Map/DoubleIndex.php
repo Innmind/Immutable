@@ -147,7 +147,7 @@ final class DoubleIndex implements Implementation
             return false;
         }
 
-        foreach ($this->pairs->toArray() as $pair) {
+        foreach (unwrap($this->pairs) as $pair) {
             if ($map->get($pair->key()) !== $pair->value()) {
                 return false;
             }
@@ -165,7 +165,7 @@ final class DoubleIndex implements Implementation
     {
         $map = $this->clear();
 
-        foreach ($this->pairs->toArray() as $pair) {
+        foreach (unwrap($this->pairs) as $pair) {
             if ($predicate($pair->key(), $pair->value()) === true) {
                 /** @psalm-suppress MixedArgumentTypeCoercion */
                 $map->keys = ($map->keys)($pair->key());
@@ -187,7 +187,7 @@ final class DoubleIndex implements Implementation
      */
     public function foreach(callable $function): void
     {
-        foreach ($this->pairs->toArray() as $pair) {
+        foreach (unwrap($this->pairs) as $pair) {
             $function($pair->key(), $pair->value());
         }
     }
@@ -208,7 +208,7 @@ final class DoubleIndex implements Implementation
 
         $groups = null;
 
-        foreach ($this->pairs->toArray() as $pair) {
+        foreach (unwrap($this->pairs) as $pair) {
             $key = $discriminator($pair->key(), $pair->value());
 
             if ($groups === null) {
@@ -243,7 +243,7 @@ final class DoubleIndex implements Implementation
      */
     public function keys(): Set
     {
-        return Set::of($this->keyType, ...$this->keys->toArray());
+        return Set::of($this->keyType, ...unwrap($this->keys));
     }
 
     /**
@@ -263,7 +263,7 @@ final class DoubleIndex implements Implementation
     {
         $map = $this->clear();
 
-        foreach ($this->pairs->toArray() as $pair) {
+        foreach (unwrap($this->pairs) as $pair) {
             $return = $function($pair->key(), $pair->value());
 
             if ($return instanceof Pair) {
@@ -342,7 +342,7 @@ final class DoubleIndex implements Implementation
         $truthy = $this->clearMap();
         $falsy = $this->clearMap();
 
-        foreach ($this->pairs->toArray() as $pair) {
+        foreach (unwrap($this->pairs) as $pair) {
             $return = $predicate($pair->key(), $pair->value());
 
             if ($return === true) {
@@ -370,7 +370,7 @@ final class DoubleIndex implements Implementation
      */
     public function reduce($carry, callable $reducer)
     {
-        foreach ($this->pairs->toArray() as $pair) {
+        foreach (unwrap($this->pairs) as $pair) {
             $carry = $reducer($carry, $pair->key(), $pair->value());
         }
 

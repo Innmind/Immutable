@@ -12,6 +12,7 @@ use Innmind\Immutable\{
     Str,
     Exception\CannotGroupEmptyStructure,
 };
+use function Innmind\Immutable\unwrap;
 
 /**
  * @template T
@@ -60,7 +61,7 @@ final class Primitive implements Implementation
      */
     public function toArray(): array
     {
-        return $this->values->toArray();
+        return unwrap($this->values);
     }
 
     /**
@@ -195,7 +196,7 @@ final class Primitive implements Implementation
             function(Map $carry, $key, Sequence $values): Map {
                 return ($carry)(
                     $key,
-                    Set::of($this->type, ...$values->toArray()),
+                    Set::of($this->type, ...unwrap($values)),
                 );
             }
         );
@@ -237,9 +238,9 @@ final class Primitive implements Implementation
     {
         $partitions = $this->values->partition($predicate);
         /** @var Set<T> */
-        $truthy = Set::of($this->type, ...$partitions->get(true)->toArray());
+        $truthy = Set::of($this->type, ...unwrap($partitions->get(true)));
         /** @var Set<T> */
-        $falsy = Set::of($this->type, ...$partitions->get(false)->toArray());
+        $falsy = Set::of($this->type, ...unwrap($partitions->get(false)));
 
         /**
          * @psalm-suppress InvalidScalarArgument

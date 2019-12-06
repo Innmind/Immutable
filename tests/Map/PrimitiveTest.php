@@ -247,7 +247,7 @@ class PrimitiveTest extends TestCase
         $k = $m->keys();
         $this->assertInstanceOf(Set::class, $k);
         $this->assertSame('int', $k->type());
-        $this->assertSame([0, 1, 2, 4], $k->toArray());
+        $this->assertSame([0, 1, 2, 4], unwrap($k));
         $this->assertTrue($k->equals($m->keys()));
     }
 
@@ -263,7 +263,7 @@ class PrimitiveTest extends TestCase
         $v = $m->values();
         $this->assertInstanceOf(Sequence::class, $v);
         $this->assertSame('int', $v->type());
-        $this->assertSame([1, 2, 3, 5, 5], $v->toArray());
+        $this->assertSame([1, 2, 3, 5, 5], unwrap($v));
         $this->assertTrue($v->equals($m->values()));
     }
 
@@ -286,10 +286,10 @@ class PrimitiveTest extends TestCase
         $this->assertInstanceOf(Primitive::class, $m2);
         $this->assertSame($m->keyType(), $m2->keyType());
         $this->assertSame($m->valueType(), $m2->valueType());
-        $this->assertSame([0, 1, 2, 4], $m->keys()->toArray());
-        $this->assertSame([1, 2, 3, 5], $m->values()->toArray());
-        $this->assertSame([10, 1, 12, 14], $m2->keys()->toArray());
-        $this->assertSame([1, 4, 3, 5], $m2->values()->toArray());
+        $this->assertSame([0, 1, 2, 4], unwrap($m->keys()));
+        $this->assertSame([1, 2, 3, 5], unwrap($m->values()));
+        $this->assertSame([10, 1, 12, 14], unwrap($m2->keys()));
+        $this->assertSame([1, 4, 3, 5], unwrap($m2->values()));
     }
 
     public function testThrowWhenTryingToModifyValueTypeInTheMap()
@@ -340,32 +340,32 @@ class PrimitiveTest extends TestCase
 
         $m2 = $m->remove(12);
         $this->assertSame($m, $m2);
-        $this->assertSame([0, 1, 2, 3, 4], $m->keys()->toArray());
-        $this->assertSame([1, 2, 3, 4, 5], $m->values()->toArray());
+        $this->assertSame([0, 1, 2, 3, 4], unwrap($m->keys()));
+        $this->assertSame([1, 2, 3, 4, 5], unwrap($m->values()));
 
         $m2 = $m->remove(3);
         $this->assertNotSame($m, $m2);
         $this->assertInstanceOf(Primitive::class, $m2);
-        $this->assertSame([0, 1, 2, 3, 4], $m->keys()->toArray());
-        $this->assertSame([1, 2, 3, 4, 5], $m->values()->toArray());
-        $this->assertSame([0, 1, 2, 4], $m2->keys()->toArray());
-        $this->assertSame([1, 2, 3, 5], $m2->values()->toArray());
+        $this->assertSame([0, 1, 2, 3, 4], unwrap($m->keys()));
+        $this->assertSame([1, 2, 3, 4, 5], unwrap($m->values()));
+        $this->assertSame([0, 1, 2, 4], unwrap($m2->keys()));
+        $this->assertSame([1, 2, 3, 5], unwrap($m2->values()));
 
         $m2 = $m->remove(4);
         $this->assertNotSame($m, $m2);
         $this->assertInstanceOf(Primitive::class, $m2);
-        $this->assertSame([0, 1, 2, 3, 4], $m->keys()->toArray());
-        $this->assertSame([1, 2, 3, 4, 5], $m->values()->toArray());
-        $this->assertSame([0, 1, 2, 3], $m2->keys()->toArray());
-        $this->assertSame([1, 2, 3, 4], $m2->values()->toArray());
+        $this->assertSame([0, 1, 2, 3, 4], unwrap($m->keys()));
+        $this->assertSame([1, 2, 3, 4, 5], unwrap($m->values()));
+        $this->assertSame([0, 1, 2, 3], unwrap($m2->keys()));
+        $this->assertSame([1, 2, 3, 4], unwrap($m2->values()));
 
         $m2 = $m->remove(0);
         $this->assertNotSame($m, $m2);
         $this->assertInstanceOf(Primitive::class, $m2);
-        $this->assertSame([0, 1, 2, 3, 4], $m->keys()->toArray());
-        $this->assertSame([1, 2, 3, 4, 5], $m->values()->toArray());
-        $this->assertSame([1, 2, 3, 4], $m2->keys()->toArray());
-        $this->assertSame([2, 3, 4, 5], $m2->values()->toArray());
+        $this->assertSame([0, 1, 2, 3, 4], unwrap($m->keys()));
+        $this->assertSame([1, 2, 3, 4, 5], unwrap($m->values()));
+        $this->assertSame([1, 2, 3, 4], unwrap($m2->keys()));
+        $this->assertSame([2, 3, 4, 5], unwrap($m2->values()));
     }
 
     public function testMerge()
@@ -385,12 +385,12 @@ class PrimitiveTest extends TestCase
         $this->assertSame($m->keyType(), $m3->keyType());
         $this->assertSame($m->valueType(), $m3->valueType());
         $this->assertSame(4, $m3->size());
-        $this->assertSame([$s, $s2], $m->keys()->toArray());
-        $this->assertSame([24, 42], $m->values()->toArray());
-        $this->assertSame([$s3, $s2, $s4], $m2->keys()->toArray());
-        $this->assertSame([24, 66, 42], $m2->values()->toArray());
-        $this->assertSame([$s, $s2, $s3, $s4], $m3->keys()->toArray());
-        $this->assertSame([24, 66, 24, 42], $m3->values()->toArray());
+        $this->assertSame([$s, $s2], unwrap($m->keys()));
+        $this->assertSame([24, 42], unwrap($m->values()));
+        $this->assertSame([$s3, $s2, $s4], unwrap($m2->keys()));
+        $this->assertSame([24, 66, 42], unwrap($m2->values()));
+        $this->assertSame([$s, $s2, $s3, $s4], unwrap($m3->keys()));
+        $this->assertSame([24, 66, 24, 42], unwrap($m3->values()));
         $this->assertFalse($m3->equals($m2->merge($m)));
     }
 
@@ -413,7 +413,7 @@ class PrimitiveTest extends TestCase
         $this->assertSame(Map::class, $p->valueType());
         $this->assertSame(
             [true, false],
-            $p->keys()->toArray()
+            unwrap($p->keys())
         );
         $this->assertSame('int', $p->get(true)->keyType());
         $this->assertSame('int', $p->get(true)->valueType());
@@ -421,19 +421,19 @@ class PrimitiveTest extends TestCase
         $this->assertSame('int', $p->get(false)->valueType());
         $this->assertSame(
             [1, 4],
-            $p->get(true)->keys()->toArray()
+            unwrap($p->get(true)->keys())
         );
         $this->assertSame(
             [2, 5],
-            $p->get(true)->values()->toArray()
+            unwrap($p->get(true)->values())
         );
         $this->assertSame(
             [0, 2, 3],
-            $p->get(false)->keys()->toArray()
+            unwrap($p->get(false)->keys())
         );
         $this->assertSame(
             [1, 3, 4],
-            $p->get(false)->values()->toArray()
+            unwrap($p->get(false)->values())
         );
     }
 
@@ -450,8 +450,8 @@ class PrimitiveTest extends TestCase
         );
 
         $this->assertSame(2.625, $v);
-        $this->assertSame([4], $m->keys()->toArray());
-        $this->assertSame([4], $m->values()->toArray());
+        $this->assertSame([4], unwrap($m->keys()));
+        $this->assertSame([4], unwrap($m->values()));
     }
 
     public function testEmpty()
@@ -470,7 +470,7 @@ class PrimitiveTest extends TestCase
             $this->assertSame('foo', $value);
         });
         $this->assertSame('foo', $map->get('1'));
-        $this->assertSame(['1'], $map->keys()->toArray());
+        $this->assertSame(['1'], unwrap($map->keys()));
     }
 
     public function testToSetOf()

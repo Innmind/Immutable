@@ -130,15 +130,6 @@ final class Sequence implements \Countable
     }
 
     /**
-     * @return list<T>
-     */
-    public function toArray(): array
-    {
-        /** @var list<T> */
-        return $this->implementation->toArray();
-    }
-
-    /**
      * Return the element at the given index
      *
      * @throws OutOfBoundException

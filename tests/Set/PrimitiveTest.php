@@ -143,8 +143,8 @@ class PrimitiveTest extends TestCase
         $this->assertCount(2, $groups);
         $this->assertTrue($groups->get(0)->isOfType('int'));
         $this->assertTrue($groups->get(1)->isOfType('int'));
-        $this->assertSame([2, 4], $groups->get(0)->toArray());
-        $this->assertSame([1, 3], $groups->get(1)->toArray());
+        $this->assertSame([2, 4], unwrap($groups->get(0)));
+        $this->assertSame([1, 3], unwrap($groups->get(1)));
     }
 
     public function testMap()
@@ -176,8 +176,8 @@ class PrimitiveTest extends TestCase
         $this->assertCount(2, $groups);
         $this->assertTrue($groups->get(true)->isOfType('int'));
         $this->assertTrue($groups->get(false)->isOfType('int'));
-        $this->assertSame([2, 4], $groups->get(true)->toArray());
-        $this->assertSame([1, 3], $groups->get(false)->toArray());
+        $this->assertSame([2, 4], unwrap($groups->get(true)));
+        $this->assertSame([1, 3], unwrap($groups->get(false)));
     }
 
     public function testJoin()
@@ -197,7 +197,7 @@ class PrimitiveTest extends TestCase
 
         $this->assertSame([1, 4, 3, 2], $set->toArray());
         $this->assertInstanceOf(Sequence::class, $sorted);
-        $this->assertSame([1, 2, 3, 4], $sorted->toArray());
+        $this->assertSame([1, 2, 3, 4], unwrap($sorted));
     }
 
     public function testMerge()

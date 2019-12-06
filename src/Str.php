@@ -246,7 +246,7 @@ final class Str
      */
     public function shuffle(): self
     {
-        $parts = $this->chunk()->toArray();
+        $parts = unwrap($this->chunk());
         \shuffle($parts);
 
         return new self(\implode('', $parts), $this->encoding);

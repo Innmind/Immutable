@@ -22,7 +22,7 @@ class SequenceTest extends TestCase
         $sequence = Sequence::of('int');
 
         $this->assertInstanceOf(\Countable::class, $sequence);
-        $this->assertSame([], $sequence->toArray());
+        $this->assertSame([], unwrap($sequence));
     }
 
     public function testOf()
@@ -43,7 +43,7 @@ class SequenceTest extends TestCase
 
         $this->assertInstanceOf(Sequence::class, $sequence);
         $this->assertSame('mixed', $sequence->type());
-        $this->assertSame([1, '2', 3], $sequence->toArray());
+        $this->assertSame([1, '2', 3], unwrap($sequence));
     }
 
     public function testInts()
@@ -52,7 +52,7 @@ class SequenceTest extends TestCase
 
         $this->assertInstanceOf(Sequence::class, $sequence);
         $this->assertSame('int', $sequence->type());
-        $this->assertSame([1, 2, 3], $sequence->toArray());
+        $this->assertSame([1, 2, 3], unwrap($sequence));
     }
 
     public function testFloats()
@@ -61,7 +61,7 @@ class SequenceTest extends TestCase
 
         $this->assertInstanceOf(Sequence::class, $sequence);
         $this->assertSame('float', $sequence->type());
-        $this->assertSame([1.0, 2.0, 3.2], $sequence->toArray());
+        $this->assertSame([1.0, 2.0, 3.2], unwrap($sequence));
     }
 
     public function testStrings()
@@ -70,7 +70,7 @@ class SequenceTest extends TestCase
 
         $this->assertInstanceOf(Sequence::class, $sequence);
         $this->assertSame('string', $sequence->type());
-        $this->assertSame(['1', '2', '3'], $sequence->toArray());
+        $this->assertSame(['1', '2', '3'], unwrap($sequence));
     }
 
     public function testObjects()
@@ -82,7 +82,7 @@ class SequenceTest extends TestCase
 
         $this->assertInstanceOf(Sequence::class, $sequence);
         $this->assertSame('object', $sequence->type());
-        $this->assertSame([$a, $b, $c], $sequence->toArray());
+        $this->assertSame([$a, $b, $c], unwrap($sequence));
     }
 
     public function testType()
@@ -146,9 +146,9 @@ class SequenceTest extends TestCase
         $this->assertSame('int', $a->type());
         $this->assertSame('int', $b->type());
         $this->assertSame('int', $c->type());
-        $this->assertSame([1, 2, 3], $a->toArray());
-        $this->assertSame([3, 4, 5], $b->toArray());
-        $this->assertSame([1, 2], $c->toArray());
+        $this->assertSame([1, 2, 3], unwrap($a));
+        $this->assertSame([3, 4, 5], unwrap($b));
+        $this->assertSame([1, 2], unwrap($c));
     }
 
     public function testDistinct()
@@ -163,8 +163,8 @@ class SequenceTest extends TestCase
         $this->assertNotSame($a, $b);
         $this->assertSame('int', $a->type());
         $this->assertSame('int', $b->type());
-        $this->assertSame([1, 1, 1], $a->toArray());
-        $this->assertSame([1], $b->toArray());
+        $this->assertSame([1, 1, 1], unwrap($a));
+        $this->assertSame([1], unwrap($b));
     }
 
     public function testDrop()
@@ -179,8 +179,8 @@ class SequenceTest extends TestCase
         $this->assertNotSame($a, $b);
         $this->assertSame('int', $a->type());
         $this->assertSame('int', $b->type());
-        $this->assertSame([1, 3, 5], $a->toArray());
-        $this->assertSame([5], $b->toArray());
+        $this->assertSame([1, 3, 5], unwrap($a));
+        $this->assertSame([5], unwrap($b));
     }
 
     public function testDropEnd()
@@ -195,8 +195,8 @@ class SequenceTest extends TestCase
         $this->assertNotSame($a, $b);
         $this->assertSame('int', $a->type());
         $this->assertSame('int', $b->type());
-        $this->assertSame([1, 3, 5], $a->toArray());
-        $this->assertSame([1], $b->toArray());
+        $this->assertSame([1, 3, 5], unwrap($a));
+        $this->assertSame([1], unwrap($b));
     }
 
     public function testEquals()
@@ -241,8 +241,8 @@ class SequenceTest extends TestCase
         $this->assertNotSame($a, $b);
         $this->assertSame('int', $a->type());
         $this->assertSame('int', $b->type());
-        $this->assertSame([1, 2, 3, 4], $a->toArray());
-        $this->assertSame([2, 4], $b->toArray());
+        $this->assertSame([1, 2, 3, 4], unwrap($a));
+        $this->assertSame([2, 4], unwrap($b));
     }
 
     public function testForeach()
@@ -278,9 +278,9 @@ class SequenceTest extends TestCase
         $this->assertSame('int', $map->get(0)->type());
         $this->assertSame('int', $map->get(1)->type());
         $this->assertSame('int', $map->get(2)->type());
-        $this->assertSame([3], $map->get(0)->toArray());
-        $this->assertSame([1, 4], $map->get(1)->toArray());
-        $this->assertSame([2], $map->get(2)->toArray());
+        $this->assertSame([3], unwrap($map->get(0)));
+        $this->assertSame([1, 4], unwrap($map->get(1)));
+        $this->assertSame([2], unwrap($map->get(2)));
     }
 
     public function testThrowWhenGroupingEmptySequence()
@@ -347,7 +347,7 @@ class SequenceTest extends TestCase
 
         $this->assertInstanceOf(Sequence::class, $indices);
         $this->assertSame('int', $indices->type());
-        $this->assertSame([0, 1, 2, 3], $indices->toArray());
+        $this->assertSame([0, 1, 2, 3], unwrap($indices));
     }
 
     public function testEmptyIndices()
@@ -357,7 +357,7 @@ class SequenceTest extends TestCase
 
         $this->assertInstanceOf(Sequence::class, $indices);
         $this->assertSame('int', $indices->type());
-        $this->assertSame([], $indices->toArray());
+        $this->assertSame([], unwrap($indices));
     }
 
     public function testMap()
@@ -375,8 +375,8 @@ class SequenceTest extends TestCase
         $this->assertNotSame($a, $b);
         $this->assertSame('int', $a->type());
         $this->assertSame('int', $b->type());
-        $this->assertSame([1, 2, 3, 4], $a->toArray());
-        $this->assertSame([1, 4, 9, 16], $b->toArray());
+        $this->assertSame([1, 2, 3, 4], unwrap($a));
+        $this->assertSame([1, 4, 9, 16], unwrap($b));
     }
 
     public function testThrowWhenTryingToModifyValueTypeInMap()
@@ -405,8 +405,8 @@ class SequenceTest extends TestCase
         $this->assertNotSame($a, $b);
         $this->assertSame('int', $a->type());
         $this->assertSame('int', $b->type());
-        $this->assertSame([1, 2], $a->toArray());
-        $this->assertSame([1, 2, 0, 0], $b->toArray());
+        $this->assertSame([1, 2], unwrap($a));
+        $this->assertSame([1, 2, 0, 0], unwrap($b));
     }
 
     public function testThrowWhenPaddingWithDifferentType()
@@ -433,8 +433,8 @@ class SequenceTest extends TestCase
         $this->assertSame(Sequence::class, $map->valueType());
         $this->assertSame('int', $map->get(true)->type());
         $this->assertSame('int', $map->get(false)->type());
-        $this->assertSame([2, 4], $map->get(true)->toArray());
-        $this->assertSame([1, 3], $map->get(false)->toArray());
+        $this->assertSame([2, 4], unwrap($map->get(true)));
+        $this->assertSame([1, 3], unwrap($map->get(false)));
     }
 
     public function testSlice()
@@ -450,8 +450,8 @@ class SequenceTest extends TestCase
         $this->assertNotSame($a, $b);
         $this->assertSame('int', $a->type());
         $this->assertSame('int', $b->type());
-        $this->assertSame([1, 2, 3, 4], $a->toArray());
-        $this->assertSame([2, 3], $b->toArray());
+        $this->assertSame([1, 2, 3, 4], unwrap($a));
+        $this->assertSame([2, 3], unwrap($b));
     }
 
     public function testSplitAt()
@@ -467,11 +467,11 @@ class SequenceTest extends TestCase
         $this->assertNotSame($a, $b);
         $this->assertSame('int', $a->type());
         $this->assertSame(Sequence::class, $b->type());
-        $this->assertSame([1, 2, 3, 4], $a->toArray());
+        $this->assertSame([1, 2, 3, 4], unwrap($a));
         $this->assertSame('int', $b->first()->type());
         $this->assertSame('int', $b->last()->type());
-        $this->assertSame([1, 2], $b->first()->toArray());
-        $this->assertSame([3, 4], $b->last()->toArray());
+        $this->assertSame([1, 2], unwrap($b->first()));
+        $this->assertSame([3, 4], unwrap($b->last()));
     }
 
     public function testTake()
@@ -487,8 +487,8 @@ class SequenceTest extends TestCase
         $this->assertNotSame($a, $b);
         $this->assertSame('int', $a->type());
         $this->assertSame('int', $b->type());
-        $this->assertSame([1, 2, 3, 4], $a->toArray());
-        $this->assertSame([1, 2], $b->toArray());
+        $this->assertSame([1, 2, 3, 4], unwrap($a));
+        $this->assertSame([1, 2], unwrap($b));
     }
 
     public function testTakeEnd()
@@ -504,8 +504,8 @@ class SequenceTest extends TestCase
         $this->assertNotSame($a, $b);
         $this->assertSame('int', $a->type());
         $this->assertSame('int', $b->type());
-        $this->assertSame([1, 2, 3, 4], $a->toArray());
-        $this->assertSame([3, 4], $b->toArray());
+        $this->assertSame([1, 2, 3, 4], unwrap($a));
+        $this->assertSame([3, 4], unwrap($b));
     }
 
     public function testAppend()
@@ -524,9 +524,9 @@ class SequenceTest extends TestCase
         $this->assertSame('int', $a->type());
         $this->assertSame('int', $b->type());
         $this->assertSame('int', $c->type());
-        $this->assertSame([1, 2], $a->toArray());
-        $this->assertSame([3, 4], $b->toArray());
-        $this->assertSame([3, 4, 1, 2], $c->toArray());
+        $this->assertSame([1, 2], unwrap($a));
+        $this->assertSame([3, 4], unwrap($b));
+        $this->assertSame([3, 4, 1, 2], unwrap($c));
     }
 
     public function testThrowWhenAppendingDifferentTypes()
@@ -553,9 +553,9 @@ class SequenceTest extends TestCase
         $this->assertSame('int', $a->type());
         $this->assertSame('int', $b->type());
         $this->assertSame('int', $c->type());
-        $this->assertSame([1, 2], $a->toArray());
-        $this->assertSame([2, 3], $b->toArray());
-        $this->assertSame([2], $c->toArray());
+        $this->assertSame([1, 2], unwrap($a));
+        $this->assertSame([2, 3], unwrap($b));
+        $this->assertSame([2], unwrap($c));
     }
 
     public function testThrowWhenIntersectingDifferentTypes()
@@ -586,12 +586,12 @@ class SequenceTest extends TestCase
         $this->assertNotSame($a, $b);
         $this->assertSame('int', $a->type());
         $this->assertSame('int', $b->type());
-        $this->assertSame([], $a->toArray());
-        $this->assertSame([1], $b->toArray());
+        $this->assertSame([], unwrap($a));
+        $this->assertSame([1], unwrap($b));
 
         $this->assertSame(
             [1, 2, 3],
-            Sequence::ints(1)(2)(3)->toArray(),
+            unwrap(Sequence::ints(1)(2)(3)),
         );
     }
 
@@ -619,8 +619,8 @@ class SequenceTest extends TestCase
         $this->assertNotSame($a, $b);
         $this->assertSame('int', $a->type());
         $this->assertSame('int', $b->type());
-        $this->assertSame([1, 2, 3, 3, 4], $a->toArray());
-        $this->assertSame([4, 3, 3, 2, 1], $b->toArray());
+        $this->assertSame([1, 2, 3, 3, 4], unwrap($a));
+        $this->assertSame([4, 3, 3, 2, 1], unwrap($b));
     }
 
     public function testReduce()
@@ -650,8 +650,8 @@ class SequenceTest extends TestCase
 
         $this->assertNotSame($sequence, $sequence2);
         $this->assertSame('int', $sequence2->type());
-        $this->assertSame([1, 2, 3], $sequence->toArray());
-        $this->assertSame([], $sequence2->toArray());
+        $this->assertSame([1, 2, 3], unwrap($sequence));
+        $this->assertSame([], unwrap($sequence2));
     }
 
     public function testReverse()
@@ -665,8 +665,8 @@ class SequenceTest extends TestCase
 
         $this->assertInstanceOf(Sequence::class, $reverse);
         $this->assertNotSame($sequence, $reverse);
-        $this->assertSame([1, 3, 4, 2], $sequence->toArray());
-        $this->assertSame([2, 4, 3, 1], $reverse->toArray());
+        $this->assertSame([1, 3, 4, 2], unwrap($sequence));
+        $this->assertSame([2, 4, 3, 1], unwrap($reverse));
     }
 
     public function testEmpty()
