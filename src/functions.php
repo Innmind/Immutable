@@ -3,6 +3,8 @@ declare(strict_types = 1);
 
 namespace Innmind\Immutable;
 
+use Innmind\Immutable\Exception\EmptySet;
+
 /**
  * @template T
  *
@@ -55,6 +57,41 @@ function join(string $separator, $structure): Str
     }
 
     return Str::of(\implode($separator, unwrap($structure)));
+}
+
+/**
+ * @template T
+ *
+ * @throws EmptySet
+ *
+ * @param Set<T> $set
+ *
+ * @return T
+ */
+function first(Set $set)
+{
+    if ($set->empty()) {
+        throw new EmptySet;
+    }
+
+    $seed = new \stdClass;
+
+    /**
+     * @psalm-suppress MissingClosureParamType
+     * @var T
+     */
+    return $set->reduce(
+        $seed,
+        static function($first, $value) use ($seed) {
+            if ($first === $seed) {
+                /** @var T */
+                return $value;
+            }
+
+            /** @var T */
+            return $first;
+        },
+    );
 }
 
 /**
