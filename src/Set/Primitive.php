@@ -33,11 +33,6 @@ final class Primitive implements Implementation
         $this->values = Sequence::of($type, ...$values)->distinct();
     }
 
-    public function isOfType(string $type): bool
-    {
-        return $this->type === $type;
-    }
-
     public function type(): string
     {
         return $this->type;

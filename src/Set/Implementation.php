@@ -16,8 +16,6 @@ use Innmind\Immutable\{
  */
 interface Implementation extends \Countable
 {
-    public function isOfType(string $type): bool;
-
     /**
      * Return the type of this set
      */

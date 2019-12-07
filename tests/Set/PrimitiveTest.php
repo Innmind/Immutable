@@ -24,12 +24,6 @@ class PrimitiveTest extends TestCase
         );
     }
 
-    public function testIsOfType()
-    {
-        $this->assertTrue((new Primitive('int'))->isOfType('int'));
-        $this->assertFalse((new Primitive('int'))->isOfType('string'));
-    }
-
     public function testType()
     {
         $this->assertSame('int', (new Primitive('int'))->type());
