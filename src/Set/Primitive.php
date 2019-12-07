@@ -113,8 +113,7 @@ final class Primitive implements Implementation
         $set = clone $this;
         $set->values = $this
             ->values
-            ->clear()
-            ->append($this->values->slice(0, $index))
+            ->slice(0, $index)
             ->append($this->values->slice($index + 1, $this->size()));
 
         return $set;
