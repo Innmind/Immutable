@@ -50,6 +50,8 @@ final class Sequence implements \Countable
      * It will load the values inside the generator only upon the first use
      * of the sequence
      *
+     * Use this mode when the amount of data may not fit in memory
+     *
      * @param \Generator<T> $generator
      *
      * @return self<T>
