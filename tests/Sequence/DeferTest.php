@@ -669,21 +669,25 @@ class DeferTest extends TestCase
 
     public function testToSequenceOf()
     {
-        $sequence = new Defer('int', (function() {
+        $loaded = false;
+        $sequence = new Defer('int', (function() use (&$loaded) {
             yield 1;
             yield 2;
             yield 3;
+            $loaded = true;
         })());
         $sequence = $sequence->toSequenceOf('string|int', function($i) {
             yield (string) $i;
             yield $i;
         });
 
+        $this->assertFalse($loaded);
         $this->assertInstanceOf(Sequence::class, $sequence);
         $this->assertSame(
             ['1', 1, '2', 2, '3', 3],
             unwrap($sequence),
         );
+        $this->assertTrue($loaded);
     }
 
     public function testToSetOf()
