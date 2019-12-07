@@ -9,6 +9,8 @@ use Innmind\Immutable\{
     Str,
     Set,
     Accumulate,
+    ValidateArgument,
+    Type,
     Exception\LogicException,
     Exception\CannotGroupEmptyStructure,
     Exception\ElementNotFound,
@@ -21,12 +23,15 @@ use Innmind\Immutable\{
 final class Defer implements Implementation
 {
     private string $type;
+    /** @var \Iterator<T> */
     private \Iterator $values;
+    private ValidateArgument $validate;
 
     public function __construct(string $type, \Generator $generator)
     {
         $this->type = $type;
         $this->values = new Accumulate($generator);
+        $this->validate = Type::of($type);
     }
 
     public function type(): string
@@ -78,7 +83,10 @@ final class Defer implements Implementation
      */
     public function diff(Implementation $sequence): Implementation
     {
-        return $this->load()->diff($sequence);
+        return $this->filter(static function($value) use ($sequence): bool {
+            /** @var T $value */
+            return !$sequence->contains($value);
+        });
     }
 
     /**
@@ -86,7 +94,23 @@ final class Defer implements Implementation
      */
     public function distinct(): Implementation
     {
-        return $this->load()->distinct();
+        /** @psalm-suppress MissingClosureParamType */
+        return new self(
+            $this->type,
+            (function($values): \Generator {
+                /** @var list<T> */
+                $uniques = [];
+
+                /** @var T $value */
+                foreach ($values as $value) {
+                    if (!\in_array($value, $uniques, true)) {
+                        $uniques[] = $value;
+
+                        yield $value;
+                    }
+                }
+            })($this->values),
+        );
     }
 
     /**
@@ -94,7 +118,23 @@ final class Defer implements Implementation
      */
     public function drop(int $size): Implementation
     {
-        return $this->load()->drop($size);
+        /** @psalm-suppress MissingClosureParamType */
+        return new self(
+            $this->type,
+            (function($values, $toDrop): \Generator {
+                $dropped = 0;
+
+                /** @var T $value */
+                foreach ($values as $value) {
+                    if ($dropped < $toDrop) {
+                        ++$dropped;
+                        continue;
+                    }
+
+                    yield $value;
+                }
+            })($this->values, $size),
+        );
     }
 
     /**
@@ -102,6 +142,8 @@ final class Defer implements Implementation
      */
     public function dropEnd(int $size): Implementation
     {
+        // this cannot be optimised as the whole generator needs to be loaded
+        // in order to know the elements to drop
         return $this->load()->dropEnd($size);
     }
 
@@ -120,7 +162,18 @@ final class Defer implements Implementation
      */
     public function filter(callable $predicate): Implementation
     {
-        return $this->load()->filter($predicate);
+        /** @psalm-suppress MissingClosureParamType */
+        return new self(
+            $this->type,
+            (function($values, callable $predicate): \Generator {
+                /** @var T $value */
+                foreach ($values as $value) {
+                    if ($predicate($value)) {
+                        yield $value;
+                    }
+                }
+            })($this->values, $predicate),
+        );
     }
 
     /**
@@ -185,7 +238,20 @@ final class Defer implements Implementation
      */
     public function indices(): Implementation
     {
-        return $this->load()->indices();
+        /**
+         * @psalm-suppress MissingClosureParamType
+         * @var Implementation<int>
+         */
+        return new self(
+            'int',
+            (function($values): \Generator {
+                $index = 0;
+                /** @var T $value */
+                foreach ($values as $value) {
+                    yield $index++;
+                }
+            })($this->values),
+        );
     }
 
     /**
@@ -195,7 +261,20 @@ final class Defer implements Implementation
      */
     public function map(callable $function): Implementation
     {
-        return $this->load()->map($function);
+        /** @psalm-suppress MissingClosureParamType */
+        return new self(
+            $this->type,
+            (function($values, callable $map, ValidateArgument $validate): \Generator {
+                /** @var T $value */
+                foreach ($values as $value) {
+                    /** @var T */
+                    $value = $map($value);
+                    $validate($value, 1);
+
+                    yield $value;
+                }
+            })($this->values, $function, $this->validate),
+        );
     }
 
     /**
@@ -205,8 +284,22 @@ final class Defer implements Implementation
      */
     public function pad(int $size, $element): Implementation
     {
-        /** @var Implementation<T> */
-        return $this->load()->pad($size, $element);
+        /** @psalm-suppress MissingClosureParamType */
+        return new self(
+            $this->type,
+            (function($values, int $toPad, $element): \Generator {
+                /** @var T $value */
+                foreach ($values as $value) {
+                    yield $value;
+                    --$toPad;
+                }
+
+                while ($toPad > 0) {
+                    yield $element;
+                    --$toPad;
+                }
+            })($this->values, $size, $element),
+        );
     }
 
     /**
@@ -224,7 +317,21 @@ final class Defer implements Implementation
      */
     public function slice(int $from, int $until): Implementation
     {
-        return $this->load()->slice($from, $until);
+        /** @psalm-suppress MissingClosureParamType */
+        return new self(
+            $this->type,
+            (function($values, int $from, int $until): \Generator {
+                $index = 0;
+                /** @var T $value */
+                foreach ($values as $value) {
+                    if ($index >= $from && $index < $until) {
+                        yield $value;
+                    }
+
+                    ++$index;
+                }
+            })($this->values, $from, $until),
+        );
     }
 
     /**
@@ -242,7 +349,21 @@ final class Defer implements Implementation
      */
     public function take(int $size): Implementation
     {
-        return $this->load()->take($size);
+        /** @psalm-suppress MissingClosureParamType */
+        return new self(
+            $this->type,
+            (function($values, int $size): \Generator {
+                $taken = 0;
+                /** @var T $value */
+                foreach ($values as $value) {
+                    if ($taken < $size) {
+                        yield $value;
+                    }
+
+                    ++$taken;
+                }
+            })($this->values, $size),
+        );
     }
 
     /**
@@ -250,6 +371,8 @@ final class Defer implements Implementation
      */
     public function takeEnd(int $size): Implementation
     {
+        // this cannot be optimised as the whole generator needs to be loaded
+        // in order to know the elements to drop
         return $this->load()->takeEnd($size);
     }
 
@@ -260,7 +383,21 @@ final class Defer implements Implementation
      */
     public function append(Implementation $sequence): Implementation
     {
-        return $this->load()->append($sequence);
+        /** @psalm-suppress MissingClosureParamType */
+        return new self(
+            $this->type,
+            (function($values, Implementation $sequence): \Generator {
+                /** @var T $value */
+                foreach ($values as $value) {
+                    yield $value;
+                }
+
+                /** @var T $value */
+                foreach ($sequence->toArray() as $value) {
+                    yield $value;
+                }
+            })($this->values, $sequence),
+        );
     }
 
     /**
@@ -270,7 +407,10 @@ final class Defer implements Implementation
      */
     public function intersect(Implementation $sequence): Implementation
     {
-        return $this->load()->intersect($sequence);
+        return $this->filter(static function($value) use ($sequence): bool {
+            /** @var T $value */
+            return $sequence->contains($value);
+        });
     }
 
     /**
@@ -280,8 +420,18 @@ final class Defer implements Implementation
      */
     public function add($element): Implementation
     {
-        /** @var Implementation<T> */
-        return $this->load()->add($element);
+        /** @psalm-suppress MissingClosureParamType */
+        return new self(
+            $this->type,
+            (function($values, $element): \Generator {
+                /** @var T $value */
+                foreach ($values as $value) {
+                    yield $value;
+                }
+
+                yield $element;
+            })($this->values, $element),
+        );
     }
 
     /**
@@ -291,7 +441,19 @@ final class Defer implements Implementation
      */
     public function sort(callable $function): Implementation
     {
-        return $this->load()->sort($function);
+        /** @psalm-suppress MissingClosureParamType */
+        return new self(
+            $this->type,
+            (function(\Iterator $values, callable $function): \Generator {
+                $values = \iterator_to_array($values);
+                \usort($values, $function);
+
+                /** @var T $value */
+                foreach ($values as $value) {
+                    yield $value;
+                }
+            })($this->values, $function),
+        );
     }
 
     /**
@@ -319,7 +481,15 @@ final class Defer implements Implementation
      */
     public function reverse(): Implementation
     {
-        return $this->load()->reverse();
+        /** @psalm-suppress MissingClosureParamType */
+        return new self(
+            $this->type,
+            (function(\Iterator $values): \Generator {
+                $values = \iterator_to_array($values);
+
+                yield from \array_reverse($values);
+            })($this->values),
+        );
     }
 
     public function empty(): bool
@@ -336,7 +506,19 @@ final class Defer implements Implementation
      */
     public function toSequenceOf(string $type, callable $mapper): Sequence
     {
-        return $this->load()->toSequenceOf($type, $mapper);
+        /** @psalm-suppress MissingClosureParamType */
+        return Sequence::defer(
+            $type,
+            (function($values, callable $mapper): \Generator {
+                /** @var T $value */
+                foreach ($values as $value) {
+                    /** @var ST $newValue */
+                    foreach ($mapper($value) as $newValue) {
+                        yield $newValue;
+                    }
+                }
+            })($this->values, $mapper),
+        );
     }
 
     /**

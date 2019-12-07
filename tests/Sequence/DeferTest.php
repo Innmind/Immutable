@@ -94,49 +94,65 @@ class DeferTest extends TestCase
 
     public function testDiff()
     {
-        $a = new Defer('int', (function() {
+        $aLoaded = false;
+        $bLoaded = false;
+        $a = new Defer('int', (function() use (&$aLoaded) {
             yield 1;
             yield 2;
+            $aLoaded = true;
         })());
-        $b = new Defer('int', (function() {
+        $b = new Defer('int', (function() use (&$bLoaded) {
             yield 2;
             yield 3;
+            $bLoaded = true;
         })());
         $c = $a->diff($b);
 
+        $this->assertFalse($aLoaded);
+        $this->assertFalse($bLoaded);
         $this->assertSame([1, 2], $a->toArray());
         $this->assertSame([2, 3], $b->toArray());
         $this->assertInstanceOf(Implementation::class, $c);
         $this->assertSame([1], $c->toArray());
+        $this->assertTrue($aLoaded);
+        $this->assertTrue($bLoaded);
     }
 
     public function testDistinct()
     {
-        $a = new Defer('int', (function() {
+        $loaded = false;
+        $a = new Defer('int', (function() use (&$loaded) {
             yield 1;
             yield 2;
             yield 1;
+            $loaded = true;
         })());
         $b = $a->distinct();
 
+        $this->assertFalse($loaded);
         $this->assertSame([1, 2, 1], $a->toArray());
         $this->assertInstanceOf(Implementation::class, $b);
         $this->assertSame([1, 2], $b->toArray());
+        $this->assertTrue($loaded);
     }
 
     public function testDrop()
     {
-        $a = new Defer('int', (function() {
+        $loaded = false;
+        $a = new Defer('int', (function() use (&$loaded) {
             yield 1;
             yield 2;
             yield 3;
             yield 4;
+            $loaded = true;
         })());
         $b = $a->drop(2);
 
+        $this->assertFalse($loaded);
         $this->assertSame([1, 2, 3, 4], $a->toArray());
         $this->assertInstanceOf(Implementation::class, $b);
         $this->assertSame([3, 4], $b->toArray());
+        $this->assertTrue($loaded);
     }
 
     public function testDropEnd()
@@ -171,17 +187,21 @@ class DeferTest extends TestCase
 
     public function testFilter()
     {
-        $a = new Defer('int', (function() {
+        $loaded = false;
+        $a = new Defer('int', (function() use (&$loaded) {
             yield 1;
             yield 2;
             yield 3;
             yield 4;
+            $loaded = true;
         })());
         $b = $a->filter(fn($i) => $i % 2 === 0);
 
+        $this->assertFalse($loaded);
         $this->assertSame([1, 2, 3, 4], $a->toArray());
         $this->assertInstanceOf(Implementation::class, $b);
         $this->assertSame([2, 4], $b->toArray());
+        $this->assertTrue($loaded);
     }
 
     public function testForeach()
@@ -323,16 +343,20 @@ class DeferTest extends TestCase
 
     public function testIndices()
     {
-        $a = new Defer('string', (function() {
+        $loaded = false;
+        $a = new Defer('string', (function() use (&$loaded) {
             yield '1';
             yield '2';
+            $loaded = true;
         })());
         $b = $a->indices();
 
+        $this->assertFalse($loaded);
         $this->assertSame(['1', '2'], $a->toArray());
         $this->assertInstanceOf(Implementation::class, $b);
         $this->assertSame('int', $b->type());
         $this->assertSame([0, 1], $b->toArray());
+        $this->assertTrue($loaded);
     }
 
     public function testIndicesOnEmptySequence()
@@ -352,16 +376,20 @@ class DeferTest extends TestCase
 
     public function testMap()
     {
-        $a = new Defer('int', (function() {
+        $loaded = false;
+        $a = new Defer('int', (function() use (&$loaded) {
             yield 1;
             yield 2;
             yield 3;
+            $loaded = true;
         })());
         $b = $a->map(fn($i) => $i * 2);
 
+        $this->assertFalse($loaded);
         $this->assertSame([1, 2, 3], $a->toArray());
         $this->assertInstanceOf(Implementation::class, $b);
         $this->assertSame([2, 4, 6], $b->toArray());
+        $this->assertTrue($loaded);
     }
 
     public function testThrowWhenTryingToModifyTheTypeWhenMapping()
@@ -375,23 +403,27 @@ class DeferTest extends TestCase
             yield 3;
         })());
 
-        $sequence->map(fn($i) => (string) $i);
+        $sequence->map(fn($i) => (string) $i)->toArray();
     }
 
     public function testPad()
     {
-        $a = new Defer('int', (function() {
+        $loaded = false;
+        $a = new Defer('int', (function() use (&$loaded) {
             yield 1;
             yield 2;
+            $loaded = true;
         })());
         $b = $a->pad(4, 0);
         $c = $a->pad(1, 0);
 
+        $this->assertFalse($loaded);
         $this->assertSame([1, 2], $a->toArray());
         $this->assertInstanceOf(Implementation::class, $b);
         $this->assertInstanceOf(Implementation::class, $c);
         $this->assertSame([1, 2, 0, 0], $b->toArray());
         $this->assertSame([1, 2], $c->toArray());
+        $this->assertTrue($loaded);
     }
 
     public function testPartition()
@@ -416,17 +448,21 @@ class DeferTest extends TestCase
 
     public function testSlice()
     {
-        $a = new Defer('int', (function() {
+        $loaded = false;
+        $a = new Defer('int', (function() use (&$loaded) {
             yield 2;
             yield 3;
             yield 4;
             yield 5;
+            $loaded = true;
         })());
         $b = $a->slice(1, 3);
 
+        $this->assertFalse($loaded);
         $this->assertSame([2, 3, 4, 5], $a->toArray());
         $this->assertInstanceOf(Implementation::class, $b);
         $this->assertSame([3, 4], $b->toArray());
+        $this->assertTrue($loaded);
     }
 
     public function testSplitAt()
@@ -451,16 +487,20 @@ class DeferTest extends TestCase
 
     public function testTake()
     {
-        $a = new Defer('int', (function() {
+        $loaded = false;
+        $a = new Defer('int', (function() use (&$loaded) {
             yield 2;
             yield 3;
             yield 4;
+            $loaded = true;
         })());
         $b = $a->take(2);
 
+        $this->assertFalse($loaded);
         $this->assertSame([2, 3, 4], $a->toArray());
         $this->assertInstanceOf(Implementation::class, $b);
         $this->assertSame([2, 3], $b->toArray());
+        $this->assertTrue($loaded);
     }
 
     public function testTakeEnd()
@@ -479,50 +519,70 @@ class DeferTest extends TestCase
 
     public function testAppend()
     {
-        $a = new Defer('int', (function() {
+        $aLoaded = false;
+        $bLoaded = false;
+        $a = new Defer('int', (function() use (&$aLoaded) {
             yield 1;
             yield 2;
+            $aLoaded = true;
         })());
-        $b = new Defer('int', (function() {
+        $b = new Defer('int', (function() use (&$bLoaded) {
             yield 3;
             yield 4;
+            $bLoaded = true;
         })());
         $c = $a->append($b);
 
+        $this->assertFalse($aLoaded);
+        $this->assertFalse($bLoaded);
         $this->assertSame([1, 2], $a->toArray());
         $this->assertSame([3, 4], $b->toArray());
         $this->assertInstanceOf(Implementation::class, $c);
         $this->assertSame([1, 2, 3, 4], $c->toArray());
+        $this->assertTrue($aLoaded);
+        $this->assertTrue($bLoaded);
     }
 
     public function testIntersect()
     {
-        $a = new Defer('int', (function() {
+        $aLoaded = false;
+        $bLoaded = false;
+        $a = new Defer('int', (function() use (&$aLoaded) {
             yield 1;
             yield 2;
+            $aLoaded = true;
         })());
-        $b = new Defer('int', (function() {
+        $b = new Defer('int', (function() use (&$bLoaded) {
             yield 2;
             yield 3;
+            $bLoaded = true;
         })());
         $c = $a->intersect($b);
 
+        $this->assertFalse($aLoaded);
+        $this->assertFalse($bLoaded);
         $this->assertSame([1, 2], $a->toArray());
         $this->assertSame([2, 3], $b->toArray());
         $this->assertInstanceOf(Implementation::class, $c);
         $this->assertSame([2], $c->toArray());
+        $this->assertTrue($aLoaded);
+        $this->assertTrue($bLoaded);
     }
 
     public function testAdd()
     {
-        $a = new Defer('int', (function() {
+        $loaded = false;
+        $a = new Defer('int', (function() use (&$loaded) {
             yield 1;
+            $loaded = true;
         })());
         $b = $a->add(2);
 
+        $this->assertFalse($loaded);
         $this->assertSame([1], $a->toArray());
         $this->assertInstanceOf(Implementation::class, $b);
         $this->assertSame([1, 2], $b->toArray());
+        $this->assertTrue($loaded);
     }
 
     public function testSort()
@@ -567,31 +627,44 @@ class DeferTest extends TestCase
 
     public function testReverse()
     {
-        $a = new Defer('int', (function() {
+        $loaded = false;
+        $a = new Defer('int', (function() use (&$loaded) {
             yield 1;
             yield 2;
             yield 3;
             yield 4;
+            $loaded = true;
         })());
         $b = $a->reverse();
 
+        $this->assertFalse($loaded);
         $this->assertSame([1, 2, 3, 4], $a->toArray());
         $this->assertInstanceOf(Implementation::class, $b);
         $this->assertSame([4, 3, 2, 1], $b->toArray());
+        $this->assertTrue($loaded);
     }
 
     public function testEmpty()
     {
-        $a = new Defer('int', (function() {
+        $aLoaded = false;
+        $bLoaded = false;
+        $a = new Defer('int', (function() use (&$aLoaded) {
             yield 1;
+            $aLoaded = true;
         })());
-        $b = new Defer('int', (function() {
+        $b = new Defer('int', (function() use (&$bLoaded) {
             if (false) {
                 yield 1;
             }
+            $bLoaded = true;
         })());
+
+        $this->assertFalse($aLoaded);
+        $this->assertFalse($bLoaded);
         $this->assertTrue($b->empty());
         $this->assertFalse($a->empty());
+        $this->assertFalse($aLoaded); // still false as we don't need to load the full iterator to know if it's empty
+        $this->assertTrue($bLoaded);
     }
 
     public function testToSequenceOf()
