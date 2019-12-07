@@ -190,7 +190,7 @@ final class Primitive implements Implementation
             function(Map $carry, $key, Sequence $values): Map {
                 return ($carry)(
                     $key,
-                    $values->toSetOf($this->type, static fn($v): \Generator => yield $v),
+                    $values->toSetOf($this->type),
                 );
             }
         );
@@ -234,11 +234,11 @@ final class Primitive implements Implementation
         /** @var Set<T> */
         $truthy = $partitions
             ->get(true)
-            ->toSetOf($this->type, static fn($v): \Generator => yield $v);
+            ->toSetOf($this->type);
         /** @var Set<T> */
         $falsy = $partitions
             ->get(false)
-            ->toSetOf($this->type, static fn($v): \Generator => yield $v);
+            ->toSetOf($this->type);
 
         /**
          * @psalm-suppress InvalidScalarArgument
@@ -259,7 +259,7 @@ final class Primitive implements Implementation
         return $this
             ->values
             ->sort($function)
-            ->toSequenceOf($this->type, static fn($v): \Generator => yield $v);
+            ->toSequenceOf($this->type);
     }
 
     /**
