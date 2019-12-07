@@ -46,7 +46,7 @@ final class Defer implements Implementation
 
     public function toArray(): array
     {
-        return $this->load()->toArray();
+        return \iterator_to_array($this->values);
     }
 
     /**
