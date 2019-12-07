@@ -47,6 +47,19 @@ final class Sequence implements \Countable
     }
 
     /**
+     * It will load the values inside the generator only upon the first use
+     * of the sequence
+     *
+     * @param \Generator<T> $generator
+     *
+     * @return self<T>
+     */
+    public static function defer(string $type, \Generator $generator): self
+    {
+        return new self($type, new Sequence\Defer($type, $generator));
+    }
+
+    /**
      * @param mixed $values
      *
      * @return self<mixed>
