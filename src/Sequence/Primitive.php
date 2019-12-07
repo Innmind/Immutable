@@ -473,12 +473,15 @@ final class Primitive implements Implementation
     /**
      * @template ST
      *
-     * @param callable(T): \Generator<ST> $mapper
+     * @param null|callable(T): \Generator<ST> $mapper
      *
      * @return Sequence<ST>
      */
-    public function toSequenceOf(string $type, callable $mapper): Sequence
+    public function toSequenceOf(string $type, callable $mapper = null): Sequence
     {
+        /** @psalm-suppress MissingParamType */
+        $mapper ??= static fn($v): \Generator => yield $v;
+
         /** @var Sequence<ST> */
         $sequence = Sequence::of($type);
 
@@ -494,12 +497,15 @@ final class Primitive implements Implementation
     /**
      * @template ST
      *
-     * @param callable(T): \Generator<ST> $mapper
+     * @param null|callable(T): \Generator<ST> $mapper
      *
      * @return Set<ST>
      */
-    public function toSetOf(string $type, callable $mapper): Set
+    public function toSetOf(string $type, callable $mapper = null): Set
     {
+        /** @psalm-suppress MissingParamType */
+        $mapper ??= static fn($v): \Generator => yield $v;
+
         /** @var Set<ST> */
         $set = Set::of($type);
 

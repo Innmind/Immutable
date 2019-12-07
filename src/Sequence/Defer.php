@@ -539,12 +539,15 @@ final class Defer implements Implementation
     /**
      * @template ST
      *
-     * @param callable(T): \Generator<ST> $mapper
+     * @param null|callable(T): \Generator<ST> $mapper
      *
      * @return Sequence<ST>
      */
-    public function toSequenceOf(string $type, callable $mapper): Sequence
+    public function toSequenceOf(string $type, callable $mapper = null): Sequence
     {
+        /** @psalm-suppress MissingParamType */
+        $mapper ??= static fn($v): \Generator => yield $v;
+
         /** @psalm-suppress MissingClosureParamType */
         return Sequence::defer(
             $type,
@@ -563,11 +566,11 @@ final class Defer implements Implementation
     /**
      * @template ST
      *
-     * @param callable(T): \Generator<ST> $mapper
+     * @param null|callable(T): \Generator<ST> $mapper
      *
      * @return Set<ST>
      */
-    public function toSetOf(string $type, callable $mapper): Set
+    public function toSetOf(string $type, callable $mapper = null): Set
     {
         return $this->load()->toSetOf($type, $mapper);
     }

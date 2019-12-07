@@ -682,8 +682,8 @@ class SequenceTest extends TestCase
 
     public function testToSequenceOf()
     {
-        $sequence = Sequence::ints(1, 2, 3);
-        $sequence = $sequence->toSequenceOf('string|int', function($i) {
+        $initial = Sequence::ints(1, 2, 3);
+        $sequence = $initial->toSequenceOf('string|int', function($i) {
             yield (string) $i;
             yield $i;
         });
@@ -692,6 +692,10 @@ class SequenceTest extends TestCase
         $this->assertSame(
             ['1', 1, '2', 2, '3', 3],
             unwrap($sequence),
+        );
+        $this->assertSame(
+            [1, 2, 3],
+            unwrap($initial->toSequenceOf('int')),
         );
     }
 
@@ -707,6 +711,10 @@ class SequenceTest extends TestCase
         $this->assertSame(
             ['1', 1, '2', 2, '3', 3],
             unwrap($set),
+        );
+        $this->assertSame(
+            [1, 2, 3],
+            unwrap($sequence->add(1)->toSetOf('int')),
         );
     }
 

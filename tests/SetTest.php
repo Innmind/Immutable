@@ -434,12 +434,16 @@ class SetTest extends TestCase
             ['1', 1, '2', 2, '3', 3],
             unwrap($sequence),
         );
+        $this->assertSame(
+            [1, 2, 3],
+            unwrap($set->toSequenceOf('int')),
+        );
     }
 
     public function testToSetOf()
     {
-        $set = Set::ints(1, 2, 3);
-        $set = $set->toSetOf('string|int', function($i) {
+        $initial = Set::ints(1, 2, 3);
+        $set = $initial->toSetOf('string|int', function($i) {
             yield (string) $i;
             yield $i;
         });
@@ -448,6 +452,10 @@ class SetTest extends TestCase
         $this->assertSame(
             ['1', 1, '2', 2, '3', 3],
             unwrap($set),
+        );
+        $this->assertSame(
+            [1, 2, 3],
+            unwrap($initial->toSetOf('int')),
         );
     }
 

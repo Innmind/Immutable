@@ -563,11 +563,11 @@ final class Sequence implements \Countable
     /**
      * @template ST
      *
-     * @param callable(T): \Generator<ST> $mapper
+     * @param null|callable(T): \Generator<ST> $mapper
      *
      * @return self<ST>
      */
-    public function toSequenceOf(string $type, callable $mapper): self
+    public function toSequenceOf(string $type, callable $mapper = null): self
     {
         return $this->implementation->toSequenceOf($type, $mapper);
     }
@@ -575,11 +575,11 @@ final class Sequence implements \Countable
     /**
      * @template ST
      *
-     * @param callable(T): \Generator<ST> $mapper
+     * @param null|callable(T): \Generator<ST> $mapper
      *
      * @return Set<ST>
      */
-    public function toSetOf(string $type, callable $mapper): Set
+    public function toSetOf(string $type, callable $mapper = null): Set
     {
         return $this->implementation->toSetOf($type, $mapper);
     }
