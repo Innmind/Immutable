@@ -21,14 +21,12 @@ use Innmind\Immutable\{
 final class Defer implements Implementation
 {
     private string $type;
-    private \Generator $generator;
-    private ?Implementation $sequence;
+    private \Iterator $values;
 
     public function __construct(string $type, \Generator $generator)
     {
         $this->type = $type;
-        $this->generator = $generator;
-        $this->sequence = null;
+        $this->values = new Accumulate($generator);
     }
 
     public function type(): string
@@ -359,9 +357,9 @@ final class Defer implements Implementation
      */
     private function load(): Implementation
     {
-        return $this->sequence ?? $this->sequence = new Primitive(
+        return new Primitive(
             $this->type,
-            ...\iterator_to_array($this->generator),
+            ...\iterator_to_array($this->values),
         );
     }
 }
