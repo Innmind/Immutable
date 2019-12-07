@@ -12,7 +12,6 @@ use Innmind\Immutable\{
     Str,
     Exception\CannotGroupEmptyStructure,
 };
-use function Innmind\Immutable\unwrap;
 
 /**
  * @template T
@@ -21,7 +20,7 @@ final class Primitive implements Implementation
 {
     private string $type;
     private ValidateArgument $validate;
-    private Sequence $values;
+    private Sequence\Implementation $values;
 
     /**
      * @param T $values
@@ -30,7 +29,7 @@ final class Primitive implements Implementation
     {
         $this->type = $type;
         $this->validate = Type::of($type);
-        $this->values = Sequence::of($type, ...$values)->distinct();
+        $this->values = (new Sequence\Primitive($type, ...$values))->distinct();
     }
 
     public function type(): string
@@ -56,7 +55,7 @@ final class Primitive implements Implementation
      */
     public function iterator(): \Iterator
     {
-        return new \ArrayIterator(unwrap($this->values));
+        return $this->values->iterator();
     }
 
     /**
@@ -68,7 +67,7 @@ final class Primitive implements Implementation
     {
         $self = $this->clear();
         $self->values = $this->values->intersect(
-            Sequence::of($this->type, ...$set->iterator())
+            new Sequence\Primitive($this->type, ...$set->iterator())
         );
 
         return $self;
@@ -86,7 +85,7 @@ final class Primitive implements Implementation
         }
 
         $set = clone $this;
-        $set->values = ($this->values)($element);
+        $set->values = $this->values->add($element);
 
         return $set;
     }
@@ -130,7 +129,7 @@ final class Primitive implements Implementation
     {
         $self = clone $this;
         $self->values = $this->values->diff(
-            Sequence::of($this->type, ...$set->iterator())
+            new Sequence\Primitive($this->type, ...$set->iterator())
         );
 
         return $self;
@@ -191,7 +190,7 @@ final class Primitive implements Implementation
             function(Map $carry, $key, Sequence $values): Map {
                 return ($carry)(
                     $key,
-                    Set::of($this->type, ...unwrap($values)),
+                    $values->toSetOf($this->type, static fn($v): \Generator => yield $v),
                 );
             }
         );
@@ -233,9 +232,13 @@ final class Primitive implements Implementation
     {
         $partitions = $this->values->partition($predicate);
         /** @var Set<T> */
-        $truthy = Set::of($this->type, ...unwrap($partitions->get(true)));
+        $truthy = $partitions
+            ->get(true)
+            ->toSetOf($this->type, static fn($v): \Generator => yield $v);
         /** @var Set<T> */
-        $falsy = Set::of($this->type, ...unwrap($partitions->get(false)));
+        $falsy = $partitions
+            ->get(false)
+            ->toSetOf($this->type, static fn($v): \Generator => yield $v);
 
         /**
          * @psalm-suppress InvalidScalarArgument
@@ -253,7 +256,10 @@ final class Primitive implements Implementation
      */
     public function sort(callable $function): Sequence
     {
-        return $this->values->sort($function);
+        return $this
+            ->values
+            ->sort($function)
+            ->toSequenceOf($this->type, static fn($v): \Generator => yield $v);
     }
 
     /**
