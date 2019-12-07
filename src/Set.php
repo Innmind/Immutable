@@ -37,6 +37,18 @@ final class Set implements \Countable
     }
 
     /**
+     * @param \Generator<T> $generator
+     *
+     * @return self<T>
+     */
+    public static function defer(string $type, \Generator $generator): self
+    {
+        $self = new self($type, new Set\Defer($type, $generator));
+
+        return $self;
+    }
+
+    /**
      * @param mixed $values
      *
      * @return self<mixed>

@@ -572,7 +572,22 @@ final class Defer implements Implementation
      */
     public function toSetOf(string $type, callable $mapper = null): Set
     {
-        return $this->load()->toSetOf($type, $mapper);
+        /** @psalm-suppress MissingParamType */
+        $mapper ??= static fn($v): \Generator => yield $v;
+
+        /** @psalm-suppress MissingClosureParamType */
+        return Set::defer(
+            $type,
+            (function($values, callable $mapper): \Generator {
+                /** @var T $value */
+                foreach ($values as $value) {
+                    /** @var ST $newValue */
+                    foreach ($mapper($value) as $newValue) {
+                        yield $newValue;
+                    }
+                }
+            })($this->values, $mapper),
+        );
     }
 
     /**

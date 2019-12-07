@@ -34,6 +34,22 @@ class SetTest extends TestCase
         );
     }
 
+    public function testDefer()
+    {
+        $loaded = false;
+        $set = Set::defer('int', (function() use (&$loaded) {
+            yield 1;
+            yield 2;
+            yield 3;
+            $loaded = true;
+        })());
+
+        $this->assertInstanceOf(Set::class, $set);
+        $this->assertFalse($loaded);
+        $this->assertSame([1, 2, 3], unwrap($set));
+        $this->assertTrue($loaded);
+    }
+
     public function testMixed()
     {
         $set = Set::mixed(1, '2', 3, 1);
