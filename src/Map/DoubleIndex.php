@@ -15,7 +15,6 @@ use Innmind\Immutable\{
     Exception\ElementNotFound,
     Exception\CannotGroupEmptyStructure,
 };
-use function Innmind\Immutable\unwrap;
 
 /**
  * @template T
@@ -27,12 +26,12 @@ final class DoubleIndex implements Implementation
     private string $valueType;
     private ValidateArgument $validateKey;
     private ValidateArgument $validateValue;
-    /** @var Sequence<T> */
-    private Sequence $keys;
-    /** @var Sequence<S> */
-    private Sequence $values;
-    /** @var Sequence<Pair<T, S>> */
-    private Sequence $pairs;
+    /** @var Sequence\Implementation<T> */
+    private Sequence\Implementation $keys;
+    /** @var Sequence\Implementation<S> */
+    private Sequence\Implementation $values;
+    /** @var Sequence\Implementation<Pair<T, S>> */
+    private Sequence\Implementation $pairs;
 
     public function __construct(string $keyType, string $valueType)
     {
@@ -40,10 +39,10 @@ final class DoubleIndex implements Implementation
         $this->validateValue = Type::of($valueType);
         $this->keyType = $keyType;
         $this->valueType = $valueType;
-        $this->keys = Sequence::of($keyType);
-        $this->values = Sequence::of($valueType);
-        /** @var Sequence<Pair<T, S>> */
-        $this->pairs = Sequence::of(Pair::class);
+        $this->keys = new Sequence\Primitive($keyType);
+        $this->values = new Sequence\Primitive($valueType);
+        /** @var Sequence\Implementation<Pair<T, S>> */
+        $this->pairs = new Sequence\Primitive(Pair::class);
     }
 
     public function keyType(): string
@@ -84,16 +83,16 @@ final class DoubleIndex implements Implementation
             $map->values = $this->values->take($index)
                 ->add($value)
                 ->append($this->values->drop($index + 1));
-            /** @var Sequence<Pair<T, S>> */
+            /** @var Sequence\Implementation<Pair<T, S>> */
             $map->pairs = $this->pairs->take($index)
                 ->add(new Pair($key, $value))
                 ->append($this->pairs->drop($index + 1));
         } else {
-            /** @var Sequence<T> */
-            $map->keys = ($this->keys)($key);
-            $map->values = ($this->values)($value);
-            /** @var Sequence<Pair<T, S>> */
-            $map->pairs = ($this->pairs)(new Pair($key, $value));
+            /** @var Sequence\Implementation<T> */
+            $map->keys = $this->keys->add($key);
+            $map->values = $this->values->add($value);
+            /** @var Sequence\Implementation<Pair<T, S>> */
+            $map->pairs = $this->pairs->add(new Pair($key, $value));
         }
 
         return $map;
@@ -147,7 +146,7 @@ final class DoubleIndex implements Implementation
             return false;
         }
 
-        foreach (unwrap($this->pairs) as $pair) {
+        foreach ($this->pairs->iterator() as $pair) {
             if ($map->get($pair->key()) !== $pair->value()) {
                 return false;
             }
@@ -165,17 +164,17 @@ final class DoubleIndex implements Implementation
     {
         $map = $this->clear();
 
-        foreach (unwrap($this->pairs) as $pair) {
+        foreach ($this->pairs->iterator() as $pair) {
             if ($predicate($pair->key(), $pair->value()) === true) {
                 /** @psalm-suppress MixedArgumentTypeCoercion */
-                $map->keys = ($map->keys)($pair->key());
+                $map->keys = $map->keys->add($pair->key());
                 /** @psalm-suppress MixedArgumentTypeCoercion */
-                $map->values = ($map->values)($pair->value());
+                $map->values = $map->values->add($pair->value());
                 /**
                  * @psalm-suppress MixedArgumentTypeCoercion
-                 * @var Sequence<Pair<T, S>>
+                 * @var Sequence\Implementation<Pair<T, S>>
                  */
-                $map->pairs = ($map->pairs)($pair);
+                $map->pairs = $map->pairs->add($pair);
             }
         }
 
@@ -187,7 +186,7 @@ final class DoubleIndex implements Implementation
      */
     public function foreach(callable $function): void
     {
-        foreach (unwrap($this->pairs) as $pair) {
+        foreach ($this->pairs->iterator() as $pair) {
             $function($pair->key(), $pair->value());
         }
     }
@@ -208,7 +207,7 @@ final class DoubleIndex implements Implementation
 
         $groups = null;
 
-        foreach (unwrap($this->pairs) as $pair) {
+        foreach ($this->pairs->iterator() as $pair) {
             $key = $discriminator($pair->key(), $pair->value());
 
             if ($groups === null) {
@@ -243,7 +242,7 @@ final class DoubleIndex implements Implementation
      */
     public function keys(): Set
     {
-        return Set::of($this->keyType, ...unwrap($this->keys));
+        return $this->keys->toSetOf($this->keyType);
     }
 
     /**
@@ -251,7 +250,7 @@ final class DoubleIndex implements Implementation
      */
     public function values(): Sequence
     {
-        return $this->values;
+        return $this->values->toSequenceOf($this->valueType);
     }
 
     /**
@@ -263,7 +262,7 @@ final class DoubleIndex implements Implementation
     {
         $map = $this->clear();
 
-        foreach (unwrap($this->pairs) as $pair) {
+        foreach ($this->pairs->iterator() as $pair) {
             $return = $function($pair->key(), $pair->value());
 
             if ($return instanceof Pair) {
@@ -303,7 +302,7 @@ final class DoubleIndex implements Implementation
             ->values
             ->slice(0, $index)
             ->append($this->values->slice($index + 1, $this->values->size()));
-        /** @var Sequence<Pair<T, S>> */
+        /** @var Sequence\Implementation<Pair<T, S>> */
         $map->pairs = $this
             ->pairs
             ->slice(0, $index)
@@ -337,7 +336,7 @@ final class DoubleIndex implements Implementation
         $truthy = $this->clearMap();
         $falsy = $this->clearMap();
 
-        foreach (unwrap($this->pairs) as $pair) {
+        foreach ($this->pairs->iterator() as $pair) {
             $return = $predicate($pair->key(), $pair->value());
 
             if ($return === true) {
@@ -365,7 +364,7 @@ final class DoubleIndex implements Implementation
      */
     public function reduce($carry, callable $reducer)
     {
-        foreach (unwrap($this->pairs) as $pair) {
+        foreach ($this->pairs->iterator() as $pair) {
             $carry = $reducer($carry, $pair->key(), $pair->value());
         }
 
@@ -389,7 +388,7 @@ final class DoubleIndex implements Implementation
         /** @var Sequence<ST> */
         $sequence = Sequence::of($type);
 
-        foreach (unwrap($this->pairs) as $pair) {
+        foreach ($this->pairs->iterator() as $pair) {
             foreach ($mapper($pair->key(), $pair->value()) as $newValue) {
                 $sequence = ($sequence)($newValue);
             }
@@ -410,7 +409,7 @@ final class DoubleIndex implements Implementation
         /** @var Set<ST> */
         $set = Set::of($type);
 
-        foreach (unwrap($this->pairs) as $pair) {
+        foreach ($this->pairs->iterator() as $pair) {
             foreach ($mapper($pair->key(), $pair->value()) as $newValue) {
                 $set = ($set)($newValue);
             }
@@ -432,7 +431,7 @@ final class DoubleIndex implements Implementation
         /** @var Map<MT, MS> */
         $map = Map::of($key, $value);
 
-        foreach (unwrap($this->pairs) as $pair) {
+        foreach ($this->pairs->iterator() as $pair) {
             foreach ($mapper($pair->key(), $pair->value()) as $newKey => $newValue) {
                 $map = ($map)($newKey, $newValue);
             }
