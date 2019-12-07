@@ -27,6 +27,17 @@ class DeferTest extends TestCase
         );
     }
 
+    public function testGeneratorNotLoadedAtInstanciation()
+    {
+        $loaded = false;
+        $sequence = new Defer('int', (function() use (&$loaded) {
+            yield 1;
+            $loaded = true;
+        })());
+
+        $this->assertFalse($loaded);
+    }
+
     public function testType()
     {
         $this->assertSame('int', (new Defer('int', (fn() => yield)()))->type());
