@@ -23,9 +23,9 @@ interface Implementation extends \Countable
     public function size(): int;
 
     /**
-     * @return list<T>
+     * @return \Iterator<T>
      */
-    public function toArray(): array;
+    public function iterator(): \Iterator;
 
     /**
      * Intersect this set with the given one

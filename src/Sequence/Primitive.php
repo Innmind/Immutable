@@ -53,9 +53,12 @@ final class Primitive implements Implementation
         return $this->size();
     }
 
-    public function toArray(): array
+    /**
+     * @return \Iterator<T>
+     */
+    public function iterator(): \Iterator
     {
-        return $this->values;
+        return new \ArrayIterator($this->values);
     }
 
     /**
@@ -129,7 +132,7 @@ final class Primitive implements Implementation
      */
     public function equals(Implementation $sequence): bool
     {
-        return $this->values === $sequence->toArray();
+        return $this->values === \iterator_to_array($sequence->iterator());
     }
 
     /**
@@ -352,9 +355,9 @@ final class Primitive implements Implementation
     public function splitAt(int $index): Sequence
     {
         /** @var Sequence<T> */
-        $first = Sequence::of($this->type, ...$this->slice(0, $index)->toArray());
+        $first = Sequence::of($this->type, ...$this->slice(0, $index)->iterator());
         /** @var Sequence<T> */
-        $second = Sequence::of($this->type, ...$this->slice($index, $this->size())->toArray());
+        $second = Sequence::of($this->type, ...$this->slice($index, $this->size())->iterator());
 
         /** @var Sequence<Sequence<T>> */
         return Sequence::of(Sequence::class, $first, $second);
@@ -385,7 +388,7 @@ final class Primitive implements Implementation
     {
         $self = $this->clear();
         /** @var list<T> */
-        $self->values = \array_merge($this->values, $sequence->toArray());
+        $self->values = \array_merge($this->values, \iterator_to_array($sequence->iterator()));
 
         return $self;
     }

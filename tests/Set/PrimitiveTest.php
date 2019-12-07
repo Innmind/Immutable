@@ -35,9 +35,9 @@ class PrimitiveTest extends TestCase
         $this->assertSame(2, (new Primitive('int', 1, 2))->count());
     }
 
-    public function testToArray()
+    public function testIterator()
     {
-        $this->assertSame([1, 2], (new Primitive('int', 1, 2))->toArray());
+        $this->assertSame([1, 2], \iterator_to_array((new Primitive('int', 1, 2))->iterator()));
     }
 
     public function testIntersect()
@@ -46,10 +46,10 @@ class PrimitiveTest extends TestCase
         $b = new Primitive('int', 2, 3);
         $c = $a->intersect($b);
 
-        $this->assertSame([1, 2], $a->toArray());
-        $this->assertSame([2, 3], $b->toArray());
+        $this->assertSame([1, 2], \iterator_to_array($a->iterator()));
+        $this->assertSame([2, 3], \iterator_to_array($b->iterator()));
         $this->assertInstanceOf(Primitive::class, $c);
-        $this->assertSame([2], $c->toArray());
+        $this->assertSame([2], \iterator_to_array($c->iterator()));
     }
 
     public function testAdd()
@@ -57,9 +57,9 @@ class PrimitiveTest extends TestCase
         $a = new Primitive('int', 1);
         $b = $a->add(2);
 
-        $this->assertSame([1], $a->toArray());
+        $this->assertSame([1], \iterator_to_array($a->iterator()));
         $this->assertInstanceOf(Primitive::class, $b);
-        $this->assertSame([1, 2], $b->toArray());
+        $this->assertSame([1, 2], \iterator_to_array($b->iterator()));
         $this->assertSame($b, $b->add(2));
     }
 
@@ -76,9 +76,9 @@ class PrimitiveTest extends TestCase
         $a = new Primitive('int', 1, 2, 3, 4);
         $b = $a->remove(3);
 
-        $this->assertSame([1, 2, 3, 4], $a->toArray());
+        $this->assertSame([1, 2, 3, 4], \iterator_to_array($a->iterator()));
         $this->assertInstanceOf(Primitive::class, $b);
-        $this->assertSame([1, 2, 4], $b->toArray());
+        $this->assertSame([1, 2, 4], \iterator_to_array($b->iterator()));
         $this->assertSame($a, $a->remove(5));
     }
 
@@ -88,10 +88,10 @@ class PrimitiveTest extends TestCase
         $b = new Primitive('int', 2, 4);
         $c = $a->diff($b);
 
-        $this->assertSame([1, 2, 3], $a->toArray());
-        $this->assertSame([2, 4], $b->toArray());
+        $this->assertSame([1, 2, 3], \iterator_to_array($a->iterator()));
+        $this->assertSame([2, 4], \iterator_to_array($b->iterator()));
         $this->assertInstanceOf(Primitive::class, $c);
-        $this->assertSame([1, 3], $c->toArray());
+        $this->assertSame([1, 3], \iterator_to_array($c->iterator()));
     }
 
     public function testEquals()
@@ -106,9 +106,9 @@ class PrimitiveTest extends TestCase
         $a = new Primitive('int', 1, 2, 3, 4);
         $b = $a->filter(fn($i) => $i % 2 === 0);
 
-        $this->assertSame([1, 2, 3, 4], $a->toArray());
+        $this->assertSame([1, 2, 3, 4], \iterator_to_array($a->iterator()));
         $this->assertInstanceOf(Primitive::class, $b);
-        $this->assertSame([2, 4], $b->toArray());
+        $this->assertSame([2, 4], \iterator_to_array($b->iterator()));
     }
 
     public function testForeach()
@@ -131,7 +131,7 @@ class PrimitiveTest extends TestCase
         $set = new Primitive('int', 1, 2, 3, 4);
         $groups = $set->groupBy(fn($i) => $i % 2);
 
-        $this->assertSame([1, 2, 3, 4], $set->toArray());
+        $this->assertSame([1, 2, 3, 4], \iterator_to_array($set->iterator()));
         $this->assertInstanceOf(Map::class, $groups);
         $this->assertTrue($groups->isOfType('int', Set::class));
         $this->assertCount(2, $groups);
@@ -146,9 +146,9 @@ class PrimitiveTest extends TestCase
         $a = new Primitive('int', 1, 2, 3);
         $b = $a->map(fn($i) => $i * 2);
 
-        $this->assertSame([1, 2, 3], $a->toArray());
+        $this->assertSame([1, 2, 3], \iterator_to_array($a->iterator()));
         $this->assertInstanceOf(Primitive::class, $b);
-        $this->assertSame([2, 4, 6], $b->toArray());
+        $this->assertSame([2, 4, 6], \iterator_to_array($b->iterator()));
     }
 
     public function testThrowWhenTryingToModifyTheTypeWhenMapping()
@@ -164,7 +164,7 @@ class PrimitiveTest extends TestCase
         $set = new Primitive('int', 1, 2, 3, 4);
         $groups = $set->partition(fn($i) => $i % 2 === 0);
 
-        $this->assertSame([1, 2, 3, 4], $set->toArray());
+        $this->assertSame([1, 2, 3, 4], \iterator_to_array($set->iterator()));
         $this->assertInstanceOf(Map::class, $groups);
         $this->assertTrue($groups->isOfType('bool', Set::class));
         $this->assertCount(2, $groups);
@@ -179,7 +179,7 @@ class PrimitiveTest extends TestCase
         $set = new Primitive('int', 1, 4, 3, 2);
         $sorted = $set->sort(fn($a, $b) => $a > $b);
 
-        $this->assertSame([1, 4, 3, 2], $set->toArray());
+        $this->assertSame([1, 4, 3, 2], \iterator_to_array($set->iterator()));
         $this->assertInstanceOf(Sequence::class, $sorted);
         $this->assertSame([1, 2, 3, 4], unwrap($sorted));
     }
@@ -190,10 +190,10 @@ class PrimitiveTest extends TestCase
         $b = new Primitive('int', 2, 3);
         $c = $a->merge($b);
 
-        $this->assertSame([1, 2], $a->toArray());
-        $this->assertSame([2, 3], $b->toArray());
+        $this->assertSame([1, 2], \iterator_to_array($a->iterator()));
+        $this->assertSame([2, 3], \iterator_to_array($b->iterator()));
         $this->assertInstanceOf(Primitive::class, $c);
-        $this->assertSame([1, 2, 3], $c->toArray());
+        $this->assertSame([1, 2, 3], \iterator_to_array($c->iterator()));
     }
 
     public function testReduce()
@@ -208,9 +208,9 @@ class PrimitiveTest extends TestCase
         $a = new Primitive('int', 1);
         $b = $a->clear();
 
-        $this->assertSame([1], $a->toArray());
+        $this->assertSame([1], \iterator_to_array($a->iterator()));
         $this->assertInstanceOf(Primitive::class, $b);
-        $this->assertSame([], $b->toArray());
+        $this->assertSame([], \iterator_to_array($b->iterator()));
     }
 
     public function testEmpty()

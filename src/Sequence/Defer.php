@@ -49,9 +49,12 @@ final class Defer implements Implementation
         return $this->load()->count();
     }
 
-    public function toArray(): array
+    /**
+     * @return \Iterator<T>
+     */
+    public function iterator(): \Iterator
     {
-        return \iterator_to_array($this->values);
+        return $this->values;
     }
 
     /**
@@ -423,7 +426,7 @@ final class Defer implements Implementation
                 }
 
                 /** @var T $value */
-                foreach ($sequence->toArray() as $value) {
+                foreach ($sequence->iterator() as $value) {
                     yield $value;
                 }
             })($this->values, $sequence),

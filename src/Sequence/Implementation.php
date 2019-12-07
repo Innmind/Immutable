@@ -25,7 +25,11 @@ interface Implementation extends \Countable
     public function type(): string;
 
     public function size(): int;
-    public function toArray(): array;
+
+    /**
+     * @return \Iterator<T>
+     */
+    public function iterator(): \Iterator;
 
     /**
      * Return the element at the given index

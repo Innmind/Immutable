@@ -52,11 +52,11 @@ final class Primitive implements Implementation
     }
 
     /**
-     * @return list<T>
+     * @return \Iterator<T>
      */
-    public function toArray(): array
+    public function iterator(): \Iterator
     {
-        return unwrap($this->values);
+        return new \ArrayIterator(unwrap($this->values));
     }
 
     /**
@@ -68,7 +68,7 @@ final class Primitive implements Implementation
     {
         $self = $this->clear();
         $self->values = $this->values->intersect(
-            Sequence::of($this->type, ...$set->toArray())
+            Sequence::of($this->type, ...$set->iterator())
         );
 
         return $self;
@@ -130,7 +130,7 @@ final class Primitive implements Implementation
     {
         $self = clone $this;
         $self->values = $this->values->diff(
-            Sequence::of($this->type, ...$set->toArray())
+            Sequence::of($this->type, ...$set->iterator())
         );
 
         return $self;
