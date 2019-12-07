@@ -181,7 +181,9 @@ final class Defer implements Implementation
      */
     public function foreach(callable $function): void
     {
-        $this->load()->foreach($function);
+        foreach ($this->values as $value) {
+            $function($value);
+        }
     }
 
     /**
@@ -202,7 +204,11 @@ final class Defer implements Implementation
      */
     public function first()
     {
-        return $this->load()->first();
+        foreach ($this->values as $value) {
+            return $value;
+        }
+
+        throw new OutOfBoundException;
     }
 
     /**
@@ -210,7 +216,15 @@ final class Defer implements Implementation
      */
     public function last()
     {
-        return $this->load()->last();
+        foreach ($this->values as $value) {
+        }
+
+        if (!isset($value)) {
+            throw new OutOfBoundException;
+        }
+
+        /** @var T */
+        return $value;
     }
 
     /**
@@ -218,7 +232,13 @@ final class Defer implements Implementation
      */
     public function contains($element): bool
     {
-        return $this->load()->contains($element);
+        foreach ($this->values as $value) {
+            if ($value === $element) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -228,7 +248,17 @@ final class Defer implements Implementation
      */
     public function indexOf($element): int
     {
-        return $this->load()->indexOf($element);
+        $index = 0;
+
+        foreach ($this->values as $value) {
+            if ($value === $element) {
+                return $index;
+            }
+
+            ++$index;
+        }
+
+        throw new ElementNotFound($element);
     }
 
     /**
@@ -465,7 +495,11 @@ final class Defer implements Implementation
      */
     public function reduce($carry, callable $reducer)
     {
-        return $this->load()->reduce($carry, $reducer);
+        foreach ($this->values as $value) {
+            $carry = $reducer($carry, $value);
+        }
+
+        return $carry;
     }
 
     /**
@@ -494,7 +528,9 @@ final class Defer implements Implementation
 
     public function empty(): bool
     {
-        return $this->load()->empty();
+        $this->values->rewind();
+
+        return !$this->values->valid();
     }
 
     /**
