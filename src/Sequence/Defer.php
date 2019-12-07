@@ -56,7 +56,19 @@ final class Defer implements Implementation
      */
     public function get(int $index)
     {
-        return $this->load()->get($index);
+        $iteration = 0;
+
+        /** @var T $value */
+        foreach ($this->values as $value) {
+            if ($index === $iteration) {
+                /** @var T */
+                return $value;
+            }
+
+            ++$iteration;
+        }
+
+        throw new OutOfBoundException;
     }
 
     /**
