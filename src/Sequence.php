@@ -64,7 +64,7 @@ final class Sequence implements \Countable
     /**
      * It will call the given function every time a new operation is done on the
      * sequence. This means the returned structure may not be truly immutable
-     * as between the calls the underlyong source may change.
+     * as between the calls the underlying source may change.
      *
      * Use this mode when calling to an external source (meaning IO bound) such
      * as parsing a file or calling an API

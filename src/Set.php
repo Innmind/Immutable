@@ -37,6 +37,11 @@ final class Set implements \Countable
     }
 
     /**
+     * It will load the values inside the generator only upon the first use
+     * of the set
+     *
+     * Use this mode when the amount of data may not fit in memory
+     *
      * @param \Generator<T> $generator
      *
      * @return self<T>
@@ -49,6 +54,13 @@ final class Set implements \Countable
     }
 
     /**
+     * It will call the given function every time a new operation is done on the
+     * set. This means the returned structure may not be truly immutable as
+     * between the calls the underlying source may change.
+     *
+     * Use this mode when calling to an external source (meaning IO bound) such
+     * as parsing a file or calling an API
+     *
      * @param callable(): \Generator<T> $generator
      *
      * @return self<T>
