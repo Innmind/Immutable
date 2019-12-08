@@ -5,37 +5,28 @@ namespace Tests\Innmind\Immutable;
 
 use Innmind\Immutable\{
     Set,
-    SetInterface,
-    SizeableInterface,
-    PrimitiveInterface,
-    MapInterface,
-    SequenceInterface,
+    Map,
     Str,
-    StreamInterface,
-    Exception\InvalidArgumentException
+    Sequence,
 };
+use function Innmind\Immutable\unwrap;
 use PHPUnit\Framework\TestCase;
 
 class SetTest extends TestCase
 {
     public function testInterface()
     {
-        $s = new Set('int');
+        $s = Set::of('int');
 
-        $this->assertInstanceOf(SetInterface::class, $s);
-        $this->assertInstanceOf(SizeableInterface::class, $s);
-        $this->assertInstanceOf(PrimitiveInterface::class, $s);
         $this->assertInstanceOf(\Countable::class, $s);
-        $this->assertInstanceOf(\Iterator::class, $s);
-        $this->assertInstanceOf(Str::class, $s->type());
-        $this->assertSame('int', (string) $s->type());
+        $this->assertSame('int', $s->type());
     }
 
     public function testOf()
     {
         $this->assertTrue(
             Set::of('int', 1, 1, 2, 3)->equals(
-                (new Set('int'))
+                Set::of('int')
                     ->add(1)
                     ->add(2)
                     ->add(3)
@@ -43,11 +34,91 @@ class SetTest extends TestCase
         );
     }
 
+    public function testDefer()
+    {
+        $loaded = false;
+        $set = Set::defer('int', (function() use (&$loaded) {
+            yield 1;
+            yield 2;
+            yield 3;
+            $loaded = true;
+        })());
+
+        $this->assertInstanceOf(Set::class, $set);
+        $this->assertFalse($loaded);
+        $this->assertSame([1, 2, 3], unwrap($set));
+        $this->assertTrue($loaded);
+    }
+
+    public function testLazy()
+    {
+        $loaded = false;
+        $set = Set::lazy('int', function() use (&$loaded) {
+            yield 1;
+            yield 2;
+            yield 3;
+            $loaded = true;
+        });
+
+        $this->assertInstanceOf(Set::class, $set);
+        $this->assertFalse($loaded);
+        $this->assertSame([1, 2, 3], unwrap($set));
+        $this->assertTrue($loaded);
+    }
+
+    public function testMixed()
+    {
+        $set = Set::mixed(1, '2', 3, 1);
+
+        $this->assertInstanceOf(Set::class, $set);
+        $this->assertSame('mixed', $set->type());
+        $this->assertSame([1, '2', 3], unwrap($set));
+    }
+
+    public function testInts()
+    {
+        $set = Set::ints(1, 2, 3, 1);
+
+        $this->assertInstanceOf(Set::class, $set);
+        $this->assertSame('int', $set->type());
+        $this->assertSame([1, 2, 3], unwrap($set));
+    }
+
+    public function testFloats()
+    {
+        $set = Set::floats(1, 2, 3.2, 1);
+
+        $this->assertInstanceOf(Set::class, $set);
+        $this->assertSame('float', $set->type());
+        $this->assertSame([1.0, 2.0, 3.2], unwrap($set));
+    }
+
+    public function testStrings()
+    {
+        $set = Set::strings('1', '2', '3', '1');
+
+        $this->assertInstanceOf(Set::class, $set);
+        $this->assertSame('string', $set->type());
+        $this->assertSame(['1', '2', '3'], unwrap($set));
+    }
+
+    public function testObjects()
+    {
+        $a = new \stdClass;
+        $b = new \stdClass;
+        $c = new \stdClass;
+        $set = Set::objects($a, $b, $c, $a);
+
+        $this->assertInstanceOf(Set::class, $set);
+        $this->assertSame('object', $set->type());
+        $this->assertSame([$a, $b, $c], unwrap($set));
+    }
+
     public function testAdd()
     {
-        $this->assertSame(0, (new Set('in'))->size());
+        $this->assertSame(0, Set::of('in')->size());
 
-        $s = (new Set('int'))->add(42);
+        $s = Set::of('int')->add(42);
 
         $this->assertSame(1, $s->size());
         $this->assertSame(1, $s->count());
@@ -58,64 +129,48 @@ class SetTest extends TestCase
         $this->assertSame(2, $s->size());
         $s = $s->add(24);
         $this->assertSame(2, $s->size());
-        $this->assertSame([42, 24], $s->toPrimitive());
+        $this->assertSame([42, 24], unwrap($s));
+
+        $this->assertSame(
+            [1, 2, 3],
+            unwrap(Set::ints(1)(2)(3)),
+        );
     }
 
     public function testThrowWhenAddindInvalidElementType()
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage('Argument 1 must be of type int, float given');
 
-        (new Set('int'))->add(42.0);
-    }
-
-    public function testIterator()
-    {
-        $s = (new Set('int'))
-            ->add(24)
-            ->add(42)
-            ->add(66);
-
-        $this->assertSame(24, $s->current());
-        $this->assertSame(0, $s->key());
-        $this->assertTrue($s->valid());
-        $this->assertSame(null, $s->next());
-        $this->assertSame(42, $s->current());
-        $this->assertSame(1, $s->key());
-        $this->assertTrue($s->valid());
-        $s->next();
-        $s->next();
-        $this->assertFalse($s->valid());
-        $this->assertSame(null, $s->rewind());
-        $this->assertSame(24, $s->current());
-        $this->assertTrue($s->valid());
+        Set::of('int')->add(42.0);
     }
 
     public function testIntersect()
     {
-        $s = (new Set('int'))
+        $s = Set::of('int')
             ->add(24)
             ->add(42)
             ->add(66);
 
-        $s2 = $s->intersect((new Set('int'))->add(42));
+        $s2 = $s->intersect(Set::of('int')->add(42));
         $this->assertNotSame($s, $s2);
         $this->assertInstanceOf(Set::class, $s2);
         $this->assertSame($s->type(), $s2->type());
-        $this->assertSame([24, 42, 66], $s->toPrimitive());
-        $this->assertSame([42], $s2->toPrimitive());
+        $this->assertSame([24, 42, 66], unwrap($s));
+        $this->assertSame([42], unwrap($s2));
     }
 
     public function testThrowWhenIntersectingSetsOfDifferentTypes()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The 2 sets does not reference the same type');
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage('Argument 1 must be of type Set<int>, Set<float> given');
 
-        (new Set('int'))->intersect(new Set('float'));
+        Set::of('int')->intersect(Set::of('float'));
     }
 
     public function testContains()
     {
-        $s = new Set('int');
+        $s = Set::of('int');
 
         $this->assertFalse($s->contains(42));
         $s = $s->add(42);
@@ -124,7 +179,7 @@ class SetTest extends TestCase
 
     public function testRemove()
     {
-        $s = (new Set('int'))
+        $s = Set::of('int')
             ->add(24)
             ->add(42)
             ->add(66)
@@ -135,56 +190,56 @@ class SetTest extends TestCase
         $this->assertNotSame($s, $s2);
         $this->assertInstanceOf(Set::class, $s2);
         $this->assertSame($s->type(), $s2->type());
-        $this->assertSame([24, 42, 66, 90, 114], $s->toPrimitive());
-        $this->assertSame([24, 66, 90, 114], $s2->toPrimitive());
-        $this->assertSame([42, 66, 90, 114], $s->remove(24)->toPrimitive());
-        $this->assertSame([24, 42, 90, 114], $s->remove(66)->toPrimitive());
-        $this->assertSame([24, 42, 66, 114], $s->remove(90)->toPrimitive());
-        $this->assertSame([24, 42, 66, 90], $s->remove(114)->toPrimitive());
+        $this->assertSame([24, 42, 66, 90, 114], unwrap($s));
+        $this->assertSame([24, 66, 90, 114], unwrap($s2));
+        $this->assertSame([42, 66, 90, 114], unwrap($s->remove(24)));
+        $this->assertSame([24, 42, 90, 114], unwrap($s->remove(66)));
+        $this->assertSame([24, 42, 66, 114], unwrap($s->remove(90)));
+        $this->assertSame([24, 42, 66, 90], unwrap($s->remove(114)));
     }
 
     public function testDiff()
     {
-        $s = (new Set('int'))
+        $s = Set::of('int')
             ->add(24)
             ->add(42)
             ->add(66);
 
-        $s2 = $s->diff((new Set('int'))->add(42));
+        $s2 = $s->diff(Set::of('int')->add(42));
         $this->assertNotSame($s, $s2);
         $this->assertInstanceOf(Set::class, $s2);
         $this->assertSame($s->type(), $s2->type());
-        $this->assertSame([24, 42, 66], $s->toPrimitive());
-        $this->assertSame([24, 66], $s2->toPrimitive());
+        $this->assertSame([24, 42, 66], unwrap($s));
+        $this->assertSame([24, 66], unwrap($s2));
     }
 
     public function testThrowWhenDiffingSetsOfDifferentType()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The 2 sets does not reference the same type');
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage('Argument 1 must be of type Set<int>, Set<float> given');
 
-        (new Set('int'))->diff(new Set('float'));
+        Set::of('int')->diff(Set::of('float'));
     }
 
     public function testEquals()
     {
-        $s = (new Set('int'))
+        $s = Set::of('int')
             ->add(24)
             ->add(42)
             ->add(66);
 
         $this->assertTrue(
             $s->equals(
-                (new Set('int'))
+                Set::of('int')
                     ->add(24)
                     ->add(66)
                     ->add(42)
             )
         );
-        $this->assertTrue(Set::of('int')->equals(new Set('int')));
+        $this->assertTrue(Set::of('int')->equals(Set::of('int')));
         $this->assertFalse(
             $s->equals(
-                (new Set('int'))
+                Set::of('int')
                     ->add(24)
                     ->add(66)
             )
@@ -193,15 +248,15 @@ class SetTest extends TestCase
 
     public function testThrowWhenCheckingEqualityBetweenSetsOfDifferentType()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The 2 sets does not reference the same type');
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage('Argument 1 must be of type Set<int>, Set<float> given');
 
-        (new Set('int'))->equals(new Set('float'));
+        Set::of('int')->equals(Set::of('float'));
     }
 
     public function testFilter()
     {
-        $s = (new Set('int'))
+        $s = Set::of('int')
             ->add(1)
             ->add(2)
             ->add(3)
@@ -213,13 +268,13 @@ class SetTest extends TestCase
         $this->assertNotSame($s, $s2);
         $this->assertInstanceOf(Set::class, $s2);
         $this->assertSame($s->type(), $s2->type());
-        $this->assertSame([1, 2, 3, 4], $s->toPrimitive());
-        $this->assertSame([2, 4], $s2->toPrimitive());
+        $this->assertSame([1, 2, 3, 4], unwrap($s));
+        $this->assertSame([2, 4], unwrap($s2));
     }
 
     public function testForeach()
     {
-        $s = (new Set('int'))
+        $s = Set::of('int')
             ->add(1)
             ->add(2)
             ->add(3)
@@ -234,7 +289,7 @@ class SetTest extends TestCase
 
     public function testGroupBy()
     {
-        $s = (new Set('int'))
+        $s = Set::of('int')
             ->add(1)
             ->add(2)
             ->add(3)
@@ -243,19 +298,19 @@ class SetTest extends TestCase
         $m = $s->groupBy(function(int $v) {
             return $v % 2;
         });
-        $this->assertInstanceOf(MapInterface::class, $m);
-        $this->assertSame('int', (string) $m->keyType());
-        $this->assertSame(SetInterface::class, (string) $m->valueType());
-        $this->assertSame('int', (string) $m->get(0)->type());
-        $this->assertSame('int', (string) $m->get(1)->type());
-        $this->assertSame([1, 0], $m->keys()->toPrimitive());
-        $this->assertSame([1, 3], $m->get(1)->toPrimitive());
-        $this->assertSame([2, 4], $m->get(0)->toPrimitive());
+        $this->assertInstanceOf(Map::class, $m);
+        $this->assertSame('int', $m->keyType());
+        $this->assertSame(Set::class, $m->valueType());
+        $this->assertSame('int', $m->get(0)->type());
+        $this->assertSame('int', $m->get(1)->type());
+        $this->assertSame([1, 0], unwrap($m->keys()));
+        $this->assertSame([1, 3], unwrap($m->get(1)));
+        $this->assertSame([2, 4], unwrap($m->get(0)));
     }
 
     public function testMap()
     {
-        $s = (new Set('int'))
+        $s = Set::of('int')
             ->add(1)
             ->add(2)
             ->add(3)
@@ -267,15 +322,16 @@ class SetTest extends TestCase
         $this->assertNotSame($s, $s2);
         $this->assertInstanceOf(Set::class, $s2);
         $this->assertSame($s->type(), $s2->type());
-        $this->assertSame([1, 2, 3, 4], $s->toPrimitive());
-        $this->assertSame([1, 4, 9, 16], $s2->toPrimitive());
+        $this->assertSame([1, 2, 3, 4], unwrap($s));
+        $this->assertSame([1, 4, 9, 16], unwrap($s2));
     }
 
     public function testThrowWhenTryingToModifyValueTypeInMap()
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage('Argument 1 must be of type int, string given');
 
-        (new Set('int'))
+        Set::of('int')
             ->add(1)
             ->map(function(int $value) {
                 return (string) $value;
@@ -284,7 +340,7 @@ class SetTest extends TestCase
 
     public function testPartition()
     {
-        $s = (new Set('int'))
+        $s = Set::of('int')
             ->add(1)
             ->add(2)
             ->add(3)
@@ -294,35 +350,21 @@ class SetTest extends TestCase
             return $v % 2 === 0;
         });
         $this->assertNotSame($s, $s2);
-        $this->assertInstanceOf(MapInterface::class, $s2);
-        $this->assertSame('bool', (string) $s2->keyType());
-        $this->assertSame(SetInterface::class, (string) $s2->valueType());
-        $this->assertSame([1, 2, 3, 4], $s->toPrimitive());
+        $this->assertInstanceOf(Map::class, $s2);
+        $this->assertSame('bool', $s2->keyType());
+        $this->assertSame(Set::class, $s2->valueType());
+        $this->assertSame([1, 2, 3, 4], unwrap($s));
         $this->assertInstanceOf(Set::class, $s2->get(true));
         $this->assertInstanceOf(Set::class, $s2->get(false));
         $this->assertSame($s->type(), $s2->get(true)->type());
         $this->assertSame($s->type(), $s2->get(false)->type());
-        $this->assertSame([2, 4], $s2->get(true)->toPrimitive());
-        $this->assertSame([1, 3], $s2->get(false)->toPrimitive());
-    }
-
-    public function testJoin()
-    {
-        $s = (new Set('int'))
-            ->add(1)
-            ->add(2)
-            ->add(3)
-            ->add(4);
-
-        $s2 = $s->join(', ');
-        $this->assertInstanceOf(Str::class, $s2);
-        $this->assertSame([1, 2, 3, 4], $s->toPrimitive());
-        $this->assertSame('1, 2, 3, 4', (string) $s2);
+        $this->assertSame([2, 4], unwrap($s2->get(true)));
+        $this->assertSame([1, 3], unwrap($s2->get(false)));
     }
 
     public function testSort()
     {
-        $s = (new Set('int'))
+        $s = Set::of('int')
             ->add(1)
             ->add(2)
             ->add(3)
@@ -331,15 +373,15 @@ class SetTest extends TestCase
         $s2 = $s->sort(function(int $a, int $b) {
             return $a < $b;
         });
-        $this->assertInstanceOf(StreamInterface::class, $s2);
-        $this->assertSame('int', (string) $s2->type());
-        $this->assertSame([1, 2, 3, 4], $s->toPrimitive());
-        $this->assertSame([4, 3, 2, 1], $s2->toPrimitive());
+        $this->assertInstanceOf(Sequence::class, $s2);
+        $this->assertSame('int', $s2->type());
+        $this->assertSame([1, 2, 3, 4], unwrap($s));
+        $this->assertSame([4, 3, 2, 1], unwrap($s2));
     }
 
     public function testMerge()
     {
-        $s = (new Set('int'))
+        $s = Set::of('int')
             ->add(24)
             ->add(42)
             ->add(66);
@@ -347,7 +389,7 @@ class SetTest extends TestCase
         $this->assertTrue(
             $s
                 ->merge(
-                    (new Set('int'))
+                    Set::of('int')
                         ->add(24)
                         ->add(42)
                         ->add(66)
@@ -356,29 +398,27 @@ class SetTest extends TestCase
         );
         $this->assertSame(
             [24, 42, 66, 90, 114],
-            $s
-                ->merge(
-                    (new Set('int'))
-                        ->add(90)
-                        ->add(114)
-                )
-                ->toPrimitive()
+            unwrap($s->merge(
+                Set::of('int')
+                    ->add(90)
+                    ->add(114)
+            )),
         );
-        $this->assertSame([24, 42, 66], $s->toPrimitive());
-        $this->assertSame($s->type(), $s->merge(new Set('int'))->type());
+        $this->assertSame([24, 42, 66], unwrap($s));
+        $this->assertSame($s->type(), $s->merge(Set::of('int'))->type());
     }
 
     public function testThrowWhenMergingSetsOfDifferentType()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The 2 sets does not reference the same type');
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage('Argument 1 must be of type Set<int>, Set<float> given');
 
-        (new Set('int'))->merge(new Set('float'));
+        Set::of('int')->merge(Set::of('float'));
     }
 
     public function testReduce()
     {
-        $s = (new Set('int'))
+        $s = Set::of('int')
             ->add(4)
             ->add(3)
             ->add(2);
@@ -391,20 +431,19 @@ class SetTest extends TestCase
         );
 
         $this->assertSame(1.75, $v);
-        $this->assertSame([4, 3, 2], $s->toPrimitive());
+        $this->assertSame([4, 3, 2], unwrap($s));
     }
 
     public function testVariableSet()
     {
         $this->assertSame(
             ['foo', 42, 42.1, true, []],
-            (new Set('variable'))
+            unwrap(Set::of('variable')
                 ->add('foo')
                 ->add(42)
                 ->add(42.1)
                 ->add(true)
-                ->add([])
-                ->toPrimitive()
+                ->add([]))
         );
     }
 
@@ -412,5 +451,55 @@ class SetTest extends TestCase
     {
         $this->assertTrue(Set::of('int')->empty());
         $this->assertFalse(Set::of('int', 1)->empty());
+    }
+
+    public function testToSequenceOf()
+    {
+        $set = Set::ints(1, 2, 3);
+        $sequence = $set->toSequenceOf('string|int', function($i) {
+            yield (string) $i;
+            yield $i;
+        });
+
+        $this->assertInstanceOf(Sequence::class, $sequence);
+        $this->assertSame(
+            ['1', 1, '2', 2, '3', 3],
+            unwrap($sequence),
+        );
+        $this->assertSame(
+            [1, 2, 3],
+            unwrap($set->toSequenceOf('int')),
+        );
+    }
+
+    public function testToSetOf()
+    {
+        $initial = Set::ints(1, 2, 3);
+        $set = $initial->toSetOf('string|int', function($i) {
+            yield (string) $i;
+            yield $i;
+        });
+
+        $this->assertInstanceOf(Set::class, $set);
+        $this->assertSame(
+            ['1', 1, '2', 2, '3', 3],
+            unwrap($set),
+        );
+        $this->assertSame(
+            [1, 2, 3],
+            unwrap($initial->toSetOf('int')),
+        );
+    }
+
+    public function testToMapOf()
+    {
+        $set = Set::ints(1, 2, 3);
+        $map = $set->toMapOf('string', 'int', fn($i) => yield (string) $i => $i);
+
+        $this->assertInstanceOf(Map::class, $map);
+        $this->assertCount(3, $map);
+        $this->assertSame(1, $map->get('1'));
+        $this->assertSame(2, $map->get('2'));
+        $this->assertSame(3, $map->get('3'));
     }
 }

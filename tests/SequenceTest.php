@@ -5,507 +5,744 @@ namespace Tests\Innmind\Immutable;
 
 use Innmind\Immutable\{
     Sequence,
-    SequenceInterface,
-    SizeableInterface,
-    PrimitiveInterface,
     Str,
-    MapInterface,
-    StreamInterface,
-    Exception\LogicException,
+    Set,
+    Map,
     Exception\OutOfBoundException,
-    Exception\GroupEmptySequenceException,
-    Exception\ElementNotFoundException
+    Exception\LogicException,
+    Exception\CannotGroupEmptyStructure,
 };
+use function Innmind\Immutable\unwrap;
 use PHPUnit\Framework\TestCase;
 
 class SequenceTest extends TestCase
 {
     public function testInterface()
     {
-        $s = new Sequence(1);
+        $sequence = Sequence::of('int');
 
-        $this->assertInstanceOf(SequenceInterface::class, $s);
-        $this->assertInstanceOf(SizeableInterface::class, $s);
-        $this->assertInstanceOf(PrimitiveInterface::class, $s);
-        $this->assertInstanceOf(\Countable::class, $s);
-        $this->assertInstanceOf(\Iterator::class, $s);
-        $this->assertInstanceOf(\ArrayAccess::class, $s);
-        $this->assertSame([1], $s->toPrimitive());
+        $this->assertInstanceOf(\Countable::class, $sequence);
+        $this->assertSame([], unwrap($sequence));
     }
 
     public function testOf()
     {
-        $this->assertTrue(Sequence::of(1, 2, 3)->equals(new Sequence(1, 2, 3)));
+        $this->assertTrue(
+            Sequence::of('int', 1, 2, 3)->equals(
+                Sequence::of('int')
+                    ->add(1)
+                    ->add(2)
+                    ->add(3)
+            )
+        );
+    }
+
+    public function testDefer()
+    {
+        $loaded = false;
+        $sequence = Sequence::defer('int', (function() use (&$loaded) {
+            yield 1;
+            yield 2;
+            yield 3;
+            $loaded = true;
+        })());
+
+        $this->assertInstanceOf(Sequence::class, $sequence);
+        $this->assertFalse($loaded);
+        $this->assertSame([1, 2, 3], unwrap($sequence));
+        $this->assertTrue($loaded);
+    }
+
+    public function testLazy()
+    {
+        $loaded = false;
+        $sequence = Sequence::lazy('int', function() use (&$loaded) {
+            yield 1;
+            yield 2;
+            yield 3;
+            $loaded = true;
+        });
+
+        $this->assertInstanceOf(Sequence::class, $sequence);
+        $this->assertFalse($loaded);
+        $this->assertSame([1, 2, 3], unwrap($sequence));
+        $this->assertTrue($loaded);
+    }
+
+    public function testMixed()
+    {
+        $sequence = Sequence::mixed(1, '2', 3);
+
+        $this->assertInstanceOf(Sequence::class, $sequence);
+        $this->assertSame('mixed', $sequence->type());
+        $this->assertSame([1, '2', 3], unwrap($sequence));
+    }
+
+    public function testInts()
+    {
+        $sequence = Sequence::ints(1, 2, 3);
+
+        $this->assertInstanceOf(Sequence::class, $sequence);
+        $this->assertSame('int', $sequence->type());
+        $this->assertSame([1, 2, 3], unwrap($sequence));
+    }
+
+    public function testFloats()
+    {
+        $sequence = Sequence::floats(1, 2, 3.2);
+
+        $this->assertInstanceOf(Sequence::class, $sequence);
+        $this->assertSame('float', $sequence->type());
+        $this->assertSame([1.0, 2.0, 3.2], unwrap($sequence));
+    }
+
+    public function testStrings()
+    {
+        $sequence = Sequence::strings('1', '2', '3');
+
+        $this->assertInstanceOf(Sequence::class, $sequence);
+        $this->assertSame('string', $sequence->type());
+        $this->assertSame(['1', '2', '3'], unwrap($sequence));
+    }
+
+    public function testObjects()
+    {
+        $a = new \stdClass;
+        $b = new \stdClass;
+        $c = new \stdClass;
+        $sequence = Sequence::objects($a, $b, $c);
+
+        $this->assertInstanceOf(Sequence::class, $sequence);
+        $this->assertSame('object', $sequence->type());
+        $this->assertSame([$a, $b, $c], unwrap($sequence));
+    }
+
+    public function testType()
+    {
+        $type = Sequence::of('int')->type();
+
+        $this->assertSame('int', $type);
     }
 
     public function testSize()
     {
-        $this->assertSame(0, (new Sequence)->size());
-        $this->assertSame(0, (new Sequence)->count());
-        $this->assertSame(2, (new Sequence('foo', 42))->size());
-        $this->assertSame(2, (new Sequence('foo', 42))->count());
+        $this->assertSame(
+            2,
+            Sequence::of('int')
+                ->add(1)
+                ->add(2)
+                ->size()
+        );
     }
 
-    public function testIterator()
+    public function testCount()
     {
-        $s = new Sequence(1, 2);
-
-        $this->assertSame(1, $s->current());
-        $this->assertSame(0, $s->key());
-        $this->assertTrue($s->valid());
-        $this->assertSame(null, $s->next());
-        $this->assertSame(2, $s->current());
-        $this->assertSame(1, $s->key());
-        $this->assertTrue($s->valid());
-        $s->next();
-        $this->assertFalse($s->valid());
-        $this->assertSame(null, $s->rewind());
-        $this->assertSame(0, $s->key());
-    }
-
-    public function testArrayAccess()
-    {
-        $this->assertSame(1, (new Sequence(1))[0]);
-        $this->assertSame(2, (new Sequence(1, 2))[1]);
-    }
-
-    public function testThrowWhenAddingAnElement()
-    {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('You can\'t modify a sequence');
-
-        $s = new Sequence;
-        $s[0] = 1;
-    }
-
-    public function testThrowWhenRemovingAnElement()
-    {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('You can\'t modify a sequence');
-
-        $s = new Sequence(1);
-        unset($s[0]);
+        $this->assertCount(
+            2,
+            Sequence::of('int')
+                ->add(1)
+                ->add(2)
+        );
     }
 
     public function testGet()
     {
-        $this->assertSame(3, (new Sequence(1, 2, 3))->get(2));
+        $this->assertSame(
+            1,
+            Sequence::of('int')->add(1)->get(0)
+        );
     }
 
-    public function testThrowWhenAccessingUnknownIndex()
+    public function testThrowWhenGettingUnknownIndex()
     {
         $this->expectException(OutOfBoundException::class);
 
-        (new Sequence)->get(0);
-    }
-
-    public function testHas()
-    {
-        $this->assertFalse((new Sequence)->has(0));
-        $this->assertTrue((new Sequence(1))->has(0));
+        Sequence::of('int')->get(0);
     }
 
     public function testDiff()
     {
-        $s = new Sequence(1, 2, 3, 4);
-        $s2 = new Sequence(1, 3);
+        $a = Sequence::of('int')
+            ->add(1)
+            ->add(2)
+            ->add(3);
+        $b = Sequence::of('int')
+            ->add(3)
+            ->add(4)
+            ->add(5);
+        $c = $a->diff($b);
 
-        $s3 = $s->diff($s2);
-        $this->assertNotSame($s, $s3);
-        $this->assertNotSame($s2, $s3);
-        $this->assertInstanceOf(Sequence::class, $s3);
-        $this->assertSame([2, 4], $s3->toPrimitive());
-        $this->assertSame([1, 2, 3, 4], $s->toPrimitive());
-        $this->assertSame([1, 3], $s2->toPrimitive());
-    }
-
-    public function testDiffObjects()
-    {
-        $foo = new \stdClass;
-        $bar = new \stdClass;
-        $baz = new \stdClass;
-
-        $s = new Sequence($foo, $bar, $baz, $bar);
-        $s2 = new Sequence($bar);
-
-        $s3 = $s->diff($s2);
-        $this->assertNotSame($s, $s3);
-        $this->assertNotSame($s2, $s3);
-        $this->assertInstanceOf(Sequence::class, $s3);
-        $this->assertSame([$foo, $baz], $s3->toPrimitive());
-        $this->assertSame([$foo, $bar, $baz, $bar], $s->toPrimitive());
-        $this->assertSame([$bar], $s2->toPrimitive());
+        $this->assertInstanceOf(Sequence::class, $c);
+        $this->assertNotSame($c, $a);
+        $this->assertNotSame($c, $b);
+        $this->assertSame('int', $a->type());
+        $this->assertSame('int', $b->type());
+        $this->assertSame('int', $c->type());
+        $this->assertSame([1, 2, 3], unwrap($a));
+        $this->assertSame([3, 4, 5], unwrap($b));
+        $this->assertSame([1, 2], unwrap($c));
     }
 
     public function testDistinct()
     {
-        $s = new Sequence(1, 2, 2, 3);
+        $a = Sequence::of('int')
+            ->add(1)
+            ->add(1)
+            ->add(1);
+        $b = $a->distinct();
 
-        $s2 = $s->distinct();
-        $this->assertNotSame($s, $s2);
-        $this->assertInstanceOf(Sequence::class, $s2);
-        $this->assertSame([1, 2, 3], $s2->toPrimitive());
-        $this->assertSame([1, 2, 2, 3], $s->toPrimitive());
-    }
-
-    public function testDistinctObjects()
-    {
-        $foo = new \stdClass;
-        $bar = new \stdClass;
-        $baz = new \stdClass;
-
-        $s = new Sequence($foo, $bar, $foo, $baz);
-
-        $s2 = $s->distinct();
-        $this->assertNotSame($s, $s2);
-        $this->assertInstanceOf(Sequence::class, $s2);
-        $this->assertSame([$foo, $bar, $baz], $s2->toPrimitive());
-        $this->assertSame([$foo, $bar, $foo, $baz], $s->toPrimitive());
+        $this->assertInstanceOf(Sequence::class, $b);
+        $this->assertNotSame($a, $b);
+        $this->assertSame('int', $a->type());
+        $this->assertSame('int', $b->type());
+        $this->assertSame([1, 1, 1], unwrap($a));
+        $this->assertSame([1], unwrap($b));
     }
 
     public function testDrop()
     {
-        $s = new Sequence(1, 2, 3);
+        $a = Sequence::of('int')
+            ->add(1)
+            ->add(3)
+            ->add(5);
+        $b = $a->drop(2);
 
-        $s2 = $s->drop(2);
-        $this->assertNotSame($s, $s2);
-        $this->assertInstanceOf(Sequence::class, $s2);
-        $this->assertSame([3], $s2->toPrimitive());
-        $this->assertSame([1, 2, 3], $s->toPrimitive());
+        $this->assertInstanceOf(Sequence::class, $b);
+        $this->assertNotSame($a, $b);
+        $this->assertSame('int', $a->type());
+        $this->assertSame('int', $b->type());
+        $this->assertSame([1, 3, 5], unwrap($a));
+        $this->assertSame([5], unwrap($b));
     }
 
     public function testDropEnd()
     {
-        $s = new Sequence(1, 2, 3, 4);
+        $a = Sequence::of('int')
+            ->add(1)
+            ->add(3)
+            ->add(5);
+        $b = $a->dropEnd(2);
 
-        $s2 = $s->dropEnd(2);
-        $this->assertNotSame($s, $s2);
-        $this->assertInstanceOf(Sequence::class, $s2);
-        $this->assertSame([1, 2], $s2->toPrimitive());
-        $this->assertSame([1, 2, 3, 4], $s->toPrimitive());
+        $this->assertInstanceOf(Sequence::class, $b);
+        $this->assertNotSame($a, $b);
+        $this->assertSame('int', $a->type());
+        $this->assertSame('int', $b->type());
+        $this->assertSame([1, 3, 5], unwrap($a));
+        $this->assertSame([1], unwrap($b));
     }
 
     public function testEquals()
     {
-        $s = new Sequence(1, 2, 3, 4);
+        $a = Sequence::of('int')
+            ->add(1)
+            ->add(3)
+            ->add(5);
+        $b = Sequence::of('int')
+            ->add(1)
+            ->add(5);
+        $c = Sequence::of('int')
+            ->add(1)
+            ->add(3)
+            ->add(5);
 
-        $this->assertTrue($s->equals(new Sequence(1, 2, 3, 4)));
-        $this->assertFalse($s->equals(new Sequence(1, 2, 3)));
+        $this->assertTrue($a->equals($c));
+        $this->assertTrue($a->equals($a));
+        $this->assertFalse($a->equals($b));
+    }
+
+    public function testThrowWhenTryingToTestEqualityForDifferentTypes()
+    {
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage('Argument 1 must be of type Sequence<int>, Sequence<stdClass> given');
+
+        Sequence::of('int')->equals(Sequence::of('stdClass'));
     }
 
     public function testFilter()
     {
-        $s = new Sequence(1, 2, 3, 4);
-
-        $s2 = $s->filter(function ($v) {
-            return $v % 2 === 0;
+        $a = Sequence::of('int')
+            ->add(1)
+            ->add(2)
+            ->add(3)
+            ->add(4);
+        $b = $a->filter(function(int $value): bool {
+            return $value % 2 === 0;
         });
 
-        $this->assertNotSame($s, $s2);
-        $this->assertInstanceOf(Sequence::class, $s2);
-        $this->assertSame([2, 4], $s2->toPrimitive());
-        $this->assertSame([1, 2, 3, 4], $s->toPrimitive());
+        $this->assertInstanceOf(Sequence::class, $b);
+        $this->assertNotSame($a, $b);
+        $this->assertSame('int', $a->type());
+        $this->assertSame('int', $b->type());
+        $this->assertSame([1, 2, 3, 4], unwrap($a));
+        $this->assertSame([2, 4], unwrap($b));
     }
 
     public function testForeach()
     {
-        $s = new Sequence(1, 2, 3, 4);
-        $count = 0;
+        $sum = 0;
+        $sequence = Sequence::of('int')
+            ->add(1)
+            ->add(2)
+            ->add(3)
+            ->add(4)
+            ->foreach(function(int $value) use (&$sum) {
+                $sum += $value;
+            });
 
-        $s->foreach(function ($v) use (&$count) {
-            ++$count;
-            $this->assertSame($v, $count);
-        });
-        $this->assertSame(4, $count);
+        $this->assertSame(10, $sum);
     }
 
     public function testGroupBy()
     {
-        $s = new Sequence(1, 2, 3, 4);
-
-        $m = $s->groupBy(function(int $v) {
-            return $v % 2;
+        $sequence = Sequence::of('int')
+            ->add(1)
+            ->add(2)
+            ->add(3)
+            ->add(4);
+        $map = $sequence->groupBy(function(int $value): int {
+            return $value % 3;
         });
-        $this->assertInstanceOf(MapInterface::class, $m);
-        $this->assertSame('int', (string) $m->keyType());
-        $this->assertSame(SequenceInterface::class, (string) $m->valueType());
-        $this->assertSame(2, $m->size());
-        $this->assertSame([1, 0], $m->keys()->toPrimitive());
-        $this->assertSame([1, 3], $m->get(1)->toPrimitive());
-        $this->assertSame([2, 4], $m->get(0)->toPrimitive());
+
+        $this->assertInstanceOf(Map::class, $map);
+        $this->assertSame('int', $map->keyType());
+        $this->assertSame(Sequence::class, $map->valueType());
+        $this->assertCount(3, $map);
+        $this->assertSame('int', $map->get(0)->type());
+        $this->assertSame('int', $map->get(1)->type());
+        $this->assertSame('int', $map->get(2)->type());
+        $this->assertSame([3], unwrap($map->get(0)));
+        $this->assertSame([1, 4], unwrap($map->get(1)));
+        $this->assertSame([2], unwrap($map->get(2)));
     }
 
-    public function testThrowWhenGroupingAnEmptySequence()
+    public function testThrowWhenGroupingEmptySequence()
     {
-        $this->expectException(GroupEmptySequenceException::class);
+        $this->expectException(CannotGroupEmptyStructure::class);
 
-        (new Sequence)->groupBy(function() {});
+        Sequence::of('int')->groupBy(function() {});
     }
 
     public function testFirst()
     {
-        $s = new Sequence(1, 2, 3);
-        $s->next();
+        $sequence = Sequence::of('int')
+            ->add(1)
+            ->add(2)
+            ->add(3)
+            ->add(4);
 
-        $this->assertSame(1, $s->key());
-        $this->assertSame(1, $s->first());
-        $this->assertSame(1, $s->key());
-    }
-
-    public function testThrowWhenAccessingFirstValueOnEmptySequence()
-    {
-        $this->expectException(OutOfBoundException::class);
-
-        (new Sequence)->first();
+        $this->assertSame(1, $sequence->first());
     }
 
     public function testLast()
     {
-        $s = new Sequence(1, 2, 3);
-        $s->next();
+        $sequence = Sequence::of('int')
+            ->add(1)
+            ->add(2)
+            ->add(3)
+            ->add(4);
 
-        $this->assertSame(1, $s->key());
-        $this->assertSame(3, $s->last());
-        $this->assertSame(1, $s->key());
-    }
-
-    public function testThrowWhenAccessingLastValueOnEmptySequence()
-    {
-        $this->expectException(OutOfBoundException::class);
-
-        (new Sequence)->last();
+        $this->assertSame(4, $sequence->last());
     }
 
     public function testContains()
     {
-        $s = new Sequence(1, 2, 3);
+        $sequence = Sequence::of('int')
+            ->add(1)
+            ->add(2)
+            ->add(3)
+            ->add(4);
 
-        $this->assertTrue($s->contains(3));
-        $this->assertFalse($s->contains('3'));
+        $this->assertTrue($sequence->contains(2));
+        $this->assertFalse($sequence->contains(5));
     }
 
     public function testIndexOf()
     {
-        $s = new Sequence(1, 2, 3, new \stdClass, $o = new \stdClass);
+        $sequence = Sequence::of('int')
+            ->add(1)
+            ->add(2)
+            ->add(3)
+            ->add(4);
 
-        $this->assertSame(0, $s->indexOf(1));
-        $this->assertSame(1, $s->indexOf(2));
-        $this->assertSame(2, $s->indexOf(3));
-        $this->assertSame(4, $s->indexOf($o));
-    }
-
-    public function testThrowWhenElementNotInSequence()
-    {
-        $this->expectException(ElementNotFoundException::class);
-
-        (new Sequence)->indexOf(1);
+        $this->assertSame(0, $sequence->indexOf(1));
+        $this->assertSame(3, $sequence->indexOf(4));
     }
 
     public function testIndices()
     {
-        $indices = (new Sequence(1, 2, 3))->indices();
+        $sequence = Sequence::of('int')
+            ->add(1)
+            ->add(2)
+            ->add(3)
+            ->add(4);
+        $indices = $sequence->indices();
 
-        $this->assertInstanceOf(StreamInterface::class, $indices);
-        $this->assertSame('int', (string) $indices->type());
-        $this->assertSame([0, 1, 2], $indices->toPrimitive());
+        $this->assertInstanceOf(Sequence::class, $indices);
+        $this->assertSame('int', $indices->type());
+        $this->assertSame([0, 1, 2, 3], unwrap($indices));
     }
 
     public function testEmptyIndices()
     {
-        $indices = Sequence::of()->indices();
+        $sequence = Sequence::of('int');
+        $indices = $sequence->indices();
 
-        $this->assertInstanceOf(StreamInterface::class, $indices);
-        $this->assertSame('int', (string) $indices->type());
-        $this->assertSame([], $indices->toPrimitive());
+        $this->assertInstanceOf(Sequence::class, $indices);
+        $this->assertSame('int', $indices->type());
+        $this->assertSame([], unwrap($indices));
     }
 
     public function testMap()
     {
-        $s = new Sequence(1, 2, 3);
-
-        $s2 = $s->map(function ($v) {
-            return $v**2;
+        $a = Sequence::of('int')
+            ->add(1)
+            ->add(2)
+            ->add(3)
+            ->add(4);
+        $b = $a->map(function(int $value): int {
+            return $value**2;
         });
-        $this->assertNotSame($s, $s2);
-        $this->assertInstanceOf(Sequence::class, $s2);
-        $this->assertSame([1, 2, 3], $s->toPrimitive());
-        $this->assertSame([1, 4, 9], $s2->toPrimitive());
+
+        $this->assertInstanceOf(Sequence::class, $b);
+        $this->assertNotSame($a, $b);
+        $this->assertSame('int', $a->type());
+        $this->assertSame('int', $b->type());
+        $this->assertSame([1, 2, 3, 4], unwrap($a));
+        $this->assertSame([1, 4, 9, 16], unwrap($b));
+    }
+
+    public function testThrowWhenTryingToModifyValueTypeInMap()
+    {
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage('Argument 1 must be of type int, string given');
+
+        Sequence::of('int')
+            ->add(1)
+            ->add(2)
+            ->add(3)
+            ->add(4)
+            ->map(function(int $value) {
+                return (string) $value;
+            });
     }
 
     public function testPad()
     {
-        $s = new Sequence;
+        $a = Sequence::of('int')
+            ->add(1)
+            ->add(2);
+        $b = $a->pad(4, 0);
 
-        $s2 = $s->pad(2, null);
-        $this->assertNotSame($s, $s2);
-        $this->assertInstanceOf(Sequence::class, $s2);
-        $this->assertSame([], $s->toPrimitive());
-        $this->assertSame([null, null], $s2->toPrimitive());
+        $this->assertInstanceOf(Sequence::class, $b);
+        $this->assertNotSame($a, $b);
+        $this->assertSame('int', $a->type());
+        $this->assertSame('int', $b->type());
+        $this->assertSame([1, 2], unwrap($a));
+        $this->assertSame([1, 2, 0, 0], unwrap($b));
+    }
+
+    public function testThrowWhenPaddingWithDifferentType()
+    {
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage('Argument 2 must be of type int, string given');
+
+        Sequence::of('int')->pad(2, '0');
     }
 
     public function testPartition()
     {
-        $s = new Sequence(1, 2, 3, 4);
+        $map = Sequence::of('int')
+            ->add(1)
+            ->add(2)
+            ->add(3)
+            ->add(4)
+            ->partition(function(int $value): bool {
+                return $value % 2 === 0;
+            });
 
-        $s2 = $s->partition(function ($v) {
-            return $v % 2 === 0;
-        });
-        $this->assertNotSame($s, $s2);
-        $this->assertInstanceOf(MapInterface::class, $s2);
-        $this->assertSame('bool', (string) $s2->keyType());
-        $this->assertSame(SequenceInterface::class, (string) $s2->valueType());
-        $this->assertSame([1, 2, 3, 4], $s->toPrimitive());
-        $this->assertSame(2, $s2->size());
-        $this->assertSame([2, 4], $s2->get(true)->toPrimitive());
-        $this->assertSame([1, 3], $s2->get(false)->toPrimitive());
+        $this->assertInstanceOf(Map::class, $map);
+        $this->assertSame('bool', $map->keyType());
+        $this->assertSame(Sequence::class, $map->valueType());
+        $this->assertSame('int', $map->get(true)->type());
+        $this->assertSame('int', $map->get(false)->type());
+        $this->assertSame([2, 4], unwrap($map->get(true)));
+        $this->assertSame([1, 3], unwrap($map->get(false)));
     }
 
     public function testSlice()
     {
-        $s = new Sequence(1, 2, 3, 4, 5, 6, 7);
+        $a = Sequence::of('int')
+            ->add(1)
+            ->add(2)
+            ->add(3)
+            ->add(4);
+        $b = $a->slice(1, 3);
 
-        $s2 = $s->slice(2, 5);
-        $this->assertNotSame($s, $s2);
-        $this->assertInstanceOf(Sequence::class, $s2);
-        $this->assertSame([1, 2, 3, 4, 5, 6, 7], $s->toPrimitive());
-        $this->assertSame([3, 4, 5], $s2->toPrimitive());
+        $this->assertInstanceOf(Sequence::class, $b);
+        $this->assertNotSame($a, $b);
+        $this->assertSame('int', $a->type());
+        $this->assertSame('int', $b->type());
+        $this->assertSame([1, 2, 3, 4], unwrap($a));
+        $this->assertSame([2, 3], unwrap($b));
     }
 
     public function testSplitAt()
     {
-        $s = new Sequence(3, 1, 2, 4, 5, 6, 7);
+        $a = Sequence::of('int')
+            ->add(1)
+            ->add(2)
+            ->add(3)
+            ->add(4);
+        $b = $a->splitAt(2);
 
-        $s2 = $s->splitAt(3);
-        $this->assertNotSame($s, $s2);
-        $this->assertInstanceOf(StreamInterface::class, $s2);
-        $this->assertSame(SequenceInterface::class, (string) $s2->type());
-        $this->assertSame([3, 1, 2, 4, 5, 6, 7], $s->toPrimitive());
-        $this->assertSame(2, $s2->size());
-        $this->assertSame([3, 1, 2], $s2->get(0)->toPrimitive());
-        $this->assertSame([4, 5, 6, 7], $s2->get(1)->toPrimitive());
+        $this->assertInstanceOf(Sequence::class, $b);
+        $this->assertNotSame($a, $b);
+        $this->assertSame('int', $a->type());
+        $this->assertSame(Sequence::class, $b->type());
+        $this->assertSame([1, 2, 3, 4], unwrap($a));
+        $this->assertSame('int', $b->first()->type());
+        $this->assertSame('int', $b->last()->type());
+        $this->assertSame([1, 2], unwrap($b->first()));
+        $this->assertSame([3, 4], unwrap($b->last()));
     }
 
     public function testTake()
     {
-        $s = new Sequence(3, 1, 2, 4, 5, 6, 7);
+        $a = Sequence::of('int')
+            ->add(1)
+            ->add(2)
+            ->add(3)
+            ->add(4);
+        $b = $a->take(2);
 
-        $s2 = $s->take(4);
-        $this->assertNotSame($s, $s2);
-        $this->assertInstanceOf(Sequence::class, $s2);
-        $this->assertSame([3, 1, 2, 4, 5, 6, 7], $s->toPrimitive());
-        $this->assertSame([3, 1, 2, 4], $s2->toPrimitive());
+        $this->assertInstanceOf(Sequence::class, $b);
+        $this->assertNotSame($a, $b);
+        $this->assertSame('int', $a->type());
+        $this->assertSame('int', $b->type());
+        $this->assertSame([1, 2, 3, 4], unwrap($a));
+        $this->assertSame([1, 2], unwrap($b));
     }
 
     public function testTakeEnd()
     {
-        $s = new Sequence(3, 1, 2, 4, 5, 6, 7);
+        $a = Sequence::of('int')
+            ->add(1)
+            ->add(2)
+            ->add(3)
+            ->add(4);
+        $b = $a->takeEnd(2);
 
-        $s2 = $s->takeEnd(4);
-        $this->assertNotSame($s, $s2);
-        $this->assertInstanceOf(Sequence::class, $s2);
-        $this->assertSame([3, 1, 2, 4, 5, 6, 7], $s->toPrimitive());
-        $this->assertSame([4, 5, 6, 7], $s2->toPrimitive());
+        $this->assertInstanceOf(Sequence::class, $b);
+        $this->assertNotSame($a, $b);
+        $this->assertSame('int', $a->type());
+        $this->assertSame('int', $b->type());
+        $this->assertSame([1, 2, 3, 4], unwrap($a));
+        $this->assertSame([3, 4], unwrap($b));
     }
 
     public function testAppend()
     {
-        $s = new Sequence(1, 2);
+        $a = Sequence::of('int')
+            ->add(1)
+            ->add(2);
+        $b = Sequence::of('int')
+            ->add(3)
+            ->add(4);
+        $c = $b->append($a);
 
-        $s2 = $s->append(new Sequence(2, 3));
-        $this->assertNotSame($s, $s2);
-        $this->assertInstanceOf(Sequence::class, $s2);
-        $this->assertSame([1, 2], $s->toPrimitive());
-        $this->assertSame([1, 2, 2, 3], $s2->toPrimitive());
+        $this->assertInstanceOf(Sequence::class, $c);
+        $this->assertNotSame($c, $a);
+        $this->assertNotSame($c, $b);
+        $this->assertSame('int', $a->type());
+        $this->assertSame('int', $b->type());
+        $this->assertSame('int', $c->type());
+        $this->assertSame([1, 2], unwrap($a));
+        $this->assertSame([3, 4], unwrap($b));
+        $this->assertSame([3, 4, 1, 2], unwrap($c));
+    }
+
+    public function testThrowWhenAppendingDifferentTypes()
+    {
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage('Argument 1 must be of type Sequence<int>, Sequence<stdClass> given');
+
+        Sequence::of('int')->append(Sequence::of('stdClass'));
     }
 
     public function testIntersect()
     {
-        $s = new Sequence(1, 2, 3, 4);
+        $a = Sequence::of('int')
+            ->add(1)
+            ->add(2);
+        $b = Sequence::of('int')
+            ->add(2)
+            ->add(3);
+        $c = $b->intersect($a);
 
-        $s2 = $s->intersect(new Sequence(2, 3, 5));
-        $this->assertNotSame($s, $s2);
-        $this->assertInstanceOf(Sequence::class, $s2);
-        $this->assertSame([1, 2, 3, 4], $s->toPrimitive());
-        $this->assertSame([2, 3], $s2->toPrimitive());
+        $this->assertInstanceOf(Sequence::class, $c);
+        $this->assertNotSame($c, $a);
+        $this->assertNotSame($c, $b);
+        $this->assertSame('int', $a->type());
+        $this->assertSame('int', $b->type());
+        $this->assertSame('int', $c->type());
+        $this->assertSame([1, 2], unwrap($a));
+        $this->assertSame([2, 3], unwrap($b));
+        $this->assertSame([2], unwrap($c));
     }
 
-    public function testIntersectObjects()
+    public function testThrowWhenIntersectingDifferentTypes()
     {
-        $foo = new \stdClass;
-        $bar = new \stdClass;
-        $baz = new \stdClass;
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage('Argument 1 must be of type Sequence<int>, Sequence<stdClass> given');
 
-        $s = new Sequence($foo, $bar, $baz);
-
-        $s2 = $s->intersect(new Sequence($bar, new \stdClass));
-        $this->assertNotSame($s, $s2);
-        $this->assertInstanceOf(Sequence::class, $s2);
-        $this->assertSame([$foo, $bar, $baz], $s->toPrimitive());
-        $this->assertSame([$bar], $s2->toPrimitive());
-    }
-
-    public function testJoin()
-    {
-        $s = new Sequence(1, 2, 3);
-
-        $s2 = $s->join(', ');
-        $this->assertInstanceOf(Str::class, $s2);
-        $this->assertSame('1, 2, 3', (string) $s2);
+        Sequence::of('int')->intersect(Sequence::of('stdClass'));
     }
 
     public function testAdd()
     {
-        $s = new Sequence(1);
+        $a = Sequence::of('int');
+        $b = $a->add(1);
 
-        $s2 = $s->add(-1);
-        $this->assertNotSame($s, $s2);
-        $this->assertInstanceOf(Sequence::class, $s2);
-        $this->assertSame([1], $s->toPrimitive());
-        $this->assertSame([1, -1], $s2->toPrimitive());
+        $this->assertInstanceOf(Sequence::class, $b);
+        $this->assertNotSame($a, $b);
+        $this->assertSame('int', $a->type());
+        $this->assertSame('int', $b->type());
+        $this->assertSame([], unwrap($a));
+        $this->assertSame([1], unwrap($b));
+
+        $this->assertSame(
+            [1, 2, 3],
+            unwrap(Sequence::ints(1)(2)(3)),
+        );
+    }
+
+    public function testThrowWhenAddingInvalidType()
+    {
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage('Argument 1 must be of type int, float given');
+
+        Sequence::of('int')->add(4.2);
     }
 
     public function testSort()
     {
-        $s = new Sequence(4, 3, 2, 1);
-
-        $s2 = $s->sort(function(int $a, int $b) {
-            return $a > $b;
+        $a = Sequence::of('int')
+            ->add(1)
+            ->add(2)
+            ->add(3)
+            ->add(3)
+            ->add(4);
+        $b = $a->sort(function(int $a, int $b): bool {
+            return $b > $a;
         });
-        $this->assertNotSame($s, $s2);
-        $this->assertInstanceOf(Sequence::class, $s2);
-        $this->assertSame([4, 3, 2, 1], $s->toPrimitive());
-        $this->assertSame([1, 2, 3, 4], $s2->toPrimitive());
+
+        $this->assertInstanceOf(Sequence::class, $b);
+        $this->assertNotSame($a, $b);
+        $this->assertSame('int', $a->type());
+        $this->assertSame('int', $b->type());
+        $this->assertSame([1, 2, 3, 3, 4], unwrap($a));
+        $this->assertSame([4, 3, 3, 2, 1], unwrap($b));
     }
 
     public function testReduce()
     {
-        $s = new Sequence(4, 3, 2, 1);
+        $value = Sequence::of('int')
+            ->add(1)
+            ->add(2)
+            ->add(3)
+            ->add(4)
+            ->reduce(
+                0,
+                function(int $carry, int $value): int {
+                    return $carry + $value;
+                }
+            );
 
-        $v = $s->reduce(
-            42,
-            function (float $carry, int $value): float {
-                return $carry / $value;
-            }
-        );
+        $this->assertSame(10, $value);
+    }
 
-        $this->assertSame(1.75, $v);
-        $this->assertSame([4, 3, 2, 1], $s->toPrimitive());
+    public function testClear()
+    {
+        $sequence = Sequence::of('int')
+            ->add(1)
+            ->add(2)
+            ->add(3);
+        $sequence2 = $sequence->clear();
+
+        $this->assertNotSame($sequence, $sequence2);
+        $this->assertSame('int', $sequence2->type());
+        $this->assertSame([1, 2, 3], unwrap($sequence));
+        $this->assertSame([], unwrap($sequence2));
     }
 
     public function testReverse()
     {
-        $sequence = new Sequence(1, 3, 4, 2);
+        $sequence = Sequence::of('int')
+            ->add(1)
+            ->add(3)
+            ->add(4)
+            ->add(2);
         $reverse = $sequence->reverse();
 
-        $this->assertInstanceOf(SequenceInterface::class, $reverse);
+        $this->assertInstanceOf(Sequence::class, $reverse);
         $this->assertNotSame($sequence, $reverse);
-        $this->assertSame([1, 3, 4, 2], $sequence->toPrimitive());
-        $this->assertSame([2, 4, 3, 1], $reverse->toPrimitive());
+        $this->assertSame([1, 3, 4, 2], unwrap($sequence));
+        $this->assertSame([2, 4, 3, 1], unwrap($reverse));
     }
 
     public function testEmpty()
     {
-        $this->assertTrue(Sequence::of()->empty());
-        $this->assertFalse(Sequence::of(1)->empty());
+        $this->assertTrue(Sequence::of('int')->empty());
+        $this->assertFalse(Sequence::of('int', 1)->empty());
+    }
+
+    public function testToSequenceOf()
+    {
+        $initial = Sequence::ints(1, 2, 3);
+        $sequence = $initial->toSequenceOf('string|int', function($i) {
+            yield (string) $i;
+            yield $i;
+        });
+
+        $this->assertInstanceOf(Sequence::class, $sequence);
+        $this->assertSame(
+            ['1', 1, '2', 2, '3', 3],
+            unwrap($sequence),
+        );
+        $this->assertSame(
+            [1, 2, 3],
+            unwrap($initial->toSequenceOf('int')),
+        );
+    }
+
+    public function testToSetOf()
+    {
+        $sequence = Sequence::ints(1, 2, 3);
+        $set = $sequence->toSetOf('string|int', function($i) {
+            yield (string) $i;
+            yield $i;
+        });
+
+        $this->assertInstanceOf(Set::class, $set);
+        $this->assertSame(
+            ['1', 1, '2', 2, '3', 3],
+            unwrap($set),
+        );
+        $this->assertSame(
+            [1, 2, 3],
+            unwrap($sequence->add(1)->toSetOf('int')),
+        );
+    }
+
+    public function testToMapOf()
+    {
+        $sequence = Sequence::ints(1, 2, 3);
+        $map = $sequence->toMapOf('string', 'int', fn($i) => yield (string) $i => $i);
+
+        $this->assertInstanceOf(Map::class, $map);
+        $this->assertCount(3, $map);
+        $this->assertSame(1, $map->get('1'));
+        $this->assertSame(2, $map->get('2'));
+        $this->assertSame(3, $map->get('3'));
     }
 }

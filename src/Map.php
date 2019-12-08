@@ -4,77 +4,76 @@ declare(strict_types = 1);
 namespace Innmind\Immutable;
 
 use Innmind\Immutable\{
-    Specification\ClassType,
-    Exception\InvalidArgumentException,
+    ValidateArgument\ClassType,
     Exception\LogicException,
-    Exception\ElementNotFoundException,
-    Exception\GroupEmptyMapException
+    Exception\ElementNotFound,
+    Exception\CannotGroupEmptyStructure,
 };
 
 /**
- * {@inheritdoc}
+ * @template T
+ * @template S
  */
-final class Map implements MapInterface
+final class Map implements \Countable
 {
-    private $implementation;
+    private Map\Implementation $implementation;
+    private string $keyType;
+    private string $valueType;
+    private ValidateArgument $validateKey;
+    private ValidateArgument $validateValue;
 
-    /**
-     * {@inheritdoc}
-     */
-    public function __construct(string $keyType, string $valueType)
-    {
+    private function __construct(
+        string $keyType,
+        string $valueType,
+        Map\Implementation $implementation
+    ) {
         $type = Type::of($keyType);
-
-        if ($type instanceof ClassType || $keyType === 'object') {
-            $this->implementation = new Map\ObjectKeys($keyType, $valueType);
-        } else if (\in_array($keyType, ['int', 'integer', 'string'], true)) {
-            $this->implementation = new Map\Primitive($keyType, $valueType);
-        } else {
-            $this->implementation = new Map\DoubleIndex($keyType, $valueType);
-        }
-    }
-
-    public static function of(
-        string $key,
-        string $value,
-        array $keys = [],
-        array $values = []
-    ): self {
-        $keys = \array_values($keys);
-        $values = \array_values($values);
-
-        if (\count($keys) !== \count($values)) {
-            throw new LogicException('Different sizes of keys and values');
-        }
-
-        $self = new self($key, $value);
-
-        foreach ($keys as $i => $key) {
-            $self = $self->put($key, $values[$i]);
-        }
-
-        return $self;
+        $this->implementation = $implementation;
+        $this->keyType = $keyType;
+        $this->valueType = $valueType;
+        $this->validateKey = Type::of($keyType);
+        $this->validateValue = Type::of($valueType);
     }
 
     /**
-     * {@inheritdoc}
+     * @return self<T, S>
      */
-    public function keyType(): Str
+    public static function of(string $key, string $value): self
+    {
+        $type = Type::of($key);
+
+        if ($type instanceof ClassType || $key === 'object') {
+            $implementation = new Map\ObjectKeys($key, $value);
+        } else if (\in_array($key, ['int', 'integer', 'string'], true)) {
+            $implementation = new Map\Primitive($key, $value);
+        } else {
+            $implementation = new Map\DoubleIndex($key, $value);
+        }
+
+        return new self($key, $value, $implementation);
+    }
+
+    public function isOfType(string $key, string $value): bool
+    {
+        return $this->keyType === $key && $this->valueType === $value;
+    }
+
+    /**
+     * Return the key type for this map
+     */
+    public function keyType(): string
     {
         return $this->implementation->keyType();
     }
 
     /**
-     * {@inheritdoc}
+     * Return the value type for this map
      */
-    public function valueType(): Str
+    public function valueType(): string
     {
         return $this->implementation->valueType();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function size(): int
     {
         return $this->implementation->size();
@@ -89,91 +88,20 @@ final class Map implements MapInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Set a new key/value pair
+     *
+     * @param T $key
+     * @param S $value
+     *
+     * @return self<T, S>
      */
-    public function current()
+    public function put($key, $value): self
     {
-        return $this->implementation->current();
+        return ($this)($key, $value);
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function key()
-    {
-        return $this->implementation->key();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function next(): void
-    {
-        $this->implementation->next();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function rewind(): void
-    {
-        $this->implementation->rewind();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function valid(): bool
-    {
-        return $this->implementation->valid();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function offsetExists($offset): bool
-    {
-        return $this->implementation->offsetExists($offset);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function offsetGet($offset)
-    {
-        return $this->implementation->offsetGet($offset);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function offsetSet($offset, $value): void
-    {
-        throw new LogicException('You can\'t modify a map');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function offsetUnset($offset): void
-    {
-        throw new LogicException('You can\'t modify a map');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function put($key, $value): MapInterface
-    {
-        $map = clone $this;
-        $map->implementation = $this->implementation->put($key, $value);
-
-        return $map;
-    }
-
-    /**
-     * Alias for put method in order to have a syntax similar to a true tuple
-     * when constructing the map
+     * Set a new key/value pair
      *
      * Example:
      * <code>
@@ -189,29 +117,50 @@ final class Map implements MapInterface
      */
     public function __invoke($key, $value): self
     {
-        return $this->put($key, $value);
+        ($this->validateKey)($key, 1);
+        ($this->validateValue)($value, 2);
+
+        $map = clone $this;
+        $map->implementation = ($this->implementation)($key, $value);
+
+        return $map;
     }
 
     /**
-     * {@inheritdoc}
+     * Return the element with the given key
+     *
+     * @param T $key
+     *
+     * @throws ElementNotFound
+     *
+     * @return S
      */
     public function get($key)
     {
+        ($this->validateKey)($key, 1);
+
+        /** @var S */
         return $this->implementation->get($key);
     }
 
     /**
-     * {@inheritdoc}
+     * Check if there is an element for the given key
+     *
+     * @param T $key
      */
     public function contains($key): bool
     {
+        ($this->validateKey)($key, 1);
+
         return $this->implementation->contains($key);
     }
 
     /**
-     * {@inheritdoc}
+     * Return an empty map given the same given type
+     *
+     * @return self<T, S>
      */
-    public function clear(): MapInterface
+    public function clear(): self
     {
         $map = clone $this;
         $map->implementation = $this->implementation->clear();
@@ -220,17 +169,25 @@ final class Map implements MapInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Check if the two maps are equal
+     *
+     * @param self<T, S> $map
      */
-    public function equals(MapInterface $map): bool
+    public function equals(self $map): bool
     {
-        return $this->implementation->equals($map);
+        assertMap($this->keyType, $this->valueType, $map, 1);
+
+        return $this->implementation->equals($map->implementation);
     }
 
     /**
-     * {@inheritdoc}
+     * Filter the map based on the given predicate
+     *
+     * @param callable(T, S): bool $predicate
+     *
+     * @return self<T, S>
      */
-    public function filter(callable $predicate): MapInterface
+    public function filter(callable $predicate): self
     {
         $map = $this->clear();
         $map->implementation = $this->implementation->filter($predicate);
@@ -239,43 +196,61 @@ final class Map implements MapInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Run the given function for each element of the map
+     *
+     * @param callable(T, S): void $function
      */
-    public function foreach(callable $function): MapInterface
+    public function foreach(callable $function): void
     {
         $this->implementation->foreach($function);
-
-        return $this;
     }
 
     /**
-     * {@inheritdoc}
+     * Return a new map of pairs' sequences grouped by keys determined with the given
+     * discriminator function
+     *
+     * @template D
+     * @param callable(T, S): D $discriminator
+     *
+     * @throws CannotGroupEmptyStructure
+     *
+     * @return self<D, self<T, S>>
      */
-    public function groupBy(callable $discriminator): MapInterface
+    public function groupBy(callable $discriminator): self
     {
         return $this->implementation->groupBy($discriminator);
     }
 
     /**
-     * {@inheritdoc}
+     * Return all keys
+     *
+     * @return Set<T>
      */
-    public function keys(): SetInterface
+    public function keys(): Set
     {
         return $this->implementation->keys();
     }
 
     /**
-     * {@inheritdoc}
+     * Return all values
+     *
+     * @return Sequence<S>
      */
-    public function values(): StreamInterface
+    public function values(): Sequence
     {
         return $this->implementation->values();
     }
 
     /**
-     * {@inheritdoc}
+     * Apply the given function on all elements and return a new map
+     *
+     * Keys can't be modified
+     *
+     * @param callable(T, S): (S|Pair<T, S>) $function
+     *
+     * @return self<T, S>
      */
-    public function map(callable $function): MapInterface
+    public function map(callable $function): self
     {
         $map = $this->clear();
         $map->implementation = $this->implementation->map($function);
@@ -284,18 +259,16 @@ final class Map implements MapInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Remove the element with the given key
+     *
+     * @param T $key
+     *
+     * @return self<T, S>
      */
-    public function join(string $separator): Str
+    public function remove($key): self
     {
-        return $this->implementation->join($separator);
-    }
+        ($this->validateKey)($key, 1);
 
-    /**
-     * {@inheritdoc}
-     */
-    public function remove($key): MapInterface
-    {
         $map = clone $this;
         $map->implementation = $this->implementation->remove($key);
 
@@ -303,26 +276,42 @@ final class Map implements MapInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Create a new map by combining both maps
+     *
+     * @param self<T, S> $map
+     *
+     * @return self<T, S>
      */
-    public function merge(MapInterface $map): MapInterface
+    public function merge(self $map): self
     {
+        assertMap($this->keyType, $this->valueType, $map, 1);
+
         $self = clone $this;
-        $self->implementation = $this->implementation->merge($map);
+        $self->implementation = $this->implementation->merge($map->implementation);
 
         return $self;
     }
 
     /**
-     * {@inheritdoc}
+     * Return a map of 2 maps partitioned according to the given predicate
+     *
+     * @param callable(T, S): bool $predicate
+     *
+     * @return self<bool, self<T, S>>
      */
-    public function partition(callable $predicate): MapInterface
+    public function partition(callable $predicate): self
     {
         return $this->implementation->partition($predicate);
     }
 
     /**
-     * {@inheritdoc}
+     * Reduce the map to a single value
+     *
+     * @template R
+     * @param R $carry
+     * @param callable(R, T, S): R $reducer
+     *
+     * @return R
      */
     public function reduce($carry, callable $reducer)
     {
@@ -332,5 +321,42 @@ final class Map implements MapInterface
     public function empty(): bool
     {
         return $this->implementation->empty();
+    }
+
+    /**
+     * @template ST
+     *
+     * @param callable(T, S): \Generator<ST> $mapper
+     *
+     * @return Sequence<ST>
+     */
+    public function toSequenceOf(string $type, callable $mapper): Sequence
+    {
+        return $this->implementation->toSequenceOf($type, $mapper);
+    }
+
+    /**
+     * @template ST
+     *
+     * @param callable(T, S): \Generator<ST> $mapper
+     *
+     * @return Set<ST>
+     */
+    public function toSetOf(string $type, callable $mapper): Set
+    {
+        return $this->implementation->toSetOf($type, $mapper);
+    }
+
+    /**
+     * @template MT
+     * @template MS
+     *
+     * @param null|callable(T, S): \Generator<MT, MS> $mapper
+     *
+     * @return self<MT, MS>
+     */
+    public function toMapOf(string $key, string $value, callable $mapper = null): self
+    {
+        return $this->implementation->toMapOf($key, $value, $mapper);
     }
 }

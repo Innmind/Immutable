@@ -4,199 +4,120 @@ declare(strict_types = 1);
 namespace Innmind\Immutable\Map;
 
 use Innmind\Immutable\{
-    MapInterface,
     Map,
     Type,
     Str,
-    Stream,
-    StreamInterface,
-    SetInterface,
+    Sequence,
     Set,
     Pair,
-    Exception\InvalidArgumentException,
+    ValidateArgument,
     Exception\LogicException,
-    Exception\ElementNotFoundException,
-    Exception\GroupEmptyMapException
+    Exception\ElementNotFound,
+    Exception\CannotGroupEmptyStructure,
 };
 
 /**
- * {@inheritdoc}
+ * @template T
+ * @template S
  */
-final class DoubleIndex implements MapInterface
+final class DoubleIndex implements Implementation
 {
-    private $keyType;
-    private $valueType;
-    private $keySpecification;
-    private $valueSpecification;
-    private $keys;
-    private $values;
-    private $pairs;
+    private string $keyType;
+    private string $valueType;
+    private ValidateArgument $validateKey;
+    private ValidateArgument $validateValue;
+    /** @var Sequence\Implementation<T> */
+    private Sequence\Implementation $keys;
+    /** @var Sequence\Implementation<S> */
+    private Sequence\Implementation $values;
+    /** @var Sequence\Implementation<Pair<T, S>> */
+    private Sequence\Implementation $pairs;
 
-    /**
-     * {@inheritdoc}
-     */
     public function __construct(string $keyType, string $valueType)
     {
-        $this->keySpecification = Type::of($keyType);
-        $this->valueSpecification = Type::of($valueType);
-        $this->keyType = new Str($keyType);
-        $this->valueType = new Str($valueType);
-        $this->keys = new Stream($keyType);
-        $this->values = new Stream($valueType);
-        $this->pairs = new Stream(Pair::class);
+        $this->validateKey = Type::of($keyType);
+        $this->validateValue = Type::of($valueType);
+        $this->keyType = $keyType;
+        $this->valueType = $valueType;
+        $this->keys = new Sequence\Primitive($keyType);
+        $this->values = new Sequence\Primitive($valueType);
+        /** @var Sequence\Implementation<Pair<T, S>> */
+        $this->pairs = new Sequence\Primitive(Pair::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function keyType(): Str
+    public function keyType(): string
     {
         return $this->keyType;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function valueType(): Str
+    public function valueType(): string
     {
         return $this->valueType;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function size(): int
     {
         return $this->keys->size();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function count(): int
     {
         return $this->keys->count();
     }
 
     /**
-     * {@inheritdoc}
+     * @param T $key
+     * @param S $value
+     *
+     * @return self<T, S>
      */
-    public function current()
+    public function __invoke($key, $value): self
     {
-        return $this->values->current();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function key()
-    {
-        return $this->keys->current();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function next(): void
-    {
-        $this->keys->next();
-        $this->values->next();
-        $this->pairs->next();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function rewind(): void
-    {
-        $this->keys->rewind();
-        $this->values->rewind();
-        $this->pairs->rewind();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function valid(): bool
-    {
-        return $this->keys->valid();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function offsetExists($offset): bool
-    {
-        return $this->keys->contains($offset);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function offsetGet($offset)
-    {
-        return $this->get($offset);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function offsetSet($offset, $value): void
-    {
-        throw new LogicException('You can\'t modify a map');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function offsetUnset($offset): void
-    {
-        throw new LogicException('You can\'t modify a map');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function put($key, $value): MapInterface
-    {
-        $this->keySpecification->validate($key);
-        $this->valueSpecification->validate($value);
+        ($this->validateKey)($key, 1);
+        ($this->validateValue)($value, 2);
 
         $map = clone $this;
 
         if ($this->keys->contains($key)) {
             $index = $this->keys->indexOf($key);
-            $map->values = $this->values->take($index)
-                ->add($value)
-                ->append($this->values->drop($index + 1));
-            $map->pairs = $this->pairs->take($index)
-                ->add(new Pair($key, $value))
-                ->append($this->pairs->drop($index + 1));
+            /** @psalm-suppress MixedArgumentTypeCoercion */
+            $map->values = $this->values->take($index)($value)->append($this->values->drop($index + 1));
+            /**
+             * @psalm-suppress MixedArgumentTypeCoercion
+             * @var Sequence\Implementation<Pair<T, S>>
+             */
+            $map->pairs = $this->pairs->take($index)(new Pair($key, $value))->append($this->pairs->drop($index + 1));
         } else {
-            $map->keys = $this->keys->add($key);
-            $map->values = $this->values->add($value);
-            $map->pairs = $this->pairs->add(new Pair($key, $value));
+            /** @var Sequence\Implementation<T> */
+            $map->keys = ($this->keys)($key);
+            $map->values = ($this->values)($value);
+            /** @var Sequence\Implementation<Pair<T, S>> */
+            $map->pairs = ($this->pairs)(new Pair($key, $value));
         }
 
         return $map;
     }
 
     /**
-     * {@inheritdoc}
+     * @param T $key
+     *
+     * @throws ElementNotFound
+     *
+     * @return S
      */
     public function get($key)
     {
         if (!$this->keys->contains($key)) {
-            throw new ElementNotFoundException;
+            throw new ElementNotFound($key);
         }
 
         return $this->values->get(
-            $this->keys->indexOf($key)
+            $this->keys->indexOf($key),
         );
     }
 
     /**
-     * {@inheritdoc}
+     * @param T $key
      */
     public function contains($key): bool
     {
@@ -204,9 +125,9 @@ final class DoubleIndex implements MapInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @return self<T, S>
      */
-    public function clear(): MapInterface
+    public function clear(): self
     {
         $map = clone $this;
         $map->keys = $this->keys->clear();
@@ -217,15 +138,15 @@ final class DoubleIndex implements MapInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @param Implementation<T, S> $map
      */
-    public function equals(MapInterface $map): bool
+    public function equals(Implementation $map): bool
     {
         if (!$map->keys()->equals($this->keys())) {
             return false;
         }
 
-        foreach ($this->pairs as $pair) {
+        foreach ($this->pairs->iterator() as $pair) {
             if ($map->get($pair->key()) !== $pair->value()) {
                 return false;
             }
@@ -235,17 +156,25 @@ final class DoubleIndex implements MapInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @param callable(T, S): bool $predicate
+     *
+     * @return self<T, S>
      */
-    public function filter(callable $predicate): MapInterface
+    public function filter(callable $predicate): self
     {
         $map = $this->clear();
 
-        foreach ($this->pairs as $pair) {
+        foreach ($this->pairs->iterator() as $pair) {
             if ($predicate($pair->key(), $pair->value()) === true) {
-                $map->keys = $map->keys->add($pair->key());
-                $map->values = $map->values->add($pair->value());
-                $map->pairs = $map->pairs->add($pair);
+                /** @psalm-suppress MixedArgumentTypeCoercion */
+                $map->keys = ($map->keys)($pair->key());
+                /** @psalm-suppress MixedArgumentTypeCoercion */
+                $map->values = ($map->values)($pair->value());
+                /**
+                 * @psalm-suppress MixedArgumentTypeCoercion
+                 * @var Sequence\Implementation<Pair<T, S>>
+                 */
+                $map->pairs = ($map->pairs)($pair);
             }
         }
 
@@ -253,115 +182,111 @@ final class DoubleIndex implements MapInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @param callable(T, S): void $function
      */
-    public function foreach(callable $function): MapInterface
+    public function foreach(callable $function): void
     {
-        foreach ($this->pairs as $pair) {
+        foreach ($this->pairs->iterator() as $pair) {
             $function($pair->key(), $pair->value());
         }
-
-        return $this;
     }
 
     /**
-     * {@inheritdoc}
+     * @template D
+     * @param callable(T, S): D $discriminator
+     *
+     * @throws CannotGroupEmptyStructure
+     *
+     * @return Map<D, Map<T, S>>
      */
-    public function groupBy(callable $discriminator): MapInterface
+    public function groupBy(callable $discriminator): Map
     {
-        if ($this->size() === 0) {
-            throw new GroupEmptyMapException;
+        if ($this->empty()) {
+            throw new CannotGroupEmptyStructure;
         }
 
-        $map = null;
+        $groups = null;
 
-        foreach ($this->pairs as $pair) {
+        foreach ($this->pairs->iterator() as $pair) {
             $key = $discriminator($pair->key(), $pair->value());
 
-            if ($map === null) {
-                $map = new Map(
+            if ($groups === null) {
+                /** @var Map<D, Map<T, S>> */
+                $groups = Map::of(
                     Type::determine($key),
-                    MapInterface::class
+                    Map::class,
                 );
             }
 
-            if ($map->contains($key)) {
-                $map = $map->put(
-                    $key,
-                    $map->get($key)->put(
-                        $pair->key(),
-                        $pair->value()
-                    )
-                );
+            if ($groups->contains($key)) {
+                /** @var Map<T, S> */
+                $group = $groups->get($key);
+                /** @var Map<T, S> */
+                $group = ($group)($pair->key(), $pair->value());
+
+                $groups = ($groups)($key, $group);
             } else {
-                $map = $map->put(
-                    $key,
-                    $this->clear()->put(
-                        $pair->key(),
-                        $pair->value()
-                    )
-                );
+                /** @var Map<T, S> */
+                $group = $this->clearMap()($pair->key(), $pair->value());
+
+                $groups = ($groups)($key, $group);
             }
         }
 
-        return $map;
+        /** @var Map<D, Map<T, S>> */
+        return $groups;
     }
 
     /**
-     * {@inheritdoc}
+     * @return Set<T>
      */
-    public function keys(): SetInterface
+    public function keys(): Set
     {
-        return Set::of((string) $this->keyType, ...$this->keys);
+        return $this->keys->toSetOf($this->keyType);
     }
 
     /**
-     * {@inheritdoc}
+     * @return Sequence<S>
      */
-    public function values(): StreamInterface
+    public function values(): Sequence
     {
-        return $this->values;
+        return $this->values->toSequenceOf($this->valueType);
     }
 
     /**
-     * {@inheritdoc}
+     * @param callable(T, S): (S|Pair<T, S>) $function
+     *
+     * @return self<T, S>
      */
-    public function map(callable $function): MapInterface
+    public function map(callable $function): self
     {
         $map = $this->clear();
 
-        foreach ($this->pairs as $pair) {
-            $return = $function(
-                $pair->key(),
-                $pair->value()
-            );
+        foreach ($this->pairs->iterator() as $pair) {
+            $return = $function($pair->key(), $pair->value());
 
             if ($return instanceof Pair) {
+                /** @var T */
                 $key = $return->key();
+                /** @var S */
                 $value = $return->value();
             } else {
                 $key = $pair->key();
                 $value = $return;
             }
 
-            $map = $map->put($key, $value);
+            $map = ($map)($key, $value);
         }
 
         return $map;
     }
 
     /**
-     * {@inheritdoc}
+     * @param T $key
+     *
+     * @return self<T, S>
      */
-    public function join(string $separator): Str
-    {
-        return $this->values->join($separator);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function remove($key): MapInterface
+    public function remove($key): Implementation
     {
         if (!$this->contains($key)) {
             return $this;
@@ -377,6 +302,7 @@ final class DoubleIndex implements MapInterface
             ->values
             ->slice(0, $index)
             ->append($this->values->slice($index + 1, $this->values->size()));
+        /** @var Sequence\Implementation<Pair<T, S>> */
         $map->pairs = $this
             ->pairs
             ->slice(0, $index)
@@ -386,59 +312,58 @@ final class DoubleIndex implements MapInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @param Implementation<T, S> $map
+     *
+     * @return self<T, S>
      */
-    public function merge(MapInterface $map): MapInterface
+    public function merge(Implementation $map): self
     {
-        if (
-            !$this->keyType()->equals($map->keyType()) ||
-            !$this->valueType()->equals($map->valueType())
-        ) {
-            throw new InvalidArgumentException(
-                'The 2 maps does not reference the same types'
-            );
-        }
-
         return $map->reduce(
             $this,
-            function(self $carry, $key, $value): self {
-                return $carry->put($key, $value);
-            }
+            static fn(self $carry, $key, $value): self => ($carry)($key, $value),
         );
     }
 
     /**
-     * {@inheritdoc}
+     * @param callable(T, S): bool $predicate
+     *
+     * @return Map<bool, Map<T, S>>
      */
-    public function partition(callable $predicate): MapInterface
+    public function partition(callable $predicate): Map
     {
-        $truthy = $this->clear();
-        $falsy = $this->clear();
+        $truthy = $this->clearMap();
+        $falsy = $this->clearMap();
 
-        foreach ($this->pairs as $pair) {
-            $return = $predicate(
-                $pair->key(),
-                $pair->value()
-            );
+        foreach ($this->pairs->iterator() as $pair) {
+            $return = $predicate($pair->key(), $pair->value());
 
             if ($return === true) {
-                $truthy = $truthy->put($pair->key(), $pair->value());
+                $truthy = ($truthy)($pair->key(), $pair->value());
             } else {
-                $falsy = $falsy->put($pair->key(), $pair->value());
+                $falsy = ($falsy)($pair->key(), $pair->value());
             }
         }
 
-        return Map::of('bool', MapInterface::class)
+        /**
+         * @psalm-suppress InvalidScalarArgument
+         * @psalm-suppress InvalidArgument
+         * @var Map<bool, Map<T, S>>
+         */
+        return Map::of('bool', Map::class)
             (true, $truthy)
             (false, $falsy);
     }
 
     /**
-     * {@inheritdoc}
+     * @template R
+     * @param R $carry
+     * @param callable(R, T, S): R $reducer
+     *
+     * @return R
      */
     public function reduce($carry, callable $reducer)
     {
-        foreach ($this->pairs as $pair) {
+        foreach ($this->pairs->iterator() as $pair) {
             $carry = $reducer($carry, $pair->key(), $pair->value());
         }
 
@@ -448,5 +373,80 @@ final class DoubleIndex implements MapInterface
     public function empty(): bool
     {
         return $this->pairs->empty();
+    }
+
+    /**
+     * @template ST
+     *
+     * @param callable(T, S): \Generator<ST> $mapper
+     *
+     * @return Sequence<ST>
+     */
+    public function toSequenceOf(string $type, callable $mapper): Sequence
+    {
+        /** @var Sequence<ST> */
+        $sequence = Sequence::of($type);
+
+        foreach ($this->pairs->iterator() as $pair) {
+            foreach ($mapper($pair->key(), $pair->value()) as $newValue) {
+                $sequence = ($sequence)($newValue);
+            }
+        }
+
+        return $sequence;
+    }
+
+    /**
+     * @template ST
+     *
+     * @param callable(T, S): \Generator<ST> $mapper
+     *
+     * @return Set<ST>
+     */
+    public function toSetOf(string $type, callable $mapper): Set
+    {
+        /** @var Set<ST> */
+        $set = Set::of($type);
+
+        foreach ($this->pairs->iterator() as $pair) {
+            foreach ($mapper($pair->key(), $pair->value()) as $newValue) {
+                $set = ($set)($newValue);
+            }
+        }
+
+        return $set;
+    }
+
+    /**
+     * @template MT
+     * @template MS
+     *
+     * @param null|callable(T, S): \Generator<MT, MS> $mapper
+     *
+     * @return Map<MT, MS>
+     */
+    public function toMapOf(string $key, string $value, callable $mapper = null): Map
+    {
+        /** @psalm-suppress MissingParamType */
+        $mapper ??= static fn($k, $v): \Generator => yield $k => $v;
+
+        /** @var Map<MT, MS> */
+        $map = Map::of($key, $value);
+
+        foreach ($this->pairs->iterator() as $pair) {
+            foreach ($mapper($pair->key(), $pair->value()) as $newKey => $newValue) {
+                $map = ($map)($newKey, $newValue);
+            }
+        }
+
+        return $map;
+    }
+
+    /**
+     * @return Map<T, S>
+     */
+    private function clearMap(): Map
+    {
+        return Map::of($this->keyType, $this->valueType);
     }
 }

@@ -5,18 +5,17 @@ namespace Tests\Innmind\Immutable\Map;
 
 use Innmind\Immutable\{
     Map\ObjectKeys,
-    MapInterface,
-    SizeableInterface,
+    Map\Implementation,
+    Map,
     Pair,
     Str,
-    Symbol,
-    SetInterface,
-    StreamInterface,
+    Set,
+    Sequence,
     Exception\LogicException,
-    Exception\InvalidArgumentException,
-    Exception\ElementNotFoundException,
-    Exception\GroupEmptyMapException
+    Exception\ElementNotFound,
+    Exception\CannotGroupEmptyStructure,
 };
+use function Innmind\Immutable\unwrap;
 use PHPUnit\Framework\TestCase;
 
 class ObjectKeysTest extends TestCase
@@ -25,15 +24,10 @@ class ObjectKeysTest extends TestCase
     {
         $m = new ObjectKeys('stdClass', 'float');
 
-        $this->assertInstanceOf(MapInterface::class, $m);
-        $this->assertInstanceOf(SizeableInterface::class, $m);
+        $this->assertInstanceOf(Map\Implementation::class, $m);
         $this->assertInstanceOf(\Countable::class, $m);
-        $this->assertInstanceOf(\Iterator::class, $m);
-        $this->assertInstanceOf(\ArrayAccess::class, $m);
-        $this->assertInstanceOf(Str::class, $m->keyType());
-        $this->assertInstanceOf(Str::class, $m->valueType());
-        $this->assertSame('stdClass', (string) $m->keyType());
-        $this->assertSame('float', (string) $m->valueType());
+        $this->assertSame('stdClass', $m->keyType());
+        $this->assertSame('float', $m->valueType());
     }
 
     public function testThrowWhenKeyNotAClass()
@@ -48,18 +42,18 @@ class ObjectKeysTest extends TestCase
         $m = new ObjectKeys('stdClass', 'int');
 
         $this->assertSame(0, $m->size());
-        $m2 = $m->put(new \stdClass, 42);
+        $m2 = ($m)(new \stdClass, 42);
         $this->assertNotSame($m, $m2);
         $this->assertSame(0, $m->size());
         $this->assertSame(1, $m2->size());
 
         $m = new ObjectKeys('stdClass', 'int');
         $m = $m
-            ->put($a = new \stdClass, 24)
-            ->put($b = new \stdClass, 42)
-            ->put($c = new \stdClass, 66)
-            ->put($d = new \stdClass, 90)
-            ->put($c, 1);
+            ($a = new \stdClass, 24)
+            ($b = new \stdClass, 42)
+            ($c = new \stdClass, 66)
+            ($d = new \stdClass, 90)
+            ($c, 1);
 
         $this->assertSame(24, $m->get($a));
         $this->assertSame(42, $m->get($b));
@@ -68,100 +62,35 @@ class ObjectKeysTest extends TestCase
         $this->assertSame(4, $m->size());
     }
 
-    public function testThrowWhenInvalidType()
-    {
-        $this->expectException(InvalidArgumentException::class);
-
-        (new ObjectKeys('stdClass', 'int'))->put(new \stdClass, 42.0);
-    }
-
-    public function testIterator()
-    {
-        $m = new ObjectKeys('stdClass', 'int');
-        $m = $m
-            ->put($a = new \stdClass, 24)
-            ->put($b = new \stdClass, 42)
-            ->put(new \stdClass, 66);
-
-        $this->assertSame(24, $m->current());
-        $this->assertSame($a, $m->key());
-        $this->assertTrue($m->valid());
-        $this->assertSame(null, $m->next());
-        $this->assertSame(42, $m->current());
-        $this->assertSame($b, $m->key());
-        $this->assertTrue($m->valid());
-        $m->next();
-        $m->next();
-        $this->assertFalse($m->valid());
-        $this->assertSame(null, $m->rewind());
-        $this->assertSame(24, $m->current());
-        $this->assertSame($a, $m->key());
-    }
-
-    public function testArrayAccess()
-    {
-        $m = new ObjectKeys('stdClass', 'stdClass');
-        $m = $m->put($k = new \stdClass, $v = new \stdClass);
-
-        $this->assertTrue(isset($m[$k]));
-        $this->assertSame($v, $m[$k]);
-    }
-
-    public function testThrowWhenInjectingData()
-    {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('You can\'t modify a map');
-
-        $m = new ObjectKeys('stdClass', 'int');
-        $m[new \stdClass] = 42;
-    }
-
-    public function testThrowWhenDeletingData()
-    {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('You can\'t modify a map');
-
-        $m = new ObjectKeys('stdClass', 'int');
-        $m = $m->put($a = new \stdClass, 42);
-
-        unset($m[$a]);
-    }
-
-    public function testThrowWhenUnknownOffset()
-    {
-        $this->expectException(ElementNotFoundException::class);
-
-        $m = new ObjectKeys('stdClass', 'int');
-        $m[new \stdClass];
-    }
-
     public function testThrowWhenKeyDoesntMatchType()
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage('Argument 1 must be of type stdClass, string given');
 
         $m = new ObjectKeys('stdClass', 'int');
-        $m->put(new \stdClass, '42');
+        ($m)('stdClass', 42);
     }
 
     public function testThrowWhenValueDoesntMatchType()
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage('Argument 2 must be of type int, float given');
 
         $m = new ObjectKeys('stdClass', 'int');
-        $m->put(new \stdClass, 42.0);
+        ($m)(new \stdClass, 42.0);
     }
 
     public function testGet()
     {
         $m = new ObjectKeys('stdClass', 'int');
-        $m = $m->put($a = new \stdClass, 24);
+        $m = ($m)($a = new \stdClass, 24);
 
         $this->assertSame(24, $m->get($a));
     }
 
     public function testThrowWhenGettingUnknownKey()
     {
-        $this->expectException(ElementNotFoundException::class);
+        $this->expectException(ElementNotFound::class);
 
         (new ObjectKeys('stdClass', 'int'))->get(new \stdClass);
     }
@@ -169,7 +98,7 @@ class ObjectKeysTest extends TestCase
     public function testContains()
     {
         $m = new ObjectKeys('stdClass', 'int');
-        $m = $m->put($a = new \stdClass, 24);
+        $m = ($m)($a = new \stdClass, 24);
 
         $this->assertFalse($m->contains(24));
         $this->assertTrue($m->contains($a));
@@ -178,34 +107,34 @@ class ObjectKeysTest extends TestCase
     public function testClear()
     {
         $m = new ObjectKeys('stdClass', 'float');
-        $m = $m->put(new \stdClass, 42.0);
+        $m = ($m)(new \stdClass, 42.0);
 
         $m2 = $m->clear();
         $this->assertNotSame($m, $m2);
         $this->assertInstanceOf(ObjectKeys::class, $m2);
         $this->assertSame(1, $m->size());
         $this->assertSame(0, $m2->size());
-        $this->assertSame('stdClass', (string) $m2->keyType());
-        $this->assertSame('float', (string) $m2->valueType());
+        $this->assertSame('stdClass', $m2->keyType());
+        $this->assertSame('float', $m2->valueType());
     }
 
     public function testEquals()
     {
-        $m = (new ObjectKeys('stdClass', 'int'))->put($a = new \stdClass, 42);
-        $m2 = (new ObjectKeys('stdClass', 'int'))->put($a, 42);
+        $m = (new ObjectKeys('stdClass', 'int'))($a = new \stdClass, 42);
+        $m2 = (new ObjectKeys('stdClass', 'int'))($a, 42);
 
         $this->assertTrue($m->equals($m2));
-        $this->assertFalse($m->equals($m2->put(new \stdClass, 66)));
-        $this->assertFalse($m->equals($m2->put($a, 24)));
+        $this->assertFalse($m->equals(($m2)(new \stdClass, 66)));
+        $this->assertFalse($m->equals(($m2)($a, 24)));
     }
 
     public function testFilter()
     {
         $m = (new ObjectKeys('stdClass', 'int'))
-            ->put($a = new \stdClass, 1)
-            ->put($b = new \stdClass, 2)
-            ->put($c = new \stdClass, 3)
-            ->put($d = new \stdClass, 4);
+            ($a = new \stdClass, 1)
+            ($b = new \stdClass, 2)
+            ($c = new \stdClass, 3)
+            ($d = new \stdClass, 4);
 
         $m2 = $m->filter(function(\stdClass $key, int $value) {
             return $value % 2 === 0;
@@ -226,10 +155,10 @@ class ObjectKeysTest extends TestCase
     public function testForeach()
     {
         $m = (new ObjectKeys('stdClass', 'int'))
-            ->put(new \stdClass, 1)
-            ->put(new \stdClass, 2)
-            ->put(new \stdClass, 3)
-            ->put(new \stdClass, 4);
+            (new \stdClass, 1)
+            (new \stdClass, 2)
+            (new \stdClass, 3)
+            (new \stdClass, 4);
         $count = 0;
 
         $m->foreach(function(\stdClass $key, int $value) use (&$count) {
@@ -241,7 +170,7 @@ class ObjectKeysTest extends TestCase
 
     public function testThrowWhenGroupingAnEmptyMap()
     {
-        $this->expectException(GroupEmptyMapException::class);
+        $this->expectException(CannotGroupEmptyStructure::class);
 
         (new ObjectKeys('stdClass', 'int'))->groupBy(function() {});
     }
@@ -249,26 +178,26 @@ class ObjectKeysTest extends TestCase
     public function testGroupBy()
     {
         $m = (new ObjectKeys('stdClass', 'int'))
-            ->put($a = new \stdClass, 1)
-            ->put($b = new \stdClass, 2)
-            ->put($c = new \stdClass, 3)
-            ->put($d = new \stdClass, 4);
+            ($a = new \stdClass, 1)
+            ($b = new \stdClass, 2)
+            ($c = new \stdClass, 3)
+            ($d = new \stdClass, 4);
 
         $m2 = $m->groupBy(function(\stdClass $key, int $value) {
             return $value % 2;
         });
         $this->assertNotSame($m, $m2);
-        $this->assertInstanceOf(MapInterface::class, $m2);
-        $this->assertSame('int', (string) $m2->keyType());
-        $this->assertSame(MapInterface::class, (string) $m2->valueType());
+        $this->assertInstanceOf(Map::class, $m2);
+        $this->assertSame('int', $m2->keyType());
+        $this->assertSame(Map::class, $m2->valueType());
         $this->assertTrue($m2->contains(0));
         $this->assertTrue($m2->contains(1));
         $this->assertSame(2, $m2->get(0)->size());
         $this->assertSame(2, $m2->get(1)->size());
-        $this->assertSame('stdClass', (string) $m2->get(0)->keyType());
-        $this->assertSame('int', (string) $m2->get(0)->valueType());
-        $this->assertSame('stdClass', (string) $m2->get(1)->keyType());
-        $this->assertSame('int', (string) $m2->get(1)->valueType());
+        $this->assertSame('stdClass', $m2->get(0)->keyType());
+        $this->assertSame('int', $m2->get(0)->valueType());
+        $this->assertSame('stdClass', $m2->get(1)->keyType());
+        $this->assertSame('int', $m2->get(1)->valueType());
         $this->assertSame(1, $m2->get(1)->get($a));
         $this->assertSame(2, $m2->get(0)->get($b));
         $this->assertSame(3, $m2->get(1)->get($c));
@@ -277,41 +206,41 @@ class ObjectKeysTest extends TestCase
     public function testKeys()
     {
         $m = (new ObjectKeys('stdClass', 'int'))
-            ->put($a = new \stdClass, 1)
-            ->put($b = new \stdClass, 2)
-            ->put($c = new \stdClass, 3)
-            ->put($d = new \stdClass, 5);
+            ($a = new \stdClass, 1)
+            ($b = new \stdClass, 2)
+            ($c = new \stdClass, 3)
+            ($d = new \stdClass, 5);
 
         $k = $m->keys();
-        $this->assertInstanceOf(SetInterface::class, $k);
-        $this->assertSame('stdClass', (string) $k->type());
-        $this->assertSame([$a, $b, $c, $d], $k->toPrimitive());
+        $this->assertInstanceOf(Set::class, $k);
+        $this->assertSame('stdClass', $k->type());
+        $this->assertSame([$a, $b, $c, $d], unwrap($k));
         $this->assertTrue($k->equals($m->keys()));
     }
 
     public function testValues()
     {
         $m = (new ObjectKeys('stdClass', 'int'))
-            ->put(new \stdClass, 1)
-            ->put(new \stdClass, 2)
-            ->put(new \stdClass, 3)
-            ->put(new \stdClass, 5)
-            ->put(new \stdClass, 5);
+            (new \stdClass, 1)
+            (new \stdClass, 2)
+            (new \stdClass, 3)
+            (new \stdClass, 5)
+            (new \stdClass, 5);
 
         $v = $m->values();
-        $this->assertInstanceOf(StreamInterface::class, $v);
-        $this->assertSame('int', (string) $v->type());
-        $this->assertSame([1, 2, 3, 5, 5], $v->toPrimitive());
+        $this->assertInstanceOf(Sequence::class, $v);
+        $this->assertSame('int', $v->type());
+        $this->assertSame([1, 2, 3, 5, 5], unwrap($v));
         $this->assertTrue($v->equals($m->values()));
     }
 
     public function testMap()
     {
         $m = (new ObjectKeys('stdClass', 'int'))
-            ->put($a = new \stdClass, 1)
-            ->put($b = new \stdClass, 2)
-            ->put($c = new \stdClass, 3)
-            ->put($d = new \stdClass, 4);
+            ($a = new \stdClass, 1)
+            ($b = new \stdClass, 2)
+            ($c = new \stdClass, 3)
+            ($d = new \stdClass, 4);
 
         $m2 = $m->map(function(\stdClass $key, int $value) {
             if ($value % 2 === 0) {
@@ -324,18 +253,19 @@ class ObjectKeysTest extends TestCase
         $this->assertInstanceOf(ObjectKeys::class, $m2);
         $this->assertSame($m->keyType(), $m2->keyType());
         $this->assertSame($m->valueType(), $m2->valueType());
-        $this->assertSame([$a, $b, $c, $d], $m->keys()->toPrimitive());
-        $this->assertSame([1, 2, 3, 4], $m->values()->toPrimitive());
-        $this->assertSame([$a, $b, $c, $d], $m2->keys()->toPrimitive());
-        $this->assertSame([1, 12, 9, 14], $m2->values()->toPrimitive());
+        $this->assertSame([$a, $b, $c, $d], unwrap($m->keys()));
+        $this->assertSame([1, 2, 3, 4], unwrap($m->values()));
+        $this->assertSame([$a, $b, $c, $d], unwrap($m2->keys()));
+        $this->assertSame([1, 12, 9, 14], unwrap($m2->values()));
     }
 
     public function testThrowWhenTryingToModifyValueTypeInTheMap()
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage('Argument 2 must be of type int, string given');
 
         (new ObjectKeys('stdClass', 'int'))
-            ->put(new \stdClass, 2)
+            (new \stdClass, 2)
             ->map(function(\stdClass $key, int $value) {
                 return (string) $value;
             });
@@ -343,76 +273,64 @@ class ObjectKeysTest extends TestCase
 
     public function testThrowWhenTryingToModifyKeyTypeInTheMap()
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage('Argument 1 must be of type stdClass, int given');
 
         (new ObjectKeys('stdClass', 'int'))
-            ->put(new \stdClass, 2)
+            (new \stdClass, 2)
             ->map(function(\stdClass $key, int $value) {
                 return new Pair(42, $value);
             });
     }
 
-    public function testJoin()
-    {
-        $m = (new ObjectKeys('stdClass', 'int'))
-            ->put(new \stdClass, 1)
-            ->put(new \stdClass, 2)
-            ->put(new \stdClass, 3)
-            ->put(new \stdClass, 5);
-
-        $s = $m->join(', ');
-        $this->assertInstanceOf(Str::class, $s);
-        $this->assertSame('1, 2, 3, 5', (string) $s);
-    }
-
     public function testRemove()
     {
         $m = (new ObjectKeys('stdClass', 'int'))
-            ->put($a = new \stdClass, 1)
-            ->put($b = new \stdClass, 2)
-            ->put($c = new \stdClass, 3)
-            ->put($d = new \stdClass, 4)
-            ->put($e = new \stdClass, 5);
+            ($a = new \stdClass, 1)
+            ($b = new \stdClass, 2)
+            ($c = new \stdClass, 3)
+            ($d = new \stdClass, 4)
+            ($e = new \stdClass, 5);
 
         $m2 = $m->remove(new \stdClass);
         $this->assertSame($m, $m2);
-        $this->assertSame([$a, $b, $c, $d, $e], $m->keys()->toPrimitive());
-        $this->assertSame([1, 2, 3, 4, 5], $m->values()->toPrimitive());
+        $this->assertSame([$a, $b, $c, $d, $e], unwrap($m->keys()));
+        $this->assertSame([1, 2, 3, 4, 5], unwrap($m->values()));
 
         $m2 = $m->remove($d);
         $this->assertNotSame($m, $m2);
         $this->assertInstanceOf(ObjectKeys::class, $m2);
-        $this->assertSame([$a, $b, $c, $d, $e], $m->keys()->toPrimitive());
-        $this->assertSame([1, 2, 3, 4, 5], $m->values()->toPrimitive());
-        $this->assertSame([$a, $b, $c, $e], $m2->keys()->toPrimitive());
-        $this->assertSame([1, 2, 3, 5], $m2->values()->toPrimitive());
+        $this->assertSame([$a, $b, $c, $d, $e], unwrap($m->keys()));
+        $this->assertSame([1, 2, 3, 4, 5], unwrap($m->values()));
+        $this->assertSame([$a, $b, $c, $e], unwrap($m2->keys()));
+        $this->assertSame([1, 2, 3, 5], unwrap($m2->values()));
 
         $m2 = $m->remove($e);
         $this->assertNotSame($m, $m2);
         $this->assertInstanceOf(ObjectKeys::class, $m2);
-        $this->assertSame([$a, $b, $c, $d, $e], $m->keys()->toPrimitive());
-        $this->assertSame([1, 2, 3, 4, 5], $m->values()->toPrimitive());
-        $this->assertSame([$a, $b, $c, $d], $m2->keys()->toPrimitive());
-        $this->assertSame([1, 2, 3, 4], $m2->values()->toPrimitive());
+        $this->assertSame([$a, $b, $c, $d, $e], unwrap($m->keys()));
+        $this->assertSame([1, 2, 3, 4, 5], unwrap($m->values()));
+        $this->assertSame([$a, $b, $c, $d], unwrap($m2->keys()));
+        $this->assertSame([1, 2, 3, 4], unwrap($m2->values()));
 
         $m2 = $m->remove($a);
         $this->assertNotSame($m, $m2);
         $this->assertInstanceOf(ObjectKeys::class, $m2);
-        $this->assertSame([$a, $b, $c, $d, $e], $m->keys()->toPrimitive());
-        $this->assertSame([1, 2, 3, 4, 5], $m->values()->toPrimitive());
-        $this->assertSame([$b, $c, $d, $e], $m2->keys()->toPrimitive());
-        $this->assertSame([2, 3, 4, 5], $m2->values()->toPrimitive());
+        $this->assertSame([$a, $b, $c, $d, $e], unwrap($m->keys()));
+        $this->assertSame([1, 2, 3, 4, 5], unwrap($m->values()));
+        $this->assertSame([$b, $c, $d, $e], unwrap($m2->keys()));
+        $this->assertSame([2, 3, 4, 5], unwrap($m2->values()));
     }
 
     public function testMerge()
     {
-        $m = (new ObjectKeys(Symbol::class, 'int'))
-            ->put($s = new Symbol('foo'), 24)
-            ->put($s2 = new Symbol('foo'), 42);
-        $m2 = (new ObjectKeys(Symbol::class, 'int'))
-            ->put($s3 = new Symbol('foo'), 24)
-            ->put($s2, 66)
-            ->put($s4 = new Symbol('bar'), 42);
+        $m = (new ObjectKeys(\stdClass::class, 'int'))
+            ($s = new \stdClass, 24)
+            ($s2 = new \stdClass, 42);
+        $m2 = (new ObjectKeys(\stdClass::class, 'int'))
+            ($s3 = new \stdClass, 24)
+            ($s2, 66)
+            ($s4 = new \stdClass, 42);
 
         $m3 = $m->merge($m2);
         $this->assertNotSame($m, $m3);
@@ -421,70 +339,62 @@ class ObjectKeysTest extends TestCase
         $this->assertSame($m->keyType(), $m3->keyType());
         $this->assertSame($m->valueType(), $m3->valueType());
         $this->assertSame(4, $m3->size());
-        $this->assertSame([$s, $s2], $m->keys()->toPrimitive());
-        $this->assertSame([24, 42], $m->values()->toPrimitive());
-        $this->assertSame([$s3, $s2, $s4], $m2->keys()->toPrimitive());
-        $this->assertSame([24, 66, 42], $m2->values()->toPrimitive());
-        $this->assertSame([$s, $s2, $s3, $s4], $m3->keys()->toPrimitive());
-        $this->assertSame([24, 66, 24, 42], $m3->values()->toPrimitive());
+        $this->assertSame([$s, $s2], unwrap($m->keys()));
+        $this->assertSame([24, 42], unwrap($m->values()));
+        $this->assertSame([$s3, $s2, $s4], unwrap($m2->keys()));
+        $this->assertSame([24, 66, 42], unwrap($m2->values()));
+        $this->assertSame([$s, $s2, $s3, $s4], unwrap($m3->keys()));
+        $this->assertSame([24, 66, 24, 42], unwrap($m3->values()));
         $this->assertFalse($m3->equals($m2->merge($m)));
-    }
-
-    public function testThrowWhenMergingSetsOfDifferentType()
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The 2 maps does not reference the same types');
-
-        (new ObjectKeys('stdClass', 'int'))->merge(new ObjectKeys(Symbol::class, 'int'));
     }
 
     public function testPartition()
     {
         $m = (new ObjectKeys('stdClass', 'int'))
-            ->put($a = new \stdClass, 1)
-            ->put($b = new \stdClass, 2)
-            ->put($c = new \stdClass, 3)
-            ->put($d = new \stdClass, 4)
-            ->put($e = new \stdClass, 5);
+            ($a = new \stdClass, 1)
+            ($b = new \stdClass, 2)
+            ($c = new \stdClass, 3)
+            ($d = new \stdClass, 4)
+            ($e = new \stdClass, 5);
 
         $p = $m->partition(function(\stdClass $i, int $v) {
             return $v % 2 === 0;
         });
 
-        $this->assertInstanceOf(MapInterface::class, $p);
+        $this->assertInstanceOf(Map::class, $p);
         $this->assertNotSame($p, $m);
-        $this->assertSame('bool', (string) $p->keyType());
-        $this->assertSame(MapInterface::class, (string) $p->valueType());
+        $this->assertSame('bool', $p->keyType());
+        $this->assertSame(Map::class, $p->valueType());
         $this->assertSame(
             [true, false],
-            $p->keys()->toPrimitive()
+            unwrap($p->keys()),
         );
-        $this->assertSame('stdClass', (string) $p->get(true)->keyType());
-        $this->assertSame('int', (string) $p->get(true)->valueType());
-        $this->assertSame('stdClass', (string) $p->get(false)->keyType());
-        $this->assertSame('int', (string) $p->get(false)->valueType());
+        $this->assertSame('stdClass', $p->get(true)->keyType());
+        $this->assertSame('int', $p->get(true)->valueType());
+        $this->assertSame('stdClass', $p->get(false)->keyType());
+        $this->assertSame('int', $p->get(false)->valueType());
         $this->assertSame(
             [$b, $d],
-            $p->get(true)->keys()->toPrimitive()
+            unwrap($p->get(true)->keys()),
         );
         $this->assertSame(
             [2, 4],
-            $p->get(true)->values()->toPrimitive()
+            unwrap($p->get(true)->values()),
         );
         $this->assertSame(
             [$a, $c, $e],
-            $p->get(false)->keys()->toPrimitive()
+            unwrap($p->get(false)->keys()),
         );
         $this->assertSame(
             [1, 3, 5],
-            $p->get(false)->values()->toPrimitive()
+            unwrap($p->get(false)->values()),
         );
     }
 
     public function testReduce()
     {
         $m = (new ObjectKeys('stdClass', 'int'))
-            ->put($a = new \stdClass, 4);
+            ($a = new \stdClass, 4);
 
         $v = $m->reduce(
             42,
@@ -494,18 +404,59 @@ class ObjectKeysTest extends TestCase
         );
 
         $this->assertSame(10.5, $v);
-        $this->assertSame([$a], $m->keys()->toPrimitive());
-        $this->assertSame([4], $m->values()->toPrimitive());
+        $this->assertSame([$a], unwrap($m->keys()));
+        $this->assertSame([4], unwrap($m->values()));
     }
 
     public function testEmpty()
     {
         $this->assertTrue((new ObjectKeys('stdClass', 'int'))->empty());
-        $this->assertFalse((new ObjectKeys('stdClass', 'int'))->put(new \stdClass, 1)->empty());
+        $this->assertFalse((new ObjectKeys('stdClass', 'int'))(new \stdClass, 1)->empty());
     }
 
     public function testGenericObjectTypeAllowedAsKey()
     {
-        $this->assertSame('object', (string) (new ObjectKeys('object', 'int'))->keyType());
+        $this->assertSame('object', (new ObjectKeys('object', 'int'))->keyType());
+    }
+
+    public function testToSequenceOf()
+    {
+        $map = (new ObjectKeys('object', 'int'))
+            (new \stdClass, 2)
+            (new \stdClass, 4);
+        $sequence = $map->toSequenceOf('int', fn($k, $v) => yield $v);
+
+        $this->assertInstanceOf(Sequence::class, $sequence);
+        $this->assertSame(
+            [2, 4],
+            unwrap($sequence),
+        );
+    }
+
+    public function testToSetOf()
+    {
+        $map = (new ObjectKeys('object', 'int'))
+            (new \stdClass, 2)
+            (new \stdClass, 4);
+        $set = $map->toSetOf('int', fn($k, $v) => yield $v);
+
+        $this->assertInstanceOf(Set::class, $set);
+        $this->assertSame(
+            [2, 4],
+            unwrap($set),
+        );
+    }
+
+    public function testToMapOf()
+    {
+        $map = (new ObjectKeys('object', 'int'))
+            ($a = new \stdClass, 2)
+            ($b = new \stdClass, 4);
+        $map = $map->toMapOf('int', 'object', fn($i, $j) => yield $j => $i);
+
+        $this->assertInstanceOf(Map::class, $map);
+        $this->assertCount(2, $map);
+        $this->assertSame($a, $map->get(2));
+        $this->assertSame($b, $map->get(4));
     }
 }

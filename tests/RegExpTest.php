@@ -6,7 +6,7 @@ namespace Tests\Innmind\Immutable;
 use Innmind\Immutable\{
     RegExp,
     Str,
-    MapInterface,
+    Map,
     Exception\DomainException
 };
 use PHPUnit\Framework\TestCase;
@@ -15,9 +15,9 @@ class RegExpTest extends TestCase
 {
     public function testInterface()
     {
-        $regexp = new RegExp('/foo/');
+        $regexp = RegExp::of('/foo/');
 
-        $this->assertSame('/foo/', (string) $regexp);
+        $this->assertSame('/foo/', $regexp->toString());
     }
 
     public function testOf()
@@ -25,19 +25,19 @@ class RegExpTest extends TestCase
         $regexp = RegExp::of('/foo/');
 
         $this->assertInstanceOf(RegExp::class, $regexp);
-        $this->assertSame('/foo/', (string) $regexp);
+        $this->assertSame('/foo/', $regexp->toString());
     }
 
     public function testThrowWhenInvalidRegexp()
     {
         $this->expectException(DomainException::class);
 
-        new RegExp('/foo');
+        RegExp::of('/foo');
     }
 
     public function testMatches()
     {
-        $regexp = new RegExp('/^foo/');
+        $regexp = RegExp::of('/^foo/');
 
         $this->assertTrue($regexp->matches(Str::of('foofoo')));
         $this->assertFalse($regexp->matches(Str::of('barfoo')));
@@ -45,13 +45,13 @@ class RegExpTest extends TestCase
 
     public function testCapture()
     {
-        $regexp = new RegExp('/(?<i>\d)/');
+        $regexp = RegExp::of('/(?<i>\d)/');
 
         $map = $regexp->capture(Str::of('foo123bar'));
 
-        $this->assertInstanceOf(MapInterface::class, $map);
-        $this->assertSame('scalar', (string) $map->keyType());
-        $this->assertSame(Str::class, (string) $map->valueType());
-        $this->assertSame('1', (string) $map->get('i'));
+        $this->assertInstanceOf(Map::class, $map);
+        $this->assertSame('scalar', $map->keyType());
+        $this->assertSame(Str::class, $map->valueType());
+        $this->assertSame('1', $map->get('i')->toString());
     }
 }

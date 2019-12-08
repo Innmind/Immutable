@@ -4,71 +4,58 @@ declare(strict_types = 1);
 namespace Innmind\Immutable\Map;
 
 use Innmind\Immutable\{
-    MapInterface,
     Map,
     Type,
     Str,
-    Stream,
-    StreamInterface,
-    SetInterface,
+    Sequence,
     Set,
     Pair,
-    Exception\InvalidArgumentException,
+    ValidateArgument,
     Exception\LogicException,
-    Exception\ElementNotFoundException,
-    Exception\GroupEmptyMapException
+    Exception\ElementNotFound,
+    Exception\CannotGroupEmptyStructure,
 };
 
 /**
- * {@inheritdoc}
+ * @template T
+ * @template S
  */
-final class Primitive implements MapInterface
+final class Primitive implements Implementation
 {
-    private $keyType;
-    private $valueType;
-    private $keySpecification;
-    private $valueSpecification;
-    private $values;
-    private $size;
+    private string $keyType;
+    private string $valueType;
+    private ValidateArgument $validateKey;
+    private ValidateArgument $validateValue;
+    /** @var array<T, S> */
+    private array $values = [];
+    private ?int $size = null;
 
-    /**
-     * {@inheritdoc}
-     */
     public function __construct(string $keyType, string $valueType)
     {
-        $this->keySpecification = Type::of($keyType);
+        $this->validateKey = Type::of($keyType);
 
         if (!in_array($keyType, ['int', 'integer', 'string'], true)) {
             throw new LogicException;
         }
 
-        $this->valueSpecification = Type::of($valueType);
-        $this->keyType = new Str($keyType);
-        $this->valueType = new Str($valueType);
-        $this->values = [];
+        $this->validateValue = Type::of($valueType);
+        $this->keyType = $keyType;
+        $this->valueType = $valueType;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function keyType(): Str
+    public function keyType(): string
     {
         return $this->keyType;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function valueType(): Str
+    public function valueType(): string
     {
         return $this->valueType;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function size(): int
     {
+        /** @psalm-suppress MixedArgumentTypeCoercion */
         return $this->size ?? $this->size = \count($this->values);
     }
 
@@ -81,117 +68,52 @@ final class Primitive implements MapInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @param T $key
+     * @param S $value
+     *
+     * @return self<T, S>
      */
-    public function current()
+    public function __invoke($key, $value): self
     {
-        return \current($this->values);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function key()
-    {
-        return $this->normalizeKey(\key($this->values));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function next(): void
-    {
-        \next($this->values);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function rewind(): void
-    {
-        \reset($this->values);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function valid(): bool
-    {
-        return $this->key() !== null;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function offsetExists($offset): bool
-    {
-        return \array_key_exists($offset, $this->values);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function offsetGet($offset)
-    {
-        return $this->get($offset);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function offsetSet($offset, $value): void
-    {
-        throw new LogicException('You can\'t modify a map');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function offsetUnset($offset): void
-    {
-        throw new LogicException('You can\'t modify a map');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function put($key, $value): MapInterface
-    {
-        $this->keySpecification->validate($key);
-        $this->valueSpecification->validate($value);
+        ($this->validateKey)($key, 1);
+        ($this->validateValue)($value, 2);
 
         $map = clone $this;
         $map->size = null;
         $map->values[$key] = $value;
-        $map->rewind();
 
         return $map;
     }
 
     /**
-     * {@inheritdoc}
+     * @param T $key
+     *
+     * @throws ElementNotFound
+     *
+     * @return S
      */
     public function get($key)
     {
-        if (!$this->offsetExists($key)) {
-            throw new ElementNotFoundException;
+        if (!$this->contains($key)) {
+            throw new ElementNotFound($key);
         }
 
         return $this->values[$key];
     }
 
     /**
-     * {@inheritdoc}
+     * @param T $key
      */
     public function contains($key): bool
     {
-        return $this->offsetExists($key);
+        /** @psalm-suppress MixedArgumentTypeCoercion */
+        return \array_key_exists($key, $this->values);
     }
 
     /**
-     * {@inheritdoc}
+     * @return self<T, S>
      */
-    public function clear(): MapInterface
+    public function clear(): self
     {
         $map = clone $this;
         $map->size = null;
@@ -201,9 +123,9 @@ final class Primitive implements MapInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @param Implementation<T, S> $map
      */
-    public function equals(MapInterface $map): bool
+    public function equals(Implementation $map): bool
     {
         if ($map->size() !== $this->size()) {
             return false;
@@ -223,9 +145,11 @@ final class Primitive implements MapInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @param callable(T, S): bool $predicate
+     *
+     * @return self<T, S>
      */
-    public function filter(callable $predicate): MapInterface
+    public function filter(callable $predicate): self
     {
         $map = $this->clear();
 
@@ -235,85 +159,103 @@ final class Primitive implements MapInterface
             }
         }
 
-        $map->rewind();
-
         return $map;
     }
 
     /**
-     * {@inheritdoc}
+     * @param callable(T, S): void $function
      */
-    public function foreach(callable $function): MapInterface
+    public function foreach(callable $function): void
     {
         foreach ($this->values as $k => $v) {
             $function($this->normalizeKey($k), $v);
         }
-
-        return $this;
     }
 
     /**
-     * {@inheritdoc}
+     * @template D
+     * @param callable(T, S): D $discriminator
+     *
+     * @throws CannotGroupEmptyStructure
+     *
+     * @return Map<D, Map<T, S>>
      */
-    public function groupBy(callable $discriminator): MapInterface
+    public function groupBy(callable $discriminator): Map
     {
-        if ($this->size() === 0) {
-            throw new GroupEmptyMapException;
+        if ($this->empty()) {
+            throw new CannotGroupEmptyStructure;
         }
 
-        $map = null;
+        $groups = null;
 
         foreach ($this->values as $k => $v) {
-            $key = $discriminator($this->normalizeKey($k), $v);
+            /** @var T */
+            $key = $this->normalizeKey($k);
+            /** @var S */
+            $value = $v;
+            $discriminant = $discriminator($key, $value);
 
-            if ($map === null) {
-                $map = new Map(
-                    Type::determine($key),
-                    MapInterface::class
+            if ($groups === null) {
+                /** @var Map<D, Map<T, S>> */
+                $groups = Map::of(
+                    Type::determine($discriminant),
+                    Map::class,
                 );
             }
 
-            if ($map->contains($key)) {
-                $map = $map->put(
-                    $key,
-                    $map->get($key)->put($k, $v)
-                );
+            if ($groups->contains($discriminant)) {
+                /** @var Map<T, S> */
+                $group = $groups->get($discriminant);
+                /** @var Map<T, S> */
+                $group = ($group)($key, $value);
+
+                $groups = ($groups)($discriminant, $group);
             } else {
-                $map = $map->put(
-                    $key,
-                    $this->clear()->put($k, $v)
-                );
+                /** @var Map<T, S> */
+                $group = $this->clearMap()($key, $value);
+
+                $groups = ($groups)($discriminant, $group);
             }
         }
 
-        return $map;
+        /** @var Map<D, Map<T, S>> */
+        return $groups;
     }
 
     /**
-     * {@inheritdoc}
+     * @return Set<T>
      */
-    public function keys(): SetInterface
+    public function keys(): Set
     {
+        /** @psalm-suppress MixedArgumentTypeCoercion */
+        $keys = \array_keys($this->values);
+
         return Set::of(
-            (string) $this->keyType,
-            ...\array_map(function($key) {
-                return $this->normalizeKey($key);
-            }, \array_keys($this->values))
+            $this->keyType,
+            ...\array_map(
+                fn($key) => $this->normalizeKey($key),
+                $keys,
+            ),
         );
     }
 
     /**
-     * {@inheritdoc}
+     * @return Sequence<S>
      */
-    public function values(): StreamInterface
+    public function values(): Sequence
     {
-        return Stream::of((string) $this->valueType, ...\array_values($this->values));
+        /** @psalm-suppress MixedArgumentTypeCoercion */
+        $values = \array_values($this->values);
+
+        return Sequence::of($this->valueType, ...$values);
     }
 
     /**
-     * {@inheritdoc}
+     * @param callable(T, S): (S|Pair<T, S>) $function
+     *
+     * @return self<T, S>
      */
-    public function map(callable $function): MapInterface
+    public function map(callable $function): self
     {
         $map = $this->clear();
 
@@ -321,37 +263,31 @@ final class Primitive implements MapInterface
             $return = $function($this->normalizeKey($k), $v);
 
             if ($return instanceof Pair) {
-                $this->keySpecification->validate($return->key());
+                ($this->validateKey)($return->key(), 1);
 
+                /** @var T */
                 $key = $return->key();
+                /** @var S */
                 $value = $return->value();
             } else {
                 $key = $k;
                 $value = $return;
             }
 
-            $this->valueSpecification->validate($value);
+            ($this->validateValue)($value, 2);
 
             $map->values[$key] = $value;
         }
-
-        $map->rewind();
 
         return $map;
     }
 
     /**
-     * {@inheritdoc}
+     * @param T $key
+     *
+     * @return self<T, S>
      */
-    public function join(string $separator): Str
-    {
-        return $this->values()->join($separator);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function remove($key): MapInterface
+    public function remove($key): self
     {
         if (!$this->contains($key)) {
             return $this;
@@ -359,62 +295,61 @@ final class Primitive implements MapInterface
 
         $map = clone $this;
         $map->size = null;
+        /** @psalm-suppress MixedArrayTypeCoercion */
         unset($map->values[$key]);
-        $map->rewind();
 
         return $map;
     }
 
     /**
-     * {@inheritdoc}
+     * @param Implementation<T, S> $map
+     *
+     * @return self<T, S>
      */
-    public function merge(MapInterface $map): MapInterface
+    public function merge(Implementation $map): self
     {
-        if (
-            !$this->keyType()->equals($map->keyType()) ||
-            !$this->valueType()->equals($map->valueType())
-        ) {
-            throw new InvalidArgumentException(
-                'The 2 maps does not reference the same types'
-            );
-        }
-
         return $map->reduce(
             $this,
-            function(self $carry, $key, $value): self {
-                return $carry->put($key, $value);
-            }
+            static fn(self $carry, $key, $value): self => ($carry)($key, $value),
         );
     }
 
     /**
-     * {@inheritdoc}
+     * @param callable(T, S): bool $predicate
+     *
+     * @return Map<bool, Map<T, S>>
      */
-    public function partition(callable $predicate): MapInterface
+    public function partition(callable $predicate): Map
     {
-        $truthy = $this->clear();
-        $falsy = $this->clear();
+        $truthy = $this->clearMap();
+        $falsy = $this->clearMap();
 
         foreach ($this->values as $k => $v) {
             $return = $predicate($this->normalizeKey($k), $v);
 
             if ($return === true) {
-                $truthy->values[$k] = $v;
+                $truthy = ($truthy)($k, $v);
             } else {
-                $falsy->values[$k] = $v;
+                $falsy = ($falsy)($k, $v);
             }
         }
 
-        $truthy->rewind();
-        $falsy->rewind();
-
-        return Map::of('bool', MapInterface::class)
+        /**
+         * @psalm-suppress InvalidScalarArgument
+         * @psalm-suppress InvalidArgument
+         * @var Map<bool, Map<T, S>>
+         */
+        return Map::of('bool', Map::class)
             (true, $truthy)
             (false, $falsy);
     }
 
     /**
-     * {@inheritdoc}
+     * @template R
+     * @param R $carry
+     * @param callable(R, T, S): R $reducer
+     *
+     * @return R
      */
     public function reduce($carry, callable $reducer)
     {
@@ -427,17 +362,101 @@ final class Primitive implements MapInterface
 
     public function empty(): bool
     {
-        $this->rewind();
+        /** @psalm-suppress MixedArgumentTypeCoercion */
+        \reset($this->values);
 
-        return !$this->valid();
+        /** @psalm-suppress MixedArgumentTypeCoercion */
+        return \is_null(\key($this->values));
     }
 
+    /**
+     * @template ST
+     *
+     * @param callable(T, S): \Generator<ST> $mapper
+     *
+     * @return Sequence<ST>
+     */
+    public function toSequenceOf(string $type, callable $mapper): Sequence
+    {
+        /** @var Sequence<ST> */
+        $sequence = Sequence::of($type);
+
+        foreach ($this->values as $key => $value) {
+            foreach ($mapper($key, $value) as $newValue) {
+                $sequence = ($sequence)($newValue);
+            }
+        }
+
+        return $sequence;
+    }
+
+    /**
+     * @template ST
+     *
+     * @param callable(T, S): \Generator<ST> $mapper
+     *
+     * @return Set<ST>
+     */
+    public function toSetOf(string $type, callable $mapper): Set
+    {
+        /** @var Set<ST> */
+        $set = Set::of($type);
+
+        foreach ($this->values as $key => $value) {
+            foreach ($mapper($key, $value) as $newValue) {
+                $set = ($set)($newValue);
+            }
+        }
+
+        return $set;
+    }
+
+    /**
+     * @template MT
+     * @template MS
+     *
+     * @param null|callable(T, S): \Generator<MT, MS> $mapper
+     *
+     * @return Map<MT, MS>
+     */
+    public function toMapOf(string $key, string $value, callable $mapper = null): Map
+    {
+        /** @psalm-suppress MissingParamType */
+        $mapper ??= static fn($k, $v): \Generator => yield $k => $v;
+
+        /** @var Map<MT, MS> */
+        $map = Map::of($key, $value);
+
+        foreach ($this->values as $key => $value) {
+            foreach ($mapper($key, $value) as $newKey => $newValue) {
+                $map = ($map)($newKey, $newValue);
+            }
+        }
+
+        return $map;
+    }
+
+    /**
+     * @param mixed $value
+     *
+     * @return T
+     */
     private function normalizeKey($value)
     {
-        if ((string) $this->keyType === 'string' && !\is_null($value)) {
+        if ($this->keyType === 'string' && !\is_null($value)) {
+            /** @var T */
             return (string) $value;
         }
 
+        /** @var T */
         return $value;
+    }
+
+    /**
+     * @return Map<T, S>
+     */
+    private function clearMap(): Map
+    {
+        return Map::of($this->keyType, $this->valueType);
     }
 }

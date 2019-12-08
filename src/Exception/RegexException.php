@@ -3,7 +3,7 @@ declare(strict_types = 1);
 
 namespace Innmind\Immutable\Exception;
 
-class RegexException extends \Exception implements ExceptionInterface
+class RegexException extends \Exception implements Exception
 {
     const INTERNAL_ERROR = 1;
     const BACKTRACK_LIMIT_ERROR = 2;
@@ -12,7 +12,7 @@ class RegexException extends \Exception implements ExceptionInterface
     const BAD_UTF8_OFFSET_ERROR = 5;
     const JIT_STACKLIMIT_ERROR = 6;
 
-    public function __construct($message = '', $code = 0)
+    public function __construct(string $message = '', int $code = 0)
     {
         if ($message === '') {
             switch ($code) {

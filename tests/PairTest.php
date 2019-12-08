@@ -3,19 +3,16 @@ declare(strict_types = 1);
 
 namespace Tests\Innmind\Immutable;
 
-use Innmind\Immutable\{
-    Pair,
-    Symbol
-};
+use Innmind\Immutable\Pair;
 use PHPUnit\Framework\TestCase;
 
 class PairTest extends TestCase
 {
     public function testInterface()
     {
-        $p = new Pair($s = new Symbol('foo'), 42);
+        $pair = new Pair($key = new \stdClass, 42);
 
-        $this->assertSame($s, $p->key());
-        $this->assertSame(42, $p->value());
+        $this->assertSame($key, $pair->key());
+        $this->assertSame(42, $pair->value());
     }
 }

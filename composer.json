@@ -15,11 +15,12 @@
         "issues": "http://github.com/Innmind/Immutable/issues"
     },
     "require": {
-        "php": "~7.1"
+        "php": "~7.4"
     },
     "autoload": {
         "psr-4": {
-            "Innmind\\Immutable\\": "src/"
+            "Innmind\\Immutable\\": "src/",
+            "Fixtures\\Innmind\\Immutable\\": "fixtures/"
         },
         "files": ["src/functions.php"]
     },
@@ -29,11 +30,14 @@
         }
     },
     "require-dev": {
-        "phpunit/phpunit": "~7.0",
-        "phpbench/phpbench": "^0.14.0"
+        "phpunit/phpunit": "~8.0",
+        "vimeo/psalm": "^3.7",
+        "innmind/black-box": "^3.0"
     },
-    "scripts": {
-        "test": "vendor/bin/phpunit --colors=always",
-        "bench": "vendor/bin/phpbench run benchmarks --report=aggregate --iterations=5 --revs=2"
+    "conflict": {
+        "innmind/black-box": "<3.0|~4.0"
+    },
+    "suggest": {
+        "innmind/black-box": "For property based testing"
     }
 }

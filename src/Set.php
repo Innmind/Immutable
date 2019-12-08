@@ -3,46 +3,139 @@ declare(strict_types = 1);
 
 namespace Innmind\Immutable;
 
-use Innmind\Immutable\Exception\InvalidArgumentException;
+use Innmind\Immutable\Exception\CannotGroupEmptyStructure;
 
-class Set implements SetInterface
+/**
+ * @template T
+ */
+final class Set implements \Countable
 {
-    private $type;
-    private $spec;
-    private $values;
+    private string $type;
+    private ValidateArgument $validate;
+    private Set\Implementation $implementation;
 
     /**
      * {@inheritdoc}
      */
-    public function __construct(string $type)
+    private function __construct(string $type, Set\Implementation $implementation)
     {
-        $this->type = new Str($type);
-        $this->spec = Type::of($type);
-        $this->values = new Stream($type);
+        $this->type = $type;
+        $this->validate = Type::of($type);
+        $this->implementation = $implementation;
     }
 
+    /**
+     * @param T $values
+     *
+     * @return self<T>
+     */
     public static function of(string $type, ...$values): self
     {
-        $self = new self($type);
-        $self->values = Stream::of($type, ...$values)->distinct();
+        return new self($type, new Set\Primitive($type, ...$values));
+    }
+
+    /**
+     * It will load the values inside the generator only upon the first use
+     * of the set
+     *
+     * Use this mode when the amount of data may not fit in memory
+     *
+     * @param \Generator<T> $generator
+     *
+     * @return self<T>
+     */
+    public static function defer(string $type, \Generator $generator): self
+    {
+        return new self($type, new Set\Defer($type, $generator));
+    }
+
+    /**
+     * It will call the given function every time a new operation is done on the
+     * set. This means the returned structure may not be truly immutable as
+     * between the calls the underlying source may change.
+     *
+     * Use this mode when calling to an external source (meaning IO bound) such
+     * as parsing a file or calling an API
+     *
+     * @param callable(): \Generator<T> $generator
+     *
+     * @return self<T>
+     */
+    public static function lazy(string $type, callable $generator): self
+    {
+        return new self($type, new Set\Lazy($type, $generator));
+    }
+
+    /**
+     * @param mixed $values
+     *
+     * @return self<mixed>
+     */
+    public static function mixed(...$values): self
+    {
+        return new self('mixed', new Set\Primitive('mixed', ...$values));
+    }
+
+    /**
+     * @return self<int>
+     */
+    public static function ints(int ...$values): self
+    {
+        /** @var self<int> */
+        $self = new self('int', new Set\Primitive('int', ...$values));
 
         return $self;
     }
 
     /**
-     * {@inheritdoc}
+     * @return self<float>
      */
-    public function type(): Str
+    public static function floats(float ...$values): self
+    {
+        /** @var self<float> */
+        $self = new self('float', new Set\Primitive('float', ...$values));
+
+        return $self;
+    }
+
+    /**
+     * @return self<string>
+     */
+    public static function strings(string ...$values): self
+    {
+        /** @var self<string> */
+        $self = new self('string', new Set\Primitive('string', ...$values));
+
+        return $self;
+    }
+
+    /**
+     * @return self<object>
+     */
+    public static function objects(object ...$values): self
+    {
+        /** @var self<object> */
+        $self = new self('object', new Set\Primitive('object', ...$values));
+
+        return $self;
+    }
+
+    public function isOfType(string $type): bool
+    {
+        return $this->type === $type;
+    }
+
+    /**
+     * Return the type of this set
+     */
+    public function type(): string
     {
         return $this->type;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function size(): int
     {
-        return $this->values->size();
+        return $this->implementation->size();
     }
 
     /**
@@ -50,284 +143,287 @@ class Set implements SetInterface
      */
     public function count(): int
     {
-        return $this->values->size();
+        return $this->implementation->size();
     }
 
     /**
-     * {@inheritdoc}
+     * Intersect this set with the given one
+     *
+     * @param self<T> $set
+     *
+     * @return self<T>
      */
-    public function toPrimitive(): array
+    public function intersect(self $set): self
     {
-        return $this->values->toPrimitive();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function current()
-    {
-        return $this->values->current();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function key(): int
-    {
-        return $this->values->key();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function next(): void
-    {
-        $this->values->next();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function rewind(): void
-    {
-        $this->values->rewind();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function valid(): bool
-    {
-        return $this->values->valid();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function intersect(SetInterface $set): SetInterface
-    {
-        $this->validate($set);
+        assertSet($this->type, $set, 1);
 
         $newSet = clone $this;
-        $newSet->values = $this->values->intersect(
-            Stream::of((string) $this->type, ...$set)
+        $newSet->implementation = $this->implementation->intersect(
+            $set->implementation,
         );
 
         return $newSet;
     }
 
     /**
-     * {@inheritdoc}
+     * Add an element to the set
+     *
+     * @param T $element
+     *
+     * @return self<T>
      */
-    public function add($element): SetInterface
+    public function add($element): self
     {
-        $this->spec->validate($element);
-
-        if ($this->contains($element)) {
-            return $this;
-        }
-
-        $set = clone $this;
-        $set->values = $this->values->add($element);
-
-        return $set;
+        return ($this)($element);
     }
 
     /**
-     * {@inheritdoc}
+     * Add an element to the set
+     *
+     * Example:
+     * <code>
+     * Set::of('int')(1)(3)
+     * </code>
+     *
+     * @param T $element
+     *
+     * @return self<T>
+     */
+    public function __invoke($element): self
+    {
+        ($this->validate)($element, 1);
+
+        $self = clone $this;
+        $self->implementation = ($this->implementation)($element);
+
+        return $self;
+    }
+
+    /**
+     * Check if the set contains the given element
+     *
+     * @param T $element
      */
     public function contains($element): bool
     {
-        return $this->values->contains($element);
+        ($this->validate)($element, 1);
+
+        return $this->implementation->contains($element);
     }
 
     /**
-     * {@inheritdoc}
+     * Remove the element from the set
+     *
+     * @param T $element
+     *
+     * @return self<T>
      */
-    public function remove($element): SetInterface
+    public function remove($element): self
     {
-        if (!$this->contains($element)) {
-            return $this;
-        }
+        ($this->validate)($element, 1);
 
-        $index = $this->values->indexOf($element);
+        $self = clone $this;
+        $self->implementation = $this->implementation->remove($element);
+
+        return $self;
+    }
+
+    /**
+     * Return the diff between this set and the given one
+     *
+     * @param self<T> $set
+     *
+     * @return self<T>
+     */
+    public function diff(self $set): self
+    {
+        assertSet($this->type, $set, 1);
+
+        $self = clone $this;
+        $self->implementation = $this->implementation->diff(
+            $set->implementation,
+        );
+
+        return $self;
+    }
+
+    /**
+     * Check if the given set is identical to this one
+     *
+     * @param self<T> $set
+     */
+    public function equals(self $set): bool
+    {
+        assertSet($this->type, $set, 1);
+
+        return $this->implementation->equals($set->implementation);
+    }
+
+    /**
+     * Return all elements that satisfy the given predicate
+     *
+     * @param callable(T): bool $predicate
+     *
+     * @return self<T>
+     */
+    public function filter(callable $predicate): self
+    {
         $set = clone $this;
-        $set->values = $this
-            ->values
-            ->clear()
-            ->append($this->values->slice(0, $index))
-            ->append($this->values->slice($index + 1, $this->size()));
+        $set->implementation = $this->implementation->filter($predicate);
 
         return $set;
     }
 
     /**
-     * {@inheritdoc}
+     * Apply the given function to all elements of the set
+     *
+     * @param callable(T): void $function
      */
-    public function diff(SetInterface $set): SetInterface
+    public function foreach(callable $function): void
     {
-        $this->validate($set);
+        $this->implementation->foreach($function);
+    }
 
-        $newSet = clone $this;
-        $newSet->values = $this->values->diff(
-            Stream::of((string) $this->type, ...$set)
+    /**
+     * Return a new map of pairs grouped by keys determined with the given
+     * discriminator function
+     *
+     * @template D
+     * @param callable(T): D $discriminator
+     *
+     * @throws CannotGroupEmptyStructure
+     *
+     * @return Map<D, self<T>>
+     */
+    public function groupBy(callable $discriminator): Map
+    {
+        return $this->implementation->groupBy($discriminator);
+    }
+
+    /**
+     * Return a new set by applying the given function to all elements
+     *
+     * @param callable(T): T $function
+     *
+     * @return self<T>
+     */
+    public function map(callable $function): self
+    {
+        $self = $this->clear();
+        $self->implementation = $this->implementation->map($function);
+
+        return $self;
+    }
+
+    /**
+     * Return a sequence of 2 sets partitioned according to the given predicate
+     *
+     * @param callable(T): bool $predicate
+     *
+     * @return Map<bool, self<T>>
+     */
+    public function partition(callable $predicate): Map
+    {
+        return $this->implementation->partition($predicate);
+    }
+
+    /**
+     * Return a sequence sorted with the given function
+     *
+     * @param callable(T, T): int $function
+     *
+     * @return Sequence<T>
+     */
+    public function sort(callable $function): Sequence
+    {
+        return $this->implementation->sort($function);
+    }
+
+    /**
+     * Create a new set with elements of both sets
+     *
+     * @param self<T> $set
+     *
+     * @return self<T>
+     */
+    public function merge(self $set): self
+    {
+        assertSet($this->type, $set, 1);
+
+        $self = clone $this;
+        $self->implementation = $this->implementation->merge(
+            $set->implementation,
         );
 
-        return $newSet;
+        return $self;
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function equals(SetInterface $set): bool
-    {
-        $this->validate($set);
-
-        if ($this->size() !== $set->size()) {
-            return false;
-        }
-
-        return $this->intersect($set)->size() === $this->size();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function filter(callable $predicate): SetInterface
-    {
-        $set = clone $this;
-        $set->values = $this->values->filter($predicate);
-
-        return $set;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function foreach(callable $function): SetInterface
-    {
-        $this->values->foreach($function);
-
-        return $this;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function groupBy(callable $discriminator): MapInterface
-    {
-        $map = $this->values->groupBy($discriminator);
-
-        return $map->reduce(
-            new Map((string) $map->keyType(), SetInterface::class),
-            function(MapInterface $carry, $key, StreamInterface $values): MapInterface {
-                $set = $this->clear();
-                $set->values = $values;
-
-                return $carry->put($key, $set);
-            }
-        );
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function map(callable $function): SetInterface
-    {
-        return $this->reduce(
-            $this->clear(),
-            function(SetInterface $carry, $value) use ($function): SetInterface {
-                return $carry->add($function($value));
-            }
-        );
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function partition(callable $predicate): MapInterface
-    {
-        $truthy = $this->clear();
-        $falsy = $this->clear();
-        $partitions = $this->values->partition($predicate);
-        $truthy->values = $partitions->get(true);
-        $falsy->values = $partitions->get(false);
-
-        return Map::of('bool', SetInterface::class)
-            (true, $truthy)
-            (false, $falsy);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function join(string $separator): Str
-    {
-        return $this->values->join($separator);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function sort(callable $function): StreamInterface
-    {
-        return $this->values->sort($function);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function merge(SetInterface $set): SetInterface
-    {
-        $this->validate($set);
-
-        return $set->reduce(
-            $this,
-            function(SetInterface $carry, $value): SetInterface {
-                return $carry->add($value);
-            }
-        );
-    }
-
-    /**
-     * {@inheritdoc}
+     * Reduce the set to a single value
+     *
+     * @template R
+     * @param R $carry
+     * @param callable(R, T): R $reducer
+     *
+     * @return R
      */
     public function reduce($carry, callable $reducer)
     {
-        return $this->values->reduce($carry, $reducer);
+        return $this->implementation->reduce($carry, $reducer);
     }
 
     /**
-     * {@inheritdoc}
+     * Return a set of the same type but without any value
+     *
+     * @return self<T>
      */
-    public function clear(): SetInterface
+    public function clear(): self
     {
         $self = clone $this;
-        $self->values = $this->values->clear();
+        $self->implementation = $this->implementation->clear();
 
         return $self;
     }
 
     public function empty(): bool
     {
-        return $this->values->empty();
+        return $this->implementation->empty();
     }
 
     /**
-     * Make sure the set is compatible with the current one
+     * @template ST
      *
-     * @param SetInterface $set
+     * @param null|callable(T): \Generator<ST> $mapper
      *
-     * @throws InvalidArgumentException
-     *
-     * @return void
+     * @return Sequence<ST>
      */
-    private function validate(SetInterface $set)
+    public function toSequenceOf(string $type, callable $mapper = null): Sequence
     {
-        if (!$set->type()->equals($this->type)) {
-            throw new InvalidArgumentException(
-                'The 2 sets does not reference the same type'
-            );
-        }
+        return $this->implementation->toSequenceOf($type, $mapper);
+    }
+
+    /**
+     * @template ST
+     *
+     * @param null|callable(T): \Generator<ST> $mapper
+     *
+     * @return self<ST>
+     */
+    public function toSetOf(string $type, callable $mapper = null): self
+    {
+        return $this->implementation->toSetOf($type, $mapper);
+    }
+
+    /**
+     * @template MT
+     * @template MS
+     *
+     * @param callable(T): \Generator<MT, MS> $mapper
+     *
+     * @return Map<MT, MS>
+     */
+    public function toMapOf(string $key, string $value, callable $mapper): Map
+    {
+        return $this->implementation->toMapOf($key, $value, $mapper);
     }
 }

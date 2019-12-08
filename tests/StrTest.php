@@ -7,23 +7,23 @@ use Innmind\Immutable\{
     Str as S,
     PrimitiveInterface,
     StringableInterface,
-    StreamInterface,
-    MapInterface,
+    Sequence,
+    Map,
     Exception\SubstringException,
     Exception\RegexException
 };
-use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\{
+    TestCase,
+    ExpectationFailedException,
+};
 
 class StrTest extends TestCase
 {
     public function testInterfaces()
     {
-        $str = new S('foo');
+        $str = S::of('foo');
 
-        $this->assertInstanceOf(PrimitiveInterface::class, $str);
-        $this->assertInstanceOf(StringableInterface::class, $str);
-        $this->assertSame('foo', $str->toPrimitive());
-        $this->assertSame('foo', (string) $str);
+        $this->assertSame('foo', $str->toString());
     }
 
     public function testOf()
@@ -31,199 +31,209 @@ class StrTest extends TestCase
         $str = S::of('foo', 'ASCII');
 
         $this->assertInstanceOf(S::class, $str);
-        $this->assertSame('foo', (string) $str);
-        $this->assertSame('ASCII', (string) $str->encoding());
+        $this->assertSame('foo', $str->toString());
+        $this->assertSame('ASCII', $str->encoding()->toString());
     }
 
     public function testThrowWhenInvalidType()
     {
         $this->expectException(\TypeError::class);
-        $this->expectExceptionMessage('must be of the type string, integer given');
+        $this->expectExceptionMessage('must be of the type string, int given');
 
-        new S(42);
+        S::of(42);
     }
 
     public function testEncoding()
     {
-        $this->assertInstanceOf(S::class, (new S(''))->encoding());
-        $this->assertSame('UTF-8', (string) (new S(''))->encoding());
+        $this->assertInstanceOf(S::class, S::of('')->encoding());
+        $this->assertSame('UTF-8', S::of('')->encoding()->toString());
     }
 
     public function testToEncoding()
     {
-        $str = new S('foo🙏bar');
+        $str = S::of('foo🙏bar');
         $str2 = $str->toEncoding('ASCII');
 
         $this->assertInstanceOf(S::class, $str2);
         $this->assertNotSame($str, $str2);
-        $this->assertSame('UTF-8', (string) $str->encoding());
-        $this->assertSame('ASCII', (string) $str2->encoding());
+        $this->assertSame('UTF-8', $str->encoding()->toString());
+        $this->assertSame('ASCII', $str2->encoding()->toString());
         $this->assertSame(7, $str->length());
         $this->assertSame(10, $str2->length());
     }
 
     public function testSplit()
     {
-        $str = new S('foo');
+        $str = S::of('foo');
 
-        $stream = $str->split();
-        $this->assertInstanceOf(StreamInterface::class, $stream);
-        $this->assertSame(S::class, (string) $stream->type());
-        $this->assertCount(3, $stream);
+        $sequence = $str->split();
+        $this->assertInstanceOf(Sequence::class, $sequence);
+        $this->assertSame(S::class, $sequence->type());
+        $this->assertCount(3, $sequence);
 
-        foreach ($stream as $part) {
+        foreach ($sequence as $part) {
             $this->assertInstanceOf(S::class, $part);
         }
 
-        $this->assertSame('f', (string) $stream[0]);
-        $this->assertSame('o', (string) $stream[1]);
-        $this->assertSame('o', (string) $stream[2]);
+        $this->assertSame('f', $sequence->get(0)->toString());
+        $this->assertSame('o', $sequence->get(1)->toString());
+        $this->assertSame('o', $sequence->get(2)->toString());
 
-        $stream = $str->split('');
-        $this->assertInstanceOf(StreamInterface::class, $stream);
-        $this->assertSame(S::class, (string) $stream->type());
-        $this->assertCount(3, $stream);
+        $parts = S::of('🤩👍🤔', 'UTF-8')->split();
 
-        foreach ($stream as $part) {
+        $this->assertSame('🤩', $parts->get(0)->toString());
+        $this->assertSame('👍', $parts->get(1)->toString());
+        $this->assertSame('🤔', $parts->get(2)->toString());
+        $this->assertNotSame(
+            '🤩',
+            S::of('🤩👍🤔', 'ASCII')->split()->get(0)->toString()
+        );
+
+        $sequence = $str->split('');
+        $this->assertInstanceOf(Sequence::class, $sequence);
+        $this->assertSame(S::class, $sequence->type());
+        $this->assertCount(3, $sequence);
+
+        foreach ($sequence as $part) {
             $this->assertInstanceOf(S::class, $part);
         }
 
-        $this->assertSame('f', (string) $stream[0]);
-        $this->assertSame('o', (string) $stream[1]);
-        $this->assertSame('o', (string) $stream[2]);
+        $this->assertSame('f', $sequence->get(0)->toString());
+        $this->assertSame('o', $sequence->get(1)->toString());
+        $this->assertSame('o', $sequence->get(2)->toString());
 
-        $str = new S('f|o|o');
-        $stream = $str->split('|');
-        $this->assertInstanceOf(StreamInterface::class, $stream);
-        $this->assertSame(S::class, (string) $stream->type());
-        $this->assertCount(3, $stream);
+        $str = S::of('f|o|o');
+        $sequence = $str->split('|');
+        $this->assertInstanceOf(Sequence::class, $sequence);
+        $this->assertSame(S::class, $sequence->type());
+        $this->assertCount(3, $sequence);
 
-        foreach ($stream as $part) {
+        foreach ($sequence as $part) {
             $this->assertInstanceOf(S::class, $part);
         }
 
-        $this->assertSame('f', (string) $stream[0]);
-        $this->assertSame('o', (string) $stream[1]);
-        $this->assertSame('o', (string) $stream[2]);
+        $this->assertSame('f', $sequence->get(0)->toString());
+        $this->assertSame('o', $sequence->get(1)->toString());
+        $this->assertSame('o', $sequence->get(2)->toString());
     }
 
     public function testSplitOnZeroString()
     {
-        $parts = (new S('10101'))->split('0');
+        $parts = S::of('10101')->split('0');
 
         $this->assertCount(3, $parts);
-        $this->assertSame('1', (string) $parts[0]);
-        $this->assertSame('1', (string) $parts[1]);
-        $this->assertSame('1', (string) $parts[2]);
+        $this->assertSame('1', $parts->get(0)->toString());
+        $this->assertSame('1', $parts->get(1)->toString());
+        $this->assertSame('1', $parts->get(2)->toString());
     }
 
     public function testSplitUtf8ManipulatedAsAscii()
     {
-        $str = new S('foo🙏bar');
+        $str = S::of('foo🙏bar');
         $splits = $str->split();
 
-        $this->assertSame('f', (string) $splits[0]);
-        $this->assertSame('o', (string) $splits[1]);
-        $this->assertSame('o', (string) $splits[2]);
-        $this->assertSame('🙏', (string) $splits[3]);
-        $this->assertSame('b', (string) $splits[4]);
-        $this->assertSame('a', (string) $splits[5]);
-        $this->assertSame('r', (string) $splits[6]);
+        $this->assertSame('f', $splits->get(0)->toString());
+        $this->assertSame('o', $splits->get(1)->toString());
+        $this->assertSame('o', $splits->get(2)->toString());
+        $this->assertSame('🙏', $splits->get(3)->toString());
+        $this->assertSame('b', $splits->get(4)->toString());
+        $this->assertSame('a', $splits->get(5)->toString());
+        $this->assertSame('r', $splits->get(6)->toString());
 
         $splits = $str->toEncoding('ASCII')->split();
 
-        $this->assertSame('f', (string) $splits[0]);
-        $this->assertSame('o', (string) $splits[1]);
-        $this->assertSame('o', (string) $splits[2]);
+        $this->assertSame('f', $splits->get(0)->toString());
+        $this->assertSame('o', $splits->get(1)->toString());
+        $this->assertSame('o', $splits->get(2)->toString());
         $this->assertSame(
             '🙏',
-            $splits[3].$splits[4].$splits[5].$splits[6]
+            $splits->get(3)->toString().$splits->get(4)->toString().$splits->get(5)->toString().$splits->get(6)->toString()
         );
-        $this->assertSame('b', (string) $splits[7]);
-        $this->assertSame('a', (string) $splits[8]);
-        $this->assertSame('r', (string) $splits[9]);
+        $this->assertSame('b', $splits->get(7)->toString());
+        $this->assertSame('a', $splits->get(8)->toString());
+        $this->assertSame('r', $splits->get(9)->toString());
     }
 
     public function testSplitUtf8ManipulatedAsAsciiWithDelimiter()
     {
-        $str = new S('foo🙏bar');
+        $str = S::of('foo🙏bar');
         $splits = $str->split('🙏');
 
-        $this->assertSame('foo', (string) $splits[0]);
-        $this->assertSame('bar', (string) $splits[1]);
+        $this->assertSame('foo', $splits->get(0)->toString());
+        $this->assertSame('bar', $splits->get(1)->toString());
 
         $splits = $str->toEncoding('ASCII')->split('🙏');
 
-        $this->assertSame('foo', (string) $splits[0]);
-        $this->assertSame('bar', (string) $splits[1]);
+        $this->assertSame('foo', $splits->get(0)->toString());
+        $this->assertSame('bar', $splits->get(1)->toString());
 
         $splits = $str->toEncoding('ASCII')->split(
             mb_substr('🙏', 0, 1, 'ASCII')
         );
 
-        $this->assertSame('foo', (string) $splits[0]);
+        $this->assertSame('foo', $splits->get(0)->toString());
         $this->assertSame(
             mb_substr('🙏', 1, null, 'ASCII').'bar',
-            (string) $splits[1]
+            $splits->get(1)->toString()
         );
     }
 
     public function testChunk()
     {
-        $str = new S('foobarbaz');
+        $str = S::of('foobarbaz');
 
-        $stream = $str->chunk(4);
-        $this->assertInstanceOf(StreamInterface::class, $stream);
-        $this->assertSame(S::class, (string) $stream->type());
-        $this->assertInstanceOf(S::class, $stream[0]);
-        $this->assertInstanceOf(S::class, $stream[1]);
-        $this->assertInstanceOf(S::class, $stream[2]);
-        $this->assertSame('foob', (string) $stream[0]);
-        $this->assertSame('arba', (string) $stream[1]);
-        $this->assertSame('z', (string) $stream[2]);
+        $sequence = $str->chunk(4);
+        $this->assertInstanceOf(Sequence::class, $sequence);
+        $this->assertSame(S::class, $sequence->type());
+        $this->assertInstanceOf(S::class, $sequence->get(0));
+        $this->assertInstanceOf(S::class, $sequence->get(1));
+        $this->assertInstanceOf(S::class, $sequence->get(2));
+        $this->assertSame('foob', $sequence->get(0)->toString());
+        $this->assertSame('arba', $sequence->get(1)->toString());
+        $this->assertSame('z', $sequence->get(2)->toString());
     }
 
     public function testChunkUtf8ManipulatedAsAscii()
     {
-        $splits = (new S('foo🙏bar'))
+        $splits = S::of('foo🙏bar')
             ->toEncoding('ASCII')
             ->chunk();
 
-        $this->assertSame('f', (string) $splits[0]);
-        $this->assertSame('o', (string) $splits[1]);
-        $this->assertSame('o', (string) $splits[2]);
+        $this->assertSame('f', $splits->get(0)->toString());
+        $this->assertSame('o', $splits->get(1)->toString());
+        $this->assertSame('o', $splits->get(2)->toString());
         $this->assertSame(
             '🙏',
-            $splits[3].$splits[4].$splits[5].$splits[6]
+            $splits->get(3)->toString().$splits->get(4)->toString().$splits->get(5)->toString().$splits->get(6)->toString()
         );
-        $this->assertSame('b', (string) $splits[7]);
-        $this->assertSame('a', (string) $splits[8]);
-        $this->assertSame('r', (string) $splits[9]);
+        $this->assertSame('b', $splits->get(7)->toString());
+        $this->assertSame('a', $splits->get(8)->toString());
+        $this->assertSame('r', $splits->get(9)->toString());
 
-        $splits = (new S('foo🙏bar'))
+        $splits = S::of('foo🙏bar')
             ->toEncoding('ASCII')
             ->chunk(3);
 
-        $this->assertSame('foo', (string) $splits[0]);
+        $this->assertSame('foo', $splits->get(0)->toString());
         $this->assertSame(
             mb_substr('🙏', 0, 3, 'ASCII'),
-            (string) $splits[1]
+            $splits->get(1)->toString()
         );
         $this->assertSame(
             mb_substr('🙏', 3, 4, 'ASCII').'ba',
-            (string) $splits[2]
+            $splits->get(2)->toString()
         );
-        $this->assertSame('r', (string) $splits[3]);
+        $this->assertSame('r', $splits->get(3)->toString());
     }
 
     public function testPosition()
     {
-        $str = new S('foo');
+        $str = S::of('foo');
 
         $this->assertSame(1, $str->position('o'));
         $this->assertSame(2, $str->position('o', 2));
 
-        $emoji = new S('foo🙏bar');
+        $emoji = S::of('foo🙏bar');
 
         $this->assertSame(4, $emoji->position('bar'));
         $this->assertSame(7, $emoji->toEncoding('ASCII')->position('bar'));
@@ -234,68 +244,68 @@ class StrTest extends TestCase
         $this->expectException(SubstringException::class);
         $this->expectExceptionMessage('Substring "o" not found');
 
-        (new S('bar'))->position('o');
+        S::of('bar')->position('o');
     }
 
     public function testReplace()
     {
-        $str = new S('<body text="%body%">');
+        $str = S::of('<body text="%body%">');
 
         $str2 = $str->replace('%body%', 'black');
         $this->assertInstanceOf(S::class, $str2);
         $this->assertNotSame($str, $str2);
-        $this->assertSame('<body text="black">', (string) $str2);
-        $this->assertSame('<body text="%body%">', (string) $str);
+        $this->assertSame('<body text="black">', $str2->toString());
+        $this->assertSame('<body text="%body%">', $str->toString());
 
-        $this->assertSame('foo', (string) (new S('foo'))->replace('.', '/'));
-        $this->assertSame('foo/bar', (string) (new S('foo.bar'))->replace('.', '/'));
+        $this->assertSame('foo', S::of('foo')->replace('.', '/')->toString());
+        $this->assertSame('foo/bar', S::of('foo.bar')->replace('.', '/')->toString());
     }
 
     public function testReplaceWithDifferentEncoding()
     {
-        $str = new S('foo🙏🙏🙏bar');
+        $str = S::of('foo🙏🙏🙏bar');
 
         $str2 = $str->replace(
             mb_substr('🙏', 0, 1, 'ASCII'),
             'baz'
         );
         $remaining = mb_substr('🙏', 1, null, 'ASCII');
-        $this->assertSame('foo🙏🙏🙏bar', (string) $str);
+        $this->assertSame('foo🙏🙏🙏bar', $str->toString());
         $this->assertSame(
             'foobaz'.$remaining.'baz'.$remaining.'baz'.$remaining.'bar',
-            (string) $str2
+            $str2->toString()
         );
 
         $str3 = $str->toEncoding('ASCII')->replace(
             mb_substr('🙏', 0, 1, 'ASCII'),
             'baz'
         );
-        $this->assertSame('foo🙏🙏🙏bar', (string) $str);
+        $this->assertSame('foo🙏🙏🙏bar', $str->toString());
         $subPray = mb_substr('🙏', 1, null, 'ASCII');
         $this->assertSame(
             'foobaz'.$subPray.'baz'.$subPray.'baz'.$subPray.'bar',
-            (string) $str3
+            $str3->toString()
         );
     }
 
     public function testStr()
     {
-        $str = new S('name@example.com');
+        $str = S::of('name@example.com');
 
         $str2 = $str->str('@');
         $this->assertInstanceOf(S::class, $str2);
         $this->assertNotSame($str, $str2);
-        $this->assertSame('@example.com', (string) $str2);
-        $this->assertSame('name@example.com', (string) $str);
+        $this->assertSame('@example.com', $str2->toString());
+        $this->assertSame('name@example.com', $str->toString());
     }
 
     public function testStrUtf8ManipulatedAsAscii()
     {
-        $str = new S('foo🙏bar');
+        $str = S::of('foo🙏bar');
 
         $str2 = $str->toEncoding('ASCII')->str(mb_substr('🙏', 0, 1, 'ASCII'));
-        $this->assertSame('foo🙏bar', (string) $str);
-        $this->assertSame('🙏bar', (string) $str2);
+        $this->assertSame('foo🙏bar', $str->toString());
+        $this->assertSame('🙏bar', $str2->toString());
     }
 
     public function testThrowWhenStrDelimiterNotFound()
@@ -303,37 +313,37 @@ class StrTest extends TestCase
         $this->expectException(SubstringException::class);
         $this->expectExceptionMessage('Substring "foo" not found');
 
-        (new S('name@example.com'))->str('foo');
+        S::of('name@example.com')->str('foo');
     }
 
     public function testToUpper()
     {
-        $str = new S('foo🙏');
+        $str = S::of('foo🙏');
 
         $str2 = $str->toUpper();
         $this->assertInstanceOf(S::class, $str2);
         $this->assertNotSame($str, $str2);
-        $this->assertSame('FOO🙏', (string) $str2);
-        $this->assertSame('foo🙏', (string) $str);
-        $this->assertSame('ÉGÉRIE', (string) S::of('égérie')->toUpper());
+        $this->assertSame('FOO🙏', $str2->toString());
+        $this->assertSame('foo🙏', $str->toString());
+        $this->assertSame('ÉGÉRIE', S::of('égérie')->toUpper()->toString());
     }
 
     public function testToLower()
     {
-        $str = new S('FOO🙏');
+        $str = S::of('FOO🙏');
 
         $str2 = $str->toLower();
         $this->assertInstanceOf(S::class, $str2);
         $this->assertNotSame($str, $str2);
-        $this->assertSame('foo🙏', (string) $str2);
-        $this->assertSame('FOO🙏', (string) $str);
-        $this->assertSame('égérie', (string) S::of('ÉGÉRIE')->toLower());
+        $this->assertSame('foo🙏', $str2->toString());
+        $this->assertSame('FOO🙏', $str->toString());
+        $this->assertSame('égérie', S::of('ÉGÉRIE')->toLower()->toString());
     }
 
     public function testLength()
     {
-        $this->assertSame(4, (new S('foo🙏'))->length());
-        $this->assertSame(7, (new S('foo🙏'))->toEncoding('ASCII')->length());
+        $this->assertSame(4, S::of('foo🙏')->length());
+        $this->assertSame(7, S::of('foo🙏')->toEncoding('ASCII')->length());
     }
 
     public function testEmpty()
@@ -345,51 +355,63 @@ class StrTest extends TestCase
 
     public function testReverse()
     {
-        $str = new S('foo🙏');
+        $str = S::of('foo🙏');
 
         $str2 = $str->reverse();
         $this->assertInstanceOf(S::class, $str2);
         $this->assertNotSame($str, $str2);
-        $this->assertSame('🙏oof', (string) $str2);
-        $this->assertSame('foo🙏', (string) $str);
+        $this->assertSame('🙏oof', $str2->toString());
+        $this->assertSame('foo🙏', $str->toString());
         $this->assertSame(
             strrev('🙏').'oof',
-            (string) $str->toEncoding('ASCII')->reverse()
+            $str->toEncoding('ASCII')->reverse()->toString()
+        );
+    }
+
+    public function testReverseKeepTheGivenEncoding()
+    {
+        $this->assertSame(
+            'UTF-8',
+            S::of('foo')->reverse()->encoding()->toString(),
+        );
+        $this->assertSame(
+            'ASCII',
+            S::of('foo', 'ASCII')->reverse()->encoding()->toString(),
         );
     }
 
     public function testPad()
     {
-        $str = new S('foo');
+        $str = S::of('foo');
 
         $str2 = $str->rightPad(6, '0');
         $this->assertInstanceOf(S::class, $str2);
         $this->assertNotSame($str, $str2);
-        $this->assertSame('foo000', (string) $str2);
-        $this->assertSame('foo', (string) $str);
+        $this->assertSame('foo000', $str2->toString());
+        $this->assertSame('foo', $str->toString());
 
         $str2 = $str->leftPad(6, '0');
         $this->assertInstanceOf(S::class, $str2);
         $this->assertNotSame($str, $str2);
-        $this->assertSame('000foo', (string) $str2);
-        $this->assertSame('foo', (string) $str);
+        $this->assertSame('000foo', $str2->toString());
+        $this->assertSame('foo', $str->toString());
 
         $str2 = $str->uniPad(6, '0');
         $this->assertInstanceOf(S::class, $str2);
         $this->assertNotSame($str, $str2);
-        $this->assertSame('0foo00', (string) $str2);
-        $this->assertSame('foo', (string) $str);
+        $this->assertSame('0foo00', $str2->toString());
+        $this->assertSame('foo', $str->toString());
     }
 
     public function testCspn()
     {
-        $str = new S('abcdhelloabcd');
+        $str = S::of('abcdhelloabcd');
 
         $this->assertSame(0, $str->cspn('abcd'));
         $this->assertSame(5, $str->cspn('abcd', -9));
         $this->assertSame(4, $str->cspn('abcd', -9, -5));
 
-        $str = new S('foo🙏bar');
+        $str = S::of('foo🙏bar');
 
         $this->assertSame(3, $str->cspn('🙏'));
         $this->assertSame(0, $str->cspn('🙏', 4));
@@ -400,30 +422,30 @@ class StrTest extends TestCase
 
     public function testRepeat()
     {
-        $str = new S('foo');
+        $str = S::of('foo');
 
         $str2 = $str->repeat(3);
         $this->assertInstanceOf(S::class, $str2);
         $this->assertNotSame($str, $str2);
-        $this->assertSame('foofoofoo', (string) $str2);
-        $this->assertSame('foo', (string) $str);
-        $this->assertSame('🙏🙏', (string) (new S('🙏'))->repeat(2));
-        $this->assertSame('🙏🙏', (string) (new S('🙏'))->toEncoding('ASCII')->repeat(2));
+        $this->assertSame('foofoofoo', $str2->toString());
+        $this->assertSame('foo', $str->toString());
+        $this->assertSame('🙏🙏', S::of('🙏')->repeat(2)->toString());
+        $this->assertSame('🙏🙏', S::of('🙏')->toEncoding('ASCII')->repeat(2)->toString());
     }
 
     public function testShuffle()
     {
-        $str = new S('shuffle🙏');
+        $str = S::of('shuffle🙏');
 
         $str2 = $str->shuffle();
         $this->assertInstanceOf(S::class, $str2);
         $this->assertNotSame($str, $str2);
-        $this->assertSame('shuffle🙏', (string) $str);
+        $this->assertSame('shuffle🙏', $str->toString());
         $this->assertSame(8, $str2->length());
 
         try {
             foreach ($str2->split() as $char) {
-                $str->position((string) $char);
+                $str->position($char->toString());
             }
         } catch (\Exception $e) {
             $this->fail('every character should be in the original string');
@@ -432,40 +454,45 @@ class StrTest extends TestCase
 
     public function testShuffleEmoji()
     {
-        $str = new S('🙏');
+        $str = S::of('🙏');
 
-        $this->assertSame('🙏', (string) $str->shuffle());
+        try {
+            $this->assertSame('🙏 ', $str->shuffle()->toString());
+        } catch (ExpectationFailedException $e) {
+            // sometimes it shuffles to the same order so the tests fails
+            $this->assertSame('🙏', $str->shuffle()->toString());
+        }
         $this->assertNotSame(
             '🙏',
-            (string) $str->toEncoding('ASCII')->shuffle()
+            $str->toEncoding('ASCII')->shuffle()->toString()
         );
     }
 
     public function testStripSlashes()
     {
-        $str = new S("Is your name O\'reilly?");
+        $str = S::of("Is your name O\'reilly?");
 
         $str2 = $str->stripSlashes();
         $this->assertInstanceOf(S::class, $str2);
         $this->assertNotSame($str, $str2);
-        $this->assertSame("Is your name O\'reilly?", (string) $str);
-        $this->assertSame("Is your name O'reilly?", (string) $str2);
+        $this->assertSame("Is your name O\'reilly?", $str->toString());
+        $this->assertSame("Is your name O'reilly?", $str2->toString());
     }
 
     public function testStripCSlahes()
     {
-        $str = new S('He\xallo');
+        $str = S::of('He\xallo');
 
         $str2 = $str->stripCSlashes();
         $this->assertInstanceOf(S::class, $str2);
         $this->assertNotSame($str, $str2);
-        $this->assertSame('He\xallo', (string) $str);
-        $this->assertSame('He' . "\n" . 'llo', (string) $str2);
+        $this->assertSame('He\xallo', $str->toString());
+        $this->assertSame('He' . "\n" . 'llo', $str2->toString());
     }
 
     public function testWordCount()
     {
-        $str = new S("Hello fri3nd, you're
+        $str = S::of("Hello fri3nd, you're
                     looking          good today!");
 
         $this->assertSame(7, $str->wordCount());
@@ -474,13 +501,13 @@ class StrTest extends TestCase
 
     public function testWords()
     {
-        $str = new S("Hello fri3nd, you're
+        $str = S::of("Hello fri3nd, you're
         looking          good today!");
 
         $map = $str->words();
-        $this->assertInstanceOf(MapInterface::class, $map);
-        $this->assertSame('int', (string) $map->keyType());
-        $this->assertSame(S::class, (string) $map->valueType());
+        $this->assertInstanceOf(Map::class, $map);
+        $this->assertSame('int', $map->keyType());
+        $this->assertSame(S::class, $map->valueType());
         $words = [
             0 => 'Hello',
             6 => 'fri',
@@ -492,14 +519,14 @@ class StrTest extends TestCase
         ];
 
         foreach ($words as $pos => $word) {
-            $this->assertInstanceOf(S::class, $map[$pos]);
-            $this->assertSame($word, (string) $map[$pos]);
+            $this->assertInstanceOf(S::class, $map->get($pos));
+            $this->assertSame($word, $map->get($pos)->toString());
         }
 
         $map = $str->words('àáãç3');
-        $this->assertInstanceOf(MapInterface::class, $map);
-        $this->assertSame('int', (string) $map->keyType());
-        $this->assertSame(S::class, (string) $map->valueType());
+        $this->assertInstanceOf(Map::class, $map);
+        $this->assertSame('int', $map->keyType());
+        $this->assertSame(S::class, $map->valueType());
         $words = [
             0 => 'Hello',
             6 => 'fri3nd',
@@ -510,32 +537,32 @@ class StrTest extends TestCase
         ];
 
         foreach ($words as $pos => $word) {
-            $this->assertInstanceOf(S::class, $map[$pos]);
-            $this->assertSame($word, (string) $map[$pos]);
+            $this->assertInstanceOf(S::class, $map->get($pos));
+            $this->assertSame($word, $map->get($pos)->toString());
         }
     }
 
     public function testPregSplit()
     {
-        $str = new S('hypertext language, programming');
+        $str = S::of('hypertext language, programming');
 
         $c = $str->pregSplit('/[\s,]+/');
-        $this->assertInstanceOf(StreamInterface::class, $c);
-        $this->assertSame(S::class, (string) $c->type());
-        $this->assertSame('hypertext', (string) $c[0]);
-        $this->assertSame('language', (string) $c[1]);
-        $this->assertSame('programming', (string) $c[2]);
+        $this->assertInstanceOf(Sequence::class, $c);
+        $this->assertSame(S::class, $c->type());
+        $this->assertSame('hypertext', $c->get(0)->toString());
+        $this->assertSame('language', $c->get(1)->toString());
+        $this->assertSame('programming', $c->get(2)->toString());
     }
 
     public function testMatches()
     {
-        $str = new S('abcdef');
+        $str = S::of('abcdef');
 
         $this->assertFalse($str->matches('/^def/'));
         $this->assertTrue($str->matches('/^abc/'));
 
-        $this->assertTrue((new S('foo🙏bar'))->matches('/🙏/'));
-        $this->assertTrue((new S('foo🙏bar'))->toEncoding('ASCII')->matches('/🙏/'));
+        $this->assertTrue(S::of('foo🙏bar')->matches('/🙏/'));
+        $this->assertTrue(S::of('foo🙏bar')->toEncoding('ASCII')->matches('/🙏/'));
     }
 
     public function testThrowWhenMatchInvalidRegex()
@@ -543,41 +570,41 @@ class StrTest extends TestCase
         $this->expectException(RegexException::class);
         $this->expectExceptionMessage('Backtrack limit error');
 
-        (new S(str_repeat("x", 1000000)))->matches('/x+x+y/');
+        S::of(str_repeat("x", 1000000))->matches('/x+x+y/');
     }
 
     public function testCapture()
     {
-        $str = new S('http://www.php.net/index.html');
+        $str = S::of('http://www.php.net/index.html');
 
         $map = $str->capture('@^(?:http://)?(?P<host>[^/]+)@i');
-        $this->assertInstanceOf(MapInterface::class, $map);
-        $this->assertSame('scalar', (string) $map->keyType());
-        $this->assertSame(S::class, (string) $map->valueType());
+        $this->assertInstanceOf(Map::class, $map);
+        $this->assertSame('scalar', $map->keyType());
+        $this->assertSame(S::class, $map->valueType());
         $this->assertCount(3, $map);
-        $this->assertSame('http://www.php.net', (string) $map[0]);
-        $this->assertSame('www.php.net', (string) $map[1]);
-        $this->assertSame('www.php.net', (string) $map['host']);
+        $this->assertSame('http://www.php.net', $map->get(0)->toString());
+        $this->assertSame('www.php.net', $map->get(1)->toString());
+        $this->assertSame('www.php.net', $map->get('host')->toString());
     }
 
     public function testCastNullValuesWhenCapturing()
     {
-        $str = new S('en;q=0.7');
+        $str = S::of('en;q=0.7');
 
         $matches = $str->capture('~(?<lang>([a-zA-Z0-9]+(-[a-zA-Z0-9]+)*|\*))(; ?q=(?<quality>\d+(\.\d+)?))?~');
-        $this->assertInstanceOf(MapInterface::class, $matches);
-        $this->assertSame('scalar', (string) $matches->keyType());
-        $this->assertSame(S::class, (string) $matches->valueType());
+        $this->assertInstanceOf(Map::class, $matches);
+        $this->assertSame('scalar', $matches->keyType());
+        $this->assertSame(S::class, $matches->valueType());
         $this->assertCount(9, $matches);
-        $this->assertSame('en;q=0.7', (string) $matches->get(0));
-        $this->assertSame('en', (string) $matches->get(1));
-        $this->assertSame('en', (string) $matches->get(2));
-        $this->assertSame('', (string) $matches->get(3));
-        $this->assertSame('en', (string) $matches->get('lang'));
-        $this->assertSame(';q=0.7', (string) $matches->get(4));
-        $this->assertSame('0.7', (string) $matches->get(5));
-        $this->assertSame('0.7', (string) $matches->get('quality'));
-        $this->assertSame('.7', (string) $matches->get(6));
+        $this->assertSame('en;q=0.7', $matches->get(0)->toString());
+        $this->assertSame('en', $matches->get(1)->toString());
+        $this->assertSame('en', $matches->get(2)->toString());
+        $this->assertSame('', $matches->get(3)->toString());
+        $this->assertSame('en', $matches->get('lang')->toString());
+        $this->assertSame(';q=0.7', $matches->get(4)->toString());
+        $this->assertSame('0.7', $matches->get(5)->toString());
+        $this->assertSame('0.7', $matches->get('quality')->toString());
+        $this->assertSame('.7', $matches->get(6)->toString());
     }
 
     public function testThrowWhenGettingMatchesInvalidRegex()
@@ -585,214 +612,214 @@ class StrTest extends TestCase
         $this->expectException(RegexException::class);
         $this->expectExceptionMessage('Backtrack limit error');
 
-        (new S(str_repeat("x", 1000000)))->capture('/x+x+y/');
+        S::of(str_repeat("x", 1000000))->capture('/x+x+y/');
     }
 
     public function testPregReplace()
     {
-        $str = new S('April 15, 2003');
+        $str = S::of('April 15, 2003');
 
         $str2 = $str->pregReplace('/(\w+) (\d+), (\d+)/i', '${1}1,$3');
         $this->assertInstanceOf(S::class, $str2);
         $this->assertNotSame($str, $str2);
-        $this->assertSame('April1,2003', (string) $str2);
-        $this->assertSame('April 15, 2003', (string) $str);
+        $this->assertSame('April1,2003', $str2->toString());
+        $this->assertSame('April 15, 2003', $str->toString());
     }
 
     public function testSubstring()
     {
-        $str = new S('foobarbaz');
+        $str = S::of('foobarbaz');
 
         $str2 = $str->substring(3);
         $this->assertInstanceOf(S::class, $str2);
         $this->assertNotSame($str, $str2);
-        $this->assertSame('barbaz', (string) $str2);
-        $this->assertSame('foobarbaz', (string) $str);
+        $this->assertSame('barbaz', $str2->toString());
+        $this->assertSame('foobarbaz', $str->toString());
 
         $str3 = $str->substring(3, 3);
         $this->assertInstanceOf(S::class, $str3);
         $this->assertNotSame($str, $str3);
-        $this->assertSame('bar', (string) $str3);
-        $this->assertSame('foobarbaz', (string) $str);
+        $this->assertSame('bar', $str3->toString());
+        $this->assertSame('foobarbaz', $str->toString());
 
-        $str4 = ($str = new S(''))->substring(0, -1);
+        $str4 = ($str = S::of(''))->substring(0, -1);
 
         $this->assertSame($str, $str4);
     }
 
     public function testTake()
     {
-        $str = new S('foobarbaz');
+        $str = S::of('foobarbaz');
 
         $str2 = $str->take(3);
 
         $this->assertInstanceOf(S::class, $str2);
         $this->assertNotSame($str, $str2);
-        $this->assertSame('foo', (string) $str2);
-        $this->assertSame('foobarbaz', (string) $str);
+        $this->assertSame('foo', $str2->toString());
+        $this->assertSame('foobarbaz', $str->toString());
     }
 
     public function testTakeEnd()
     {
-        $str = new S('foobarbaz');
+        $str = S::of('foobarbaz');
 
         $str2 = $str->takeEnd(3);
 
         $this->assertInstanceOf(S::class, $str2);
         $this->assertNotSame($str, $str2);
-        $this->assertSame('baz', (string) $str2);
-        $this->assertSame('foobarbaz', (string) $str);
+        $this->assertSame('baz', $str2->toString());
+        $this->assertSame('foobarbaz', $str->toString());
     }
 
     public function testDrop()
     {
-        $str = new S('foobarbaz');
+        $str = S::of('foobarbaz');
 
         $str2 = $str->drop(3);
 
         $this->assertInstanceOf(S::class, $str2);
         $this->assertNotSame($str, $str2);
-        $this->assertSame('barbaz', (string) $str2);
-        $this->assertSame('foobarbaz', (string) $str);
+        $this->assertSame('barbaz', $str2->toString());
+        $this->assertSame('foobarbaz', $str->toString());
     }
 
     public function testDropEnd()
     {
-        $str = new S('foobarbaz');
+        $str = S::of('foobarbaz');
 
         $str2 = $str->dropEnd(3);
 
         $this->assertInstanceOf(S::class, $str2);
         $this->assertNotSame($str, $str2);
-        $this->assertSame('foobar', (string) $str2);
-        $this->assertSame('foobarbaz', (string) $str);
+        $this->assertSame('foobar', $str2->toString());
+        $this->assertSame('foobarbaz', $str->toString());
     }
 
     public function testSubstringUtf8ManipulatedAsAscii()
     {
-        $str = (new S('foo🙏bar'))->toEncoding('ASCII');
+        $str = S::of('foo🙏bar')->toEncoding('ASCII');
 
-        $this->assertSame('🙏bar', (string) $str->substring(3));
-        $this->assertSame('🙏', (string) $str->substring(3, 4));
+        $this->assertSame('🙏bar', $str->substring(3)->toString());
+        $this->assertSame('🙏', $str->substring(3, 4)->toString());
         $this->assertSame(
             mb_substr('🙏', 0, 1, 'ASCII'),
-            (string) $str->substring(3, 1)
+            $str->substring(3, 1)->toString()
         );
     }
 
     public function testSprintf()
     {
-        $str = new S('foo %s baz');
+        $str = S::of('foo %s baz');
 
         $str2 = $str->sprintf('bar');
         $this->assertInstanceOf(S::class, $str2);
         $this->assertNotSame($str, $str2);
-        $this->assertSame('foo bar baz', (string) $str2);
-        $this->assertSame('foo %s baz', (string) $str);
+        $this->assertSame('foo bar baz', $str2->toString());
+        $this->assertSame('foo %s baz', $str->toString());
     }
 
     public function testUcfirst()
     {
-        $str = new S('foo');
+        $str = S::of('foo');
 
         $str2 = $str->ucfirst();
         $this->assertInstanceOf(S::class, $str2);
         $this->assertNotSame($str, $str2);
-        $this->assertSame('foo', (string) $str);
-        $this->assertSame('Foo', (string) $str2);
-        $this->assertSame('🙏', (string) (new S('🙏'))->ucfirst());
-        $this->assertSame('Égérie', (string) S::of('égérie')->ucfirst());
+        $this->assertSame('foo', $str->toString());
+        $this->assertSame('Foo', $str2->toString());
+        $this->assertSame('🙏', S::of('🙏')->ucfirst()->toString());
+        $this->assertSame('Égérie', S::of('égérie')->ucfirst()->toString());
     }
 
     public function testLcfirst()
     {
-        $str = new S('FOO');
+        $str = S::of('FOO');
 
         $str2 = $str->lcfirst();
         $this->assertInstanceOf(S::class, $str2);
         $this->assertNotSame($str, $str2);
-        $this->assertSame('FOO', (string) $str);
-        $this->assertSame('fOO', (string) $str2);
-        $this->assertSame('🙏', (string) (new S('🙏'))->lcfirst());
-        $this->assertSame('éGÉRIE', (string) S::of('ÉGÉRIE')->lcfirst());
+        $this->assertSame('FOO', $str->toString());
+        $this->assertSame('fOO', $str2->toString());
+        $this->assertSame('🙏', S::of('🙏')->lcfirst()->toString());
+        $this->assertSame('éGÉRIE', S::of('ÉGÉRIE')->lcfirst()->toString());
     }
 
     public function testCamelize()
     {
-        $str = new S('foo_bar baz');
+        $str = S::of('foo_bar baz');
 
         $str2 = $str->camelize();
         $this->assertInstanceOf(S::class, $str2);
         $this->assertNotSame($str, $str2);
-        $this->assertSame('foo_bar baz', (string) $str);
-        $this->assertSame('FooBarBaz', (string) $str2);
+        $this->assertSame('foo_bar baz', $str->toString());
+        $this->assertSame('fooBarBaz', $str2->toString());
     }
 
     public function testAppend()
     {
-        $str = new S('foo');
+        $str = S::of('foo');
 
         $str2 = $str->append(' bar');
         $this->assertNotSame($str, $str2);
-        $this->assertSame('foo', (string) $str);
-        $this->assertSame('foo bar', (string) $str2);
+        $this->assertSame('foo', $str->toString());
+        $this->assertSame('foo bar', $str2->toString());
     }
 
     public function testPrepend()
     {
-        $str = new S('foo');
+        $str = S::of('foo');
 
         $str2 = $str->prepend('baz ');
         $this->assertNotSame($str, $str2);
-        $this->assertSame('foo', (string) $str);
-        $this->assertSame('baz foo', (string) $str2);
+        $this->assertSame('foo', $str->toString());
+        $this->assertSame('baz foo', $str2->toString());
     }
 
     public function testEquals()
     {
-        $this->assertTrue((new S('foo'))->equals(new S('foo')));
-        $this->assertFalse((new S('foo'))->equals(new S('fo')));
+        $this->assertTrue(S::of('foo')->equals(S::of('foo')));
+        $this->assertFalse(S::of('foo')->equals(S::of('fo')));
     }
 
     public function testTrim()
     {
-        $str = new S(' foo ');
+        $str = S::of(' foo ');
         $str2 = $str->trim();
 
         $this->assertInstanceOf(S::class, $str2);
         $this->assertNotSame($str, $str2);
-        $this->assertSame(' foo ', (string) $str);
-        $this->assertSame('foo', (string) $str2);
-        $this->assertSame('f', (string) $str2->trim('o'));
+        $this->assertSame(' foo ', $str->toString());
+        $this->assertSame('foo', $str2->toString());
+        $this->assertSame('f', $str2->trim('o')->toString());
     }
 
     public function testRightTrim()
     {
-        $str = new S(' foo ');
+        $str = S::of(' foo ');
         $str2 = $str->rightTrim();
 
         $this->assertInstanceOf(S::class, $str2);
         $this->assertNotSame($str, $str2);
-        $this->assertSame(' foo ', (string) $str);
-        $this->assertSame(' foo', (string) $str2);
-        $this->assertSame(' f', (string) $str2->rightTrim('o'));
+        $this->assertSame(' foo ', $str->toString());
+        $this->assertSame(' foo', $str2->toString());
+        $this->assertSame(' f', $str2->rightTrim('o')->toString());
     }
 
     public function testLeftTrim()
     {
-        $str = new S(' foo ');
+        $str = S::of(' foo ');
         $str2 = $str->leftTrim();
 
         $this->assertInstanceOf(S::class, $str2);
         $this->assertNotSame($str, $str2);
-        $this->assertSame(' foo ', (string) $str);
-        $this->assertSame('foo ', (string) $str2);
-        $this->assertSame('oo ', (string) $str2->leftTrim('f'));
+        $this->assertSame(' foo ', $str->toString());
+        $this->assertSame('foo ', $str2->toString());
+        $this->assertSame('oo ', $str2->leftTrim('f')->toString());
     }
 
     public function testContains()
     {
-        $str = new S('foobar');
+        $str = S::of('foobar');
 
         $this->assertTrue($str->contains('foo'));
         $this->assertTrue($str->contains('bar'));
@@ -801,7 +828,7 @@ class StrTest extends TestCase
 
     public function testStartsWith()
     {
-        $str = new S('foobar');
+        $str = S::of('foobar');
 
         $this->assertTrue($str->startsWith(''));
         $this->assertTrue($str->startsWith('foo'));
@@ -814,7 +841,7 @@ class StrTest extends TestCase
 
     public function testEndsWith()
     {
-        $str = new S('foobar');
+        $str = S::of('foobar');
 
         $this->assertTrue($str->endsWith(''));
         $this->assertTrue($str->endsWith('bar'));
@@ -827,14 +854,14 @@ class StrTest extends TestCase
 
     public function testPregQuote()
     {
-        $a = new S('foo#bar.*');
+        $a = S::of('foo#bar.*');
         $b = $a->pregQuote();
-        $c = $a->pregQuote('#');
+        $c = $a->pregQuote('o');
 
         $this->assertInstanceOf(S::class, $b);
         $this->assertInstanceOf(S::class, $c);
-        $this->assertSame('foo#bar.*', (string) $a);
-        $this->assertSame('foo#bar\.\*', (string) $b);
-        $this->assertSame('foo\#bar\.\*', (string) $c);
+        $this->assertSame('foo#bar.*', $a->toString());
+        $this->assertSame('foo\#bar\.\*', $b->toString());
+        $this->assertSame('f\o\o\#bar\.\*', $c->toString());
     }
 }

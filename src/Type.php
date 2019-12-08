@@ -3,25 +3,21 @@ declare(strict_types = 1);
 
 namespace Innmind\Immutable;
 
-use Innmind\Immutable\{
-    Specification\PrimitiveType,
-    Specification\ClassType,
-    Specification\VariableType,
-    Specification\MixedType,
-    Specification\NullableType,
-    Specification\UnionType
+use Innmind\Immutable\ValidateArgument\{
+    PrimitiveType,
+    ClassType,
+    VariableType,
+    MixedType,
+    NullableType,
+    UnionType,
 };
 
 final class Type
 {
     /**
      * Build the appropriate specification for the given type
-     *
-     * @param string $type
-     *
-     * @return SpecificationInterface
      */
-    public static function of(string $type): SpecificationInterface
+    public static function of(string $type): ValidateArgument
     {
         if ($type === '?null') {
             throw new \ParseError('\'null\' type is already nullable');
@@ -38,25 +34,26 @@ final class Type
         }
 
         if ($type->contains('|')) {
-            return new UnionType(
-                ...$type->split('|')->reduce(
-                    [],
-                    static function(array $types, Str $type): array {
-                        $types[] = self::of((string) $type);
+            /** @var list<ValidateArgument> */
+            $types = $type->split('|')->reduce(
+                [],
+                static function(array $types, Str $type): array {
+                    $types[] = self::of($type->toString());
 
-                        return $types;
-                    }
-                )
+                    return $types;
+                },
             );
+
+            return new UnionType($type->toString(), ...$types);
         }
 
         if ($type->startsWith('?')) {
             return new NullableType(
-                self::ofPrimitive((string) $type->drop(1))
+                self::ofPrimitive($type->drop(1)->toString()),
             );
         }
 
-        return self::ofPrimitive((string) $type);
+        return self::ofPrimitive($type->toString());
     }
 
     /**
@@ -91,7 +88,7 @@ final class Type
         }
     }
 
-    private static function ofPrimitive(string $type): SpecificationInterface
+    private static function ofPrimitive(string $type): ValidateArgument
     {
         if (\function_exists('is_'.$type)) {
             return new PrimitiveType($type);

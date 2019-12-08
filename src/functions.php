@@ -3,53 +3,123 @@ declare(strict_types = 1);
 
 namespace Innmind\Immutable;
 
-/**
- * @throws TypeError
- */
-function assertSet(string $type, SetInterface $set, int $position = null): void
-{
-    $message = '';
+use Innmind\Immutable\Exception\EmptySet;
 
-    if (is_int($position)) {
-        $message = "Argument $position must be of type SetInterface<$type>";
+/**
+ * @template T
+ *
+ * @param Set<T>|Sequence<T> $structure
+ *
+ * @return list<T>
+ */
+function unwrap($structure): array
+{
+    /** @psalm-suppress DocblockTypeContradiction */
+    if (!$structure instanceof Set && !$structure instanceof Sequence) {
+        $given = Type::determine($structure);
+
+        throw new \TypeError("Argument 1 must be of type Set|Sequence, $given given");
     }
 
-    if ((string) $set->type() !== $type) {
-        throw new \TypeError($message);
+    /**
+     * @psalm-suppress MixedAssignment
+     *
+     * @var list<T>
+     */
+    return $structure->reduce(
+        [],
+        static function(array $carry, $t): array {
+            $carry[] = $t;
+
+            return $carry;
+        },
+    );
+}
+
+/**
+ * Concatenate all elements with the given separator
+ *
+ * @param Set<string>|Sequence<string> $structure
+ */
+function join(string $separator, $structure): Str
+{
+    /** @psalm-suppress DocblockTypeContradiction */
+    if (!$structure instanceof Set && !$structure instanceof Sequence) {
+        $given = Type::determine($structure);
+
+        throw new \TypeError("Argument 2 must be of type Set|Sequence, $given given");
+    }
+
+    if ($structure instanceof Set) {
+        assertSet('string', $structure, 2);
+    } else {
+        assertSequence('string', $structure, 2);
+    }
+
+    return Str::of(\implode($separator, unwrap($structure)));
+}
+
+/**
+ * @template T
+ *
+ * @throws EmptySet
+ *
+ * @param Set<T> $set
+ *
+ * @return T
+ */
+function first(Set $set)
+{
+    if ($set->empty()) {
+        throw new EmptySet;
+    }
+
+    $seed = new \stdClass;
+
+    /**
+     * @psalm-suppress MissingClosureParamType
+     * @var T
+     */
+    return $set->reduce(
+        $seed,
+        static function($first, $value) use ($seed) {
+            if ($first === $seed) {
+                /** @var T */
+                return $value;
+            }
+
+            /** @var T */
+            return $first;
+        },
+    );
+}
+
+/**
+ * @throws \TypeError
+ */
+function assertSet(string $type, Set $set, int $position): void
+{
+    if (!$set->isOfType($type)) {
+        throw new \TypeError("Argument $position must be of type Set<$type>, Set<{$set->type()}> given");
     }
 }
 
 /**
- * @throws TypeError
+ * @throws \TypeError
  */
-function assertMap(string $key, string $value, MapInterface $map, int $position = null): void
+function assertMap(string $key, string $value, Map $map, int $position): void
 {
-    $message = '';
-
-    if (is_int($position)) {
-        $message = "Argument $position must be of type MapInterface<$key, $value>";
-    }
-
-    if (
-        (string) $map->keyType() !== $key ||
-        (string) $map->valueType() !== $value
-    ) {
-        throw new \TypeError($message);
+    if (!$map->isOfType($key, $value)) {
+        throw new \TypeError("Argument $position must be of type Map<$key, $value>, Map<{$map->keyType()}, {$map->valueType()}> given");
     }
 }
 
 /**
- * @throws TypeError
+ * @throws \TypeError
  */
-function assertStream(string $type, StreamInterface $stream, int $position = null): void
+function assertSequence(string $type, Sequence $sequence, int $position): void
 {
-    $message = '';
-
-    if (is_int($position)) {
-        $message = "Argument $position must be of type StreamInterface<$type>";
-    }
-
-    if ((string) $stream->type() !== $type) {
-        throw new \TypeError($message);
+    if (!$sequence->isOfType($type)) {
+        throw new \TypeError("Argument $position must be of type Sequence<$type>, Sequence<{$sequence->type()}> given");
     }
 }

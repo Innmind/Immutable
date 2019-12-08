@@ -3,40 +3,151 @@ declare(strict_types = 1);
 
 namespace Innmind\Immutable;
 
-use Innmind\Immutable\{
-    Exception\OutOfBoundException,
-    Exception\LogicException,
-    Exception\ElementNotFoundException,
-    Exception\GroupEmptySequenceException
+use Innmind\Immutable\Exception\{
+    LogicException,
+    CannotGroupEmptyStructure,
+    ElementNotFound,
+    OutOfBoundException,
 };
 
 /**
- * {@inheritdoc}
+ * @template T
  */
-class Sequence implements SequenceInterface
+final class Sequence implements \Countable
 {
-    private $values;
-    private $size;
+    private string $type;
+    private ValidateArgument $validate;
+    private Sequence\Implementation $implementation;
 
-    public function __construct(...$values)
+    private function __construct(string $type, Sequence\Implementation $implementation)
     {
-        $this->values = $values;
+        $this->type = $type;
+        $this->validate = Type::of($type);
+        $this->implementation = $implementation;
     }
 
-    public static function of(...$values): self
+    /**
+     * @param T $values
+     *
+     * @return self<T>
+     */
+    public static function of(string $type, ...$values): self
     {
-        $self = new self;
-        $self->values = $values;
+        $self = new self($type, new Sequence\Primitive($type, ...$values));
+        $self->implementation->reduce(
+            1,
+            static function(int $position, $element) use ($self): int {
+                ($self->validate)($element, $position);
+
+                return ++$position;
+            }
+        );
 
         return $self;
     }
 
     /**
-     * {@inheritdoc}
+     * It will load the values inside the generator only upon the first use
+     * of the sequence
+     *
+     * Use this mode when the amount of data may not fit in memory
+     *
+     * @param \Generator<T> $generator
+     *
+     * @return self<T>
      */
+    public static function defer(string $type, \Generator $generator): self
+    {
+        return new self($type, new Sequence\Defer($type, $generator));
+    }
+
+    /**
+     * It will call the given function every time a new operation is done on the
+     * sequence. This means the returned structure may not be truly immutable
+     * as between the calls the underlying source may change.
+     *
+     * Use this mode when calling to an external source (meaning IO bound) such
+     * as parsing a file or calling an API
+     *
+     * @param callable(): \Generator<T> $generator
+     *
+     * @return self<T>
+     */
+    public static function lazy(string $type, callable $generator): self
+    {
+        return new self($type, new Sequence\Lazy($type, $generator));
+    }
+
+    /**
+     * @param mixed $values
+     *
+     * @return self<mixed>
+     */
+    public static function mixed(...$values): self
+    {
+        return new self('mixed', new Sequence\Primitive('mixed', ...$values));
+    }
+
+    /**
+     * @return self<int>
+     */
+    public static function ints(int ...$values): self
+    {
+        /** @var self<int> */
+        $self = new self('int', new Sequence\Primitive('int', ...$values));
+
+        return $self;
+    }
+
+    /**
+     * @return self<float>
+     */
+    public static function floats(float ...$values): self
+    {
+        /** @var self<float> */
+        $self = new self('float', new Sequence\Primitive('float', ...$values));
+
+        return $self;
+    }
+
+    /**
+     * @return self<string>
+     */
+    public static function strings(string ...$values): self
+    {
+        /** @var self<string> */
+        $self = new self('string', new Sequence\Primitive('string', ...$values));
+
+        return $self;
+    }
+
+    /**
+     * @return self<object>
+     */
+    public static function objects(object ...$values): self
+    {
+        /** @var self<object> */
+        $self = new self('object', new Sequence\Primitive('object', ...$values));
+
+        return $self;
+    }
+
+    public function isOfType(string $type): bool
+    {
+        return $this->type === $type;
+    }
+
+    /**
+     * Type of the elements
+     */
+    public function type(): string
+    {
+        return $this->type;
+    }
+
     public function size(): int
     {
-        return $this->size ?? $this->size = \count($this->values);
+        return $this->implementation->size();
     }
 
     /**
@@ -44,443 +155,459 @@ class Sequence implements SequenceInterface
      */
     public function count(): int
     {
-        return $this->size();
+        return $this->implementation->size();
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function current()
-    {
-        return \current($this->values);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function key(): int
-    {
-        return \key($this->values);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function next(): void
-    {
-        \next($this->values);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function rewind(): void
-    {
-        \reset($this->values);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function valid(): bool
-    {
-        return \key($this->values) !== null;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function offsetExists($offset): bool
-    {
-        return $this->has($offset);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function offsetGet($offset)
-    {
-        return $this->get($offset);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function offsetSet($offset, $value): void
-    {
-        throw new LogicException('You can\'t modify a sequence');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function offsetUnset($offset): void
-    {
-        throw new LogicException('You can\'t modify a sequence');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function toPrimitive(): array
-    {
-        return $this->values;
-    }
-
-    /**
-     * {@inheritdoc}
+     * Return the element at the given index
+     *
+     * @throws OutOfBoundException
+     *
+     * @return T
      */
     public function get(int $index)
     {
-        if (!$this->has($index)) {
-            throw new OutOfBoundException;
-        }
-
-        return $this->values[$index];
+        /** @var T */
+        return $this->implementation->get($index);
     }
 
     /**
-     * {@inheritdoc}
+     * Return the diff between this sequence and another
+     *
+     * @param self<T> $sequence
+     *
+     * @return self<T>
      */
-    public function has(int $index): bool
+    public function diff(self $sequence): self
     {
-        return \array_key_exists($index, $this->values);
+        assertSequence($this->type, $sequence, 1);
+
+        $self = clone $this;
+        $self->implementation = $this->implementation->diff(
+            $sequence->implementation,
+        );
+
+        return $self;
     }
 
     /**
-     * {@inheritdoc}
+     * Remove all duplicates from the sequence
+     *
+     * @return self<T>
      */
-    public function diff(SequenceInterface $seq): SequenceInterface
+    public function distinct(): self
     {
-        return $this->filter(static function($value) use ($seq): bool {
-            return !$seq->contains($value);
-        });
+        $self = clone $this;
+        $self->implementation = $this->implementation->distinct();
+
+        return $self;
     }
 
     /**
-     * {@inheritdoc}
+     * Remove the n first elements
+     *
+     * @return self<T>
      */
-    public function distinct(): SequenceInterface
+    public function drop(int $size): self
     {
-        return $this->reduce(
-            new self,
-            static function(SequenceInterface $values, $value): SequenceInterface {
-                if ($values->contains($value)) {
-                    return $values;
-                }
+        $self = clone $this;
+        $self->implementation = $this->implementation->drop($size);
 
-                return $values->add($value);
-            }
+        return $self;
+    }
+
+    /**
+     * Remove the n last elements
+     *
+     * @return self<T>
+     */
+    public function dropEnd(int $size): self
+    {
+        $self = clone $this;
+        $self->implementation = $this->implementation->dropEnd($size);
+
+        return $self;
+    }
+
+    /**
+     * Check if the two sequences are equal
+     *
+     * @param self<T> $sequence
+     */
+    public function equals(self $sequence): bool
+    {
+        assertSequence($this->type, $sequence, 1);
+
+        return $this->implementation->equals(
+            $sequence->implementation,
         );
     }
 
     /**
-     * {@inheritdoc}
+     * Return all elements that satisfy the given predicate
+     *
+     * @param callable(T): bool $predicate
+     *
+     * @return self<T>
      */
-    public function drop(int $size): SequenceInterface
+    public function filter(callable $predicate): self
     {
-        $self = new self;
-        $self->values = \array_slice($this->values, $size);
+        $self = clone $this;
+        $self->implementation = $this->implementation->filter($predicate);
 
         return $self;
     }
 
     /**
-     * {@inheritdoc}
+     * Apply the given function to all elements of the sequence
+     *
+     * @param callable(T): void $function
      */
-    public function dropEnd(int $size): SequenceInterface
+    public function foreach(callable $function): void
     {
-        $self = new self;
-        $self->values = \array_slice($this->values, 0, $this->size() - $size);
-
-        return $self;
+        $this->implementation->foreach($function);
     }
 
     /**
-     * {@inheritdoc}
+     * Return a new map of pairs grouped by keys determined with the given
+     * discriminator function
+     *
+     * @template D
+     * @param callable(T): D $discriminator
+     *
+     * @throws CannotGroupEmptyStructure
+     *
+     * @return Map<D, self<T>>
      */
-    public function equals(SequenceInterface $seq): bool
+    public function groupBy(callable $discriminator): Map
     {
-        return $this->values === $seq->toPrimitive();
+        return $this->implementation->groupBy($discriminator);
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function filter(callable $predicate): SequenceInterface
-    {
-        return new self(...\array_filter(
-            $this->values,
-            $predicate
-        ));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function foreach(callable $function): SequenceInterface
-    {
-        foreach ($this->values as $value) {
-            $function($value);
-        }
-
-        return $this;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function groupBy(callable $discriminator): MapInterface
-    {
-        if ($this->size() === 0) {
-            throw new GroupEmptySequenceException;
-        }
-
-        $map = null;
-
-        foreach ($this->values as $value) {
-            $key = $discriminator($value);
-
-            if ($map === null) {
-                $map = new Map(
-                    Type::determine($key),
-                    SequenceInterface::class
-                );
-            }
-
-            if ($map->contains($key)) {
-                $map = $map->put(
-                    $key,
-                    $map->get($key)->add($value)
-                );
-            } else {
-                $map = $map->put($key, new self($value));
-            }
-        }
-
-        return $map;
-    }
-
-    /**
-     * {@inheritdoc}
+     * Return the first element
+     *
+     * @return T
      */
     public function first()
     {
-        if ($this->size() === 0) {
-            throw new OutOfBoundException;
-        }
-
-        return $this->values[0];
+        /** @var T */
+        return $this->implementation->first();
     }
 
     /**
-     * {@inheritdoc}
+     * Return the last element
+     *
+     * @return T
      */
     public function last()
     {
-        if ($this->size() === 0) {
-            throw new OutOfBoundException;
-        }
-
-        return $this->values[$this->size() - 1];
+        /** @var T */
+        return $this->implementation->last();
     }
 
     /**
-     * {@inheritdoc}
+     * Check if the sequence contains the given element
+     *
+     * @param T $element
      */
     public function contains($element): bool
     {
-        return \in_array($element, $this->values, true);
+        ($this->validate)($element, 1);
+
+        return $this->implementation->contains($element);
     }
 
     /**
-     * {@inheritdoc}
+     * Return the index for the given element
+     *
+     * @param T $element
+     *
+     * @throws ElementNotFound
      */
     public function indexOf($element): int
     {
-        $index = \array_search($element, $this->values, true);
+        ($this->validate)($element, 1);
 
-        if ($index === false) {
-            throw new ElementNotFoundException;
-        }
-
-        return $index;
+        return $this->implementation->indexOf($element);
     }
 
     /**
-     * {@inheritdoc}
+     * Return the list of indices
+     *
+     * @return self<int>
      */
-    public function indices(): StreamInterface
+    public function indices(): self
     {
-        if ($this->size() === 0) {
-            return Stream::of('int');
-        }
+        /** @var self<int> */
+        $self = new self('int', $this->implementation->indices());
 
-        return Stream::of('int', ...\range(0, $this->size() - 1));
+        return $self;
     }
 
     /**
-     * {@inheritdoc}
+     * Return a new sequence by applying the given function to all elements
+     *
+     * @param callable(T): T $function
+     *
+     * @return self<T>
      */
-    public function map(callable $function): SequenceInterface
+    public function map(callable $function): self
     {
         $self = clone $this;
-        $self->values = \array_map($function, $this->values);
+        $self->implementation = $this->implementation->map($function);
 
         return $self;
     }
 
     /**
-     * {@inheritdoc}
+     * Pad the sequence to a defined size with the given element
+     *
+     * @param T $element
+     *
+     * @return self<T>
      */
-    public function pad(int $size, $element): SequenceInterface
+    public function pad(int $size, $element): self
     {
-        $self = new self;
-        $self->values = \array_pad($this->values, $size, $element);
+        ($this->validate)($element, 2);
+
+        $self = clone $this;
+        $self->implementation = $this->implementation->pad($size, $element);
 
         return $self;
     }
 
     /**
-     * {@inheritdoc}
+     * Return a sequence of 2 sequences partitioned according to the given predicate
+     *
+     * @param callable(T): bool $predicate
+     *
+     * @return Map<bool, self<T>>
      */
-    public function partition(callable $predicate): MapInterface
+    public function partition(callable $predicate): Map
     {
-        $truthy = [];
-        $falsy = [];
-
-        foreach ($this->values as $value) {
-            if ($predicate($value) === true) {
-                $truthy[] = $value;
-            } else {
-                $falsy[] = $value;
-            }
-        }
-
-        $true = new self;
-        $true->values = $truthy;
-        $false = new self;
-        $false->values = $falsy;
-
-        return Map::of('bool', SequenceInterface::class)
-            (true, $true)
-            (false, $false);
+        return $this->implementation->partition($predicate);
     }
 
     /**
-     * {@inheritdoc}
+     * Slice the sequence
+     *
+     * @return self<T>
      */
-    public function slice(int $from, int $until): SequenceInterface
+    public function slice(int $from, int $until): self
     {
-        $self = new self;
-        $self->values = \array_slice(
-            $this->values,
-            $from,
-            $until - $from
+        $self = clone $this;
+        $self->implementation = $this->implementation->slice($from, $until);
+
+        return $self;
+    }
+
+    /**
+     * Split the sequence in a sequence of 2 sequences splitted at the given position
+     *
+     * @throws OutOfBoundException
+     *
+     * @return self<self<T>>
+     */
+    public function splitAt(int $position): self
+    {
+        return $this->implementation->splitAt($position);
+    }
+
+    /**
+     * Return a sequence with the n first elements
+     *
+     * @return self<T>
+     */
+    public function take(int $size): self
+    {
+        $self = clone $this;
+        $self->implementation = $this->implementation->take($size);
+
+        return $self;
+    }
+
+    /**
+     * Return a sequence with the n last elements
+     *
+     * @return self<T>
+     */
+    public function takeEnd(int $size): self
+    {
+        $self = clone $this;
+        $self->implementation = $this->implementation->takeEnd($size);
+
+        return $self;
+    }
+
+    /**
+     * Append the given sequence to the current one
+     *
+     * @param self<T> $sequence
+     *
+     * @return self<T>
+     */
+    public function append(self $sequence): self
+    {
+        assertSequence($this->type, $sequence, 1);
+
+        $self = clone $this;
+        $self->implementation = $this->implementation->append(
+            $sequence->implementation,
         );
 
         return $self;
     }
 
     /**
-     * {@inheritdoc}
+     * Return a sequence with all elements from the current one that exist
+     * in the given one
+     *
+     * @param self<T> $sequence
+     *
+     * @return self<T>
      */
-    public function splitAt(int $index): StreamInterface
+    public function intersect(self $sequence): self
     {
-        return (new Stream(SequenceInterface::class))
-            ->add($this->slice(0, $index))
-            ->add($this->slice($index, $this->size()));
-    }
+        assertSequence($this->type, $sequence, 1);
 
-    /**
-     * {@inheritdoc}
-     */
-    public function take(int $size): SequenceInterface
-    {
-        return $this->slice(0, $size);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function takeEnd(int $size): SequenceInterface
-    {
-        return $this->slice($this->size() - $size, $this->size());
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function append(SequenceInterface $seq): SequenceInterface
-    {
-        $self = new self;
-        $self->values = \array_merge($this->values, $seq->toPrimitive());
+        $self = clone $this;
+        $self->implementation = $this->implementation->intersect(
+            $sequence->implementation,
+        );
 
         return $self;
     }
 
     /**
-     * {@inheritdoc}
+     * Add the given element at the end of the sequence
+     *
+     * @param T $element
+     *
+     * @return self<T>
      */
-    public function intersect(SequenceInterface $seq): SequenceInterface
+    public function add($element): self
     {
-        return $this->filter(static function($value) use ($seq): bool {
-            return $seq->contains($value);
-        });
+        return ($this)($element);
     }
 
     /**
-     * {@inheritdoc}
+     * Add the given element at the end of the sequence
+     *
+     * Example:
+     * <code>
+     * Sequence::of('int')(1)(3)
+     * </code>
+     *
+     * @param T $element
+     *
+     * @return self<T>
      */
-    public function join(string $separator): Str
+    public function __invoke($element): self
     {
-        return new Str(\implode($separator, $this->values));
+        ($this->validate)($element, 1);
+
+        $self = clone $this;
+        $self->implementation = ($this->implementation)($element);
+
+        return $self;
+        return $this->add($element);
     }
 
     /**
-     * {@inheritdoc}
+     * Sort the sequence in a different order
+     *
+     * @param callable(T, T): int $function
+     *
+     * @return self<T>
      */
-    public function add($element): SequenceInterface
+    public function sort(callable $function): self
     {
         $self = clone $this;
-        $self->values[] = $element;
-        $self->size = $this->size() + 1;
+        $self->implementation = $this->implementation->sort($function);
 
         return $self;
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function sort(callable $function): SequenceInterface
-    {
-        $self = clone $this;
-        \usort($self->values, $function);
-
-        return $self;
-    }
-
-    /**
-     * {@inheritdoc}
+     * Reduce the sequence to a single value
+     *
+     * @template R
+     * @param R $carry
+     * @param callable(R, T): R $reducer
+     *
+     * @return R
      */
     public function reduce($carry, callable $reducer)
     {
-        return \array_reduce($this->values, $reducer, $carry);
+        return $this->implementation->reduce($carry, $reducer);
     }
 
     /**
-     * {@inheritdoc}
+     * Return a set of the same type but without any value
+     *
+     * @return self<T>
      */
-    public function reverse(): SequenceInterface
+    public function clear(): self
     {
         $self = clone $this;
-        $self->values = \array_reverse($this->values);
+        $self->implementation = new Sequence\Primitive($this->type);
+
+        return $self;
+    }
+
+    /**
+     * Return the same sequence but in reverse order
+     *
+     * @return self<T>
+     */
+    public function reverse(): self
+    {
+        $self = clone $this;
+        $self->implementation = $this->implementation->reverse();
 
         return $self;
     }
 
     public function empty(): bool
     {
-        return !$this->has(0);
+        return $this->implementation->empty();
+    }
+
+    /**
+     * @template ST
+     *
+     * @param null|callable(T): \Generator<ST> $mapper
+     *
+     * @return self<ST>
+     */
+    public function toSequenceOf(string $type, callable $mapper = null): self
+    {
+        return $this->implementation->toSequenceOf($type, $mapper);
+    }
+
+    /**
+     * @template ST
+     *
+     * @param null|callable(T): \Generator<ST> $mapper
+     *
+     * @return Set<ST>
+     */
+    public function toSetOf(string $type, callable $mapper = null): Set
+    {
+        return $this->implementation->toSetOf($type, $mapper);
+    }
+
+    /**
+     * @template MT
+     * @template MS
+     *
+     * @param callable(T): \Generator<MT, MS> $mapper
+     *
+     * @return Map<MT, MS>
+     */
+    public function toMapOf(string $key, string $value, callable $mapper): Map
+    {
+        return $this->implementation->toMapOf($key, $value, $mapper);
     }
 }

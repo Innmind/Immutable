@@ -6,24 +6,15 @@ namespace Innmind\Immutable;
 use Innmind\Immutable\{
     Exception\RegexException,
     Exception\SubstringException,
-    Exception\LogicException
+    Exception\LogicException,
 };
 
-class Str implements PrimitiveInterface, StringableInterface
+final class Str
 {
-    private const PAD_RIGHT = STR_PAD_RIGHT;
-    private const PAD_LEFT = STR_PAD_LEFT;
-    private const PAD_BOTH = STR_PAD_BOTH;
-    private const PREG_NO_FLAGS = 0;
-    private const PREG_SPLIT_NO_EMPTY = PREG_SPLIT_NO_EMPTY;
-    private const PREG_SPLIT_DELIM_CAPTURE = PREG_SPLIT_DELIM_CAPTURE;
-    private const PREG_SPLIT_OFFSET_CAPTURE = PREG_SPLIT_OFFSET_CAPTURE;
-    private const PREG_OFFSET_CAPTURE = PREG_OFFSET_CAPTURE;
+    private string $value;
+    private ?string $encoding;
 
-    private $value;
-    private $encoding;
-
-    public function __construct(string $value, string $encoding = null)
+    private function __construct(string $value, string $encoding = null)
     {
         $this->value = $value;
         $this->encoding = $encoding;
@@ -37,15 +28,7 @@ class Str implements PrimitiveInterface, StringableInterface
     /**
      * {@inheritdoc}
      */
-    public function toPrimitive(): string
-    {
-        return $this->value;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function __toString(): string
+    public function toString(): string
     {
         return $this->value;
     }
@@ -53,6 +36,7 @@ class Str implements PrimitiveInterface, StringableInterface
     public function encoding(): self
     {
         if (\is_null($this->encoding)) {
+            /** @var string */
             $this->encoding = \mb_internal_encoding();
         }
 
@@ -67,40 +51,42 @@ class Str implements PrimitiveInterface, StringableInterface
     /**
      * Split the string into a collection of ones
      *
-     * @return StreamInterface<self>
+     * @return Sequence<self>
      */
-    public function split(string $delimiter = null): StreamInterface
+    public function split(string $delimiter = null): Sequence
     {
         if (\is_null($delimiter) || $delimiter === '') {
             return $this->chunk();
         }
 
         $parts = \explode($delimiter, $this->value);
-        $stream = new Stream(self::class);
+        /** @var Sequence<self> */
+        $sequence = Sequence::of(self::class);
 
         foreach ($parts as $part) {
-            $stream = $stream->add(new self($part, $this->encoding));
+            $sequence = ($sequence)(new self($part, $this->encoding));
         }
 
-        return $stream;
+        return $sequence;
     }
 
     /**
      * Returns a collection of the string splitted by the given chunk size
      *
-     * @return StreamInterface<self>
+     * @return Sequence<self>
      */
-    public function chunk(int $size = 1): StreamInterface
+    public function chunk(int $size = 1): Sequence
     {
-        $stream = new Stream(self::class);
-        $string = $this;
+        /** @var Sequence<self> */
+        $sequence = Sequence::of(self::class);
+        /** @var list<string> */
+        $parts = \mb_str_split($this->value, $size, $this->encoding()->toString());
 
-        while ($string->length() > 0) {
-            $stream = $stream->add($string->substring(0, $size));
-            $string = $string->substring($size);
+        foreach ($parts as $value) {
+            $sequence = ($sequence)(new self($value, $this->encoding));
         }
 
-        return $stream;
+        return $sequence;
     }
 
     /**
@@ -110,12 +96,12 @@ class Str implements PrimitiveInterface, StringableInterface
      */
     public function position(string $needle, int $offset = 0): int
     {
-        $position = \mb_strpos($this->value, $needle, $offset, (string) $this->encoding());
+        $position = \mb_strpos($this->value, $needle, $offset, $this->encoding()->toString());
 
         if ($position === false) {
             throw new SubstringException(\sprintf(
                 'Substring "%s" not found',
-                $needle
+                $needle,
             ));
         }
 
@@ -131,9 +117,15 @@ class Str implements PrimitiveInterface, StringableInterface
             return $this;
         }
 
-        return $this
+        /**
+         * @psalm-suppress InvalidArgument
+         * @var Sequence<string>
+         */
+        $parts = $this
             ->split($search)
-            ->join($replacement);
+            ->toSequenceOf('string', fn($v) => yield $v->toString());
+
+        return join($replacement, $parts);
     }
 
     /**
@@ -143,12 +135,12 @@ class Str implements PrimitiveInterface, StringableInterface
      */
     public function str(string $delimiter): self
     {
-        $sub = \mb_strstr($this->value, $delimiter, false, (string) $this->encoding());
+        $sub = \mb_strstr($this->value, $delimiter, false, $this->encoding()->toString());
 
         if ($sub === false) {
             throw new SubstringException(\sprintf(
                 'Substring "%s" not found',
-                $delimiter
+                $delimiter,
             ));
         }
 
@@ -176,7 +168,7 @@ class Str implements PrimitiveInterface, StringableInterface
      */
     public function length(): int
     {
-        return \mb_strlen($this->value, (string) $this->encoding());
+        return \mb_strlen($this->value, $this->encoding()->toString());
     }
 
     public function empty(): bool
@@ -189,10 +181,16 @@ class Str implements PrimitiveInterface, StringableInterface
      */
     public function reverse(): self
     {
-        return $this
+        /**
+         * @psalm-suppress InvalidArgument
+         * @var Sequence<string>
+         */
+        $parts = $this
             ->chunk()
             ->reverse()
-            ->join('');
+            ->toSequenceOf('string', fn($v) => yield $v->toString());
+
+        return join('', $parts)->toEncoding($this->encoding()->toString());
     }
 
     /**
@@ -200,7 +198,7 @@ class Str implements PrimitiveInterface, StringableInterface
      */
     public function rightPad(int $length, string $character = ' '): self
     {
-        return $this->pad($length, $character, self::PAD_RIGHT);
+        return $this->pad($length, $character, \STR_PAD_RIGHT);
     }
 
     /**
@@ -208,7 +206,7 @@ class Str implements PrimitiveInterface, StringableInterface
      */
     public function leftPad(int $length, string $character = ' '): self
     {
-        return $this->pad($length, $character, self::PAD_LEFT);
+        return $this->pad($length, $character, \STR_PAD_LEFT);
     }
 
     /**
@@ -216,7 +214,7 @@ class Str implements PrimitiveInterface, StringableInterface
      */
     public function uniPad(int $length, string $character = ' '): self
     {
-        return $this->pad($length, $character, self::PAD_BOTH);
+        return $this->pad($length, $character, \STR_PAD_BOTH);
     }
 
     /**
@@ -231,7 +229,7 @@ class Str implements PrimitiveInterface, StringableInterface
                 $this->value,
                 $mask,
                 $start,
-                $length
+                $length,
             );
         }
 
@@ -251,7 +249,12 @@ class Str implements PrimitiveInterface, StringableInterface
      */
     public function shuffle(): self
     {
-        $parts = $this->chunk()->toPrimitive();
+        /** @psalm-suppress InvalidArgument */
+        $parts = unwrap(
+            $this
+                ->chunk()
+                ->toSequenceOf('string', fn($v) => yield $v->toString()),
+        );
         \shuffle($parts);
 
         return new self(\implode('', $parts), $this->encoding);
@@ -278,22 +281,24 @@ class Str implements PrimitiveInterface, StringableInterface
         return (int) \str_word_count(
             $this->value,
             0,
-            $charlist
+            $charlist,
         );
     }
 
     /**
      * Return the collection of words
      *
-     * @return MapInterface<int, self>
+     * @return Map<int, self>
      */
-    public function words(string $charlist = ''): MapInterface
+    public function words(string $charlist = ''): Map
     {
+        /** @var list<string> */
         $words = \str_word_count($this->value, 2, $charlist);
-        $map = new Map('int', self::class);
+        /** @var Map<int, self> */
+        $map = Map::of('int', self::class);
 
         foreach ($words as $position => $word) {
-            $map = $map->put($position, new self($word, $this->encoding));
+            $map = ($map)($position, new self($word, $this->encoding));
         }
 
         return $map;
@@ -302,71 +307,47 @@ class Str implements PrimitiveInterface, StringableInterface
     /**
      * Split the string using a regular expression
      *
-     * @return StreamInterface<self>
+     * @return Sequence<self>
      */
-    public function pregSplit(string $regex, int $limit = -1): StreamInterface
+    public function pregSplit(string $regex, int $limit = -1): Sequence
     {
         $strings = \preg_split($regex, $this->value, $limit);
-        $stream = new Stream(self::class);
+        /** @var Sequence<self> */
+        $sequence = Sequence::of(self::class);
 
         foreach ($strings as $string) {
-            $stream = $stream->add(new self($string, $this->encoding));
+            $sequence = ($sequence)(new self($string, $this->encoding));
         }
 
-        return $stream;
+        return $sequence;
     }
 
     /**
      * Check if the string match the given regular expression
      *
-     * @throws Exception If the regex failed
+     * @throws RegexException If the regex failed
      */
     public function matches(string $regex): bool
     {
-        if (\func_num_args() !== 1) {
-            throw new LogicException('Offset is no longer supported');
-        }
-
         return RegExp::of($regex)->matches($this);
     }
 
     /**
      * Return a collection of the elements matching the regex
      *
-     * @deprecated replaced by self::capture, to be removed in 3.0
+     * @throws RegexException If the regex failed
      *
-     * @throws Exception If the regex failed
-     *
-     * @return MapInterface<scalar, self>
+     * @return Map<scalar, self>
      */
-    public function getMatches(
-        string $regex,
-        int $offset = 0,
-        int $flags = self::PREG_NO_FLAGS
-    ): MapInterface {
-        return $this->capture($regex, $offset, $flags);
-    }
-
-    /**
-     * Return a collection of the elements matching the regex
-     *
-     * @throws Exception If the regex failed
-     *
-     * @return MapInterface<scalar, self>
-     */
-    public function capture(string $regex): MapInterface
+    public function capture(string $regex): Map
     {
-        if (\func_num_args() !== 1) {
-            throw new LogicException('Offset and flags are no longer supported');
-        }
-
         return RegExp::of($regex)->capture($this);
     }
 
     /**
      * Replace part of the string by using a regular expression
      *
-     * @throws Exception If the regex failed
+     * @throws RegexException If the regex failed
      */
     public function pregReplace(
         string $regex,
@@ -377,7 +358,7 @@ class Str implements PrimitiveInterface, StringableInterface
             $regex,
             $replacement,
             $this->value,
-            $limit
+            $limit,
         );
 
         if ($value === null) {
@@ -392,11 +373,11 @@ class Str implements PrimitiveInterface, StringableInterface
      */
     public function substring(int $start, int $length = null): self
     {
-        if ($this->length() === 0) {
+        if ($this->empty()) {
             return $this;
         }
 
-        $sub = \mb_substr($this->value, $start, $length, (string) $this->encoding());
+        $sub = \mb_substr($this->value, $start, $length, $this->encoding()->toString());
 
         return new self($sub, $this->encoding);
     }
@@ -424,7 +405,7 @@ class Str implements PrimitiveInterface, StringableInterface
     /**
      * Return a formatted string
      */
-    public function sprintf(...$values): self
+    public function sprintf(string ...$values): self
     {
         return new self(\sprintf($this->value, ...$values), $this->encoding);
     }
@@ -437,7 +418,7 @@ class Str implements PrimitiveInterface, StringableInterface
         return $this
             ->substring(0, 1)
             ->toUpper()
-            ->append((string) $this->substring(1));
+            ->append($this->substring(1)->toString());
     }
 
     /**
@@ -448,7 +429,7 @@ class Str implements PrimitiveInterface, StringableInterface
         return $this
             ->substring(0, 1)
             ->toLower()
-            ->append((string) $this->substring(1));
+            ->append($this->substring(1)->toString());
     }
 
     /**
@@ -456,13 +437,20 @@ class Str implements PrimitiveInterface, StringableInterface
      */
     public function camelize(): self
     {
-        return $this
+        /**
+         * @psalm-suppress InvalidArgument
+         * @var Sequence<string>
+         */
+        $words = $this
             ->pregSplit('/_| /')
             ->map(function(self $part) {
                 return $part->ucfirst();
             })
-            ->join('')
-            ->toEncoding((string) $this->encoding());
+            ->toSequenceOf('string', fn($v) => yield $v->toString());
+
+        return join('', $words)
+            ->lcfirst()
+            ->toEncoding($this->encoding()->toString());
     }
 
     /**
@@ -470,7 +458,7 @@ class Str implements PrimitiveInterface, StringableInterface
      */
     public function append(string $string): self
     {
-        return new self((string) $this.$string, $this->encoding);
+        return new self($this->value.$string, $this->encoding);
     }
 
     /**
@@ -478,7 +466,7 @@ class Str implements PrimitiveInterface, StringableInterface
      */
     public function prepend(string $string): self
     {
-        return new self($string.(string) $this, $this->encoding);
+        return new self($string.$this->value, $this->encoding);
     }
 
     /**
@@ -486,7 +474,7 @@ class Str implements PrimitiveInterface, StringableInterface
      */
     public function equals(self $string): bool
     {
-        return (string) $this === (string) $string;
+        return $this->toString() === $string->toString();
     }
 
     /**
@@ -495,8 +483,8 @@ class Str implements PrimitiveInterface, StringableInterface
     public function trim(string $mask = null): self
     {
         return new self(
-            $mask === null ? \trim((string) $this) : \trim((string) $this, $mask),
-            $this->encoding
+            $mask === null ? \trim($this->value) : \trim($this->value, $mask),
+            $this->encoding,
         );
     }
 
@@ -506,7 +494,7 @@ class Str implements PrimitiveInterface, StringableInterface
     public function rightTrim(string $mask = null): self
     {
         return new self(
-            $mask === null ? \rtrim((string) $this) : \rtrim((string) $this, $mask),
+            $mask === null ? \rtrim($this->value) : \rtrim($this->value, $mask),
             $this->encoding
         );
     }
@@ -517,7 +505,7 @@ class Str implements PrimitiveInterface, StringableInterface
     public function leftTrim(string $mask = null): self
     {
         return new self(
-            $mask === null ? \ltrim((string) $this) : \ltrim((string) $this, $mask),
+            $mask === null ? \ltrim($this->value) : \ltrim($this->value, $mask),
             $this->encoding
         );
     }
@@ -561,7 +549,7 @@ class Str implements PrimitiveInterface, StringableInterface
             return true;
         }
 
-        return (string) $this->takeEnd(self::of($value, $this->encoding)->length()) === $value;
+        return $this->takeEnd(self::of($value, $this->encoding)->length())->toString() === $value;
     }
 
     /**
@@ -569,22 +557,19 @@ class Str implements PrimitiveInterface, StringableInterface
      */
     public function pregQuote(string $delimiter = ''): self
     {
-        return new self(\preg_quote((string) $this, $delimiter), $this->encoding);
+        return new self(\preg_quote($this->value, $delimiter), $this->encoding);
     }
 
     /**
      * Pad the string
      */
-    private function pad(
-        int $length,
-        string $character = ' ',
-        int $direction = self::PAD_RIGHT
-    ): self {
+    private function pad(int $length, string $character, int $direction): self
+    {
         return new self(\str_pad(
             $this->value,
             $length,
             $character,
-            $direction
+            $direction,
         ), $this->encoding);
     }
 }

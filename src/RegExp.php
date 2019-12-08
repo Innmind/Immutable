@@ -5,14 +5,14 @@ namespace Innmind\Immutable;
 
 use Innmind\Immutable\Exception\{
     DomainException,
-    RegexException
+    RegexException,
 };
 
 final class RegExp
 {
-    private $pattern;
+    private string $pattern;
 
-    public function __construct(string $pattern)
+    private function __construct(string $pattern)
     {
         if (@\preg_match($pattern, '') === false) {
             throw new DomainException($pattern, \preg_last_error());
@@ -26,9 +26,12 @@ final class RegExp
         return new self($pattern);
     }
 
+    /**
+     * @throws RegexException
+     */
     public function matches(Str $string): bool
     {
-        $value = \preg_match($this->pattern, (string) $string);
+        $value = \preg_match($this->pattern, $string->toString());
 
         if ($value === false) {
             throw new RegexException('', \preg_last_error());
@@ -39,25 +42,28 @@ final class RegExp
 
 
     /**
-     * @return MapInterface<scalar, Str>
+     * @throws RegexException
+     *
+     * @return Map<scalar, Str>
      */
-    public function capture(Str $string): MapInterface
+    public function capture(Str $string): Map
     {
         $matches = [];
-        $value = \preg_match($this->pattern, (string) $string, $matches);
+        $value = \preg_match($this->pattern, $string->toString(), $matches);
 
         if ($value === false) {
             throw new RegexException('', \preg_last_error());
         }
 
-        $map = new Map('scalar', Str::class);
+        /** @var Map<scalar, Str> */
+        $map = Map::of('scalar', Str::class);
 
         foreach ($matches as $key => $match) {
-            $map = $map->put(
+            $map = ($map)(
                 $key,
-                new Str(
+                Str::of(
                     (string) $match,
-                    (string) $string->encoding()
+                    $string->encoding()->toString(),
                 )
             );
         }
@@ -65,7 +71,7 @@ final class RegExp
         return $map;
     }
 
-    public function __toString(): string
+    public function toString(): string
     {
         return $this->pattern;
     }
