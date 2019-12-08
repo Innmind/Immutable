@@ -30,7 +30,9 @@ class MapTest extends TestCase
 
     public function testOf()
     {
-        $map = Map::of('int', 'float', [1, 2], [1.1, 2.1]);
+        $map = Map::of('int', 'float')
+            (1, 1.1)
+            (2, 2.1);
 
         $this->assertTrue(
             $map->equals(
@@ -44,14 +46,6 @@ class MapTest extends TestCase
     public function testEmptyOf()
     {
         $this->assertTrue(Map::of('int', 'int')->equals(Map::of('int', 'int')));
-    }
-
-    public function testThrowWhenDifferentSizes()
-    {
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('Different sizes of keys and values');
-
-        Map::of('int', 'float', [], [1.1]);
     }
 
     public function testPut()

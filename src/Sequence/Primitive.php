@@ -326,6 +326,7 @@ final class Primitive implements Implementation
         /**
          * @psalm-suppress InvalidScalarArgument
          * @psalm-suppress InvalidArgument
+         * @var Map<bool, Sequence<T>>
          */
         return Map::of('bool', Sequence::class)
             (true, $true)

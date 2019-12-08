@@ -39,31 +39,11 @@ final class Map implements \Countable
     }
 
     /**
-     * @param list<T> $keys
-     * @param list<S> $values
-     *
      * @return self<T, S>
      */
-    public static function of(
-        string $key,
-        string $value,
-        array $keys = [],
-        array $values = []
-    ): self {
-        $keys = \array_values($keys);
-        $values = \array_values($values);
-
-        if (\count($keys) !== \count($values)) {
-            throw new LogicException('Different sizes of keys and values');
-        }
-
-        $self = new self($key, $value);
-
-        foreach ($keys as $i => $key) {
-            $self = ($self)($key, $values[$i]);
-        }
-
-        return $self;
+    public static function of(string $key, string $value): self
+    {
+        return new self($key, $value);
     }
 
     public function isOfType(string $key, string $value): bool

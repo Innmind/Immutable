@@ -240,6 +240,7 @@ final class Primitive implements Implementation
         /**
          * @psalm-suppress InvalidScalarArgument
          * @psalm-suppress InvalidArgument
+         * @var Map<bool, Set<T>>
          */
         return Map::of('bool', Set::class)
             (true, $truthy)
