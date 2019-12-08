@@ -451,7 +451,7 @@ final class Defer implements Implementation
      *
      * @return Implementation<T>
      */
-    public function add($element): Implementation
+    public function __invoke($element): Implementation
     {
         /** @psalm-suppress MissingClosureParamType */
         return new self(

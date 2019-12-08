@@ -175,7 +175,7 @@ final class Set implements \Countable
     }
 
     /**
-     * Add a element to the set
+     * Add an element to the set
      *
      * @param T $element
      *
@@ -183,17 +183,11 @@ final class Set implements \Countable
      */
     public function add($element): self
     {
-        ($this->validate)($element, 1);
-
-        $self = clone $this;
-        $self->implementation = $this->implementation->add($element);
-
-        return $self;
+        return ($this)($element);
     }
 
     /**
-     * Alias for add method in order to have a syntax similar to a true tuple
-     * when constructing the set
+     * Add an element to the set
      *
      * Example:
      * <code>
@@ -206,7 +200,12 @@ final class Set implements \Countable
      */
     public function __invoke($element): self
     {
-        return $this->add($element);
+        ($this->validate)($element, 1);
+
+        $self = clone $this;
+        $self->implementation = ($this->implementation)($element);
+
+        return $self;
     }
 
     /**

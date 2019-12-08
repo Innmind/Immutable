@@ -226,7 +226,7 @@ interface Implementation extends \Countable
      *
      * @return self<T>
      */
-    public function add($element): self;
+    public function __invoke($element): self;
 
     /**
      * Sort the sequence in a different order

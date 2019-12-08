@@ -40,7 +40,7 @@ interface Implementation extends \Countable
      *
      * @return self<T, S>
      */
-    public function put($key, $value): self;
+    public function __invoke($key, $value): self;
 
     /**
      * Return the element with the given key

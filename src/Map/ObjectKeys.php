@@ -72,7 +72,7 @@ final class ObjectKeys implements Implementation
      *
      * @return self<T, S>
      */
-    public function put($key, $value): Implementation
+    public function __invoke($key, $value): Implementation
     {
         ($this->validateKey)($key, 1);
         ($this->validateValue)($value, 2);
@@ -339,7 +339,7 @@ final class ObjectKeys implements Implementation
         return $map->reduce(
             $this,
             function(self $carry, $key, $value): self {
-                return $carry->put($key, $value);
+                return ($carry)($key, $value);
             }
         );
     }

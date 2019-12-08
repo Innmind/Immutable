@@ -75,7 +75,7 @@ final class Primitive implements Implementation
      *
      * @return self<T, S>
      */
-    public function put($key, $value): self
+    public function __invoke($key, $value): self
     {
         ($this->validateKey)($key, 1);
         ($this->validateValue)($value, 2);
@@ -316,7 +316,7 @@ final class Primitive implements Implementation
         $merged = $map->reduce(
             $this,
             function(self $carry, $key, $value): self {
-                return $carry->put($key, $value);
+                return ($carry)($key, $value);
             }
         );
 

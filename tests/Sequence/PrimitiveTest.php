@@ -339,7 +339,7 @@ class PrimitiveTest extends TestCase
     public function testAdd()
     {
         $a = new Primitive('int', 1);
-        $b = $a->add(2);
+        $b = ($a)(2);
 
         $this->assertSame([1], \iterator_to_array($a->iterator()));
         $this->assertInstanceOf(Primitive::class, $b);

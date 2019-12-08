@@ -482,7 +482,7 @@ final class Lazy implements Implementation
      *
      * @return Implementation<T>
      */
-    public function add($element): Implementation
+    public function __invoke($element): Implementation
     {
         $values = $this->values;
 

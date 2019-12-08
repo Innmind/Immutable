@@ -491,17 +491,11 @@ final class Sequence implements \Countable
      */
     public function add($element): self
     {
-        ($this->validate)($element, 1);
-
-        $self = clone $this;
-        $self->implementation = $this->implementation->add($element);
-
-        return $self;
+        return ($this)($element);
     }
 
     /**
-     * Alias for add method in order to have a syntax similar to a true tuple
-     * when constructing the sequence
+     * Add the given element at the end of the sequence
      *
      * Example:
      * <code>
@@ -514,6 +508,12 @@ final class Sequence implements \Countable
      */
     public function __invoke($element): self
     {
+        ($this->validate)($element, 1);
+
+        $self = clone $this;
+        $self->implementation = ($this->implementation)($element);
+
+        return $self;
         return $this->add($element);
     }
 

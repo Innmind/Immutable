@@ -71,7 +71,7 @@ final class DoubleIndex implements Implementation
      *
      * @return self<T, S>
      */
-    public function put($key, $value): self
+    public function __invoke($key, $value): self
     {
         ($this->validateKey)($key, 1);
         ($this->validateValue)($value, 2);
@@ -80,19 +80,19 @@ final class DoubleIndex implements Implementation
 
         if ($this->keys->contains($key)) {
             $index = $this->keys->indexOf($key);
-            $map->values = $this->values->take($index)
-                ->add($value)
-                ->append($this->values->drop($index + 1));
-            /** @var Sequence\Implementation<Pair<T, S>> */
-            $map->pairs = $this->pairs->take($index)
-                ->add(new Pair($key, $value))
-                ->append($this->pairs->drop($index + 1));
+            /** @psalm-suppress MixedArgumentTypeCoercion */
+            $map->values = $this->values->take($index)($value)->append($this->values->drop($index + 1));
+            /**
+             * @psalm-suppress MixedArgumentTypeCoercion
+             * @var Sequence\Implementation<Pair<T, S>>
+             */
+            $map->pairs = $this->pairs->take($index)(new Pair($key, $value))->append($this->pairs->drop($index + 1));
         } else {
             /** @var Sequence\Implementation<T> */
-            $map->keys = $this->keys->add($key);
-            $map->values = $this->values->add($value);
+            $map->keys = ($this->keys)($key);
+            $map->values = ($this->values)($value);
             /** @var Sequence\Implementation<Pair<T, S>> */
-            $map->pairs = $this->pairs->add(new Pair($key, $value));
+            $map->pairs = ($this->pairs)(new Pair($key, $value));
         }
 
         return $map;
@@ -167,14 +167,14 @@ final class DoubleIndex implements Implementation
         foreach ($this->pairs->iterator() as $pair) {
             if ($predicate($pair->key(), $pair->value()) === true) {
                 /** @psalm-suppress MixedArgumentTypeCoercion */
-                $map->keys = $map->keys->add($pair->key());
+                $map->keys = ($map->keys)($pair->key());
                 /** @psalm-suppress MixedArgumentTypeCoercion */
-                $map->values = $map->values->add($pair->value());
+                $map->values = ($map->values)($pair->value());
                 /**
                  * @psalm-suppress MixedArgumentTypeCoercion
                  * @var Sequence\Implementation<Pair<T, S>>
                  */
-                $map->pairs = $map->pairs->add($pair);
+                $map->pairs = ($map->pairs)($pair);
             }
         }
 
@@ -275,7 +275,7 @@ final class DoubleIndex implements Implementation
                 $value = $return;
             }
 
-            $map = $map->put($key, $value);
+            $map = ($map)($key, $value);
         }
 
         return $map;
@@ -321,7 +321,7 @@ final class DoubleIndex implements Implementation
         return $map->reduce(
             $this,
             function(self $carry, $key, $value): self {
-                return $carry->put($key, $value);
+                return ($carry)($key, $value);
             }
         );
     }

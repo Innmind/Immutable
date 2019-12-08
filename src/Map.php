@@ -110,18 +110,11 @@ final class Map implements \Countable
      */
     public function put($key, $value): self
     {
-        ($this->validateKey)($key, 1);
-        ($this->validateValue)($value, 2);
-
-        $map = clone $this;
-        $map->implementation = $this->implementation->put($key, $value);
-
-        return $map;
+        return ($this)($key, $value);
     }
 
     /**
-     * Alias for put method in order to have a syntax similar to a true tuple
-     * when constructing the map
+     * Set a new key/value pair
      *
      * Example:
      * <code>
@@ -137,7 +130,13 @@ final class Map implements \Countable
      */
     public function __invoke($key, $value): self
     {
-        return $this->put($key, $value);
+        ($this->validateKey)($key, 1);
+        ($this->validateValue)($value, 2);
+
+        $map = clone $this;
+        $map->implementation = ($this->implementation)($key, $value);
+
+        return $map;
     }
 
     /**

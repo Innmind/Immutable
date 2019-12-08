@@ -43,7 +43,7 @@ interface Implementation extends \Countable
      *
      * @return self<T>
      */
-    public function add($element): self;
+    public function __invoke($element): self;
 
     /**
      * Check if the set contains the given element

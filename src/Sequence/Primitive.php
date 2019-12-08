@@ -100,7 +100,7 @@ final class Primitive implements Implementation
                     return $values;
                 }
 
-                return $values->add($value);
+                return ($values)($value);
             }
         );
     }
@@ -411,7 +411,7 @@ final class Primitive implements Implementation
      *
      * @return self<T>
      */
-    public function add($element): self
+    public function __invoke($element): self
     {
         $self = clone $this;
         $self->values[] = $element;

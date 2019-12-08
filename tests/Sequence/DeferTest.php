@@ -576,7 +576,7 @@ class DeferTest extends TestCase
             yield 1;
             $loaded = true;
         })());
-        $b = $a->add(2);
+        $b = ($a)(2);
 
         $this->assertFalse($loaded);
         $this->assertSame([1], \iterator_to_array($a->iterator()));

@@ -78,14 +78,14 @@ final class Primitive implements Implementation
      *
      * @return self<T>
      */
-    public function add($element): self
+    public function __invoke($element): self
     {
         if ($this->contains($element)) {
             return $this;
         }
 
         $set = clone $this;
-        $set->values = $this->values->add($element);
+        $set->values = ($this->values)($element);
 
         return $set;
     }
@@ -217,7 +217,7 @@ final class Primitive implements Implementation
         return $this->reduce(
             $this->clear(),
             function(self $carry, $value) use ($function): self {
-                return $carry->add($function($value));
+                return ($carry)($function($value));
             }
         );
     }
@@ -271,7 +271,7 @@ final class Primitive implements Implementation
         return $set->reduce(
             $this,
             function(self $carry, $value): self {
-                return $carry->add($value);
+                return ($carry)($value);
             }
         );
     }

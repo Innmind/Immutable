@@ -92,10 +92,10 @@ final class Lazy implements Implementation
      *
      * @return self<T>
      */
-    public function add($element): self
+    public function __invoke($element): self
     {
         $set = clone $this;
-        $set->values = $this->values->add($element)->distinct();
+        $set->values = ($this->values)($element)->distinct();
 
         return $set;
     }

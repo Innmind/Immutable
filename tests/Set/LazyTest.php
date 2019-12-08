@@ -90,13 +90,13 @@ class LazyTest extends TestCase
             yield 1;
             $loaded = true;
         });
-        $b = $a->add(2);
+        $b = ($a)(2);
 
         $this->assertFalse($loaded);
         $this->assertSame([1], \iterator_to_array($a->iterator()));
         $this->assertInstanceOf(Lazy::class, $b);
         $this->assertSame([1, 2], \iterator_to_array($b->iterator()));
-        $this->assertSame([1, 2], \iterator_to_array($b->add(2)->iterator()));
+        $this->assertSame([1, 2], \iterator_to_array(($b)(2)->iterator()));
         $this->assertTrue($loaded);
     }
 

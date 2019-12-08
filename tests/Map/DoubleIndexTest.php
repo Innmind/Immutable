@@ -35,18 +35,18 @@ class DoubleIndexTest extends TestCase
         $m = new DoubleIndex('int', 'int');
 
         $this->assertSame(0, $m->size());
-        $m2 = $m->put(42, 42);
+        $m2 = ($m)(42, 42);
         $this->assertNotSame($m, $m2);
         $this->assertSame(0, $m->size());
         $this->assertSame(1, $m2->size());
 
         $m = new DoubleIndex('int', 'int');
         $m = $m
-            ->put(23, 24)
-            ->put(41, 42)
-            ->put(65, 66)
-            ->put(89, 90)
-            ->put(65, 1);
+            (23, 24)
+            (41, 42)
+            (65, 66)
+            (89, 90)
+            (65, 1);
 
         $this->assertSame(24, $m->get(23));
         $this->assertSame(42, $m->get(41));
@@ -61,7 +61,7 @@ class DoubleIndexTest extends TestCase
         $this->expectExceptionMessage('Argument 1 must be of type int, string given');
 
         $m = new DoubleIndex('int', 'int');
-        $m->put('24', 42);
+        ($m)('24', 42);
     }
 
     public function testThrowWhenValueDoesntMatchType()
@@ -70,13 +70,13 @@ class DoubleIndexTest extends TestCase
         $this->expectExceptionMessage('Argument 2 must be of type int, float given');
 
         $m = new DoubleIndex('int', 'int');
-        $m->put(24, 42.0);
+        ($m)(24, 42.0);
     }
 
     public function testGet()
     {
         $m = new DoubleIndex('int', 'int');
-        $m = $m->put(23, 24);
+        $m = ($m)(23, 24);
 
         $this->assertSame(24, $m->get(23));
     }
@@ -91,7 +91,7 @@ class DoubleIndexTest extends TestCase
     public function testContains()
     {
         $m = new DoubleIndex('int', 'int');
-        $m = $m->put(23, 24);
+        $m = ($m)(23, 24);
 
         $this->assertFalse($m->contains(24));
         $this->assertTrue($m->contains(23));
@@ -100,7 +100,7 @@ class DoubleIndexTest extends TestCase
     public function testClear()
     {
         $m = new DoubleIndex('int', 'float');
-        $m = $m->put(24, 42.0);
+        $m = ($m)(24, 42.0);
 
         $m2 = $m->clear();
         $this->assertNotSame($m, $m2);
@@ -113,29 +113,29 @@ class DoubleIndexTest extends TestCase
 
     public function testEquals()
     {
-        $m = (new DoubleIndex('int', 'int'))->put(24, 42);
-        $m2 = (new DoubleIndex('int', 'int'))->put(24, 42);
+        $m = (new DoubleIndex('int', 'int'))(24, 42);
+        $m2 = (new DoubleIndex('int', 'int'))(24, 42);
 
         $this->assertTrue($m->equals($m2));
-        $this->assertFalse($m->equals($m2->put(65, 66)));
-        $this->assertFalse($m->equals($m2->put(24, 24)));
+        $this->assertFalse($m->equals(($m2)(65, 66)));
+        $this->assertFalse($m->equals(($m2)(24, 24)));
         $this->assertFalse(
             (new DoubleIndex('string', 'string'))
-                ->put('foo_res', 'res')
-                ->put('foo_bar_res', 'res')
+                ('foo_res', 'res')
+                ('foo_bar_res', 'res')
                 ->equals(
                     (new DoubleIndex('string', 'string'))
-                        ->put('foo_res', 'res')
-                        ->put('bar_res', 'res')
+                        ('foo_res', 'res')
+                        ('bar_res', 'res')
                 )
         );
 
         $m = (new DoubleIndex('int', 'int'))
-            ->put(24, 42)
-            ->put(42, 24);
+            (24, 42)
+            (42, 24);
         $m2 = (new DoubleIndex('int', 'int'))
-            ->put(42, 24)
-            ->put(24, 42);
+            (42, 24)
+            (24, 42);
 
         $this->assertTrue($m->equals($m2));
 
@@ -145,10 +145,10 @@ class DoubleIndexTest extends TestCase
     public function testFilter()
     {
         $m = (new DoubleIndex('int', 'int'))
-            ->put(0, 1)
-            ->put(1, 2)
-            ->put(2, 3)
-            ->put(4, 5);
+            (0, 1)
+            (1, 2)
+            (2, 3)
+            (4, 5);
 
         $m2 = $m->filter(function(int $key, int $value) {
             return ($key + $value) % 3 === 0;
@@ -169,10 +169,10 @@ class DoubleIndexTest extends TestCase
     public function testForeach()
     {
         $m = (new DoubleIndex('int', 'int'))
-            ->put(0, 1)
-            ->put(1, 2)
-            ->put(2, 3)
-            ->put(3, 4);
+            (0, 1)
+            (1, 2)
+            (2, 3)
+            (3, 4);
         $count = 0;
 
         $m->foreach(function(int $key, int $value) use (&$count) {
@@ -193,10 +193,10 @@ class DoubleIndexTest extends TestCase
     public function testGroupBy()
     {
         $m = (new DoubleIndex('int', 'int'))
-            ->put(0, 1)
-            ->put(1, 2)
-            ->put(2, 3)
-            ->put(4, 5);
+            (0, 1)
+            (1, 2)
+            (2, 3)
+            (4, 5);
 
         $m2 = $m->groupBy(function(int $key, int $value) {
             return ($key + $value) % 3;
@@ -225,10 +225,10 @@ class DoubleIndexTest extends TestCase
     public function testKeys()
     {
         $m = (new DoubleIndex('int', 'int'))
-            ->put(0, 1)
-            ->put(1, 2)
-            ->put(2, 3)
-            ->put(4, 5);
+            (0, 1)
+            (1, 2)
+            (2, 3)
+            (4, 5);
 
         $k = $m->keys();
         $this->assertInstanceOf(Set::class, $k);
@@ -240,11 +240,11 @@ class DoubleIndexTest extends TestCase
     public function testValues()
     {
         $m = (new DoubleIndex('int', 'int'))
-            ->put(0, 1)
-            ->put(1, 2)
-            ->put(2, 3)
-            ->put(4, 5)
-            ->put(5, 5);
+            (0, 1)
+            (1, 2)
+            (2, 3)
+            (4, 5)
+            (5, 5);
 
         $v = $m->values();
         $this->assertInstanceOf(Sequence::class, $v);
@@ -256,10 +256,10 @@ class DoubleIndexTest extends TestCase
     public function testMap()
     {
         $m = (new DoubleIndex('int', 'int'))
-            ->put(0, 1)
-            ->put(1, 2)
-            ->put(2, 3)
-            ->put(4, 5);
+            (0, 1)
+            (1, 2)
+            (2, 3)
+            (4, 5);
 
         $m2 = $m->map(function(int $key, int $value) {
             if ($key % 2 === 0) {
@@ -284,7 +284,7 @@ class DoubleIndexTest extends TestCase
         $this->expectExceptionMessage('Argument 2 must be of type int, string given');
 
         (new DoubleIndex('int', 'int'))
-            ->put(1, 2)
+            (1, 2)
             ->map(function(int $key, int $value) {
                 return (string) $value;
             });
@@ -296,7 +296,7 @@ class DoubleIndexTest extends TestCase
         $this->expectExceptionMessage('Argument 1 must be of type int, string given');
 
         (new DoubleIndex('int', 'int'))
-            ->put(1, 2)
+            (1, 2)
             ->map(function(int $key, int $value) {
                 return new Pair((string) $key, $value);
             });
@@ -305,11 +305,11 @@ class DoubleIndexTest extends TestCase
     public function testRemove()
     {
         $m = (new DoubleIndex('int', 'int'))
-            ->put(0, 1)
-            ->put(1, 2)
-            ->put(2, 3)
-            ->put(3, 4)
-            ->put(4, 5);
+            (0, 1)
+            (1, 2)
+            (2, 3)
+            (3, 4)
+            (4, 5);
 
         $m2 = $m->remove(12);
         $this->assertSame($m, $m2);
@@ -344,12 +344,12 @@ class DoubleIndexTest extends TestCase
     public function testMerge()
     {
         $m = (new DoubleIndex(\stdClass::class, 'int'))
-            ->put($s = new \stdClass, 24)
-            ->put($s2 = new \stdClass, 42);
+            ($s = new \stdClass, 24)
+            ($s2 = new \stdClass, 42);
         $m2 = (new DoubleIndex(\stdClass::class, 'int'))
-            ->put($s3 = new \stdClass, 24)
-            ->put($s2, 66)
-            ->put($s4 = new \stdClass, 42);
+            ($s3 = new \stdClass, 24)
+            ($s2, 66)
+            ($s4 = new \stdClass, 42);
 
         $m3 = $m->merge($m2);
         $this->assertNotSame($m, $m3);
@@ -370,11 +370,11 @@ class DoubleIndexTest extends TestCase
     public function testPartition()
     {
         $m = (new DoubleIndex('int', 'int'))
-            ->put(0, 1)
-            ->put(1, 2)
-            ->put(2, 3)
-            ->put(3, 4)
-            ->put(4, 5);
+            (0, 1)
+            (1, 2)
+            (2, 3)
+            (3, 4)
+            (4, 5);
 
         $p = $m->partition(function(int $i, int $v) {
             return ($i + $v) % 3 === 0;
@@ -413,7 +413,7 @@ class DoubleIndexTest extends TestCase
     public function testReduce()
     {
         $m = (new DoubleIndex('int', 'int'))
-            ->put(4, 4);
+            (4, 4);
 
         $v = $m->reduce(
             42,
@@ -430,14 +430,14 @@ class DoubleIndexTest extends TestCase
     public function testEmpty()
     {
         $this->assertTrue((new DoubleIndex('int', 'int'))->empty());
-        $this->assertFalse((new DoubleIndex('int', 'int'))->put(1, 2)->empty());
+        $this->assertFalse((new DoubleIndex('int', 'int'))(1, 2)->empty());
     }
 
     public function testToSequenceOf()
     {
         $map = (new DoubleIndex('int', 'int'))
-            ->put(1, 2)
-            ->put(3, 4);
+            (1, 2)
+            (3, 4);
         $sequence = $map->toSequenceOf('int', function($k, $v) {
             yield $k;
             yield $v;
@@ -453,8 +453,8 @@ class DoubleIndexTest extends TestCase
     public function testToSetOf()
     {
         $map = (new DoubleIndex('int', 'int'))
-            ->put(1, 2)
-            ->put(3, 4);
+            (1, 2)
+            (3, 4);
         $set = $map->toSetOf('int', function($k, $v) {
             yield $k;
             yield $v;
@@ -470,8 +470,8 @@ class DoubleIndexTest extends TestCase
     public function testToMapOf()
     {
         $map = (new DoubleIndex('int', 'int'))
-            ->put(1, 2)
-            ->put(3, 4);
+            (1, 2)
+            (3, 4);
         $map = $map->toMapOf('string', 'int', fn($i, $j) => yield (string) $j => $i);
 
         $this->assertInstanceOf(Map::class, $map);

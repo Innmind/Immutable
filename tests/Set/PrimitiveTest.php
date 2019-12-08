@@ -55,12 +55,12 @@ class PrimitiveTest extends TestCase
     public function testAdd()
     {
         $a = new Primitive('int', 1);
-        $b = $a->add(2);
+        $b = ($a)(2);
 
         $this->assertSame([1], \iterator_to_array($a->iterator()));
         $this->assertInstanceOf(Primitive::class, $b);
         $this->assertSame([1, 2], \iterator_to_array($b->iterator()));
-        $this->assertSame($b, $b->add(2));
+        $this->assertSame($b, ($b)(2));
     }
 
     public function testContains()
