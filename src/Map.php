@@ -365,11 +365,11 @@ final class Map implements \Countable
      * @template MT
      * @template MS
      *
-     * @param callable(T, S): \Generator<MT, MS> $mapper
+     * @param null|callable(T, S): \Generator<MT, MS> $mapper
      *
      * @return self<MT, MS>
      */
-    public function toMapOf(string $key, string $value, callable $mapper): self
+    public function toMapOf(string $key, string $value, callable $mapper = null): self
     {
         return $this->implementation->toMapOf($key, $value, $mapper);
     }

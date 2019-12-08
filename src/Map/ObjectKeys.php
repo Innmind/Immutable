@@ -464,12 +464,15 @@ final class ObjectKeys implements Implementation
      * @template MT
      * @template MS
      *
-     * @param callable(T, S): \Generator<MT, MS> $mapper
+     * @param null|callable(T, S): \Generator<MT, MS> $mapper
      *
      * @return Map<MT, MS>
      */
-    public function toMapOf(string $key, string $value, callable $mapper): Map
+    public function toMapOf(string $key, string $value, callable $mapper = null): Map
     {
+        /** @psalm-suppress MissingParamType */
+        $mapper ??= static fn($k, $v): \Generator => yield $k => $v;
+
         /** @var Map<MT, MS> */
         $map = Map::of($key, $value);
 

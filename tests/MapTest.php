@@ -507,5 +507,12 @@ class MapTest extends TestCase
         $this->assertCount(2, $map);
         $this->assertSame(1, $map->get('2'));
         $this->assertSame(3, $map->get('4'));
+
+        $this->assertTrue(
+            Map::of('object', 'int')
+                (new \stdClass, 1)
+                ->toMapOf('stdClass', 'int')
+                ->isOfType('stdClass', 'int')
+        );
     }
 }
