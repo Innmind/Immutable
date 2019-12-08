@@ -16,6 +16,7 @@ class UnionTypeTest extends TestCase
         $this->assertInstanceOf(
             ValidateArgument::class,
             new UnionType(
+                'foo',
                 $this->createMock(ValidateArgument::class),
                 $this->createMock(ValidateArgument::class)
             )
@@ -25,6 +26,7 @@ class UnionTypeTest extends TestCase
     public function testDoesntThrowWhenAtLeastOneTypeAcceptsTheValue()
     {
         $type = new UnionType(
+            'foo',
             $inner1 = $this->createMock(ValidateArgument::class),
             $inner2 = $this->createMock(ValidateArgument::class),
             $inner3 = $this->createMock(ValidateArgument::class)
@@ -49,6 +51,7 @@ class UnionTypeTest extends TestCase
     public function testThrowWhenNoneOfTheTypesAcceptTheValue()
     {
         $type = new UnionType(
+            'foo',
             $inner1 = $this->createMock(ValidateArgument::class),
             $inner2 = $this->createMock(ValidateArgument::class),
             $inner3 = $this->createMock(ValidateArgument::class)
@@ -71,6 +74,7 @@ class UnionTypeTest extends TestCase
             ->will($this->throwException(new \TypeError));
 
         $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage('Argument 1 must be of type foo, stdClass given');
 
         $type($value, 1);
     }

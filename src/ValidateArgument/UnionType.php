@@ -10,14 +10,17 @@ use Innmind\Immutable\{
 
 final class UnionType implements ValidateArgument
 {
+    private string $type;
     /** @var list<ValidateArgument> */
     private array $types;
 
     public function __construct(
+        string $type,
         ValidateArgument $first,
         ValidateArgument $second,
         ValidateArgument ...$rest
     ) {
+        $this->type = $type;
         $this->types = [$first, $second, ...$rest];
     }
 
@@ -36,6 +39,8 @@ final class UnionType implements ValidateArgument
             }
         }
 
-        throw new \TypeError;
+        $given = Type::determine($value);
+
+        throw new \TypeError("Argument $position must be of type {$this->type}, $given given");
     }
 }

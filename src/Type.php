@@ -44,7 +44,7 @@ final class Type
                 },
             );
 
-            return new UnionType(...$types);
+            return new UnionType($type->toString(), ...$types);
         }
 
         if ($type->startsWith('?')) {
