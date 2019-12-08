@@ -11,15 +11,6 @@ use Innmind\Immutable\{
 
 final class Str
 {
-    private const PAD_RIGHT = STR_PAD_RIGHT;
-    private const PAD_LEFT = STR_PAD_LEFT;
-    private const PAD_BOTH = STR_PAD_BOTH;
-    private const PREG_NO_FLAGS = 0;
-    private const PREG_SPLIT_NO_EMPTY = PREG_SPLIT_NO_EMPTY;
-    private const PREG_SPLIT_DELIM_CAPTURE = PREG_SPLIT_DELIM_CAPTURE;
-    private const PREG_SPLIT_OFFSET_CAPTURE = PREG_SPLIT_OFFSET_CAPTURE;
-    private const PREG_OFFSET_CAPTURE = PREG_OFFSET_CAPTURE;
-
     private string $value;
     private ?string $encoding;
 
@@ -207,7 +198,7 @@ final class Str
      */
     public function rightPad(int $length, string $character = ' '): self
     {
-        return $this->pad($length, $character, self::PAD_RIGHT);
+        return $this->pad($length, $character, \STR_PAD_RIGHT);
     }
 
     /**
@@ -215,7 +206,7 @@ final class Str
      */
     public function leftPad(int $length, string $character = ' '): self
     {
-        return $this->pad($length, $character, self::PAD_LEFT);
+        return $this->pad($length, $character, \STR_PAD_LEFT);
     }
 
     /**
@@ -223,7 +214,7 @@ final class Str
      */
     public function uniPad(int $length, string $character = ' '): self
     {
-        return $this->pad($length, $character, self::PAD_BOTH);
+        return $this->pad($length, $character, \STR_PAD_BOTH);
     }
 
     /**
@@ -572,11 +563,8 @@ final class Str
     /**
      * Pad the string
      */
-    private function pad(
-        int $length,
-        string $character = ' ',
-        int $direction = self::PAD_RIGHT
-    ): self {
+    private function pad(int $length, string $character, int $direction): self
+    {
         return new self(\str_pad(
             $this->value,
             $length,
