@@ -49,6 +49,18 @@ final class Set implements \Countable
     }
 
     /**
+     * @param callable(): \Generator<T> $generator
+     *
+     * @return self<T>
+     */
+    public static function lazy(string $type, callable $generator): self
+    {
+        $self = new self($type, new Set\Lazy($type, $generator));
+
+        return $self;
+    }
+
+    /**
      * @param mixed $values
      *
      * @return self<mixed>

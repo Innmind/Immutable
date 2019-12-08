@@ -53,6 +53,22 @@ class SequenceTest extends TestCase
         $this->assertTrue($loaded);
     }
 
+    public function testLazy()
+    {
+        $loaded = false;
+        $sequence = Sequence::lazy('int', function() use (&$loaded) {
+            yield 1;
+            yield 2;
+            yield 3;
+            $loaded = true;
+        });
+
+        $this->assertInstanceOf(Sequence::class, $sequence);
+        $this->assertFalse($loaded);
+        $this->assertSame([1, 2, 3], unwrap($sequence));
+        $this->assertTrue($loaded);
+    }
+
     public function testMixed()
     {
         $sequence = Sequence::mixed(1, '2', 3);

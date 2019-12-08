@@ -62,6 +62,23 @@ final class Sequence implements \Countable
     }
 
     /**
+     * It will call the given function every time a new operation is done on the
+     * sequence. This means the returned structure may not be truly immutable
+     * as between the calls the underlyong source may change.
+     *
+     * Use this mode when calling to an external source (meaning IO bound) such
+     * as parsing a file or calling an API
+     *
+     * @param callable(): \Generator<T> $generator
+     *
+     * @return self<T>
+     */
+    public static function lazy(string $type, callable $generator): self
+    {
+        return new self($type, new Sequence\Lazy($type, $generator));
+    }
+
+    /**
      * @param mixed $values
      *
      * @return self<mixed>
