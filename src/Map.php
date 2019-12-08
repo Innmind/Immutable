@@ -60,7 +60,7 @@ final class Map implements \Countable
         $self = new self($key, $value);
 
         foreach ($keys as $i => $key) {
-            $self = $self->put($key, $values[$i]);
+            $self = ($self)($key, $values[$i]);
         }
 
         return $self;

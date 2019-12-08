@@ -31,9 +31,7 @@ final class Set implements \Countable
      */
     public static function of(string $type, ...$values): self
     {
-        $self = new self($type, new Set\Primitive($type, ...$values));
-
-        return $self;
+        return new self($type, new Set\Primitive($type, ...$values));
     }
 
     /**
@@ -48,9 +46,7 @@ final class Set implements \Countable
      */
     public static function defer(string $type, \Generator $generator): self
     {
-        $self = new self($type, new Set\Defer($type, $generator));
-
-        return $self;
+        return new self($type, new Set\Defer($type, $generator));
     }
 
     /**
@@ -67,9 +63,7 @@ final class Set implements \Countable
      */
     public static function lazy(string $type, callable $generator): self
     {
-        $self = new self($type, new Set\Lazy($type, $generator));
-
-        return $self;
+        return new self($type, new Set\Lazy($type, $generator));
     }
 
     /**
@@ -79,10 +73,7 @@ final class Set implements \Countable
      */
     public static function mixed(...$values): self
     {
-        /** @var self<mixed> */
-        $self = new self('mixed', new Set\Primitive('mixed', ...$values));
-
-        return $self;
+        return new self('mixed', new Set\Primitive('mixed', ...$values));
     }
 
     /**
@@ -168,7 +159,7 @@ final class Set implements \Countable
 
         $newSet = clone $this;
         $newSet->implementation = $this->implementation->intersect(
-            $set->implementation
+            $set->implementation,
         );
 
         return $newSet;
@@ -250,7 +241,7 @@ final class Set implements \Countable
 
         $self = clone $this;
         $self->implementation = $this->implementation->diff(
-            $set->implementation
+            $set->implementation,
         );
 
         return $self;
@@ -361,7 +352,7 @@ final class Set implements \Countable
 
         $self = clone $this;
         $self->implementation = $this->implementation->merge(
-            $set->implementation
+            $set->implementation,
         );
 
         return $self;
@@ -422,8 +413,6 @@ final class Set implements \Countable
     {
         return $this->implementation->toSetOf($type, $mapper);
     }
-
-
 
     /**
      * @template MT

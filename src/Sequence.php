@@ -85,10 +85,7 @@ final class Sequence implements \Countable
      */
     public static function mixed(...$values): self
     {
-        /** @var self<mixed> */
-        $self = new self('mixed', new Sequence\Primitive('mixed', ...$values));
-
-        return $self;
+        return new self('mixed', new Sequence\Primitive('mixed', ...$values));
     }
 
     /**
@@ -187,7 +184,7 @@ final class Sequence implements \Countable
 
         $self = clone $this;
         $self->implementation = $this->implementation->diff(
-            $sequence->implementation
+            $sequence->implementation,
         );
 
         return $self;
@@ -242,7 +239,7 @@ final class Sequence implements \Countable
         assertSequence($this->type, $sequence, 1);
 
         return $this->implementation->equals(
-            $sequence->implementation
+            $sequence->implementation,
         );
     }
 
@@ -456,7 +453,7 @@ final class Sequence implements \Countable
 
         $self = clone $this;
         $self->implementation = $this->implementation->append(
-            $sequence->implementation
+            $sequence->implementation,
         );
 
         return $self;
@@ -476,7 +473,7 @@ final class Sequence implements \Countable
 
         $self = clone $this;
         $self->implementation = $this->implementation->intersect(
-            $sequence->implementation
+            $sequence->implementation,
         );
 
         return $self;
@@ -600,8 +597,6 @@ final class Sequence implements \Countable
     {
         return $this->implementation->toSetOf($type, $mapper);
     }
-
-
 
     /**
      * @template MT

@@ -67,7 +67,7 @@ final class Primitive implements Implementation
     {
         $self = $this->clear();
         $self->values = $this->values->intersect(
-            new Sequence\Primitive($this->type, ...$set->iterator())
+            new Sequence\Primitive($this->type, ...$set->iterator()),
         );
 
         return $self;
@@ -128,7 +128,7 @@ final class Primitive implements Implementation
     {
         $self = clone $this;
         $self->values = $this->values->diff(
-            new Sequence\Primitive($this->type, ...$set->iterator())
+            new Sequence\Primitive($this->type, ...$set->iterator()),
         );
 
         return $self;
@@ -186,12 +186,10 @@ final class Primitive implements Implementation
          */
         return $map->reduce(
             Map::of($map->keyType(), Set::class),
-            function(Map $carry, $key, Sequence $values): Map {
-                return ($carry)(
-                    $key,
-                    $values->toSetOf($this->type),
-                );
-            }
+            fn(Map $carry, $key, Sequence $values): Map => ($carry)(
+                $key,
+                $values->toSetOf($this->type),
+            ),
         );
     }
 
@@ -202,23 +200,23 @@ final class Primitive implements Implementation
      */
     public function map(callable $function): self
     {
+        $validate = $this->validate;
+
         /**
          * @psalm-suppress MissingClosureParamType
          * @psalm-suppress MissingClosureReturnType
          */
-        $function = function($value) use ($function) {
+        $function = static function($value) use ($validate, $function) {
             /** @var T $value */
             $returned = $function($value);
-            ($this->validate)($returned, 1);
+            ($validate)($returned, 1);
 
             return $returned;
         };
 
         return $this->reduce(
             $this->clear(),
-            function(self $carry, $value) use ($function): self {
-                return ($carry)($function($value));
-            }
+            static fn(self $carry, $value): self => ($carry)($function($value)),
         );
     }
 
@@ -270,9 +268,7 @@ final class Primitive implements Implementation
     {
         return $set->reduce(
             $this,
-            function(self $carry, $value): self {
-                return ($carry)($value);
-            }
+            static fn(self $carry, $value): self => ($carry)($value),
         );
     }
 

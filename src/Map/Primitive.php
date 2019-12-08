@@ -27,8 +27,8 @@ final class Primitive implements Implementation
     private ValidateArgument $validateKey;
     private ValidateArgument $validateValue;
     /** @var array<T, S> */
-    private array $values;
-    private ?int $size;
+    private array $values = [];
+    private ?int $size = null;
 
     public function __construct(string $keyType, string $valueType)
     {
@@ -41,8 +41,6 @@ final class Primitive implements Implementation
         $this->validateValue = Type::of($valueType);
         $this->keyType = $keyType;
         $this->valueType = $valueType;
-        $this->values = [];
-        $this->size = null;
     }
 
     public function keyType(): string
@@ -235,9 +233,7 @@ final class Primitive implements Implementation
         return Set::of(
             $this->keyType,
             ...\array_map(
-                function($key) {
-                    return $this->normalizeKey($key);
-                },
+                fn($key) => $this->normalizeKey($key),
                 $keys,
             ),
         );
@@ -312,15 +308,10 @@ final class Primitive implements Implementation
      */
     public function merge(Implementation $map): self
     {
-        /** @var self<T, S> $merged */
-        $merged = $map->reduce(
+        return $map->reduce(
             $this,
-            function(self $carry, $key, $value): self {
-                return ($carry)($key, $value);
-            }
+            static fn(self $carry, $key, $value): self => ($carry)($key, $value),
         );
-
-        return $merged;
     }
 
     /**
@@ -375,22 +366,6 @@ final class Primitive implements Implementation
 
         /** @psalm-suppress MixedArgumentTypeCoercion */
         return \is_null(\key($this->values));
-    }
-
-    /**
-     * @param mixed $value
-     *
-     * @return T
-     */
-    private function normalizeKey($value)
-    {
-        if ($this->keyType === 'string' && !\is_null($value)) {
-            /** @var T */
-            return (string) $value;
-        }
-
-        /** @var T */
-        return $value;
     }
 
     /**
@@ -458,6 +433,22 @@ final class Primitive implements Implementation
         }
 
         return $map;
+    }
+
+    /**
+     * @param mixed $value
+     *
+     * @return T
+     */
+    private function normalizeKey($value)
+    {
+        if ($this->keyType === 'string' && !\is_null($value)) {
+            /** @var T */
+            return (string) $value;
+        }
+
+        /** @var T */
+        return $value;
     }
 
     /**

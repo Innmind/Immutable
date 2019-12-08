@@ -110,7 +110,7 @@ final class ObjectKeys implements Implementation
      */
     public function contains($key): bool
     {
-        if (!is_object($key)) {
+        if (!\is_object($key)) {
             return false;
         }
 
@@ -252,9 +252,7 @@ final class ObjectKeys implements Implementation
     {
         return $this->reduce(
             Set::of($this->keyType),
-            static function(Set $keys, $key): Set {
-                return ($keys)($key);
-            }
+            static fn(Set $keys, $key): Set => ($keys)($key),
         );
     }
 
@@ -265,9 +263,7 @@ final class ObjectKeys implements Implementation
     {
         return $this->reduce(
             Sequence::of($this->valueType),
-            static function(Sequence $values, $key, $value): Sequence {
-                return ($values)($value);
-            }
+            static fn(Sequence $values, $key, $value): Sequence => ($values)($value),
         );
     }
 
@@ -335,12 +331,9 @@ final class ObjectKeys implements Implementation
      */
     public function merge(Implementation $map): self
     {
-        /** @var self<T, S> */
         return $map->reduce(
             $this,
-            function(self $carry, $key, $value): self {
-                return ($carry)($key, $value);
-            }
+            static fn(self $carry, $key, $value): self => ($carry)($key, $value),
         );
     }
 
@@ -457,8 +450,6 @@ final class ObjectKeys implements Implementation
 
         return $set;
     }
-
-
 
     /**
      * @template MT

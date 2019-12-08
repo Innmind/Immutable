@@ -5,7 +5,7 @@ namespace Innmind\Immutable;
 
 use Innmind\Immutable\Exception\{
     DomainException,
-    RegexException
+    RegexException,
 };
 
 final class RegExp
@@ -63,7 +63,7 @@ final class RegExp
                 $key,
                 Str::of(
                     (string) $match,
-                    $string->encoding()->toString()
+                    $string->encoding()->toString(),
                 )
             );
         }

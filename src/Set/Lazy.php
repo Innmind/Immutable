@@ -75,7 +75,7 @@ final class Lazy implements Implementation
         $self->values = $this->values->intersect(
             new Sequence\Defer(
                 $this->type,
-                (function(\Iterator $values): \Generator {
+                (static function(\Iterator $values): \Generator {
                     /** @var T $value */
                     foreach ($values as $value) {
                         yield $value;
@@ -140,7 +140,7 @@ final class Lazy implements Implementation
         $self->values = $this->values->diff(
             new Sequence\Defer(
                 $this->type,
-                (function(\Iterator $values): \Generator {
+                (static function(\Iterator $values): \Generator {
                     /** @var T $value */
                     foreach ($values as $value) {
                         yield $value;
@@ -204,12 +204,10 @@ final class Lazy implements Implementation
          */
         return $map->reduce(
             Map::of($map->keyType(), Set::class),
-            function(Map $carry, $key, Sequence $values): Map {
-                return ($carry)(
-                    $key,
-                    $values->toSetOf($this->type),
-                );
-            }
+            fn(Map $carry, $key, Sequence $values): Map => ($carry)(
+                $key,
+                $values->toSetOf($this->type),
+            ),
         );
     }
 
@@ -220,14 +218,16 @@ final class Lazy implements Implementation
      */
     public function map(callable $function): self
     {
+        $validate = $this->validate;
+
         /**
          * @psalm-suppress MissingClosureParamType
          * @psalm-suppress MissingClosureReturnType
          */
-        $function = function($value) use ($function) {
+        $function = static function($value) use ($validate, $function) {
             /** @var T $value */
             $returned = $function($value);
-            ($this->validate)($returned, 1);
+            ($validate)($returned, 1);
 
             return $returned;
         };
@@ -290,7 +290,7 @@ final class Lazy implements Implementation
         $self = clone $this;
         $self->values = new Sequence\Defer(
             $this->type,
-            (function(\Iterator $self, \Iterator $set): \Generator {
+            (static function(\Iterator $self, \Iterator $set): \Generator {
                 /** @var T $value */
                 foreach ($self as $value) {
                     yield $value;

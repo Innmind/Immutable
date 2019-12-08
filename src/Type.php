@@ -9,7 +9,7 @@ use Innmind\Immutable\ValidateArgument\{
     VariableType,
     MixedType,
     NullableType,
-    UnionType
+    UnionType,
 };
 
 final class Type
@@ -41,7 +41,7 @@ final class Type
                     $types[] = self::of($type->toString());
 
                     return $types;
-                }
+                },
             );
 
             return new UnionType(...$types);
@@ -49,7 +49,7 @@ final class Type
 
         if ($type->startsWith('?')) {
             return new NullableType(
-                self::ofPrimitive($type->drop(1)->toString())
+                self::ofPrimitive($type->drop(1)->toString()),
             );
         }
 

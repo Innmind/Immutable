@@ -6,7 +6,7 @@ namespace Innmind\Immutable;
 use Innmind\Immutable\{
     Exception\RegexException,
     Exception\SubstringException,
-    Exception\LogicException
+    Exception\LogicException,
 };
 
 final class Str
@@ -110,7 +110,7 @@ final class Str
         if ($position === false) {
             throw new SubstringException(\sprintf(
                 'Substring "%s" not found',
-                $needle
+                $needle,
             ));
         }
 
@@ -149,7 +149,7 @@ final class Str
         if ($sub === false) {
             throw new SubstringException(\sprintf(
                 'Substring "%s" not found',
-                $delimiter
+                $delimiter,
             ));
         }
 
@@ -238,7 +238,7 @@ final class Str
                 $this->value,
                 $mask,
                 $start,
-                $length
+                $length,
             );
         }
 
@@ -262,7 +262,7 @@ final class Str
         $parts = unwrap(
             $this
                 ->chunk()
-                ->toSequenceOf('string', fn($v) => yield $v->toString())
+                ->toSequenceOf('string', fn($v) => yield $v->toString()),
         );
         \shuffle($parts);
 
@@ -290,7 +290,7 @@ final class Str
         return (int) \str_word_count(
             $this->value,
             0,
-            $charlist
+            $charlist,
         );
     }
 
@@ -367,7 +367,7 @@ final class Str
             $regex,
             $replacement,
             $this->value,
-            $limit
+            $limit,
         );
 
         if ($value === null) {
@@ -493,7 +493,7 @@ final class Str
     {
         return new self(
             $mask === null ? \trim($this->value) : \trim($this->value, $mask),
-            $this->encoding
+            $this->encoding,
         );
     }
 
@@ -581,7 +581,7 @@ final class Str
             $this->value,
             $length,
             $character,
-            $direction
+            $direction,
         ), $this->encoding);
     }
 }

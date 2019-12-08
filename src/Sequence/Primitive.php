@@ -25,7 +25,7 @@ final class Primitive implements Implementation
     private ValidateArgument $validate;
     /** @var list<T> */
     private array $values;
-    private ?int $size;
+    private ?int $size = null;
 
     /**
      * @param T $values
@@ -35,7 +35,6 @@ final class Primitive implements Implementation
         $this->type = $type;
         $this->validate = Type::of($type);
         $this->values = $values;
-        $this->size = null;
     }
 
     public function type(): string
@@ -145,7 +144,7 @@ final class Primitive implements Implementation
         $self = $this->clear();
         $self->values = \array_values(\array_filter(
             $this->values,
-            $predicate
+            $predicate,
         ));
 
         return $self;
@@ -267,14 +266,15 @@ final class Primitive implements Implementation
      */
     public function map(callable $function): self
     {
+        $validate = $this->validate;
         /**
          * @psalm-suppress MissingClosureParamType
          * @psalm-suppress MissingClosureReturnType
          */
-        $function = function($value) use ($function) {
+        $function = static function($value) use ($validate, $function) {
             /** @var T $value */
             $returned = $function($value);
-            ($this->validate)($returned, 1);
+            ($validate)($returned, 1);
 
             return $returned;
         };
@@ -354,13 +354,12 @@ final class Primitive implements Implementation
      */
     public function splitAt(int $index): Sequence
     {
-        /** @var Sequence<T> */
-        $first = Sequence::of($this->type, ...$this->slice(0, $index)->iterator());
-        /** @var Sequence<T> */
-        $second = Sequence::of($this->type, ...$this->slice($index, $this->size())->iterator());
-
         /** @var Sequence<Sequence<T>> */
-        return Sequence::of(Sequence::class, $first, $second);
+        return Sequence::of(
+            Sequence::class,
+            $this->slice(0, $index)->toSequenceOf($this->type),
+            $this->slice($index, $this->size())->toSequenceOf($this->type),
+        );
     }
 
     /**

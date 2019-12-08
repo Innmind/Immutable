@@ -112,7 +112,7 @@ final class DoubleIndex implements Implementation
         }
 
         return $this->values->get(
-            $this->keys->indexOf($key)
+            $this->keys->indexOf($key),
         );
     }
 
@@ -320,9 +320,7 @@ final class DoubleIndex implements Implementation
     {
         return $map->reduce(
             $this,
-            function(self $carry, $key, $value): self {
-                return ($carry)($key, $value);
-            }
+            static fn(self $carry, $key, $value): self => ($carry)($key, $value),
         );
     }
 
