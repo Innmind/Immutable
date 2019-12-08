@@ -22,20 +22,17 @@ final class Map implements \Countable
     private ValidateArgument $validateKey;
     private ValidateArgument $validateValue;
 
-    private function __construct(string $keyType, string $valueType)
-    {
+    private function __construct(
+        string $keyType,
+        string $valueType,
+        Map\Implementation $implementation
+    ) {
         $type = Type::of($keyType);
-        $this->implementation = new Map\DoubleIndex($keyType, $valueType);
+        $this->implementation = $implementation;
         $this->keyType = $keyType;
         $this->valueType = $valueType;
-        $this->validateKey = $type;
+        $this->validateKey = Type::of($keyType);
         $this->validateValue = Type::of($valueType);
-
-        if ($type instanceof ClassType || $keyType === 'object') {
-            $this->implementation = new Map\ObjectKeys($keyType, $valueType);
-        } else if (\in_array($keyType, ['int', 'integer', 'string'], true)) {
-            $this->implementation = new Map\Primitive($keyType, $valueType);
-        }
     }
 
     /**
@@ -43,7 +40,17 @@ final class Map implements \Countable
      */
     public static function of(string $key, string $value): self
     {
-        return new self($key, $value);
+        $type = Type::of($key);
+
+        if ($type instanceof ClassType || $key === 'object') {
+            $implementation = new Map\ObjectKeys($key, $value);
+        } else if (\in_array($key, ['int', 'integer', 'string'], true)) {
+            $implementation = new Map\Primitive($key, $value);
+        } else {
+            $implementation = new Map\DoubleIndex($key, $value);
+        }
+
+        return new self($key, $value, $implementation);
     }
 
     public function isOfType(string $key, string $value): bool
