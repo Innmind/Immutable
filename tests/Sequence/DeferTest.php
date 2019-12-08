@@ -112,7 +112,7 @@ class DeferTest extends TestCase
         $this->assertFalse($bLoaded);
         $this->assertSame([1, 2], \iterator_to_array($a->iterator()));
         $this->assertSame([2, 3], \iterator_to_array($b->iterator()));
-        $this->assertInstanceOf(Implementation::class, $c);
+        $this->assertInstanceOf(Defer::class, $c);
         $this->assertSame([1], \iterator_to_array($c->iterator()));
         $this->assertTrue($aLoaded);
         $this->assertTrue($bLoaded);
@@ -131,7 +131,7 @@ class DeferTest extends TestCase
 
         $this->assertFalse($loaded);
         $this->assertSame([1, 2, 1], \iterator_to_array($a->iterator()));
-        $this->assertInstanceOf(Implementation::class, $b);
+        $this->assertInstanceOf(Defer::class, $b);
         $this->assertSame([1, 2], \iterator_to_array($b->iterator()));
         $this->assertTrue($loaded);
     }
@@ -150,7 +150,7 @@ class DeferTest extends TestCase
 
         $this->assertFalse($loaded);
         $this->assertSame([1, 2, 3, 4], \iterator_to_array($a->iterator()));
-        $this->assertInstanceOf(Implementation::class, $b);
+        $this->assertInstanceOf(Defer::class, $b);
         $this->assertSame([3, 4], \iterator_to_array($b->iterator()));
         $this->assertTrue($loaded);
     }
@@ -199,7 +199,7 @@ class DeferTest extends TestCase
 
         $this->assertFalse($loaded);
         $this->assertSame([1, 2, 3, 4], \iterator_to_array($a->iterator()));
-        $this->assertInstanceOf(Implementation::class, $b);
+        $this->assertInstanceOf(Defer::class, $b);
         $this->assertSame([2, 4], \iterator_to_array($b->iterator()));
         $this->assertTrue($loaded);
     }
@@ -353,7 +353,7 @@ class DeferTest extends TestCase
 
         $this->assertFalse($loaded);
         $this->assertSame(['1', '2'], \iterator_to_array($a->iterator()));
-        $this->assertInstanceOf(Implementation::class, $b);
+        $this->assertInstanceOf(Defer::class, $b);
         $this->assertSame('int', $b->type());
         $this->assertSame([0, 1], \iterator_to_array($b->iterator()));
         $this->assertTrue($loaded);
@@ -369,7 +369,7 @@ class DeferTest extends TestCase
         $b = $a->indices();
 
         $this->assertSame([], \iterator_to_array($a->iterator()));
-        $this->assertInstanceOf(Implementation::class, $b);
+        $this->assertInstanceOf(Defer::class, $b);
         $this->assertSame('int', $b->type());
         $this->assertSame([], \iterator_to_array($b->iterator()));
     }
@@ -387,7 +387,7 @@ class DeferTest extends TestCase
 
         $this->assertFalse($loaded);
         $this->assertSame([1, 2, 3], \iterator_to_array($a->iterator()));
-        $this->assertInstanceOf(Implementation::class, $b);
+        $this->assertInstanceOf(Defer::class, $b);
         $this->assertSame([2, 4, 6], \iterator_to_array($b->iterator()));
         $this->assertTrue($loaded);
     }
@@ -419,8 +419,8 @@ class DeferTest extends TestCase
 
         $this->assertFalse($loaded);
         $this->assertSame([1, 2], \iterator_to_array($a->iterator()));
-        $this->assertInstanceOf(Implementation::class, $b);
-        $this->assertInstanceOf(Implementation::class, $c);
+        $this->assertInstanceOf(Defer::class, $b);
+        $this->assertInstanceOf(Defer::class, $c);
         $this->assertSame([1, 2, 0, 0], \iterator_to_array($b->iterator()));
         $this->assertSame([1, 2], \iterator_to_array($c->iterator()));
         $this->assertTrue($loaded);
@@ -460,7 +460,7 @@ class DeferTest extends TestCase
 
         $this->assertFalse($loaded);
         $this->assertSame([2, 3, 4, 5], \iterator_to_array($a->iterator()));
-        $this->assertInstanceOf(Implementation::class, $b);
+        $this->assertInstanceOf(Defer::class, $b);
         $this->assertSame([3, 4], \iterator_to_array($b->iterator()));
         $this->assertTrue($loaded);
     }
@@ -498,7 +498,7 @@ class DeferTest extends TestCase
 
         $this->assertFalse($loaded);
         $this->assertSame([2, 3, 4], \iterator_to_array($a->iterator()));
-        $this->assertInstanceOf(Implementation::class, $b);
+        $this->assertInstanceOf(Defer::class, $b);
         $this->assertSame([2, 3], \iterator_to_array($b->iterator()));
         $this->assertTrue($loaded);
     }
@@ -537,7 +537,7 @@ class DeferTest extends TestCase
         $this->assertFalse($bLoaded);
         $this->assertSame([1, 2], \iterator_to_array($a->iterator()));
         $this->assertSame([3, 4], \iterator_to_array($b->iterator()));
-        $this->assertInstanceOf(Implementation::class, $c);
+        $this->assertInstanceOf(Defer::class, $c);
         $this->assertSame([1, 2, 3, 4], \iterator_to_array($c->iterator()));
         $this->assertTrue($aLoaded);
         $this->assertTrue($bLoaded);
@@ -563,7 +563,7 @@ class DeferTest extends TestCase
         $this->assertFalse($bLoaded);
         $this->assertSame([1, 2], \iterator_to_array($a->iterator()));
         $this->assertSame([2, 3], \iterator_to_array($b->iterator()));
-        $this->assertInstanceOf(Implementation::class, $c);
+        $this->assertInstanceOf(Defer::class, $c);
         $this->assertSame([2], \iterator_to_array($c->iterator()));
         $this->assertTrue($aLoaded);
         $this->assertTrue($bLoaded);
@@ -580,7 +580,7 @@ class DeferTest extends TestCase
 
         $this->assertFalse($loaded);
         $this->assertSame([1], \iterator_to_array($a->iterator()));
-        $this->assertInstanceOf(Implementation::class, $b);
+        $this->assertInstanceOf(Defer::class, $b);
         $this->assertSame([1, 2], \iterator_to_array($b->iterator()));
         $this->assertTrue($loaded);
     }
@@ -596,7 +596,7 @@ class DeferTest extends TestCase
         $b = $a->sort(fn($a, $b) => $a > $b);
 
         $this->assertSame([1, 4, 3, 2], \iterator_to_array($a->iterator()));
-        $this->assertInstanceOf(Implementation::class, $b);
+        $this->assertInstanceOf(Defer::class, $b);
         $this->assertSame([1, 2, 3, 4], \iterator_to_array($b->iterator()));
     }
 
@@ -614,15 +614,19 @@ class DeferTest extends TestCase
 
     public function testClear()
     {
-        $a = new Defer('int', (function() {
+        $loaded = false;
+        $a = new Defer('int', (function() use (&$loaded) {
             yield 1;
             yield 2;
+           $loaded = true;
         })());
         $b = $a->clear();
 
-        $this->assertSame([1, 2], \iterator_to_array($a->iterator()));
+        $this->assertFalse($loaded);
         $this->assertInstanceOf(Implementation::class, $b);
         $this->assertSame([], \iterator_to_array($b->iterator()));
+        $this->assertFalse($loaded);
+        $this->assertSame([1, 2], \iterator_to_array($a->iterator()));
     }
 
     public function testReverse()
@@ -639,7 +643,7 @@ class DeferTest extends TestCase
 
         $this->assertFalse($loaded);
         $this->assertSame([1, 2, 3, 4], \iterator_to_array($a->iterator()));
-        $this->assertInstanceOf(Implementation::class, $b);
+        $this->assertInstanceOf(Defer::class, $b);
         $this->assertSame([4, 3, 2, 1], \iterator_to_array($b->iterator()));
         $this->assertTrue($loaded);
     }
