@@ -12,7 +12,7 @@ final class RegExp
 {
     private string $pattern;
 
-    public function __construct(string $pattern)
+    private function __construct(string $pattern)
     {
         if (@\preg_match($pattern, '') === false) {
             throw new DomainException($pattern, \preg_last_error());

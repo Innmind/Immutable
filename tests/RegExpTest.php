@@ -15,7 +15,7 @@ class RegExpTest extends TestCase
 {
     public function testInterface()
     {
-        $regexp = new RegExp('/foo/');
+        $regexp = RegExp::of('/foo/');
 
         $this->assertSame('/foo/', $regexp->toString());
     }
@@ -32,12 +32,12 @@ class RegExpTest extends TestCase
     {
         $this->expectException(DomainException::class);
 
-        new RegExp('/foo');
+        RegExp::of('/foo');
     }
 
     public function testMatches()
     {
-        $regexp = new RegExp('/^foo/');
+        $regexp = RegExp::of('/^foo/');
 
         $this->assertTrue($regexp->matches(Str::of('foofoo')));
         $this->assertFalse($regexp->matches(Str::of('barfoo')));
@@ -45,7 +45,7 @@ class RegExpTest extends TestCase
 
     public function testCapture()
     {
-        $regexp = new RegExp('/(?<i>\d)/');
+        $regexp = RegExp::of('/(?<i>\d)/');
 
         $map = $regexp->capture(Str::of('foo123bar'));
 
