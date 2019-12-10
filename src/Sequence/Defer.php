@@ -30,8 +30,14 @@ final class Defer implements Implementation
     public function __construct(string $type, \Generator $generator)
     {
         $this->type = $type;
-        $this->values = new Accumulate($generator);
-        $this->validate = Type::of($type);
+        $validate = Type::of($type);
+        $this->values = new Accumulate((function(\Generator $generator, ValidateArgument $validate): \Generator {
+            foreach ($generator as $value) {
+                $validate($value, 1);
+                yield $value;
+            }
+        })($generator, $validate));
+        $this->validate = $validate;
     }
 
     public function type(): string
