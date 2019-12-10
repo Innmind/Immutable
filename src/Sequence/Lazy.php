@@ -33,6 +33,7 @@ final class Lazy implements Implementation
         $validate = Type::of($type);
         /** @var \Closure(): \Generator<T> */
         $this->values = \Closure::fromCallable(static function() use ($generator, $validate): \Generator {
+            /** @var T $value */
             foreach ($generator() as $value) {
                 $validate($value, 1);
                 yield $value;

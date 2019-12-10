@@ -32,6 +32,7 @@ final class Defer implements Implementation
         $this->type = $type;
         $validate = Type::of($type);
         $this->values = new Accumulate((function(\Generator $generator, ValidateArgument $validate): \Generator {
+            /** @var T $value */
             foreach ($generator as $value) {
                 $validate($value, 1);
                 yield $value;
