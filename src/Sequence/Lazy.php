@@ -30,9 +30,16 @@ final class Lazy implements Implementation
     public function __construct(string $type, callable $generator)
     {
         $this->type = $type;
+        $validate = Type::of($type);
         /** @var \Closure(): \Generator<T> */
-        $this->values = \Closure::fromCallable($generator);
-        $this->validate = Type::of($type);
+        $this->values = \Closure::fromCallable(static function() use ($generator, $validate): \Generator {
+            /** @var T $value */
+            foreach ($generator() as $value) {
+                $validate($value, 1);
+                yield $value;
+            }
+        });
+        $this->validate = $validate;
     }
 
     public function type(): string

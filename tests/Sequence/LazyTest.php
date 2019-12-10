@@ -38,6 +38,17 @@ class LazyTest extends TestCase
         $this->assertFalse($loaded);
     }
 
+    public function testThrowWhenYieldingInvalidType()
+    {
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage('Argument 1 must be of type int, string given');
+
+        $sequence = new Lazy('int', function() {
+            yield '1';
+        });
+        \iterator_to_array($sequence->iterator());
+    }
+
     public function testType()
     {
         $this->assertSame('int', (new Lazy('int', fn() => yield))->type());
