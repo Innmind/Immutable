@@ -411,6 +411,17 @@ class SequenceTest extends TestCase
         $this->assertSame([1, 4, 9, 16], unwrap($b));
     }
 
+    public function testMapTo()
+    {
+        $a = Sequence::ints(1, 2, 3, 4);
+        $b = $a->mapTo('string', fn($i) => (string) $i);
+
+        $this->assertInstanceOf(Sequence::class, $b);
+        $this->assertNotSame($a, $b);
+        $this->assertSame('string', $b->type());
+        $this->assertSame(['1', '2', '3', '4'], unwrap($b));
+    }
+
     public function testThrowWhenTryingToModifyValueTypeInMap()
     {
         $this->expectException(\TypeError::class);

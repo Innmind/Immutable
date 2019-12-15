@@ -316,6 +316,25 @@ final class Set implements \Countable
     }
 
     /**
+     * Create a new Set with the exact same number of elements but with a
+     * new type transformed via the given function
+     *
+     * @template S
+     *
+     * @param callable(T): S $map
+     *
+     * @return self<S>
+     */
+    public function mapTo(string $type, callable $map): self
+    {
+        /** @psalm-suppress MixedArgument */
+        return $this->toSetOf(
+            $type,
+            static fn($value): \Generator => yield $map($value),
+        );
+    }
+
+    /**
      * Return a sequence of 2 sets partitioned according to the given predicate
      *
      * @param callable(T): bool $predicate
