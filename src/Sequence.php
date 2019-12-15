@@ -361,6 +361,25 @@ final class Sequence implements \Countable
     }
 
     /**
+     * Create a new Sequence with the exact same number of elements but with a
+     * new type transformed via the given function
+     *
+     * @template S
+     *
+     * @param callable(T): S $map
+     *
+     * @return self<S>
+     */
+    public function mapTo(string $type, callable $map): self
+    {
+        /** @psalm-suppress MixedArgument */
+        return $this->toSequenceOf(
+            $type,
+            static fn($value): \Generator => yield $map($value),
+        );
+    }
+
+    /**
      * Pad the sequence to a defined size with the given element
      *
      * @param T $element
