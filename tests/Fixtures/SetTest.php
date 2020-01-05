@@ -68,27 +68,13 @@ class SetTest extends TestCase
 
     public function testFilter()
     {
-        $sets1 = new Set('string', new DataSet\Chars);
-        $sets2 = $sets1->filter(static function($set): bool {
+        $sets = new Set('string', new DataSet\Chars);
+
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Set set can\'t be filtered, underlying set must be filtered beforehand');
+
+        $sets->filter(static function($set): bool {
             return $set->size() % 2 === 0;
         });
-
-        $this->assertNotSame($sets1, $sets2);
-        $this->assertInstanceOf(Set::class, $sets2);
-
-        $values1 = \iterator_to_array($sets1->values());
-        $values2 = \iterator_to_array($sets2->values());
-        $values1 = \array_map(function($set) {
-            return $set->size() % 2;
-        }, $values1);
-        $values2 = \array_map(function($set) {
-            return $set->size() % 2;
-        }, $values2);
-        $values1 = \array_unique($values1);
-        $values2 = \array_unique($values2);
-        \sort($values1);
-
-        $this->assertSame([0, 1], \array_values($values1));
-        $this->assertSame([0], \array_values($values2));
     }
 }

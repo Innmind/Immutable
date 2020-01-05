@@ -18,7 +18,6 @@ final class Map implements Set
     private $keys;
     private $values;
     private $sizes;
-    private $predicate;
 
     public function __construct(
         string $keyType,
@@ -32,9 +31,6 @@ final class Map implements Set
         $this->keys = $keys;
         $this->values = $values;
         $this->sizes = ($sizes ?? Set\Integers::between(0, 100))->take(100);
-        $this->predicate = static function(): bool {
-            return true;
-        };
     }
 
     /**
@@ -63,16 +59,7 @@ final class Map implements Set
      */
     public function filter(callable $predicate): Set
     {
-        $self = clone $this;
-        $self->predicate = function($value) use ($predicate): bool {
-            if (!($this->predicate)($value)) {
-                return false;
-            }
-
-            return $predicate($value);
-        };
-
-        return $self;
+        throw new \LogicException('Map set can\'t be filtered, underlying sets must be filtered beforehand');
     }
 
     /**
@@ -92,10 +79,6 @@ final class Map implements Set
                 );
                 $keys->next();
                 $values->next();
-            }
-
-            if (!($this->predicate)($map)) {
-                continue;
             }
 
             yield $map;
