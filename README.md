@@ -3,7 +3,7 @@
 |  `develop` |
 |------------|
 | [![codecov](https://codecov.io/gh/Innmind/Immutable/branch/develop/graph/badge.svg)](https://codecov.io/gh/Innmind/Immutable) |
-| [![Build Status](https://travis-ci.org/Innmind/Immutable.svg?branch=develop)](https://travis-ci.org/Innmind/Immutable) |
+| [![Build Status](https://github.com/Innmind/Immutable/workflows/CI/badge.svg)](https://github.com/Innmind/Immutable/actions?query=workflow%3ACI) |
 
 A set of classes to wrap PHP primitives to build immutable data.
 

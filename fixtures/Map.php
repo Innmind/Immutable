@@ -18,7 +18,6 @@ final class Map implements Set
     private $keys;
     private $values;
     private $sizes;
-    private $predicate;
 
     public function __construct(
         string $keyType,
@@ -32,9 +31,6 @@ final class Map implements Set
         $this->keys = $keys;
         $this->values = $values;
         $this->sizes = ($sizes ?? Set\Integers::between(0, 100))->take(100);
-        $this->predicate = static function(): bool {
-            return true;
-        };
     }
 
     /**
@@ -63,42 +59,41 @@ final class Map implements Set
      */
     public function filter(callable $predicate): Set
     {
-        $self = clone $this;
-        $self->predicate = function($value) use ($predicate): bool {
-            if (!($this->predicate)($value)) {
-                return false;
-            }
-
-            return $predicate($value);
-        };
-
-        return $self;
+        throw new \LogicException('Map set can\'t be filtered, underlying sets must be filtered beforehand');
     }
 
     /**
-     * @return \Generator<Structure<I, J>>
+     * @return \Generator<Set\Value<Structure<I, J>>>
      */
     public function values(): \Generator
     {
+        $immutable = $this->keys->values()->current()->isImmutable() &&
+            $this->values->values()->current()->isImmutable();
+
         foreach ($this->sizes->values() as $size) {
-            $map = Structure::of($this->keyType, $this->valueType);
-            $keys = $this->keys->take($size)->values();
-            $values = $this->values->take($size)->values();
-
-            while ($map->size() < $size) {
-                $map = ($map)(
-                    $keys->current(),
-                    $values->current(),
-                );
-                $keys->next();
-                $values->next();
+            if ($immutable) {
+                yield Set\Value::immutable($this->generate($size->unwrap()));
+            } else {
+                yield Set\Value::mutable(fn() => $this->generate($size->unwrap()));
             }
-
-            if (!($this->predicate)($map)) {
-                continue;
-            }
-
-            yield $map;
         }
+    }
+
+    private function generate(int $size): Structure
+    {
+        $map = Structure::of($this->keyType, $this->valueType);
+        $keys = $this->keys->take($size)->values();
+        $values = $this->values->take($size)->values();
+
+        while ($map->size() < $size) {
+            $map = ($map)(
+                $keys->current()->unwrap(),
+                $values->current()->unwrap(),
+            );
+            $keys->next();
+            $values->next();
+        }
+
+        return $map;
     }
 }

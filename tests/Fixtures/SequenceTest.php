@@ -34,8 +34,9 @@ class SequenceTest extends TestCase
         $this->assertCount(100, \iterator_to_array($sequences->values()));
 
         foreach ($sequences->values() as $sequence) {
-            $this->assertInstanceOf(Structure::class, $sequence);
-            $this->assertSame('string', (string) $sequence->type());
+            $this->assertInstanceOf(Set\Value::class, $sequence);
+            $this->assertInstanceOf(Structure::class, $sequence->unwrap());
+            $this->assertSame('string', (string) $sequence->unwrap()->type());
         }
     }
 
@@ -49,7 +50,7 @@ class SequenceTest extends TestCase
         $sizes = [];
 
         foreach ($sequences->values() as $sequence) {
-            $sizes[] = $sequence->size();
+            $sizes[] = $sequence->unwrap()->size();
         }
 
         $this->assertTrue(\count(\array_unique($sizes)) > 1);
@@ -68,27 +69,30 @@ class SequenceTest extends TestCase
 
     public function testFilter()
     {
-        $sequences1 = new Sequence('string', new Set\Chars);
-        $sequences2 = $sequences1->filter(static function($sequence): bool {
+        $sequences = new Sequence('string', new Set\Chars);
+
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Sequence set can\'t be filtered, underlying set must be filtered beforehand');
+
+        $sequences->filter(static function($sequence): bool {
             return $sequence->size() % 2 === 0;
         });
+    }
 
-        $this->assertNotSame($sequences1, $sequences2);
-        $this->assertInstanceOf(Sequence::class, $sequences2);
+    public function testFlagStructureAsMutableWhenUnderlyingSetValuesAreMutable()
+    {
+        $sequences = new Sequence(
+            'object',
+            Set\Decorate::mutable(
+                fn() => new \stdClass,
+                new Set\Chars,
+            ),
+        );
 
-        $values1 = \iterator_to_array($sequences1->values());
-        $values2 = \iterator_to_array($sequences2->values());
-        $values1 = \array_map(function($sequence) {
-            return $sequence->size() % 2;
-        }, $values1);
-        $values2 = \array_map(function($sequence) {
-            return $sequence->size() % 2;
-        }, $values2);
-        $values1 = \array_unique($values1);
-        $values2 = \array_unique($values2);
-        \sort($values1);
-
-        $this->assertSame([0, 1], \array_values($values1));
-        $this->assertSame([0], \array_values($values2));
+        foreach ($sequences->values() as $sequence) {
+            $this->assertFalse($sequence->isImmutable());
+            $this->assertNotSame($sequence->unwrap(), $sequence->unwrap());
+            $this->assertSame($sequence->unwrap()->size(), $sequence->unwrap()->size());
+        }
     }
 }

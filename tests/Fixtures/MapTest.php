@@ -49,9 +49,10 @@ class MapTest extends TestCase
         $this->assertCount(100, \iterator_to_array($maps->values()));
 
         foreach ($maps->values() as $map) {
-            $this->assertInstanceOf(Structure::class, $map);
-            $this->assertSame('string', (string) $map->keyType());
-            $this->assertSame('int', (string) $map->valueType());
+            $this->assertInstanceOf(Set\Value::class, $map);
+            $this->assertInstanceOf(Structure::class, $map->unwrap());
+            $this->assertSame('string', (string) $map->unwrap()->keyType());
+            $this->assertSame('int', (string) $map->unwrap()->valueType());
         }
     }
 
@@ -67,7 +68,7 @@ class MapTest extends TestCase
         $sizes = [];
 
         foreach ($maps->values() as $map) {
-            $sizes[] = $map->size();
+            $sizes[] = $map->unwrap()->size();
         }
 
         $this->assertTrue(\count(\array_unique($sizes)) > 1);
@@ -91,32 +92,55 @@ class MapTest extends TestCase
 
     public function testFilter()
     {
-        $maps1 = new Map(
+        $maps = new Map(
             'string',
             'string',
             new Set\Chars,
             new Set\Chars
         );
-        $maps2 = $maps1->filter(static function($map): bool {
+
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Map set can\'t be filtered, underlying sets must be filtered beforehand');
+
+        $maps->filter(static function($map): bool {
             return $map->size() % 2 === 0;
         });
+    }
 
-        $this->assertNotSame($maps1, $maps2);
-        $this->assertInstanceOf(Map::class, $maps2);
+    public function testFlagStructureAsMutableWhenUnderlyingKeysAreMutable()
+    {
+        $maps = new Map(
+            'object',
+            'string',
+            Set\Decorate::mutable(
+                fn() => new \stdClass,
+                new Set\Chars,
+            ),
+            new Set\Chars,
+        );
 
-        $values1 = \iterator_to_array($maps1->values());
-        $values2 = \iterator_to_array($maps2->values());
-        $values1 = \array_map(function($map) {
-            return $map->size() % 2;
-        }, $values1);
-        $values2 = \array_map(function($map) {
-            return $map->size() % 2;
-        }, $values2);
-        $values1 = \array_unique($values1);
-        $values2 = \array_unique($values2);
-        \sort($values1);
+        foreach ($maps->values() as $map) {
+            $this->assertFalse($map->isImmutable());
+            $this->assertNotSame($map->unwrap(), $map->unwrap());
+            $this->assertSame($map->unwrap()->size(), $map->unwrap()->size());
+        }
+    }
 
-        $this->assertSame([0, 1], \array_values($values1));
-        $this->assertSame([0], \array_values($values2));
+    public function testFlagStructureAsMutableWhenUnderlyingValuesAreMutable()
+    {
+        $maps = new Map(
+            'string',
+            'object',
+            new Set\Chars,
+            Set\Decorate::mutable(
+                fn() => new \stdClass,
+                new Set\Chars,
+            ),
+        );
+
+        foreach ($maps->values() as $map) {
+            $this->assertFalse($map->isImmutable());
+            $this->assertNotSame($map->unwrap(), $map->unwrap());
+        }
     }
 }
