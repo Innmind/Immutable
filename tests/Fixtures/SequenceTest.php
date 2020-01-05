@@ -34,8 +34,9 @@ class SequenceTest extends TestCase
         $this->assertCount(100, \iterator_to_array($sequences->values()));
 
         foreach ($sequences->values() as $sequence) {
-            $this->assertInstanceOf(Structure::class, $sequence);
-            $this->assertSame('string', (string) $sequence->type());
+            $this->assertInstanceOf(Set\Value::class, $sequence);
+            $this->assertInstanceOf(Structure::class, $sequence->unwrap());
+            $this->assertSame('string', (string) $sequence->unwrap()->type());
         }
     }
 
@@ -49,7 +50,7 @@ class SequenceTest extends TestCase
         $sizes = [];
 
         foreach ($sequences->values() as $sequence) {
-            $sizes[] = $sequence->size();
+            $sizes[] = $sequence->unwrap()->size();
         }
 
         $this->assertTrue(\count(\array_unique($sizes)) > 1);

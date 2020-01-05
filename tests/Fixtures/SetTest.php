@@ -34,8 +34,9 @@ class SetTest extends TestCase
         $this->assertCount(100, \iterator_to_array($sets->values()));
 
         foreach ($sets->values() as $set) {
-            $this->assertInstanceOf(Structure::class, $set);
-            $this->assertSame('string', (string) $set->type());
+            $this->assertInstanceOf(DataSet\Value::class, $set);
+            $this->assertInstanceOf(Structure::class, $set->unwrap());
+            $this->assertSame('string', (string) $set->unwrap()->type());
         }
     }
 
@@ -49,7 +50,7 @@ class SetTest extends TestCase
         $sizes = [];
 
         foreach ($sets->values() as $set) {
-            $sizes[] = $set->size();
+            $sizes[] = $set->unwrap()->size();
         }
 
         $this->assertTrue(\count(\array_unique($sizes)) > 1);

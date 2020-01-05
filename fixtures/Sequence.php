@@ -48,20 +48,25 @@ final class Sequence implements Set
     }
 
     /**
-     * @return \Generator<Structure<I>>
+     * @return \Generator<Set\Value<Structure<I>>>
      */
     public function values(): \Generator
     {
         foreach ($this->sizes->values() as $size) {
-            $sequence = Structure::of($this->type);
-            $values = $this->set->take($size)->values();
-
-            while ($sequence->size() < $size) {
-                $sequence = ($sequence)($values->current());
-                $values->next();
-            }
-
-            yield $sequence;
+            yield Set\Value::immutable($this->generate($size->unwrap()));
         }
+    }
+
+    private function generate(int $size): Structure
+    {
+        $sequence = Structure::of($this->type);
+        $values = $this->set->take($size)->values();
+
+        while ($sequence->size() < $size) {
+            $sequence = ($sequence)($values->current()->unwrap());
+            $values->next();
+        }
+
+        return $sequence;
     }
 }

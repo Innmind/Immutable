@@ -63,25 +63,30 @@ final class Map implements Set
     }
 
     /**
-     * @return \Generator<Structure<I, J>>
+     * @return \Generator<Set\Value<Structure<I, J>>>
      */
     public function values(): \Generator
     {
         foreach ($this->sizes->values() as $size) {
-            $map = Structure::of($this->keyType, $this->valueType);
-            $keys = $this->keys->take($size)->values();
-            $values = $this->values->take($size)->values();
-
-            while ($map->size() < $size) {
-                $map = ($map)(
-                    $keys->current(),
-                    $values->current(),
-                );
-                $keys->next();
-                $values->next();
-            }
-
-            yield $map;
+            yield Set\Value::immutable($this->generate($size->unwrap()));
         }
+    }
+
+    private function generate(int $size): Structure
+    {
+        $map = Structure::of($this->keyType, $this->valueType);
+        $keys = $this->keys->take($size)->values();
+        $values = $this->values->take($size)->values();
+
+        while ($map->size() < $size) {
+            $map = ($map)(
+                $keys->current()->unwrap(),
+                $values->current()->unwrap(),
+            );
+            $keys->next();
+            $values->next();
+        }
+
+        return $map;
     }
 }

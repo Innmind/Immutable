@@ -48,20 +48,25 @@ final class Set implements DataSet
     }
 
     /**
-     * @return \Generator<Structure<I>>
+     * @return \Generator<Set\Value<Structure<I>>>
      */
     public function values(): \Generator
     {
         foreach ($this->sizes->values() as $size) {
-            $set = Structure::of($this->type);
-            $values = $this->set->take($size)->values();
-
-            while ($set->size() < $size) {
-                $set = ($set)($values->current());
-                $values->next();
-            }
-
-            yield $set;
+            yield DataSet\Value::immutable($this->generate($size->unwrap()));
         }
+    }
+
+    private function generate(int $size): Structure
+    {
+        $set = Structure::of($this->type);
+        $values = $this->set->take($size)->values();
+
+        while ($set->size() < $size) {
+            $set = ($set)($values->current()->unwrap());
+            $values->next();
+        }
+
+        return $set;
     }
 }

@@ -49,9 +49,10 @@ class MapTest extends TestCase
         $this->assertCount(100, \iterator_to_array($maps->values()));
 
         foreach ($maps->values() as $map) {
-            $this->assertInstanceOf(Structure::class, $map);
-            $this->assertSame('string', (string) $map->keyType());
-            $this->assertSame('int', (string) $map->valueType());
+            $this->assertInstanceOf(Set\Value::class, $map);
+            $this->assertInstanceOf(Structure::class, $map->unwrap());
+            $this->assertSame('string', (string) $map->unwrap()->keyType());
+            $this->assertSame('int', (string) $map->unwrap()->valueType());
         }
     }
 
@@ -67,7 +68,7 @@ class MapTest extends TestCase
         $sizes = [];
 
         foreach ($maps->values() as $map) {
-            $sizes[] = $map->size();
+            $sizes[] = $map->unwrap()->size();
         }
 
         $this->assertTrue(\count(\array_unique($sizes)) > 1);
