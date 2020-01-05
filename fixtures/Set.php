@@ -52,8 +52,14 @@ final class Set implements DataSet
      */
     public function values(): \Generator
     {
+        $immutable = $this->set->values()->current()->isImmutable();
+
         foreach ($this->sizes->values() as $size) {
-            yield DataSet\Value::immutable($this->generate($size->unwrap()));
+            if ($immutable) {
+                yield DataSet\Value::immutable($this->generate($size->unwrap()));
+            } else {
+                yield DataSet\Value::mutable(fn() => $this->generate($size->unwrap()));
+            }
         }
     }
 

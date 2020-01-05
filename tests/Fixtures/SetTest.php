@@ -78,4 +78,21 @@ class SetTest extends TestCase
             return $set->size() % 2 === 0;
         });
     }
+
+    public function testFlagStructureAsMutableWhenUnderlyingSetValuesAreMutable()
+    {
+        $sets = new Set(
+            'object',
+            DataSet\Decorate::mutable(
+                fn() => new \stdClass,
+                new DataSet\Chars,
+            ),
+        );
+
+        foreach ($sets->values() as $set) {
+            $this->assertFalse($set->isImmutable());
+            $this->assertNotSame($set->unwrap(), $set->unwrap());
+            $this->assertSame($set->unwrap()->size(), $set->unwrap()->size());
+        }
+    }
 }

@@ -67,8 +67,15 @@ final class Map implements Set
      */
     public function values(): \Generator
     {
+        $immutable = $this->keys->values()->current()->isImmutable() &&
+            $this->values->values()->current()->isImmutable();
+
         foreach ($this->sizes->values() as $size) {
-            yield Set\Value::immutable($this->generate($size->unwrap()));
+            if ($immutable) {
+                yield Set\Value::immutable($this->generate($size->unwrap()));
+            } else {
+                yield Set\Value::mutable(fn() => $this->generate($size->unwrap()));
+            }
         }
     }
 

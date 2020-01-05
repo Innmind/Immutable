@@ -52,8 +52,14 @@ final class Sequence implements Set
      */
     public function values(): \Generator
     {
+        $immutable = $this->set->values()->current()->isImmutable();
+
         foreach ($this->sizes->values() as $size) {
-            yield Set\Value::immutable($this->generate($size->unwrap()));
+            if ($immutable) {
+                yield Set\Value::immutable($this->generate($size->unwrap()));
+            } else {
+                yield Set\Value::mutable(fn() => $this->generate($size->unwrap()));
+            }
         }
     }
 

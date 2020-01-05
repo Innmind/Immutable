@@ -78,4 +78,21 @@ class SequenceTest extends TestCase
             return $sequence->size() % 2 === 0;
         });
     }
+
+    public function testFlagStructureAsMutableWhenUnderlyingSetValuesAreMutable()
+    {
+        $sequences = new Sequence(
+            'object',
+            Set\Decorate::mutable(
+                fn() => new \stdClass,
+                new Set\Chars,
+            ),
+        );
+
+        foreach ($sequences->values() as $sequence) {
+            $this->assertFalse($sequence->isImmutable());
+            $this->assertNotSame($sequence->unwrap(), $sequence->unwrap());
+            $this->assertSame($sequence->unwrap()->size(), $sequence->unwrap()->size());
+        }
+    }
 }

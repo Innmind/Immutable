@@ -106,4 +106,41 @@ class MapTest extends TestCase
             return $map->size() % 2 === 0;
         });
     }
+
+    public function testFlagStructureAsMutableWhenUnderlyingKeysAreMutable()
+    {
+        $maps = new Map(
+            'object',
+            'string',
+            Set\Decorate::mutable(
+                fn() => new \stdClass,
+                new Set\Chars,
+            ),
+            new Set\Chars,
+        );
+
+        foreach ($maps->values() as $map) {
+            $this->assertFalse($map->isImmutable());
+            $this->assertNotSame($map->unwrap(), $map->unwrap());
+            $this->assertSame($map->unwrap()->size(), $map->unwrap()->size());
+        }
+    }
+
+    public function testFlagStructureAsMutableWhenUnderlyingValuesAreMutable()
+    {
+        $maps = new Map(
+            'string',
+            'object',
+            new Set\Chars,
+            Set\Decorate::mutable(
+                fn() => new \stdClass,
+                new Set\Chars,
+            ),
+        );
+
+        foreach ($maps->values() as $map) {
+            $this->assertFalse($map->isImmutable());
+            $this->assertNotSame($map->unwrap(), $map->unwrap());
+        }
+    }
 }
