@@ -39,5 +39,8 @@
     },
     "suggest": {
         "innmind/black-box": "For property based testing"
+    },
+    "provide": {
+        "innmind/black-box": "4.0.0"
     }
 }
