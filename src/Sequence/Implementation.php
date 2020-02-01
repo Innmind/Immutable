@@ -12,6 +12,7 @@ use Innmind\Immutable\{
     Exception\CannotGroupEmptyStructure,
     Exception\ElementNotFound,
     Exception\OutOfBoundException,
+    Exception\NoElementMatchingPredicateFound,
 };
 
 /**
@@ -291,4 +292,13 @@ interface Implementation extends \Countable
      * @return Map<MT, MS>
      */
     public function toMapOf(string $key, string $value, callable $mapper): Map;
+
+    /**
+     * @throws NoElementMatchingPredicateFound
+     *
+     * @param callable(T): bool $predicate
+     *
+     * @return T
+     */
+    public function find(callable $predicate);
 }

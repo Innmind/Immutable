@@ -3,7 +3,10 @@ declare(strict_types = 1);
 
 namespace Innmind\Immutable;
 
-use Innmind\Immutable\Exception\CannotGroupEmptyStructure;
+use Innmind\Immutable\Exception\{
+    CannotGroupEmptyStructure,
+    NoElementMatchingPredicateFound,
+};
 
 /**
  * @template T
@@ -444,5 +447,17 @@ final class Set implements \Countable
     public function toMapOf(string $key, string $value, callable $mapper): Map
     {
         return $this->implementation->toMapOf($key, $value, $mapper);
+    }
+
+    /**
+     * @throws NoElementMatchingPredicateFound
+     *
+     * @param callable(T): bool $predicate
+     *
+     * @return T
+     */
+    public function find(callable $predicate)
+    {
+        return $this->implementation->find($predicate);
     }
 }

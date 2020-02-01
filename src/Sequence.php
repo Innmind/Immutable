@@ -8,6 +8,7 @@ use Innmind\Immutable\Exception\{
     CannotGroupEmptyStructure,
     ElementNotFound,
     OutOfBoundException,
+    NoElementMatchingPredicateFound,
 };
 
 /**
@@ -628,5 +629,17 @@ final class Sequence implements \Countable
     public function toMapOf(string $key, string $value, callable $mapper): Map
     {
         return $this->implementation->toMapOf($key, $value, $mapper);
+    }
+
+    /**
+     * @throws NoElementMatchingPredicateFound
+     *
+     * @param callable(T): bool $predicate
+     *
+     * @return T
+     */
+    public function find(callable $predicate)
+    {
+        return $this->implementation->find($predicate);
     }
 }

@@ -369,4 +369,9 @@ final class Lazy implements Implementation
     {
         return $this->values->toMapOf($key, $value, $mapper);
     }
+
+    public function find(callable $predicate)
+    {
+        return $this->values->find($predicate);
+    }
 }

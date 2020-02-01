@@ -14,6 +14,7 @@ use Innmind\Immutable\{
     Exception\LogicException,
     Exception\ElementNotFound,
     Exception\CannotGroupEmptyStructure,
+    Exception\NoElementMatchingPredicateFound,
 };
 
 /**
@@ -540,6 +541,17 @@ final class Primitive implements Implementation
         }
 
         return $map;
+    }
+
+    public function find(callable $predicate)
+    {
+        foreach ($this->values as $value) {
+            if ($predicate($value) === true) {
+                return $value;
+            }
+        }
+
+        throw new NoElementMatchingPredicateFound;
     }
 
     private function has(int $index): bool
