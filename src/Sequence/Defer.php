@@ -15,6 +15,7 @@ use Innmind\Immutable\{
     Exception\CannotGroupEmptyStructure,
     Exception\ElementNotFound,
     Exception\OutOfBoundException,
+    Exception\NoElementMatchingPredicateFound,
 };
 
 /**
@@ -206,6 +207,7 @@ final class Defer implements Implementation
      */
     public function groupBy(callable $discriminator): Map
     {
+        /** @var Map<D, Sequence<T>> */
         return $this->load()->groupBy($discriminator);
     }
 
@@ -349,6 +351,7 @@ final class Defer implements Implementation
      */
     public function partition(callable $predicate): Map
     {
+        /** @var Map<bool, Sequence<T>> */
         return $this->load()->partition($predicate);
     }
 
@@ -485,6 +488,7 @@ final class Defer implements Implementation
         return new self(
             $this->type,
             (static function(\Iterator $values, callable $function): \Generator {
+                /** @var callable(T, T): int $function */
                 $values = \iterator_to_array($values);
                 \usort($values, $function);
 
@@ -608,6 +612,17 @@ final class Defer implements Implementation
     public function toMapOf(string $key, string $value, callable $mapper): Map
     {
         return $this->load()->toMapOf($key, $value, $mapper);
+    }
+
+    public function find(callable $predicate)
+    {
+        foreach ($this->values as $value) {
+            if ($predicate($value) === true) {
+                return $value;
+            }
+        }
+
+        throw new NoElementMatchingPredicateFound;
     }
 
     /**

@@ -95,7 +95,11 @@ final class Type
         }
 
         if ($type === 'variable') {
-            return new VariableType;
+            return new UnionType(
+                'scalar|array',
+                new PrimitiveType('scalar'),
+                new PrimitiveType('array'),
+            );
         }
 
         if ($type === 'mixed') {

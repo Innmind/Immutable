@@ -4,6 +4,7 @@
 |------------|
 | [![codecov](https://codecov.io/gh/Innmind/Immutable/branch/develop/graph/badge.svg)](https://codecov.io/gh/Innmind/Immutable) |
 | [![Build Status](https://github.com/Innmind/Immutable/workflows/CI/badge.svg)](https://github.com/Innmind/Immutable/actions?query=workflow%3ACI) |
+| [![Type Coverage](https://shepherd.dev/github/Innmind/Immutable/coverage.svg)](https://shepherd.dev/github/Innmind/Immutable) |
 
 A set of classes to wrap PHP primitives to build immutable data.
 

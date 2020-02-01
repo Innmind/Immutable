@@ -10,6 +10,7 @@ use Innmind\Immutable\{
     Map,
     Str,
     Sequence,
+    Exception\NoElementMatchingPredicateFound,
 };
 use function Innmind\Immutable\unwrap;
 use PHPUnit\Framework\TestCase;
@@ -442,5 +443,29 @@ class LazyTest extends TestCase
         $this->assertSame(1, $map->get('1'));
         $this->assertSame(2, $map->get('2'));
         $this->assertSame(3, $map->get('3'));
+    }
+
+    public function testFind()
+    {
+        $count = 0;
+        $sequence = new Lazy('int', function() use (&$count) {
+            ++$count;
+            yield 1;
+            ++$count;
+            yield 2;
+            ++$count;
+            yield 3;
+        });
+
+        $this->assertSame(1, $sequence->find(fn($i) => $i === 1));
+        $this->assertSame(1, $count);
+        $this->assertSame(2, $sequence->find(fn($i) => $i === 2));
+        $this->assertSame(3, $count);
+        $this->assertSame(3, $sequence->find(fn($i) => $i === 3));
+        $this->assertSame(6, $count);
+
+        $this->expectException(NoElementMatchingPredicateFound::class);
+
+        $sequence->find(fn($i) => $i === 0);
     }
 }

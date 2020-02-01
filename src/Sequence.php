@@ -8,6 +8,7 @@ use Innmind\Immutable\Exception\{
     CannotGroupEmptyStructure,
     ElementNotFound,
     OutOfBoundException,
+    NoElementMatchingPredicateFound,
 };
 
 /**
@@ -27,9 +28,11 @@ final class Sequence implements \Countable
     }
 
     /**
-     * @param T $values
+     * @template V
      *
-     * @return self<T>
+     * @param V $values
+     *
+     * @return self<V>
      */
     public static function of(string $type, ...$values): self
     {
@@ -52,9 +55,11 @@ final class Sequence implements \Countable
      *
      * Use this mode when the amount of data may not fit in memory
      *
-     * @param \Generator<T> $generator
+     * @template V
      *
-     * @return self<T>
+     * @param \Generator<V> $generator
+     *
+     * @return self<V>
      */
     public static function defer(string $type, \Generator $generator): self
     {
@@ -69,9 +74,11 @@ final class Sequence implements \Countable
      * Use this mode when calling to an external source (meaning IO bound) such
      * as parsing a file or calling an API
      *
-     * @param callable(): \Generator<T> $generator
+     * @template V
      *
-     * @return self<T>
+     * @param callable(): \Generator<V> $generator
+     *
+     * @return self<V>
      */
     public static function lazy(string $type, callable $generator): self
     {
@@ -628,5 +635,18 @@ final class Sequence implements \Countable
     public function toMapOf(string $key, string $value, callable $mapper): Map
     {
         return $this->implementation->toMapOf($key, $value, $mapper);
+    }
+
+    /**
+     * @throws NoElementMatchingPredicateFound
+     *
+     * @param callable(T): bool $predicate
+     *
+     * @return T
+     */
+    public function find(callable $predicate)
+    {
+        /** @var T */
+        return $this->implementation->find($predicate);
     }
 }

@@ -61,4 +61,4 @@ jobs:
       - name: Install Dependencies
         run: composer install
       - name: Psalm
-        run: vendor/bin/psalm
+        run: vendor/bin/psalm --output-format=github --shepherd

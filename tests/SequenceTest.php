@@ -11,6 +11,7 @@ use Innmind\Immutable\{
     Exception\OutOfBoundException,
     Exception\LogicException,
     Exception\CannotGroupEmptyStructure,
+    Exception\NoElementMatchingPredicateFound,
 };
 use function Innmind\Immutable\unwrap;
 use PHPUnit\Framework\TestCase;
@@ -755,5 +756,18 @@ class SequenceTest extends TestCase
         $this->assertSame(1, $map->get('1'));
         $this->assertSame(2, $map->get('2'));
         $this->assertSame(3, $map->get('3'));
+    }
+
+    public function testFind()
+    {
+        $sequence = Sequence::ints(1, 2, 3);
+
+        $this->assertSame(1, $sequence->find(fn($i) => $i === 1));
+        $this->assertSame(2, $sequence->find(fn($i) => $i === 2));
+        $this->assertSame(3, $sequence->find(fn($i) => $i === 3));
+
+        $this->expectException(NoElementMatchingPredicateFound::class);
+
+        $sequence->find(fn($i) => $i === 0);
     }
 }

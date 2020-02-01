@@ -181,7 +181,7 @@ final class Primitive implements Implementation
         $map = $this->values->groupBy($discriminator);
 
         /**
-         * @psalm-suppress MixedReturnTypeCoercion
+         * @psalm-suppress MissingParamType
          * @var Map<D, Set<T>>
          */
         return $map->reduce(
@@ -333,5 +333,10 @@ final class Primitive implements Implementation
     public function toMapOf(string $key, string $value, callable $mapper): Map
     {
         return $this->values->toMapOf($key, $value, $mapper);
+    }
+
+    public function find(callable $predicate)
+    {
+        return $this->values->find($predicate);
     }
 }
