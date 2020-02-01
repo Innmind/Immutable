@@ -458,6 +458,7 @@ final class Set implements \Countable
      */
     public function find(callable $predicate)
     {
+        /** @var T */
         return $this->implementation->find($predicate);
     }
 }
