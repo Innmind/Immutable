@@ -25,7 +25,7 @@ class TypeTest extends TestCase
         $this->assertInstanceOf(PrimitiveType::class, Type::of('array'));
         $this->assertInstanceOf(PrimitiveType::class, Type::of('bool'));
         $this->assertInstanceOf(PrimitiveType::class, Type::of('object'));
-        $this->assertInstanceOf(VariableType::class, Type::of('variable'));
+        $this->assertInstanceOf(UnionType::class, Type::of('variable'));
         $this->assertInstanceOf(MixedType::class, Type::of('mixed'));
         $this->assertInstanceOf(ClassType::class, Type::of('stdClass'));
         $this->assertInstanceOf(NullableType::class, Type::of('?string'));
@@ -45,6 +45,11 @@ class TypeTest extends TestCase
         $this->assertNull(Type::of('?bool')(true, 1));
         $this->assertNull(Type::of('?object')(new \stdClass, 1));
         $this->assertNull(Type::of('?variable')(false, 1));
+        $this->assertNull(Type::of('variable')('foo', 1));
+        $this->assertNull(Type::of('variable')(42, 1));
+        $this->assertNull(Type::of('variable')(42.1, 1));
+        $this->assertNull(Type::of('variable')(true, 1));
+        $this->assertNull(Type::of('variable')([], 1));
         $this->assertNull(Type::of('?stdClass')(new \stdClass, 1));
         $this->assertNull(Type::of('int|stdClass')(new \stdClass, 1));
         $this->assertNull(Type::of('int|stdClass')(42, 1));
