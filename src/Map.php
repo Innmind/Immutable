@@ -36,7 +36,10 @@ final class Map implements \Countable
     }
 
     /**
-     * @return self<T, S>
+     * @template U
+     * @template V
+     *
+     * @return self<U, V>
      */
     public static function of(string $key, string $value): self
     {

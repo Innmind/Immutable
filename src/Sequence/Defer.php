@@ -207,6 +207,7 @@ final class Defer implements Implementation
      */
     public function groupBy(callable $discriminator): Map
     {
+        /** @var Map<D, Sequence<T>> */
         return $this->load()->groupBy($discriminator);
     }
 
@@ -350,6 +351,7 @@ final class Defer implements Implementation
      */
     public function partition(callable $predicate): Map
     {
+        /** @var Map<bool, Sequence<T>> */
         return $this->load()->partition($predicate);
     }
 
@@ -486,6 +488,7 @@ final class Defer implements Implementation
         return new self(
             $this->type,
             (static function(\Iterator $values, callable $function): \Generator {
+                /** @var callable(T, T): int $function */
                 $values = \iterator_to_array($values);
                 \usort($values, $function);
 

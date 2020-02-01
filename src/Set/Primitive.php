@@ -181,7 +181,7 @@ final class Primitive implements Implementation
         $map = $this->values->groupBy($discriminator);
 
         /**
-         * @psalm-suppress MixedReturnTypeCoercion
+         * @psalm-suppress MissingParamType
          * @var Map<D, Set<T>>
          */
         return $map->reduce(

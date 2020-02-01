@@ -225,6 +225,7 @@ final class Lazy implements Implementation
      */
     public function groupBy(callable $discriminator): Map
     {
+        /** @var Map<D, Sequence<T>> */
         return $this->load()->groupBy($discriminator);
     }
 
@@ -375,6 +376,7 @@ final class Lazy implements Implementation
      */
     public function partition(callable $predicate): Map
     {
+        /** @var Map<bool, Sequence<T>> */
         return $this->load()->partition($predicate);
     }
 

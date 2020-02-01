@@ -28,9 +28,11 @@ final class Set implements \Countable
     }
 
     /**
-     * @param T $values
+     * @template V
      *
-     * @return self<T>
+     * @param V $values
+     *
+     * @return self<V>
      */
     public static function of(string $type, ...$values): self
     {
@@ -43,9 +45,11 @@ final class Set implements \Countable
      *
      * Use this mode when the amount of data may not fit in memory
      *
-     * @param \Generator<T> $generator
+     * @template V
      *
-     * @return self<T>
+     * @param \Generator<V> $generator
+     *
+     * @return self<V>
      */
     public static function defer(string $type, \Generator $generator): self
     {
@@ -60,9 +64,11 @@ final class Set implements \Countable
      * Use this mode when calling to an external source (meaning IO bound) such
      * as parsing a file or calling an API
      *
-     * @param callable(): \Generator<T> $generator
+     * @template V
      *
-     * @return self<T>
+     * @param callable(): \Generator<V> $generator
+     *
+     * @return self<V>
      */
     public static function lazy(string $type, callable $generator): self
     {

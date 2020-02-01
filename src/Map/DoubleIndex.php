@@ -166,14 +166,11 @@ final class DoubleIndex implements Implementation
 
         foreach ($this->pairs->iterator() as $pair) {
             if ($predicate($pair->key(), $pair->value()) === true) {
-                /** @psalm-suppress MixedArgumentTypeCoercion */
+                /** @var Sequence\Implementation<T> */
                 $map->keys = ($map->keys)($pair->key());
-                /** @psalm-suppress MixedArgumentTypeCoercion */
+                /** @var Sequence\Implementation<S> */
                 $map->values = ($map->values)($pair->value());
-                /**
-                 * @psalm-suppress MixedArgumentTypeCoercion
-                 * @var Sequence\Implementation<Pair<T, S>>
-                 */
+                /** @var Sequence\Implementation<Pair<T, S>> */
                 $map->pairs = ($map->pairs)($pair);
             }
         }
@@ -294,6 +291,7 @@ final class DoubleIndex implements Implementation
 
         $index = $this->keys->indexOf($key);
         $map = clone $this;
+        /** @var Sequence\Implementation<T> */
         $map->keys = $this
             ->keys
             ->slice(0, $index)
@@ -335,12 +333,15 @@ final class DoubleIndex implements Implementation
         $falsy = $this->clearMap();
 
         foreach ($this->pairs->iterator() as $pair) {
-            $return = $predicate($pair->key(), $pair->value());
+            $key = $pair->key();
+            $value = $pair->value();
+
+            $return = $predicate($key, $value);
 
             if ($return === true) {
-                $truthy = ($truthy)($pair->key(), $pair->value());
+                $truthy = ($truthy)($key, $value);
             } else {
-                $falsy = ($falsy)($pair->key(), $pair->value());
+                $falsy = ($falsy)($key, $value);
             }
         }
 
