@@ -10,7 +10,8 @@ use Innmind\Immutable\{
     ValidateArgument\MixedType,
     ValidateArgument\ClassType,
     ValidateArgument\NullableType,
-    ValidateArgument\UnionType
+    ValidateArgument\UnionType,
+    ValidateArgument\ResourceType,
 };
 use PHPUnit\Framework\TestCase;
 
@@ -25,6 +26,7 @@ class TypeTest extends TestCase
         $this->assertInstanceOf(PrimitiveType::class, Type::of('array'));
         $this->assertInstanceOf(PrimitiveType::class, Type::of('bool'));
         $this->assertInstanceOf(PrimitiveType::class, Type::of('object'));
+        $this->assertInstanceOf(ResourceType::class, Type::of('resource'));
         $this->assertInstanceOf(UnionType::class, Type::of('variable'));
         $this->assertInstanceOf(MixedType::class, Type::of('mixed'));
         $this->assertInstanceOf(ClassType::class, Type::of('stdClass'));
@@ -36,6 +38,7 @@ class TypeTest extends TestCase
         $this->assertInstanceOf(NullableType::class, Type::of('?object'));
         $this->assertInstanceOf(NullableType::class, Type::of('?variable'));
         $this->assertInstanceOf(NullableType::class, Type::of('?stdClass'));
+        $this->assertInstanceOf(NullableType::class, Type::of('?resource'));
         $this->assertInstanceOf(UnionType::class, Type::of('int|stdClass'));
 
         $this->assertNull(Type::of('?string')('foo', 1));
@@ -50,6 +53,7 @@ class TypeTest extends TestCase
         $this->assertNull(Type::of('variable')(42.1, 1));
         $this->assertNull(Type::of('variable')(true, 1));
         $this->assertNull(Type::of('variable')([], 1));
+        $this->assertNull(Type::of('resource')(\tmpfile(), 1));
         $this->assertNull(Type::of('?stdClass')(new \stdClass, 1));
         $this->assertNull(Type::of('int|stdClass')(new \stdClass, 1));
         $this->assertNull(Type::of('int|stdClass')(42, 1));
@@ -89,5 +93,6 @@ class TypeTest extends TestCase
         $this->assertSame('float', Type::determine(1.1));
         $this->assertSame('array', Type::determine([]));
         $this->assertSame('bool', Type::determine(true));
+        $this->assertSame('resource', Type::determine(\tmpfile()));
     }
 }
