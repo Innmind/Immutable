@@ -82,6 +82,7 @@ final class Primitive implements Implementation
      */
     public function diff(Implementation $sequence): self
     {
+        /** @psalm-suppress MissingClosureParamType */
         return $this->filter(static function($value) use ($sequence): bool {
             /** @var T $value */
             return !$sequence->contains($value);
@@ -93,6 +94,7 @@ final class Primitive implements Implementation
      */
     public function distinct(): self
     {
+        /** @psalm-suppress MissingClosureParamType */
         return $this->reduce(
             $this->clear(),
             static function(self $values, $value): self {
@@ -401,6 +403,7 @@ final class Primitive implements Implementation
      */
     public function intersect(Implementation $sequence): self
     {
+        /** @psalm-suppress MissingClosureParamType */
         return $this->filter(static function($value) use ($sequence): bool {
             /** @var T $value */
             return $sequence->contains($value);

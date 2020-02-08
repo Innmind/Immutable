@@ -250,6 +250,7 @@ final class ObjectKeys implements Implementation
      */
     public function keys(): Set
     {
+        /** @psalm-suppress MissingParamType */
         return $this->reduce(
             Set::of($this->keyType),
             static fn(Set $keys, $key): Set => ($keys)($key),
@@ -261,6 +262,7 @@ final class ObjectKeys implements Implementation
      */
     public function values(): Sequence
     {
+        /** @psalm-suppress MissingParamType */
         return $this->reduce(
             Sequence::of($this->valueType),
             static fn(Sequence $values, $key, $value): Sequence => ($values)($value),

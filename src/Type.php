@@ -10,6 +10,7 @@ use Innmind\Immutable\ValidateArgument\{
     MixedType,
     NullableType,
     UnionType,
+    ResourceType,
 };
 
 final class Type
@@ -90,6 +91,10 @@ final class Type
 
     private static function ofPrimitive(string $type): ValidateArgument
     {
+        if ($type === 'resource') {
+            return new ResourceType;
+        }
+
         if (\function_exists('is_'.$type)) {
             return new PrimitiveType($type);
         }

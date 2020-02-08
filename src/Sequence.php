@@ -379,7 +379,10 @@ final class Sequence implements \Countable
      */
     public function mapTo(string $type, callable $map): self
     {
-        /** @psalm-suppress MixedArgument */
+        /**
+         * @psalm-suppress MixedArgument
+         * @psalm-suppress MissingParamType
+         */
         return $this->toSequenceOf(
             $type,
             static fn($value): \Generator => yield $map($value),
