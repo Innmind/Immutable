@@ -214,6 +214,7 @@ final class Primitive implements Implementation
             return $returned;
         };
 
+        /** @psalm-suppress MissingParamType */
         return $this->reduce(
             $this->clear(),
             static fn(self $carry, $value): self => ($carry)($function($value)),

@@ -105,6 +105,7 @@ final class Lazy implements Implementation
      */
     public function diff(Implementation $sequence): Implementation
     {
+        /** @psalm-suppress MissingClosureParamType */
         return $this->filter(static function($value) use ($sequence): bool {
             /** @var T $value */
             return !$sequence->contains($value);
@@ -481,6 +482,7 @@ final class Lazy implements Implementation
      */
     public function intersect(Implementation $sequence): Implementation
     {
+        /** @psalm-suppress MissingClosureParamType */
         return $this->filter(static function($value) use ($sequence): bool {
             /** @var T $value */
             return $sequence->contains($value);
