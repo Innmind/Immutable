@@ -3,7 +3,11 @@ declare(strict_types = 1);
 
 namespace Fixtures\Innmind\Immutable;
 
-use Innmind\BlackBox\Set;
+use Innmind\BlackBox\{
+    Set,
+    Set\Value,
+    Set\Dichotomy,
+};
 use Innmind\Immutable\Sequence as Structure;
 
 /**
@@ -55,24 +59,90 @@ final class Sequence implements Set
         $immutable = $this->set->values()->current()->isImmutable();
 
         foreach ($this->sizes->values() as $size) {
+            $values = $this->generate($size->unwrap());
+
             if ($immutable) {
-                yield Set\Value::immutable($this->generate($size->unwrap()));
+                yield Set\Value::immutable(
+                    $this->wrap($values),
+                    $this->shrink(false, $this->wrap($values)),
+                );
             } else {
-                yield Set\Value::mutable(fn() => $this->generate($size->unwrap()));
+                yield Set\Value::mutable(
+                    fn() => $this->wrap($values),
+                    $this->shrink(true, $this->wrap($values)),
+                );
             }
         }
     }
 
-    private function generate(int $size): Structure
+    /**
+     * @return list<Value>
+     */
+    private function generate(int $size): array
     {
-        $sequence = Structure::of($this->type);
-        $values = $this->set->take($size)->values();
+        return \iterator_to_array($this->set->take($size)->values());
+    }
 
-        while ($sequence->size() < $size) {
-            $sequence = ($sequence)($values->current()->unwrap());
-            $values->next();
+    /**
+     * @param list<Value> $values
+     */
+    private function wrap(array $values): Structure
+    {
+        return Structure::of(
+            $this->type,
+            ...\array_map(
+                static fn(Value $value) => $value->unwrap(),
+                $values,
+            ),
+        );
+    }
+
+    private function shrink(bool $mutable, Structure $sequence): ?Dichotomy
+    {
+        if ($sequence->empty()) {
+            return null;
         }
 
-        return $sequence;
+        return new Dichotomy(
+            $this->removeHalfTheStructure($mutable, $sequence),
+            $this->removeTailElement($mutable, $sequence),
+        );
+    }
+
+    private function removeHalfTheStructure(bool $mutable, Structure $sequence): callable
+    {
+        // we round half down otherwise a sequence of 1 element would be shrunk
+        // to a sequence of 1 element resulting in a infinite recursion
+        $numberToKeep = (int) \round($sequence->size() / 2, 0, \PHP_ROUND_HALF_DOWN);
+        $shrinked = $sequence->take($numberToKeep);
+
+        if ($mutable) {
+            return fn(): Value => Value::mutable(
+                fn() => $shrinked,
+                $this->shrink(true, $shrinked),
+            );
+        }
+
+        return fn(): Value => Value::immutable(
+            $shrinked,
+            $this->shrink(false, $shrinked),
+        );
+    }
+
+    private function removeTailElement(bool $mutable, Structure $sequence): callable
+    {
+        $shrinked = $sequence->dropEnd(1);
+
+        if ($mutable) {
+            return fn(): Value => Value::mutable(
+                fn() => $shrinked,
+                $this->shrink(true, $shrinked),
+            );
+        }
+
+        return fn(): Value => Value::immutable(
+            $shrinked,
+            $this->shrink(false, $shrinked),
+        );
     }
 }

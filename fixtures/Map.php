@@ -3,8 +3,13 @@ declare(strict_types = 1);
 
 namespace Fixtures\Innmind\Immutable;
 
-use Innmind\BlackBox\Set;
+use Innmind\BlackBox\{
+    Set,
+    Set\Value,
+    Set\Dichotomy,
+};
 use Innmind\Immutable\Map as Structure;
+use function Innmind\Immutable\first;
 
 /**
  * {@inheritdoc}
@@ -71,29 +76,99 @@ final class Map implements Set
             $this->values->values()->current()->isImmutable();
 
         foreach ($this->sizes->values() as $size) {
+            $pairs = $this->generate($size->unwrap());
+
             if ($immutable) {
-                yield Set\Value::immutable($this->generate($size->unwrap()));
+                yield Set\Value::immutable(
+                    $this->wrap(...$pairs),
+                    $this->shrink(false, $this->wrap(...$pairs)),
+                );
             } else {
-                yield Set\Value::mutable(fn() => $this->generate($size->unwrap()));
+                yield Set\Value::mutable(
+                    fn() => $this->wrap(...$pairs),
+                    $this->shrink(true, $this->wrap(...$pairs)),
+                );
             }
         }
     }
 
-    private function generate(int $size): Structure
+    /**
+     * @return array{0: list<Value>, 1: list<Value>}
+     */
+    private function generate(int $size): array
+    {
+        return [
+            \iterator_to_array($this->keys->take($size)->values()),
+            \iterator_to_array($this->values->take($size)->values()),
+        ];
+    }
+
+    /**
+     * @param list<Value> $keys
+     * @param list<Value> $values
+     */
+    private function wrap(array $keys, array $values): Structure
     {
         $map = Structure::of($this->keyType, $this->valueType);
-        $keys = $this->keys->take($size)->values();
-        $values = $this->values->take($size)->values();
 
-        while ($map->size() < $size) {
-            $map = ($map)(
-                $keys->current()->unwrap(),
-                $values->current()->unwrap(),
-            );
-            $keys->next();
-            $values->next();
+        foreach ($keys as $key) {
+            $map = ($map)($key->unwrap(), \current($values)->unwrap());
+            \next($values);
         }
 
         return $map;
+    }
+
+    private function shrink(bool $mutable, Structure $map): ?Dichotomy
+    {
+        if ($map->empty()) {
+            return null;
+        }
+
+        return new Dichotomy(
+            $this->removeHalfTheStructure($mutable, $map),
+            $this->removeHeadElement($mutable, $map),
+        );
+    }
+
+    private function removeHalfTheStructure(bool $mutable, Structure $map): callable
+    {
+        // we round half up otherwise a map of 1 element would be shrunk to a
+        // map of 1 element resulting in a infinite recursion
+        $numberToDrop = (int) \round($map->size() / 2, 0, \PHP_ROUND_HALF_UP);
+        $shrinked = $map;
+
+        for ($i = 0; $i < $numberToDrop; $i++) {
+            $shrinked = $shrinked->remove(first($shrinked->keys()));
+        }
+
+        if ($mutable) {
+            return fn(): Value => Value::mutable(
+                fn() => $shrinked,
+                $this->shrink(true, $shrinked),
+            );
+        }
+
+        return fn(): Value => Value::immutable(
+            $shrinked,
+            $this->shrink(false, $shrinked),
+        );
+    }
+
+    private function removeHeadElement(bool $mutable, Structure $map): callable
+    {
+        $shrinked = $map->remove(first($map->keys()));
+
+        if ($mutable) {
+            return fn(): Value => Value::mutable(
+                fn() => $shrinked,
+                $this->shrink(true, $shrinked),
+            );
+        }
+
+        return fn(): Value => Value::immutable(
+            $shrinked,
+            $this->shrink(false, $shrinked),
+        );
     }
 }

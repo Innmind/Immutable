@@ -56,7 +56,7 @@ class MapTest extends TestCase
         }
     }
 
-    public function testGeneratesSequencesOfDifferentSizes()
+    public function testGeneratesMapsOfDifferentSizes()
     {
         $maps = new Map(
             'string',
@@ -141,6 +141,128 @@ class MapTest extends TestCase
         foreach ($maps->values() as $map) {
             $this->assertFalse($map->isImmutable());
             $this->assertNotSame($map->unwrap(), $map->unwrap());
+        }
+    }
+
+    public function testNonEmptyMapCanBeShrunk()
+    {
+        $maps = new Map(
+            'string',
+            'string',
+            new Set\Chars,
+            new Set\Chars,
+            Set\Integers::between(1, 100),
+        );
+
+        foreach ($maps->values() as $value) {
+            $this->assertTrue($value->shrinkable());
+        }
+    }
+
+    public function testEmptyMapCanNotBeShrunk()
+    {
+        $maps = new Map(
+            'string',
+            'string',
+            new Set\Chars,
+            new Set\Chars,
+            Set\Integers::below(1),
+        );
+
+        foreach ($maps->values() as $value) {
+            if (!$value->unwrap()->empty()) {
+                // as it can generate maps of 1 element
+                continue;
+            }
+
+            $this->assertFalse($value->shrinkable());
+        }
+    }
+
+    public function testNonEmptyMapAreShrunkWithDifferentStrategies()
+    {
+        $maps = new Map(
+            'string',
+            'string',
+            new Set\Chars,
+            new Set\Chars,
+            Set\Integers::between(3, 100),
+        );
+
+        foreach ($maps->values() as $value) {
+            $dichotomy = $value->shrink();
+            $this->assertFalse($dichotomy->a()->unwrap()->equals($dichotomy->b()->unwrap()));
+        }
+    }
+
+    public function testShrunkMapsDoContainsLessThanTheInitialValue()
+    {
+        $maps = new Map(
+            'string',
+            'string',
+            new Set\Chars,
+            new Set\Chars,
+            Set\Integers::between(2, 100),
+        );
+
+        foreach ($maps->values() as $value) {
+            $dichotomy = $value->shrink();
+
+            $this->assertLessThan($value->unwrap()->size(), $dichotomy->a()->unwrap()->size());
+            $this->assertLessThan($value->unwrap()->size(), $dichotomy->b()->unwrap()->size());
+        }
+    }
+
+    public function testShrinkingStrategyAReduceTheMapFasterThanStrategyB()
+    {
+        $maps = new Map(
+            'string',
+            'string',
+            new Set\Chars,
+            new Set\Chars,
+            Set\Integers::between(3, 100),
+        );
+
+        foreach ($maps->values() as $value) {
+            $dichotomy = $value->shrink();
+
+            $this->assertLessThan($dichotomy->b()->unwrap()->size(), $dichotomy->a()->unwrap()->size());
+        }
+    }
+
+    public function testShrunkValuesConserveMutabilityProperty()
+    {
+        $maps = new Map(
+            'string',
+            'string',
+            new Set\Chars,
+            new Set\Chars,
+            Set\Integers::between(1, 100),
+        );
+
+        foreach ($maps->values() as $value) {
+            $dichotomy = $value->shrink();
+
+            $this->assertTrue($dichotomy->a()->isImmutable());
+            $this->assertTrue($dichotomy->b()->isImmutable());
+        }
+
+        $maps = new Map(
+            'string',
+            'object',
+            new Set\Chars,
+            Set\Decorate::mutable(
+                fn() => new \stdClass,
+                new Set\Chars,
+            ),
+            Set\Integers::between(1, 100),
+        );
+
+        foreach ($maps->values() as $value) {
+            $dichotomy = $value->shrink();
+
+            $this->assertFalse($dichotomy->a()->isImmutable());
+            $this->assertFalse($dichotomy->b()->isImmutable());
         }
     }
 }
