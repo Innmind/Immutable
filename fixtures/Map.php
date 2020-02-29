@@ -133,9 +133,9 @@ final class Map implements Set
 
     private function removeHalfTheStructure(bool $mutable, Structure $map): callable
     {
-        // we round half down otherwise a map of 1 element would be shrunk to a
+        // we round half up otherwise a map of 1 element would be shrunk to a
         // map of 1 element resulting in a infinite recursion
-        $numberToDrop = (int) \round($map->size() / 2, \PHP_ROUND_HALF_DOWN);
+        $numberToDrop = (int) \round($map->size() / 2, 0, \PHP_ROUND_HALF_UP);
         $shrinked = $map;
 
         for ($i = 0; $i < $numberToDrop; $i++) {

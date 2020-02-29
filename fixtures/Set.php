@@ -112,9 +112,9 @@ final class Set implements DataSet
 
     private function removeHalfTheStructure(bool $mutable, Structure $set): callable
     {
-        // we round half down otherwise a set of 1 element would be shrunk to a
+        // we round half up otherwise a set of 1 element would be shrunk to a
         // set of 1 element resulting in a infinite recursion
-        $numberToDrop = (int) \round($set->size() / 2, \PHP_ROUND_HALF_DOWN);
+        $numberToDrop = (int) \round($set->size() / 2, 0, \PHP_ROUND_HALF_UP);
         $shrinked = $set;
 
         for ($i = 0; $i < $numberToDrop; $i++) {

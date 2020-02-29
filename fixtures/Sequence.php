@@ -113,8 +113,8 @@ final class Sequence implements Set
     {
         // we round half down otherwise a sequence of 1 element would be shrunk
         // to a sequence of 1 element resulting in a infinite recursion
-        $numberToDrop = (int) \round($sequence->size() / 2, \PHP_ROUND_HALF_DOWN);
-        $shrinked = $sequence->dropEnd($numberToDrop);
+        $numberToKeep = (int) \round($sequence->size() / 2, 0, \PHP_ROUND_HALF_DOWN);
+        $shrinked = $sequence->take($numberToKeep);
 
         if ($mutable) {
             return fn(): Value => Value::mutable(
