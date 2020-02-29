@@ -56,7 +56,7 @@ class MapTest extends TestCase
         }
     }
 
-    public function testGeneratesSequencesOfDifferentSizes()
+    public function testGeneratesMapsOfDifferentSizes()
     {
         $maps = new Map(
             'string',
