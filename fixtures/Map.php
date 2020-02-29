@@ -3,7 +3,10 @@ declare(strict_types = 1);
 
 namespace Fixtures\Innmind\Immutable;
 
-use Innmind\BlackBox\Set;
+use Innmind\BlackBox\{
+    Set,
+    Set\Value,
+};
 use Innmind\Immutable\Map as Structure;
 
 /**
@@ -71,27 +74,38 @@ final class Map implements Set
             $this->values->values()->current()->isImmutable();
 
         foreach ($this->sizes->values() as $size) {
+            $pairs = $this->generate($size->unwrap());
+
             if ($immutable) {
-                yield Set\Value::immutable($this->generate($size->unwrap()));
+                yield Set\Value::immutable($this->wrap(...$pairs));
             } else {
-                yield Set\Value::mutable(fn() => $this->generate($size->unwrap()));
+                yield Set\Value::mutable(fn() => $this->wrap(...$pairs));
             }
         }
     }
 
-    private function generate(int $size): Structure
+    /**
+     * @return array{0: list<Value>, 1: list<Value>}
+     */
+    private function generate(int $size): array
+    {
+        return [
+            \iterator_to_array($this->keys->take($size)->values()),
+            \iterator_to_array($this->values->take($size)->values()),
+        ];
+    }
+
+    /**
+     * @param list<Value> $keys
+     * @param list<Value> $values
+     */
+    private function wrap(array $keys, array $values): Structure
     {
         $map = Structure::of($this->keyType, $this->valueType);
-        $keys = $this->keys->take($size)->values();
-        $values = $this->values->take($size)->values();
 
-        while ($map->size() < $size) {
-            $map = ($map)(
-                $keys->current()->unwrap(),
-                $values->current()->unwrap(),
-            );
-            $keys->next();
-            $values->next();
+        foreach ($keys as $key) {
+            $map = ($map)($key->unwrap(), \current($values)->unwrap());
+            \next($values);
         }
 
         return $map;

@@ -3,7 +3,10 @@ declare(strict_types = 1);
 
 namespace Fixtures\Innmind\Immutable;
 
-use Innmind\BlackBox\Set;
+use Innmind\BlackBox\{
+    Set,
+    Set\Value,
+};
 use Innmind\Immutable\Sequence as Structure;
 
 /**
@@ -55,24 +58,35 @@ final class Sequence implements Set
         $immutable = $this->set->values()->current()->isImmutable();
 
         foreach ($this->sizes->values() as $size) {
+            $values = $this->generate($size->unwrap());
+
             if ($immutable) {
-                yield Set\Value::immutable($this->generate($size->unwrap()));
+                yield Set\Value::immutable($this->wrap($values));
             } else {
-                yield Set\Value::mutable(fn() => $this->generate($size->unwrap()));
+                yield Set\Value::mutable(fn() => $this->wrap($values));
             }
         }
     }
 
-    private function generate(int $size): Structure
+    /**
+     * @return list<Value>
+     */
+    private function generate(int $size): array
     {
-        $sequence = Structure::of($this->type);
-        $values = $this->set->take($size)->values();
+        return \iterator_to_array($this->set->take($size)->values());
+    }
 
-        while ($sequence->size() < $size) {
-            $sequence = ($sequence)($values->current()->unwrap());
-            $values->next();
-        }
-
-        return $sequence;
+    /**
+     * @param list<Value> $values
+     */
+    private function wrap(array $values): Structure
+    {
+        return Structure::of(
+            $this->type,
+            ...\array_map(
+                static fn(Value $value) => $value->unwrap(),
+                $values,
+            ),
+        );
     }
 }
