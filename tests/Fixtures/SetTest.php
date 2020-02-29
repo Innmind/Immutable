@@ -95,4 +95,88 @@ class SetTest extends TestCase
             $this->assertSame($set->unwrap()->size(), $set->unwrap()->size());
         }
     }
+
+    public function testNonEmptySetCanBeShrunk()
+    {
+        $sets = new Set('string', DataSet\Chars::any(), DataSet\Integers::above(1));
+
+        foreach ($sets->values() as $value) {
+            $this->assertTrue($value->shrinkable());
+        }
+    }
+
+    public function testEmptySetCanNotBeShrunk()
+    {
+        $sets = new Set('string', DataSet\Chars::any(), DataSet\Integers::below(1));
+
+        foreach ($sets->values() as $value) {
+            if (!$value->unwrap()->empty()) {
+                // as it can generate sets of 1 element
+                continue;
+            }
+
+            $this->assertFalse($value->shrinkable());
+        }
+    }
+
+    public function testNonEmptySetAreShrunkWithDifferentStrategies()
+    {
+        $sets = new Set('string', DataSet\Chars::any(), DataSet\Integers::above(1));
+
+        foreach ($sets->values() as $value) {
+            $dichotomy = $value->shrink();
+            $this->assertFalse($dichotomy->a()->unwrap()->equals($dichotomy->b()->unwrap()));
+        }
+    }
+
+    public function testShrunkSetsDoContainsLessThanTheInitialValue()
+    {
+        $sets = new Set('string', DataSet\Chars::any(), DataSet\Integers::above(1));
+
+        foreach ($sets->values() as $value) {
+            $dichotomy = $value->shrink();
+
+            $this->assertLessThan($value->unwrap()->size(), $dichotomy->a()->unwrap()->size());
+            $this->assertLessThan($value->unwrap()->size(), $dichotomy->b()->unwrap()->size());
+        }
+    }
+
+    public function testShrinkingStrategyAReduceTheSetFasterThanStrategyB()
+    {
+        $sets = new Set('string', DataSet\Chars::any(), DataSet\Integers::above(1));
+
+        foreach ($sets->values() as $value) {
+            $dichotomy = $value->shrink();
+
+            $this->assertLessThan($dichotomy->b()->unwrap()->size(), $dichotomy->a()->unwrap()->size());
+        }
+    }
+
+    public function testShrunkValuesConserveMutabilityProperty()
+    {
+        $sets = new Set('string', DataSet\Chars::any(), DataSet\Integers::above(1));
+
+        foreach ($sets->values() as $value) {
+            $dichotomy = $value->shrink();
+
+            $this->assertTrue($dichotomy->a()->isImmutable());
+            $this->assertTrue($dichotomy->b()->isImmutable());
+        }
+
+        $sets = new Set(
+            'object',
+            DataSet\Decorate::mutable(
+                fn() => new \stdClass,
+                new DataSet\Chars,
+            ),
+            DataSet\Integers::above(1),
+        );
+
+        foreach ($sets->values() as $value) {
+            $dichotomy = $value->shrink();
+
+            $this->assertFalse($dichotomy->a()->isImmutable());
+            $this->assertFalse($dichotomy->b()->isImmutable());
+        }
+    }
 }
