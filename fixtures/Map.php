@@ -6,8 +6,10 @@ namespace Fixtures\Innmind\Immutable;
 use Innmind\BlackBox\{
     Set,
     Set\Value,
+    Set\Dichotomy,
 };
 use Innmind\Immutable\Map as Structure;
+use function Innmind\Immutable\first;
 
 /**
  * {@inheritdoc}
@@ -77,9 +79,15 @@ final class Map implements Set
             $pairs = $this->generate($size->unwrap());
 
             if ($immutable) {
-                yield Set\Value::immutable($this->wrap(...$pairs));
+                yield Set\Value::immutable(
+                    $this->wrap(...$pairs),
+                    $this->shrink(false, $this->wrap(...$pairs)),
+                );
             } else {
-                yield Set\Value::mutable(fn() => $this->wrap(...$pairs));
+                yield Set\Value::mutable(
+                    fn() => $this->wrap(...$pairs),
+                    $this->shrink(true, $this->wrap(...$pairs)),
+                );
             }
         }
     }
@@ -109,5 +117,58 @@ final class Map implements Set
         }
 
         return $map;
+    }
+
+    private function shrink(bool $mutable, Structure $map): ?Dichotomy
+    {
+        if ($map->empty()) {
+            return null;
+        }
+
+        return new Dichotomy(
+            $this->removeHalfTheStructure($mutable, $map),
+            $this->removeHeadElement($mutable, $map),
+        );
+    }
+
+    private function removeHalfTheStructure(bool $mutable, Structure $map): callable
+    {
+        // we round half down otherwise a map of 1 element would be shrunk to a
+        // map of 1 element resulting in a infinite recursion
+        $numberToDrop = (int) \round($map->size() / 2, \PHP_ROUND_HALF_DOWN);
+        $shrinked = $map;
+
+        for ($i = 0; $i < $numberToDrop; $i++) {
+            $shrinked = $shrinked->remove(first($shrinked->keys()));
+        }
+
+        if ($mutable) {
+            return fn(): Value => Value::mutable(
+                fn() => $shrinked,
+                $this->shrink(true, $shrinked),
+            );
+        }
+
+        return fn(): Value => Value::immutable(
+            $shrinked,
+            $this->shrink(false, $shrinked),
+        );
+    }
+
+    private function removeHeadElement(bool $mutable, Structure $map): callable
+    {
+        $shrinked = $map->remove(first($map->keys()));
+
+        if ($mutable) {
+            return fn(): Value => Value::mutable(
+                fn() => $shrinked,
+                $this->shrink(true, $shrinked),
+            );
+        }
+
+        return fn(): Value => Value::immutable(
+            $shrinked,
+            $this->shrink(false, $shrinked),
+        );
     }
 }
