@@ -98,7 +98,7 @@ class SetTest extends TestCase
 
     public function testNonEmptySetCanBeShrunk()
     {
-        $sets = new Set('string', DataSet\Chars::any(), DataSet\Integers::above(1));
+        $sets = new Set('string', DataSet\Chars::any(), DataSet\Integers::between(1, 100));
 
         foreach ($sets->values() as $value) {
             $this->assertTrue($value->shrinkable());
@@ -121,17 +121,20 @@ class SetTest extends TestCase
 
     public function testNonEmptySetAreShrunkWithDifferentStrategies()
     {
-        $sets = new Set('string', DataSet\Chars::any(), DataSet\Integers::above(1));
+        $sets = new Set('string', DataSet\Chars::any(), DataSet\Integers::between(3, 100));
 
         foreach ($sets->values() as $value) {
             $dichotomy = $value->shrink();
-            $this->assertFalse($dichotomy->a()->unwrap()->equals($dichotomy->b()->unwrap()));
+            $this->assertFalse(
+                $dichotomy->a()->unwrap()->equals($dichotomy->b()->unwrap()),
+                "Initial set size: {$value->unwrap()->size()}",
+            );
         }
     }
 
     public function testShrunkSetsDoContainsLessThanTheInitialValue()
     {
-        $sets = new Set('string', DataSet\Chars::any(), DataSet\Integers::above(1));
+        $sets = new Set('string', DataSet\Chars::any(), DataSet\Integers::between(2, 100));
 
         foreach ($sets->values() as $value) {
             $dichotomy = $value->shrink();
@@ -143,7 +146,7 @@ class SetTest extends TestCase
 
     public function testShrinkingStrategyAReduceTheSetFasterThanStrategyB()
     {
-        $sets = new Set('string', DataSet\Chars::any(), DataSet\Integers::above(1));
+        $sets = new Set('string', DataSet\Chars::any(), DataSet\Integers::between(3, 100));
 
         foreach ($sets->values() as $value) {
             $dichotomy = $value->shrink();
@@ -154,7 +157,7 @@ class SetTest extends TestCase
 
     public function testShrunkValuesConserveMutabilityProperty()
     {
-        $sets = new Set('string', DataSet\Chars::any(), DataSet\Integers::above(1));
+        $sets = new Set('string', DataSet\Chars::any(), DataSet\Integers::between(1, 100));
 
         foreach ($sets->values() as $value) {
             $dichotomy = $value->shrink();
@@ -169,7 +172,7 @@ class SetTest extends TestCase
                 fn() => new \stdClass,
                 new DataSet\Chars,
             ),
-            DataSet\Integers::above(1),
+            DataSet\Integers::between(1, 100),
         );
 
         foreach ($sets->values() as $value) {

@@ -151,7 +151,7 @@ class MapTest extends TestCase
             'string',
             new Set\Chars,
             new Set\Chars,
-            Set\Integers::above(1),
+            Set\Integers::between(1, 100),
         );
 
         foreach ($maps->values() as $value) {
@@ -186,7 +186,7 @@ class MapTest extends TestCase
             'string',
             new Set\Chars,
             new Set\Chars,
-            Set\Integers::above(1),
+            Set\Integers::between(3, 100),
         );
 
         foreach ($maps->values() as $value) {
@@ -202,7 +202,7 @@ class MapTest extends TestCase
             'string',
             new Set\Chars,
             new Set\Chars,
-            Set\Integers::above(1),
+            Set\Integers::between(2, 100),
         );
 
         foreach ($maps->values() as $value) {
@@ -220,7 +220,7 @@ class MapTest extends TestCase
             'string',
             new Set\Chars,
             new Set\Chars,
-            Set\Integers::above(1),
+            Set\Integers::between(3, 100),
         );
 
         foreach ($maps->values() as $value) {
@@ -237,7 +237,7 @@ class MapTest extends TestCase
             'string',
             new Set\Chars,
             new Set\Chars,
-            Set\Integers::above(1),
+            Set\Integers::between(1, 100),
         );
 
         foreach ($maps->values() as $value) {
@@ -255,7 +255,7 @@ class MapTest extends TestCase
                 fn() => new \stdClass,
                 new Set\Chars,
             ),
-            Set\Integers::above(1),
+            Set\Integers::between(1, 100),
         );
 
         foreach ($maps->values() as $value) {

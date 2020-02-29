@@ -98,7 +98,7 @@ class SequenceTest extends TestCase
 
     public function testNonEmptySequenceCanBeShrunk()
     {
-        $sequences = new Sequence('string', Set\Chars::any(), Set\Integers::above(1));
+        $sequences = new Sequence('string', Set\Chars::any(), Set\Integers::between(1, 100));
 
         foreach ($sequences->values() as $value) {
             $this->assertTrue($value->shrinkable());
@@ -121,17 +121,20 @@ class SequenceTest extends TestCase
 
     public function testNonEmptySequenceAreShrunkWithDifferentStrategies()
     {
-        $sequences = new Sequence('string', Set\Chars::any(), Set\Integers::above(1));
+        $sequences = new Sequence('string', Set\Chars::any(), Set\Integers::between(3, 100));
 
         foreach ($sequences->values() as $value) {
             $dichotomy = $value->shrink();
-            $this->assertFalse($dichotomy->a()->unwrap()->equals($dichotomy->b()->unwrap()));
+            $this->assertFalse(
+                $dichotomy->a()->unwrap()->equals($dichotomy->b()->unwrap()),
+                "Initial sequence size: {$value->unwrap()->size()}",
+            );
         }
     }
 
     public function testShrunkSequencesDoContainsLessThanTheInitialValue()
     {
-        $sequences = new Sequence('string', Set\Chars::any(), Set\Integers::above(1));
+        $sequences = new Sequence('string', Set\Chars::any(), Set\Integers::between(2, 100));
 
         foreach ($sequences->values() as $value) {
             $dichotomy = $value->shrink();
@@ -143,7 +146,7 @@ class SequenceTest extends TestCase
 
     public function testShrinkingStrategyAReduceTheSequenceFasterThanStrategyB()
     {
-        $sequences = new Sequence('string', Set\Chars::any(), Set\Integers::above(1));
+        $sequences = new Sequence('string', Set\Chars::any(), Set\Integers::between(3, 100));
 
         foreach ($sequences->values() as $value) {
             $dichotomy = $value->shrink();
@@ -154,7 +157,7 @@ class SequenceTest extends TestCase
 
     public function testShrunkValuesConserveMutabilityProperty()
     {
-        $sequences = new Sequence('string', Set\Chars::any(), Set\Integers::above(1));
+        $sequences = new Sequence('string', Set\Chars::any(), Set\Integers::between(1, 100));
 
         foreach ($sequences->values() as $value) {
             $dichotomy = $value->shrink();
@@ -169,7 +172,7 @@ class SequenceTest extends TestCase
                 fn() => new \stdClass,
                 new Set\Chars,
             ),
-            Set\Integers::above(1),
+            Set\Integers::between(1, 100),
         );
 
         foreach ($sequences->values() as $value) {
