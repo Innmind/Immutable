@@ -510,13 +510,7 @@ final class Str
      */
     public function contains(string $value): bool
     {
-        try {
-            $this->position($value);
-
-            return true;
-        } catch (SubstringException $e) {
-            return false;
-        }
+        return \mb_strpos($this->value, $value, 0, $this->encoding) !== false;
     }
 
     /**
@@ -528,11 +522,7 @@ final class Str
             return true;
         }
 
-        try {
-            return $this->position($value) === 0;
-        } catch (SubstringException $e) {
-            return false;
-        }
+        return \mb_strpos($this->value, $value, 0, $this->encoding) === 0;
     }
 
     /**
