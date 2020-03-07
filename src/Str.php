@@ -12,12 +12,12 @@ use Innmind\Immutable\{
 final class Str
 {
     private string $value;
-    private ?string $encoding;
+    private string $encoding;
 
     private function __construct(string $value, string $encoding = null)
     {
         $this->value = $value;
-        $this->encoding = $encoding;
+        $this->encoding = $encoding ?? \mb_internal_encoding();
     }
 
     public static function of(string $value, string $encoding = null): self
@@ -35,11 +35,6 @@ final class Str
 
     public function encoding(): self
     {
-        if (\is_null($this->encoding)) {
-            /** @var string */
-            $this->encoding = \mb_internal_encoding();
-        }
-
         return new self($this->encoding);
     }
 
@@ -80,7 +75,7 @@ final class Str
         /** @var Sequence<self> */
         $sequence = Sequence::of(self::class);
         /** @var list<string> */
-        $parts = \mb_str_split($this->value, $size, $this->encoding()->toString());
+        $parts = \mb_str_split($this->value, $size, $this->encoding);
 
         foreach ($parts as $value) {
             $sequence = ($sequence)(new self($value, $this->encoding));
@@ -96,7 +91,7 @@ final class Str
      */
     public function position(string $needle, int $offset = 0): int
     {
-        $position = \mb_strpos($this->value, $needle, $offset, $this->encoding()->toString());
+        $position = \mb_strpos($this->value, $needle, $offset, $this->encoding);
 
         if ($position === false) {
             throw new SubstringException(\sprintf(
@@ -135,7 +130,7 @@ final class Str
      */
     public function str(string $delimiter): self
     {
-        $sub = \mb_strstr($this->value, $delimiter, false, $this->encoding()->toString());
+        $sub = \mb_strstr($this->value, $delimiter, false, $this->encoding);
 
         if ($sub === false) {
             throw new SubstringException(\sprintf(
@@ -168,7 +163,7 @@ final class Str
      */
     public function length(): int
     {
-        return \mb_strlen($this->value, $this->encoding()->toString());
+        return \mb_strlen($this->value, $this->encoding);
     }
 
     public function empty(): bool
@@ -190,7 +185,7 @@ final class Str
             ->reverse()
             ->toSequenceOf('string', fn($v) => yield $v->toString());
 
-        return join('', $parts)->toEncoding($this->encoding()->toString());
+        return join('', $parts)->toEncoding($this->encoding);
     }
 
     /**
@@ -377,7 +372,7 @@ final class Str
             return $this;
         }
 
-        $sub = \mb_substr($this->value, $start, $length, $this->encoding()->toString());
+        $sub = \mb_substr($this->value, $start, $length, $this->encoding);
 
         return new self($sub, $this->encoding);
     }
@@ -450,7 +445,7 @@ final class Str
 
         return join('', $words)
             ->lcfirst()
-            ->toEncoding($this->encoding()->toString());
+            ->toEncoding($this->encoding);
     }
 
     /**
