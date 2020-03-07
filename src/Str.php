@@ -17,6 +17,7 @@ final class Str
     private function __construct(string $value, string $encoding = null)
     {
         $this->value = $value;
+        /** @var string */
         $this->encoding = $encoding ?? \mb_internal_encoding();
     }
 
