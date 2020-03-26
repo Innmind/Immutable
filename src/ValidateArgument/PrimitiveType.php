@@ -10,14 +10,14 @@ use Innmind\Immutable\{
 
 final class PrimitiveType implements ValidateArgument
 {
-    private \Closure $function;
+    /** @var callable */
+    private $function;
     private string $type;
 
     public function __construct(string $type)
     {
         /** @var callable */
-        $functionName = 'is_'.$type;
-        $this->function = \Closure::fromCallable($functionName);
+        $this->function = 'is_'.$type;
         $this->type = $type;
     }
 
