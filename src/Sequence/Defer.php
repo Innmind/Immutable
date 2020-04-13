@@ -400,10 +400,11 @@ final class Defer implements Implementation
                 $taken = 0;
                 /** @var T $value */
                 foreach ($values as $value) {
-                    if ($taken < $size) {
-                        yield $value;
+                    if ($taken >= $size) {
+                        return;
                     }
 
+                    yield $value;
                     ++$taken;
                 }
             })($this->values, $size),

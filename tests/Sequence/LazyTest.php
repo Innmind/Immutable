@@ -516,6 +516,23 @@ class LazyTest extends TestCase
         $this->assertTrue($loaded);
     }
 
+    public function testSequenceNotCompletelyLoadedWhenTakingFewerThanItsSize()
+    {
+        $loaded = false;
+        $a = new Lazy('int', function() use (&$loaded) {
+            yield 2;
+            yield 3;
+            yield 4;
+            $loaded = true;
+        });
+        $b = $a->take(2);
+
+        $this->assertFalse($loaded);
+        $this->assertInstanceOf(Lazy::class, $b);
+        $this->assertSame([2, 3], \iterator_to_array($b->iterator()));
+        $this->assertFalse($loaded);
+    }
+
     public function testTakeEnd()
     {
         $a = new Lazy('int', function() {
