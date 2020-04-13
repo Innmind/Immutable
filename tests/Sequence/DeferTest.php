@@ -515,6 +515,23 @@ class DeferTest extends TestCase
         $this->assertTrue($loaded);
     }
 
+    public function testSequenceNotCompletelyLoadedWhenTakingFewerThanItsSize()
+    {
+        $loaded = false;
+        $a = new Defer('int', (function() use (&$loaded) {
+            yield 2;
+            yield 3;
+            yield 4;
+            $loaded = true;
+        })());
+        $b = $a->take(2);
+
+        $this->assertFalse($loaded);
+        $this->assertInstanceOf(Defer::class, $b);
+        $this->assertSame([2, 3], \iterator_to_array($b->iterator()));
+        $this->assertFalse($loaded);
+    }
+
     public function testTakeEnd()
     {
         $a = new Defer('int', (function() {
