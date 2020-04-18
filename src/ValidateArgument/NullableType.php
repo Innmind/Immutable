@@ -5,6 +5,9 @@ namespace Innmind\Immutable\ValidateArgument;
 
 use Innmind\Immutable\ValidateArgument;
 
+/**
+ * @psalm-immutable
+ */
 final class NullableType implements ValidateArgument
 {
     private ValidateArgument $validate;

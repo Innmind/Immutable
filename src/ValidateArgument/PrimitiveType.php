@@ -8,6 +8,9 @@ use Innmind\Immutable\{
     Type,
 };
 
+/**
+ * @psalm-immutable
+ */
 final class PrimitiveType implements ValidateArgument
 {
     /** @var callable */

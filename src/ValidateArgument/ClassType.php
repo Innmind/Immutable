@@ -8,6 +8,9 @@ use Innmind\Immutable\{
     Type,
 };
 
+/**
+ * @psalm-immutable
+ */
 final class ClassType implements ValidateArgument
 {
     private string $class;

@@ -13,6 +13,9 @@ use Innmind\Immutable\ValidateArgument\{
     ResourceType,
 };
 
+/**
+ * @psalm-immutable
+ */
 final class Type
 {
     /**
@@ -60,6 +63,8 @@ final class Type
     /**
      * Return the type of the given value
      *
+     * @psalm-pure
+     *
      * @param mixed $value
      *
      * @return string
@@ -89,6 +94,9 @@ final class Type
         }
     }
 
+    /**
+     * @psalm-pure
+     */
     private static function ofPrimitive(string $type): ValidateArgument
     {
         if ($type === 'resource') {

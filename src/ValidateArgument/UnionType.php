@@ -8,6 +8,9 @@ use Innmind\Immutable\{
     Type,
 };
 
+/**
+ * @psalm-immutable
+ */
 final class UnionType implements ValidateArgument
 {
     private string $type;

@@ -8,6 +8,9 @@ use Innmind\Immutable\{
     Type,
 };
 
+/**
+ * @psalm-immutable
+ */
 final class ResourceType implements ValidateArgument
 {
     /**

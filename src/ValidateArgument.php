@@ -3,10 +3,15 @@ declare(strict_types = 1);
 
 namespace Innmind\Immutable;
 
+/**
+ * @psalm-immutable
+ */
 interface ValidateArgument
 {
     /**
      * Check if the given value is validated by the spec
+     *
+     * @psalm-pure
      *
      * @param mixed $value
      *
