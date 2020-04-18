@@ -20,6 +20,7 @@ use Innmind\Immutable\{
 
 /**
  * @template T
+ * @psalm-immutable
  */
 final class Defer implements Implementation
 {
@@ -54,7 +55,7 @@ final class Defer implements Implementation
 
     public function count(): int
     {
-        return $this->load()->count();
+        return $this->size();
     }
 
     /**
@@ -545,8 +546,10 @@ final class Defer implements Implementation
 
     public function empty(): bool
     {
+        /** @psalm-suppress ImpureMethodCall */
         $this->values->rewind();
 
+        /** @psalm-suppress ImpureMethodCall */
         return !$this->values->valid();
     }
 

@@ -19,6 +19,7 @@ use Innmind\Immutable\{
 /**
  * @template T
  * @template S
+ * @psalm-immutable
  */
 final class Primitive implements Implementation
 {
@@ -28,7 +29,6 @@ final class Primitive implements Implementation
     private ValidateArgument $validateValue;
     /** @var array<T, S> */
     private array $values = [];
-    private ?int $size = null;
 
     public function __construct(string $keyType, string $valueType)
     {
@@ -56,7 +56,7 @@ final class Primitive implements Implementation
     public function size(): int
     {
         /** @psalm-suppress MixedArgumentTypeCoercion */
-        return $this->size ?? $this->size = \count($this->values);
+        return \count($this->values);
     }
 
     /**
@@ -79,7 +79,6 @@ final class Primitive implements Implementation
         ($this->validateValue)($value, 2);
 
         $map = clone $this;
-        $map->size = null;
         $map->values[$key] = $value;
 
         return $map;
@@ -116,7 +115,6 @@ final class Primitive implements Implementation
     public function clear(): self
     {
         $map = clone $this;
-        $map->size = null;
         $map->values = [];
 
         return $map;
@@ -151,7 +149,8 @@ final class Primitive implements Implementation
      */
     public function filter(callable $predicate): self
     {
-        $map = $this->clear();
+        $map = clone $this;
+        $map->values = [];
 
         foreach ($this->values as $k => $v) {
             if ($predicate($this->normalizeKey($k), $v) === true) {
@@ -257,7 +256,8 @@ final class Primitive implements Implementation
      */
     public function map(callable $function): self
     {
-        $map = $this->clear();
+        $map = clone $this;
+        $map->values = [];
 
         foreach ($this->values as $k => $v) {
             $return = $function($this->normalizeKey($k), $v);
@@ -294,7 +294,6 @@ final class Primitive implements Implementation
         }
 
         $map = clone $this;
-        $map->size = null;
         /** @psalm-suppress MixedArrayTypeCoercion */
         unset($map->values[$key]);
 

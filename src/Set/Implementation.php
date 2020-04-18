@@ -14,6 +14,7 @@ use Innmind\Immutable\{
 
 /**
  * @template T
+ * @psalm-immutable
  */
 interface Implementation extends \Countable
 {

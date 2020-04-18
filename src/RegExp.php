@@ -8,6 +8,9 @@ use Innmind\Immutable\Exception\{
     RegexException,
 };
 
+/**
+ * @psalm-immutable
+ */
 final class RegExp
 {
     private string $pattern;
@@ -15,12 +18,16 @@ final class RegExp
     private function __construct(string $pattern)
     {
         if (@\preg_match($pattern, '') === false) {
+            /** @psalm-suppress ImpureFunctionCall */
             throw new DomainException($pattern, \preg_last_error());
         }
 
         $this->pattern = $pattern;
     }
 
+    /**
+     * @psalm-pure
+     */
     public static function of(string $pattern): self
     {
         return new self($pattern);
@@ -34,6 +41,7 @@ final class RegExp
         $value = \preg_match($this->pattern, $string->toString());
 
         if ($value === false) {
+            /** @psalm-suppress ImpureFunctionCall */
             throw new RegexException('', \preg_last_error());
         }
 
@@ -52,6 +60,7 @@ final class RegExp
         $value = \preg_match($this->pattern, $string->toString(), $matches);
 
         if ($value === false) {
+            /** @psalm-suppress ImpureFunctionCall */
             throw new RegexException('', \preg_last_error());
         }
 

@@ -15,6 +15,7 @@ use Innmind\Immutable\{
 
 /**
  * @template T
+ * @psalm-immutable
  */
 final class Lazy implements Implementation
 {

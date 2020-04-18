@@ -20,6 +20,8 @@ final class Type
 {
     /**
      * Build the appropriate specification for the given type
+     *
+     * @psalm-pure
      */
     public static function of(string $type): ValidateArgument
     {

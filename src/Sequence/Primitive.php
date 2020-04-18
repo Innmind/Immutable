@@ -19,6 +19,7 @@ use Innmind\Immutable\{
 
 /**
  * @template T
+ * @psalm-immutable
  */
 final class Primitive implements Implementation
 {
@@ -26,7 +27,6 @@ final class Primitive implements Implementation
     private ValidateArgument $validate;
     /** @var list<T> */
     private array $values;
-    private ?int $size = null;
 
     /**
      * @param T $values
@@ -45,7 +45,7 @@ final class Primitive implements Implementation
 
     public function size(): int
     {
-        return $this->size ?? $this->size = \count($this->values);
+        return \count($this->values);
     }
 
     public function count(): int
@@ -112,7 +112,7 @@ final class Primitive implements Implementation
      */
     public function drop(int $size): self
     {
-        $self = $this->clear();
+        $self = clone $this;
         $self->values = \array_slice($this->values, $size);
 
         return $self;
@@ -123,7 +123,7 @@ final class Primitive implements Implementation
      */
     public function dropEnd(int $size): self
     {
-        $self = $this->clear();
+        $self = clone $this;
         $self->values = \array_slice($this->values, 0, $this->size() - $size);
 
         return $self;
@@ -144,7 +144,7 @@ final class Primitive implements Implementation
      */
     public function filter(callable $predicate): self
     {
-        $self = $this->clear();
+        $self = clone $this;
         $self->values = \array_values(\array_filter(
             $this->values,
             $predicate,
@@ -295,7 +295,7 @@ final class Primitive implements Implementation
      */
     public function pad(int $size, $element): self
     {
-        $self = $this->clear();
+        $self = clone $this;
         $self->values = \array_pad($this->values, $size, $element);
 
         return $self;
@@ -341,7 +341,7 @@ final class Primitive implements Implementation
      */
     public function slice(int $from, int $until): self
     {
-        $self = $this->clear();
+        $self = clone $this;
         $self->values = \array_slice(
             $this->values,
             $from,
@@ -389,9 +389,12 @@ final class Primitive implements Implementation
      */
     public function append(Implementation $sequence): self
     {
-        $self = $this->clear();
+        $self = clone $this;
         /** @var list<T> */
-        $self->values = \array_merge($this->values, \iterator_to_array($sequence->iterator()));
+        $self->values = \array_merge(
+            $this->values,
+            \iterator_to_array($sequence->iterator()),
+        );
 
         return $self;
     }
@@ -419,7 +422,6 @@ final class Primitive implements Implementation
     {
         $self = clone $this;
         $self->values[] = $element;
-        $self->size = $this->size() + 1;
 
         return $self;
     }

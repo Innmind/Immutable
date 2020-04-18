@@ -19,6 +19,7 @@ use Innmind\Immutable\{
 /**
  * @template T
  * @template S
+ * @psalm-immutable
  */
 final class DoubleIndex implements Implementation
 {
@@ -62,7 +63,7 @@ final class DoubleIndex implements Implementation
 
     public function count(): int
     {
-        return $this->keys->count();
+        return $this->size();
     }
 
     /**
@@ -162,7 +163,10 @@ final class DoubleIndex implements Implementation
      */
     public function filter(callable $predicate): self
     {
-        $map = $this->clear();
+        $map = clone $this;
+        $map->keys = $this->keys->clear();
+        $map->values = $this->values->clear();
+        $map->pairs = $this->pairs->clear();
 
         foreach ($this->pairs->iterator() as $pair) {
             if ($predicate($pair->key(), $pair->value()) === true) {

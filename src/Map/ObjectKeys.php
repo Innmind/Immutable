@@ -20,6 +20,7 @@ use Innmind\Immutable\{
 /**
  * @template T
  * @template S
+ * @psalm-immutable
  */
 final class ObjectKeys implements Implementation
 {
@@ -40,6 +41,7 @@ final class ObjectKeys implements Implementation
         $this->validateValue = Type::of($valueType);
         $this->keyType = $keyType;
         $this->valueType = $valueType;
+        /** @psalm-suppress ImpurePropertyAssignment */
         $this->values = new \SplObjectStorage;
     }
 
@@ -55,6 +57,7 @@ final class ObjectKeys implements Implementation
 
     public function size(): int
     {
+        /** @psalm-suppress ImpureMethodCall */
         return $this->values->count();
     }
 
@@ -79,7 +82,10 @@ final class ObjectKeys implements Implementation
 
         $map = clone $this;
         $map->values = clone $this->values;
-        /** @psalm-suppress MixedArgumentTypeCoercion */
+        /**
+         * @psalm-suppress MixedArgumentTypeCoercion
+         * @psalm-suppress ImpureMethodCall
+         */
         $map->values[$key] = $value;
 
         return $map;
@@ -100,6 +106,7 @@ final class ObjectKeys implements Implementation
 
         /**
          * @psalm-suppress MixedArgumentTypeCoercion
+         * @psalm-suppress ImpureMethodCall
          * @var S
          */
         return $this->values->offsetGet($key);
@@ -114,7 +121,10 @@ final class ObjectKeys implements Implementation
             return false;
         }
 
-        /** @psalm-suppress MixedArgumentTypeCoercion */
+        /**
+         * @psalm-suppress MixedArgumentTypeCoercion
+         * @psalm-suppress ImpureMethodCall
+         */
         return $this->values->offsetExists($key);
     }
 
@@ -124,6 +134,7 @@ final class ObjectKeys implements Implementation
     public function clear(): self
     {
         $map = clone $this;
+        /** @psalm-suppress ImpurePropertyAssignment */
         $map->values = new \SplObjectStorage;
 
         return $map;
@@ -138,6 +149,7 @@ final class ObjectKeys implements Implementation
             return false;
         }
 
+        /** @psalm-suppress ImpureMethodCall */
         foreach ($this->values as $k) {
             /** @var T $key */
             $key = $k;
@@ -163,15 +175,22 @@ final class ObjectKeys implements Implementation
      */
     public function filter(callable $predicate): self
     {
-        $map = $this->clear();
+        $map = clone $this;
+        /** @psalm-suppress ImpurePropertyAssignment */
+        $map->values = new \SplObjectStorage;
 
+        /** @psalm-suppress ImpureMethodCall */
         foreach ($this->values as $k) {
             /** @var T $key */
             $key = $k;
-            /** @var S $v */
+            /**
+             * @psalm-suppress ImpureMethodCall
+             * @var S $v
+             */
             $v = $this->values[$k];
 
             if ($predicate($key, $v) === true) {
+                /** @psalm-suppress ImpurePropertyAssignment */
                 $map->values[$k] = $v;
             }
         }
@@ -184,10 +203,14 @@ final class ObjectKeys implements Implementation
      */
     public function foreach(callable $function): void
     {
+        /** @psalm-suppress ImpureMethodCall */
         foreach ($this->values as $k) {
             /** @var T $key */
             $key = $k;
-            /** @var S $v */
+            /**
+             * @psalm-suppress ImpureMethodCall
+             * @var S $v
+             */
             $v = $this->values[$k];
 
             $function($key, $v);
@@ -210,10 +233,14 @@ final class ObjectKeys implements Implementation
 
         $groups = null;
 
+        /** @psalm-suppress ImpureMethodCall */
         foreach ($this->values as $k) {
             /** @var T $key */
             $key = $k;
-            /** @var S $v */
+            /**
+             * @psalm-suppress ImpureMethodCall
+             * @var S $v
+             */
             $v = $this->values[$k];
 
             $discriminant = $discriminator($key, $v);
@@ -276,12 +303,18 @@ final class ObjectKeys implements Implementation
      */
     public function map(callable $function): self
     {
-        $map = $this->clear();
+        $map = clone $this;
+        /** @psalm-suppress ImpurePropertyAssignment */
+        $map->values = new \SplObjectStorage;
 
+        /** @psalm-suppress ImpureMethodCall */
         foreach ($this->values as $k) {
             /** @var T */
             $key = $k;
-            /** @var S */
+            /**
+             * @psalm-suppress ImpureMethodCall
+             * @var S $v
+             */
             $v = $this->values[$k];
 
             $return = $function($key, $v);
@@ -300,6 +333,7 @@ final class ObjectKeys implements Implementation
 
             ($this->validateValue)($value, 2);
 
+            /** @psalm-suppress ImpurePropertyAssignment */
             $map->values[$key] = $value;
         }
 
@@ -319,8 +353,12 @@ final class ObjectKeys implements Implementation
 
         $map = clone $this;
         $map->values = clone $this->values;
-        /** @psalm-suppress MixedArgumentTypeCoercion */
+        /**
+         * @psalm-suppress MixedArgumentTypeCoercion
+         * @psalm-suppress ImpureMethodCall
+         */
         $map->values->detach($key);
+        /** @psalm-suppress ImpureMethodCall */
         $map->values->rewind();
 
         return $map;
@@ -349,10 +387,14 @@ final class ObjectKeys implements Implementation
         $truthy = $this->clearMap();
         $falsy = $this->clearMap();
 
+        /** @psalm-suppress ImpureMethodCall */
         foreach ($this->values as $k) {
             /** @var T $key */
             $key = $k;
-            /** @var S $v */
+            /**
+             * @psalm-suppress ImpureMethodCall
+             * @var S $v
+             */
             $v = $this->values[$k];
 
             $return = $predicate($key, $v);
@@ -383,10 +425,14 @@ final class ObjectKeys implements Implementation
      */
     public function reduce($carry, callable $reducer)
     {
+        /** @psalm-suppress ImpureMethodCall */
         foreach ($this->values as $k) {
             /** @var T $key */
             $key = $k;
-            /** @var S $v */
+            /**
+             * @psalm-suppress ImpureMethodCall
+             * @var S $v
+             */
             $v = $this->values[$k];
 
             $carry = $reducer($carry, $key, $v);
@@ -397,8 +443,10 @@ final class ObjectKeys implements Implementation
 
     public function empty(): bool
     {
+        /** @psalm-suppress ImpureMethodCall */
         $this->values->rewind();
 
+        /** @psalm-suppress ImpureMethodCall */
         return !$this->values->valid();
     }
 
@@ -414,10 +462,14 @@ final class ObjectKeys implements Implementation
         /** @var Sequence<ST> */
         $sequence = Sequence::of($type);
 
+        /** @psalm-suppress ImpureMethodCall */
         foreach ($this->values as $k) {
             /** @var T $key */
             $key = $k;
-            /** @var S $v */
+            /**
+             * @psalm-suppress ImpureMethodCall
+             * @var S $v
+             */
             $v = $this->values[$k];
 
             foreach ($mapper($key, $v) as $newValue) {
@@ -440,10 +492,14 @@ final class ObjectKeys implements Implementation
         /** @var Set<ST> */
         $set = Set::of($type);
 
+        /** @psalm-suppress ImpureMethodCall */
         foreach ($this->values as $k) {
             /** @var T $key */
             $key = $k;
-            /** @var S $v */
+            /**
+             * @psalm-suppress ImpureMethodCall
+             * @var S $v
+             */
             $v = $this->values[$k];
 
             foreach ($mapper($key, $v) as $newValue) {
@@ -470,10 +526,14 @@ final class ObjectKeys implements Implementation
         /** @var Map<MT, MS> */
         $map = Map::of($key, $value);
 
+        /** @psalm-suppress ImpureMethodCall */
         foreach ($this->values as $k) {
             /** @var T $key */
             $key = $k;
-            /** @var S $v */
+            /**
+             * @psalm-suppress ImpureMethodCall
+             * @var S $v
+             */
             $v = $this->values[$k];
 
             foreach ($mapper($key, $v) as $newKey => $newValue) {

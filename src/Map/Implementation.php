@@ -17,6 +17,7 @@ use Innmind\Immutable\{
  * @template T
  * @template S
  * @internal Dot not code against this interface
+ * @psalm-immutable
  */
 interface Implementation extends \Countable
 {

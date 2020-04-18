@@ -13,6 +13,7 @@ use Innmind\Immutable\{
 /**
  * @template T
  * @template S
+ * @psalm-immutable
  */
 final class Map implements \Countable
 {
@@ -38,6 +39,7 @@ final class Map implements \Countable
     /**
      * @template U
      * @template V
+     * @psalm-pure
      *
      * @return self<U, V>
      */
@@ -87,7 +89,7 @@ final class Map implements \Countable
      */
     public function count(): int
     {
-        return $this->implementation->count();
+        return $this->size();
     }
 
     /**
@@ -192,7 +194,7 @@ final class Map implements \Countable
      */
     public function filter(callable $predicate): self
     {
-        $map = $this->clear();
+        $map = clone $this;
         $map->implementation = $this->implementation->filter($predicate);
 
         return $map;
@@ -255,7 +257,7 @@ final class Map implements \Countable
      */
     public function map(callable $function): self
     {
-        $map = $this->clear();
+        $map = clone $this;
         $map->implementation = $this->implementation->map($function);
 
         return $map;

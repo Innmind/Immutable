@@ -19,6 +19,7 @@ use Innmind\Immutable\{
 
 /**
  * @template T
+ * @psalm-immutable
  */
 final class Lazy implements Implementation
 {
@@ -26,13 +27,15 @@ final class Lazy implements Implementation
     /** @var \Closure(): \Generator<T> */
     private \Closure $values;
     private ValidateArgument $validate;
-    private ?int $size = null;
 
     public function __construct(string $type, callable $generator)
     {
         $this->type = $type;
         $validate = Type::of($type);
-        /** @var \Closure(): \Generator<T> */
+        /**
+         * @psalm-suppress ImpurePropertyAssignment
+         * @var \Closure(): \Generator<T>
+         */
         $this->values = \Closure::fromCallable(static function() use ($generator, $validate): \Generator {
             /** @var T $value */
             foreach ($generator() as $value) {
@@ -50,17 +53,13 @@ final class Lazy implements Implementation
 
     public function size(): int
     {
-        if (\is_int($this->size)) {
-            return $this->size;
-        }
-
         $size = 0;
 
         foreach ($this->iterator() as $_) {
             ++$size;
         }
 
-        return $this->size = $size;
+        return $size;
     }
 
     public function count(): int
@@ -581,6 +580,7 @@ final class Lazy implements Implementation
 
     public function empty(): bool
     {
+        /** @psalm-suppress ImpureMethodCall */
         return !$this->iterator()->valid();
     }
 

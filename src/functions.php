@@ -10,6 +10,7 @@ use Innmind\Immutable\Exception\{
 
 /**
  * @template T
+ * @psalm-pure
  *
  * @param Set<T>|Sequence<T> $structure
  *
@@ -42,6 +43,8 @@ function unwrap($structure): array
 /**
  * Concatenate all elements with the given separator
  *
+ * @psalm-pure
+ *
  * @param Set<string>|Sequence<string> $structure
  */
 function join(string $separator, $structure): Str
@@ -64,6 +67,7 @@ function join(string $separator, $structure): Str
 
 /**
  * @template T
+ * @psalm-pure
  *
  * @throws EmptySet
  *
@@ -81,6 +85,8 @@ function first(Set $set)
 }
 
 /**
+ * @psalm-pure
+ *
  * @throws \TypeError
  */
 function assertSet(string $type, Set $set, int $position): void
@@ -91,6 +97,8 @@ function assertSet(string $type, Set $set, int $position): void
 }
 
 /**
+ * @psalm-pure
+ *
  * @throws \TypeError
  */
 function assertMap(string $key, string $value, Map $map, int $position): void
@@ -101,6 +109,8 @@ function assertMap(string $key, string $value, Map $map, int $position): void
 }
 
 /**
+ * @psalm-pure
+ *
  * @throws \TypeError
  */
 function assertSequence(string $type, Sequence $sequence, int $position): void

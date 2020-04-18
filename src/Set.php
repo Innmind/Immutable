@@ -10,6 +10,7 @@ use Innmind\Immutable\Exception\{
 
 /**
  * @template T
+ * @psalm-immutable
  */
 final class Set implements \Countable
 {
@@ -29,6 +30,7 @@ final class Set implements \Countable
 
     /**
      * @template V
+     * @psalm-pure
      *
      * @param V $values
      *
@@ -46,6 +48,7 @@ final class Set implements \Countable
      * Use this mode when the amount of data may not fit in memory
      *
      * @template V
+     * @psalm-pure
      *
      * @param \Generator<V> $generator
      *
@@ -65,6 +68,7 @@ final class Set implements \Countable
      * as parsing a file or calling an API
      *
      * @template V
+     * @psalm-pure
      *
      * @param callable(): \Generator<V> $generator
      *
@@ -76,6 +80,8 @@ final class Set implements \Countable
     }
 
     /**
+     * @psalm-pure
+     *
      * @param mixed $values
      *
      * @return self<mixed>
@@ -86,6 +92,8 @@ final class Set implements \Countable
     }
 
     /**
+     * @psalm-pure
+     *
      * @return self<int>
      */
     public static function ints(int ...$values): self
@@ -97,6 +105,8 @@ final class Set implements \Countable
     }
 
     /**
+     * @psalm-pure
+     *
      * @return self<float>
      */
     public static function floats(float ...$values): self
@@ -108,6 +118,8 @@ final class Set implements \Countable
     }
 
     /**
+     * @psalm-pure
+     *
      * @return self<string>
      */
     public static function strings(string ...$values): self
@@ -119,6 +131,8 @@ final class Set implements \Countable
     }
 
     /**
+     * @psalm-pure
+     *
      * @return self<object>
      */
     public static function objects(object ...$values): self
@@ -318,7 +332,7 @@ final class Set implements \Countable
      */
     public function map(callable $function): self
     {
-        $self = $this->clear();
+        $self = clone $this;
         $self->implementation = $this->implementation->map($function);
 
         return $self;

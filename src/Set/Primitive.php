@@ -15,6 +15,7 @@ use Innmind\Immutable\{
 
 /**
  * @template T
+ * @psalm-immutable
  */
 final class Primitive implements Implementation
 {
@@ -65,7 +66,7 @@ final class Primitive implements Implementation
      */
     public function intersect(Implementation $set): self
     {
-        $self = $this->clear();
+        $self = clone $this;
         $self->values = $this->values->intersect(
             new Sequence\Primitive($this->type, ...$set->iterator()),
         );
