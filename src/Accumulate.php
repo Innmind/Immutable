@@ -10,6 +10,8 @@ namespace Innmind\Immutable;
  * @template T
  * @template S
  * @internal Do not use this in your code
+ *
+ * @psalm-immutable
  */
 final class Accumulate implements \Iterator
 {
@@ -25,6 +27,7 @@ final class Accumulate implements \Iterator
      */
     public function __construct(\Generator $generator)
     {
+        /** @psalm-suppress ImpurePropertyAssignment */
         $this->generator = $generator;
     }
 
@@ -54,6 +57,7 @@ final class Accumulate implements \Iterator
         \next($this->values);
 
         if ($this->reachedCacheEnd()) {
+            /** @psalm-suppress ImpureMethodCall */
             $this->generator->next();
         }
     }
@@ -66,6 +70,7 @@ final class Accumulate implements \Iterator
 
     public function valid(): bool
     {
+        /** @psalm-suppress ImpureMethodCall */
         return !$this->reachedCacheEnd() || $this->generator->valid();
     }
 
@@ -77,7 +82,15 @@ final class Accumulate implements \Iterator
     private function pop(): void
     {
         if ($this->reachedCacheEnd()) {
+            /**
+             * @psalm-suppress ImpureMethodCall
+             * @psalm-suppress InaccessibleProperty
+             */
             $this->keys[] = $this->generator->key();
+            /**
+             * @psalm-suppress ImpureMethodCall
+             * @psalm-suppress InaccessibleProperty
+             */
             $this->values[] = $this->generator->current();
         }
     }
