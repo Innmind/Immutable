@@ -527,4 +527,16 @@ class SetTest extends TestCase
 
         $sequence->find(fn($i) => $i === 0);
     }
+
+    public function testClear()
+    {
+        $set = Set::ints(1, 2, 3);
+        $emptySet = $set->clear();
+
+        $this->assertInstanceOf(Set::class, $emptySet);
+        $this->assertSame('int', $emptySet->type());
+        $this->assertNotSame($emptySet, $set);
+        $this->assertSame([1, 2, 3], unwrap($set));
+        $this->assertSame([], unwrap($emptySet));
+    }
 }
