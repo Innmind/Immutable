@@ -52,7 +52,9 @@ class PrimitiveTest extends TestCase
         $m2 = ($m)(42, 42);
         $this->assertNotSame($m, $m2);
         $this->assertSame(0, $m->size());
+        $this->assertSame($m->count(), $m->size());
         $this->assertSame(1, $m2->size());
+        $this->assertSame($m2->count(), $m2->size());
 
         $m = new Primitive('int', 'int');
         $m = $m
@@ -67,6 +69,7 @@ class PrimitiveTest extends TestCase
         $this->assertSame(1, $m->get(65));
         $this->assertSame(90, $m->get(89));
         $this->assertSame(4, $m->size());
+        $this->assertSame($m->count(), $m->size());
     }
 
     public function testThrowWhenKeyDoesntMatchType()
