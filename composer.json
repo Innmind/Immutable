@@ -35,13 +35,13 @@
         "innmind/black-box": "^4.1"
     },
     "conflict": {
-        "innmind/black-box": "<4.1|~5.0",
+        "innmind/black-box": "<4.4|~5.0",
         "vimeo/psalm": "3.11.2|3.11.1|3.11.0"
     },
     "suggest": {
         "innmind/black-box": "For property based testing"
     },
     "provide": {
-        "innmind/black-box": "4.1.0"
+        "innmind/black-box": "4.4.0"
     }
 }

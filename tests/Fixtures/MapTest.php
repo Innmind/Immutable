@@ -10,38 +10,25 @@ use PHPUnit\Framework\TestCase;
 
 class MapTest extends TestCase
 {
-    public function testInterface()
-    {
-        $this->assertInstanceOf(
-            Set::class,
-            new Map(
-                'string',
-                'string',
-                new Set\Chars,
-                new Set\Chars
-            )
-        );
-    }
-
     public function testOf()
     {
         $this->assertInstanceOf(
-            Map::class,
+            Set::class,
             Map::of(
                 'string',
                 'string',
-                new Set\Chars,
-                new Set\Chars
+                Set\Chars::any(),
+                Set\Chars::any()
             )
         );
     }
 
     public function testGenerates100ValuesByDefault()
     {
-        $maps = new Map(
+        $maps = Map::of(
             'string',
             'int',
-            new Set\Chars,
+            Set\Chars::any(),
             Set\Integers::any()
         );
 
@@ -58,11 +45,11 @@ class MapTest extends TestCase
 
     public function testGeneratesMapsOfDifferentSizes()
     {
-        $maps = new Map(
+        $maps = Map::of(
             'string',
             'string',
-            new Set\Chars,
-            new Set\Chars,
+            Set\Chars::any(),
+            Set\Chars::any(),
             Set\Integers::between(0, 50)
         );
         $sizes = [];
@@ -76,47 +63,61 @@ class MapTest extends TestCase
 
     public function testTake()
     {
-        $maps1 = new Map(
+        $maps1 = Map::of(
             'string',
             'string',
-            new Set\Chars,
-            new Set\Chars
+            Set\Chars::any(),
+            Set\Chars::any()
         );
         $maps2 = $maps1->take(50);
 
         $this->assertNotSame($maps1, $maps2);
-        $this->assertInstanceOf(Map::class, $maps2);
+        $this->assertInstanceOf(Set::class, $maps2);
         $this->assertCount(100, \iterator_to_array($maps1->values()));
         $this->assertCount(50, \iterator_to_array($maps2->values()));
     }
 
     public function testFilter()
     {
-        $maps = new Map(
+        $maps = Map::of(
             'string',
             'string',
-            new Set\Chars,
-            new Set\Chars
+            Set\Chars::any(),
+            Set\Chars::any(),
         );
+        $maps2 = $maps->filter(fn($map) => $map->size() % 2 === 0);
 
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('Map set can\'t be filtered, underlying sets must be filtered beforehand');
+        $this->assertInstanceOf(Set::class, $maps2);
+        $this->assertNotSame($maps, $maps2);
 
-        $maps->filter(static function($map): bool {
-            return $map->size() % 2 === 0;
-        });
+        $hasOddMap = fn(bool $hasOddMap, $map) => $hasOddMap || $map->unwrap()->size() % 2 === 1;
+
+        $this->assertTrue(
+            \array_reduce(
+                \iterator_to_array($maps->values()),
+                $hasOddMap,
+                false,
+            ),
+        );
+        $this->assertFalse(
+            \array_reduce(
+                \iterator_to_array($maps2->values()),
+                $hasOddMap,
+                false,
+            ),
+        );
     }
 
     public function testFlagStructureAsMutableWhenUnderlyingKeysAreMutable()
     {
-        $maps = new Map(
+        $maps = Map::of(
             'object',
             'string',
             Set\Decorate::mutable(
                 fn() => new \stdClass,
-                new Set\Chars,
+                Set\Chars::any(),
             ),
-            new Set\Chars,
+            Set\Chars::any(),
         );
 
         foreach ($maps->values() as $map) {
@@ -128,13 +129,13 @@ class MapTest extends TestCase
 
     public function testFlagStructureAsMutableWhenUnderlyingValuesAreMutable()
     {
-        $maps = new Map(
+        $maps = Map::of(
             'string',
             'object',
-            new Set\Chars,
+            Set\Chars::any(),
             Set\Decorate::mutable(
                 fn() => new \stdClass,
-                new Set\Chars,
+                Set\Chars::any(),
             ),
         );
 
@@ -146,11 +147,11 @@ class MapTest extends TestCase
 
     public function testNonEmptyMapCanBeShrunk()
     {
-        $maps = new Map(
+        $maps = Map::of(
             'string',
             'string',
-            new Set\Chars,
-            new Set\Chars,
+            Set\Chars::any(),
+            Set\Chars::any(),
             Set\Integers::between(1, 100),
         );
 
@@ -161,11 +162,11 @@ class MapTest extends TestCase
 
     public function testEmptyMapCanNotBeShrunk()
     {
-        $maps = new Map(
+        $maps = Map::of(
             'string',
             'string',
-            new Set\Chars,
-            new Set\Chars,
+            Set\Chars::any(),
+            Set\Chars::any(),
             Set\Integers::below(1),
         );
 
@@ -181,15 +182,20 @@ class MapTest extends TestCase
 
     public function testNonEmptyMapAreShrunkWithDifferentStrategies()
     {
-        $maps = new Map(
+        $maps = Map::of(
             'string',
             'string',
-            new Set\Chars,
-            new Set\Chars,
+            Set\Chars::any(),
+            Set\Chars::any(),
             Set\Integers::between(3, 100),
         );
 
         foreach ($maps->values() as $value) {
+            if ($value->unwrap()->size() < 4) {
+                // when generating the lower bound it will shrink identity values
+                continue;
+            }
+
             $dichotomy = $value->shrink();
             $this->assertFalse($dichotomy->a()->unwrap()->equals($dichotomy->b()->unwrap()));
         }
@@ -197,33 +203,48 @@ class MapTest extends TestCase
 
     public function testShrunkMapsDoContainsLessThanTheInitialValue()
     {
-        $maps = new Map(
+        $maps = Map::of(
             'string',
             'string',
-            new Set\Chars,
-            new Set\Chars,
+            Set\Chars::any(),
+            Set\Chars::any(),
             Set\Integers::between(2, 100),
         );
 
         foreach ($maps->values() as $value) {
+            if ($value->unwrap()->size() < 4) {
+                // otherwise strategy A will return it's identity since 3/2 won't
+                // match the predicate of minimum size 2, so strategy will return
+                // an identity value
+                continue;
+            }
+
             $dichotomy = $value->shrink();
 
             $this->assertLessThan($value->unwrap()->size(), $dichotomy->a()->unwrap()->size());
             $this->assertLessThan($value->unwrap()->size(), $dichotomy->b()->unwrap()->size());
+            return;
         }
     }
 
     public function testShrinkingStrategyAReduceTheMapFasterThanStrategyB()
     {
-        $maps = new Map(
+        $maps = Map::of(
             'string',
             'string',
-            new Set\Chars,
-            new Set\Chars,
+            Set\Chars::any(),
+            Set\Chars::any(),
             Set\Integers::between(3, 100),
         );
 
         foreach ($maps->values() as $value) {
+            if ($value->unwrap()->size() < 6) {
+                // otherwise strategy A will return it's identity since 5/2 won't
+                // match the predicate of minimum size 3, so strategy will return
+                // an identity value so it will always be greater than stragey B
+                continue;
+            }
+
             $dichotomy = $value->shrink();
 
             $this->assertLessThan($dichotomy->b()->unwrap()->size(), $dichotomy->a()->unwrap()->size());
@@ -232,11 +253,11 @@ class MapTest extends TestCase
 
     public function testShrunkValuesConserveMutabilityProperty()
     {
-        $maps = new Map(
+        $maps = Map::of(
             'string',
             'string',
-            new Set\Chars,
-            new Set\Chars,
+            Set\Chars::any(),
+            Set\Chars::any(),
             Set\Integers::between(1, 100),
         );
 
@@ -247,13 +268,13 @@ class MapTest extends TestCase
             $this->assertTrue($dichotomy->b()->isImmutable());
         }
 
-        $maps = new Map(
+        $maps = Map::of(
             'string',
             'object',
-            new Set\Chars,
+            Set\Chars::any(),
             Set\Decorate::mutable(
                 fn() => new \stdClass,
-                new Set\Chars,
+                Set\Chars::any(),
             ),
             Set\Integers::between(1, 100),
         );
