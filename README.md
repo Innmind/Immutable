@@ -108,3 +108,50 @@ $regexp->matches(Str::of('foo123bar')); // true
 $regexp->matches(Str::of('foobar')); // false
 $regexp->capture(Str::of('foo123bar')); // Map<scalar, Str> with index `i` set to Str::of('123')
 ```
+
+## [BlackBox](https://github.com/innmind/blackbox/)
+
+This library provides 3 `Set`s that can be used with [`innmind/back-box`](https://packagist.org/packages/innmind/black-box).
+
+You can use them as follow:
+
+```php
+use Innmind\BlackBox\{
+    PHPUnit\BlackBox,
+    Set,
+};
+use Fixtures\Innmind\Immutable;
+
+class SomeTest extends \PHPUnit\Framework\TestCase
+{
+    use BlackBox;
+
+    public function testSomeProperty()
+    {
+        $this
+            ->forAll(
+                Immutable\Map::of(
+                    'int',
+                    'string',
+                    Set\Integers::any(),
+                    Set\Strings::any(),
+                ),
+                Immutable\Set::of(
+                    'float',
+                    Set\RealNumbers::any(),
+                ),
+                Immutable\Sequence::of(
+                    'string',
+                    Set\Uuid::any(),
+                ),
+            )
+            ->then(function($map, $set, $sequence) {
+                // $map is an instance of \Innmind\Immutable\Map<int, string>
+                // $set is an instance of \Innmind\Immutable\Set<float>
+                // $sequence is an instance of \Innmind\Immutable\Sequence<string>
+
+                // write your test here
+            });
+    }
+}
+```
