@@ -21,12 +21,14 @@ class SetTest extends TestCase
         );
     }
 
-    public function testGenerates100ValuesByDefault()
+    public function testGeneratesAtMost100ValuesByDefault()
     {
         $sets = Set::of('string', new DataSet\Chars);
 
         $this->assertInstanceOf(\Generator::class, $sets->values(new RandomInt));
-        $this->assertCount(100, \iterator_to_array($sets->values(new RandomInt)));
+        $count = \count(\iterator_to_array($sets->values(new RandomInt)));
+        $this->assertLessThanOrEqual(100, $count);
+        $this->assertGreaterThan(10, $count);
 
         foreach ($sets->values(new RandomInt) as $set) {
             $this->assertInstanceOf(DataSet\Value::class, $set);
@@ -58,8 +60,11 @@ class SetTest extends TestCase
 
         $this->assertNotSame($sets1, $sets2);
         $this->assertInstanceOf(DataSet::class, $sets2);
-        $this->assertCount(100, \iterator_to_array($sets1->values(new RandomInt)));
-        $this->assertCount(50, \iterator_to_array($sets2->values(new RandomInt)));
+        $count1 = \count(\iterator_to_array($sets1->values(new RandomInt)));
+        $count2 = \count(\iterator_to_array($sets2->values(new RandomInt)));
+        $this->assertLessThanOrEqual(100, $count1);
+        $this->assertLessThanOrEqual(50, $count2);
+        $this->assertGreaterThan($count2, $count1);
     }
 
     public function testFilter()

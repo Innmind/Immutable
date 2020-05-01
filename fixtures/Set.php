@@ -4,7 +4,10 @@ declare(strict_types = 1);
 namespace Fixtures\Innmind\Immutable;
 
 use Innmind\BlackBox\Set as DataSet;
-use Innmind\Immutable\Set as Structure;
+use Innmind\Immutable\{
+    Set as Structure,
+    Sequence as ISequence,
+};
 
 final class Set
 {
@@ -22,7 +25,10 @@ final class Set
             DataSet\Sequence::of(
                 $set,
                 $sizes,
-            ),
+            )->filter(static function(array $values): bool {
+                // checks unicity of values
+                return ISequence::mixed(...$values)->size() === Structure::mixed(...$values)->size();
+            }),
         );
     }
 }

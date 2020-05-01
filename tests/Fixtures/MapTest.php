@@ -26,7 +26,7 @@ class MapTest extends TestCase
         );
     }
 
-    public function testGenerates100ValuesByDefault()
+    public function testGeneratesAtMost100ValuesByDefault()
     {
         $maps = Map::of(
             'string',
@@ -36,7 +36,9 @@ class MapTest extends TestCase
         );
 
         $this->assertInstanceOf(\Generator::class, $maps->values(new RandomInt));
-        $this->assertCount(100, \iterator_to_array($maps->values(new RandomInt)));
+        $count = \count(\iterator_to_array($maps->values(new RandomInt)));
+        $this->assertLessThanOrEqual(100, $count);
+        $this->assertGreaterThan(10, $count);
 
         foreach ($maps->values(new RandomInt) as $map) {
             $this->assertInstanceOf(Set\Value::class, $map);
@@ -76,8 +78,11 @@ class MapTest extends TestCase
 
         $this->assertNotSame($maps1, $maps2);
         $this->assertInstanceOf(Set::class, $maps2);
-        $this->assertCount(100, \iterator_to_array($maps1->values(new RandomInt)));
-        $this->assertCount(50, \iterator_to_array($maps2->values(new RandomInt)));
+        $count1 = \count(\iterator_to_array($maps1->values(new RandomInt)));
+        $count2 = \count(\iterator_to_array($maps2->values(new RandomInt)));
+        $this->assertLessThanOrEqual(100, $count1);
+        $this->assertLessThanOrEqual(50, $count2);
+        $this->assertGreaterThan($count2, $count1);
     }
 
     public function testFilter()
