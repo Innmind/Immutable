@@ -4,7 +4,10 @@ declare(strict_types = 1);
 namespace Tests\Innmind\Immutable\Fixtures;
 
 use Innmind\Immutable\Map as Structure;
-use Innmind\BlackBox\Set;
+use Innmind\BlackBox\{
+    Set,
+    Random\RandomInt,
+};
 use Fixtures\Innmind\Immutable\Map;
 use PHPUnit\Framework\TestCase;
 
@@ -23,7 +26,7 @@ class MapTest extends TestCase
         );
     }
 
-    public function testGenerates100ValuesByDefault()
+    public function testGeneratesAtMost100ValuesByDefault()
     {
         $maps = Map::of(
             'string',
@@ -32,10 +35,12 @@ class MapTest extends TestCase
             Set\Integers::any()
         );
 
-        $this->assertInstanceOf(\Generator::class, $maps->values());
-        $this->assertCount(100, \iterator_to_array($maps->values()));
+        $this->assertInstanceOf(\Generator::class, $maps->values(new RandomInt));
+        $count = \count(\iterator_to_array($maps->values(new RandomInt)));
+        $this->assertLessThanOrEqual(100, $count);
+        $this->assertGreaterThan(10, $count);
 
-        foreach ($maps->values() as $map) {
+        foreach ($maps->values(new RandomInt) as $map) {
             $this->assertInstanceOf(Set\Value::class, $map);
             $this->assertInstanceOf(Structure::class, $map->unwrap());
             $this->assertSame('string', (string) $map->unwrap()->keyType());
@@ -54,7 +59,7 @@ class MapTest extends TestCase
         );
         $sizes = [];
 
-        foreach ($maps->values() as $map) {
+        foreach ($maps->values(new RandomInt) as $map) {
             $sizes[] = $map->unwrap()->size();
         }
 
@@ -73,8 +78,11 @@ class MapTest extends TestCase
 
         $this->assertNotSame($maps1, $maps2);
         $this->assertInstanceOf(Set::class, $maps2);
-        $this->assertCount(100, \iterator_to_array($maps1->values()));
-        $this->assertCount(50, \iterator_to_array($maps2->values()));
+        $count1 = \count(\iterator_to_array($maps1->values(new RandomInt)));
+        $count2 = \count(\iterator_to_array($maps2->values(new RandomInt)));
+        $this->assertLessThanOrEqual(100, $count1);
+        $this->assertLessThanOrEqual(50, $count2);
+        $this->assertGreaterThan($count2, $count1);
     }
 
     public function testFilter()
@@ -94,14 +102,14 @@ class MapTest extends TestCase
 
         $this->assertTrue(
             \array_reduce(
-                \iterator_to_array($maps->values()),
+                \iterator_to_array($maps->values(new RandomInt)),
                 $hasOddMap,
                 false,
             ),
         );
         $this->assertFalse(
             \array_reduce(
-                \iterator_to_array($maps2->values()),
+                \iterator_to_array($maps2->values(new RandomInt)),
                 $hasOddMap,
                 false,
             ),
@@ -120,7 +128,7 @@ class MapTest extends TestCase
             Set\Chars::any(),
         );
 
-        foreach ($maps->values() as $map) {
+        foreach ($maps->values(new RandomInt) as $map) {
             $this->assertFalse($map->isImmutable());
             $this->assertNotSame($map->unwrap(), $map->unwrap());
             $this->assertSame($map->unwrap()->size(), $map->unwrap()->size());
@@ -139,7 +147,7 @@ class MapTest extends TestCase
             ),
         );
 
-        foreach ($maps->values() as $map) {
+        foreach ($maps->values(new RandomInt) as $map) {
             $this->assertFalse($map->isImmutable());
             $this->assertNotSame($map->unwrap(), $map->unwrap());
         }
@@ -155,7 +163,7 @@ class MapTest extends TestCase
             Set\Integers::between(1, 100),
         );
 
-        foreach ($maps->values() as $value) {
+        foreach ($maps->values(new RandomInt) as $value) {
             $this->assertTrue($value->shrinkable());
         }
     }
@@ -170,7 +178,7 @@ class MapTest extends TestCase
             Set\Integers::below(1),
         );
 
-        foreach ($maps->values() as $value) {
+        foreach ($maps->values(new RandomInt) as $value) {
             if (!$value->unwrap()->empty()) {
                 // as it can generate maps of 1 element
                 continue;
@@ -190,7 +198,7 @@ class MapTest extends TestCase
             Set\Integers::between(3, 100),
         );
 
-        foreach ($maps->values() as $value) {
+        foreach ($maps->values(new RandomInt) as $value) {
             if ($value->unwrap()->size() < 4) {
                 // when generating the lower bound it will shrink identity values
                 continue;
@@ -211,7 +219,7 @@ class MapTest extends TestCase
             Set\Integers::between(2, 100),
         );
 
-        foreach ($maps->values() as $value) {
+        foreach ($maps->values(new RandomInt) as $value) {
             if ($value->unwrap()->size() < 4) {
                 // otherwise strategy A will return it's identity since 3/2 won't
                 // match the predicate of minimum size 2, so strategy will return
@@ -223,7 +231,6 @@ class MapTest extends TestCase
 
             $this->assertLessThan($value->unwrap()->size(), $dichotomy->a()->unwrap()->size());
             $this->assertLessThan($value->unwrap()->size(), $dichotomy->b()->unwrap()->size());
-            return;
         }
     }
 
@@ -237,7 +244,7 @@ class MapTest extends TestCase
             Set\Integers::between(3, 100),
         );
 
-        foreach ($maps->values() as $value) {
+        foreach ($maps->values(new RandomInt) as $value) {
             if ($value->unwrap()->size() < 6) {
                 // otherwise strategy A will return it's identity since 5/2 won't
                 // match the predicate of minimum size 3, so strategy will return
@@ -261,7 +268,7 @@ class MapTest extends TestCase
             Set\Integers::between(1, 100),
         );
 
-        foreach ($maps->values() as $value) {
+        foreach ($maps->values(new RandomInt) as $value) {
             $dichotomy = $value->shrink();
 
             $this->assertTrue($dichotomy->a()->isImmutable());
@@ -279,7 +286,7 @@ class MapTest extends TestCase
             Set\Integers::between(1, 100),
         );
 
-        foreach ($maps->values() as $value) {
+        foreach ($maps->values(new RandomInt) as $value) {
             $dichotomy = $value->shrink();
 
             $this->assertFalse($dichotomy->a()->isImmutable());

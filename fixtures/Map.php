@@ -4,7 +4,11 @@ declare(strict_types = 1);
 namespace Fixtures\Innmind\Immutable;
 
 use Innmind\BlackBox\Set;
-use Innmind\Immutable\Map as Structure;
+use Innmind\Immutable\{
+    Map as Structure,
+    Set as ISet,
+    Sequence as ISequence,
+};
 
 final class Map
 {
@@ -39,7 +43,12 @@ final class Map
                     ),
                 ),
                 $sizes,
-            ),
+            )->filter(static function(array $pairs): bool {
+                $keys = \array_column($pairs, 0);
+
+                // checks unicity of values
+                return ISequence::mixed(...$keys)->size() === ISet::mixed(...$keys)->size();
+            }),
         );
     }
 }
