@@ -4,7 +4,10 @@ declare(strict_types = 1);
 namespace Tests\Innmind\Immutable\Fixtures;
 
 use Innmind\Immutable\Set as Structure;
-use Innmind\BlackBox\Set as DataSet;
+use Innmind\BlackBox\{
+    Set as DataSet,
+    Random\RandomInt,
+};
 use Fixtures\Innmind\Immutable\Set;
 use PHPUnit\Framework\TestCase;
 
@@ -22,10 +25,10 @@ class SetTest extends TestCase
     {
         $sets = Set::of('string', new DataSet\Chars);
 
-        $this->assertInstanceOf(\Generator::class, $sets->values());
-        $this->assertCount(100, \iterator_to_array($sets->values()));
+        $this->assertInstanceOf(\Generator::class, $sets->values(new RandomInt));
+        $this->assertCount(100, \iterator_to_array($sets->values(new RandomInt)));
 
-        foreach ($sets->values() as $set) {
+        foreach ($sets->values(new RandomInt) as $set) {
             $this->assertInstanceOf(DataSet\Value::class, $set);
             $this->assertInstanceOf(Structure::class, $set->unwrap());
             $this->assertSame('string', (string) $set->unwrap()->type());
@@ -41,7 +44,7 @@ class SetTest extends TestCase
         );
         $sizes = [];
 
-        foreach ($sets->values() as $set) {
+        foreach ($sets->values(new RandomInt) as $set) {
             $sizes[] = $set->unwrap()->size();
         }
 
@@ -55,8 +58,8 @@ class SetTest extends TestCase
 
         $this->assertNotSame($sets1, $sets2);
         $this->assertInstanceOf(DataSet::class, $sets2);
-        $this->assertCount(100, \iterator_to_array($sets1->values()));
-        $this->assertCount(50, \iterator_to_array($sets2->values()));
+        $this->assertCount(100, \iterator_to_array($sets1->values(new RandomInt)));
+        $this->assertCount(50, \iterator_to_array($sets2->values(new RandomInt)));
     }
 
     public function testFilter()
@@ -71,14 +74,14 @@ class SetTest extends TestCase
 
         $this->assertTrue(
             \array_reduce(
-                \iterator_to_array($sets->values()),
+                \iterator_to_array($sets->values(new RandomInt)),
                 $hasOddSet,
                 false,
             ),
         );
         $this->assertFalse(
             \array_reduce(
-                \iterator_to_array($sets2->values()),
+                \iterator_to_array($sets2->values(new RandomInt)),
                 $hasOddSet,
                 false,
             ),
@@ -95,7 +98,7 @@ class SetTest extends TestCase
             ),
         );
 
-        foreach ($sets->values() as $set) {
+        foreach ($sets->values(new RandomInt) as $set) {
             $this->assertFalse($set->isImmutable());
             $this->assertNotSame($set->unwrap(), $set->unwrap());
             $this->assertSame($set->unwrap()->size(), $set->unwrap()->size());
@@ -106,7 +109,7 @@ class SetTest extends TestCase
     {
         $sets = Set::of('string', DataSet\Chars::any(), DataSet\Integers::between(1, 100));
 
-        foreach ($sets->values() as $value) {
+        foreach ($sets->values(new RandomInt) as $value) {
             $this->assertTrue($value->shrinkable());
         }
     }
@@ -115,7 +118,7 @@ class SetTest extends TestCase
     {
         $sets = Set::of('string', DataSet\Chars::any(), DataSet\Integers::below(1));
 
-        foreach ($sets->values() as $value) {
+        foreach ($sets->values(new RandomInt) as $value) {
             if (!$value->unwrap()->empty()) {
                 // as it can generate sets of 1 element
                 continue;
@@ -129,7 +132,7 @@ class SetTest extends TestCase
     {
         $sets = Set::of('string', DataSet\Chars::any(), DataSet\Integers::between(3, 100));
 
-        foreach ($sets->values() as $value) {
+        foreach ($sets->values(new RandomInt) as $value) {
             if ($value->unwrap()->size() === 3) {
                 // when generating the lower bound it will shrink identity values
                 continue;
@@ -147,7 +150,7 @@ class SetTest extends TestCase
     {
         $sets = Set::of('string', DataSet\Chars::any(), DataSet\Integers::between(2, 100));
 
-        foreach ($sets->values() as $value) {
+        foreach ($sets->values(new RandomInt) as $value) {
             if ($value->unwrap()->size() < 4) {
                 // otherwise strategy A will return it's identity since 3/2 won't
                 // match the predicate of minimum size 2, so strategy will return
@@ -166,7 +169,7 @@ class SetTest extends TestCase
     {
         $sets = Set::of('string', DataSet\Chars::any(), DataSet\Integers::between(3, 100));
 
-        foreach ($sets->values() as $value) {
+        foreach ($sets->values(new RandomInt) as $value) {
             if ($value->unwrap()->size() < 6) {
                 // otherwise strategy A will return it's identity since 5/2 won't
                 // match the predicate of minimum size 3, so strategy will return
@@ -184,7 +187,7 @@ class SetTest extends TestCase
     {
         $sets = Set::of('string', DataSet\Chars::any(), DataSet\Integers::between(1, 100));
 
-        foreach ($sets->values() as $value) {
+        foreach ($sets->values(new RandomInt) as $value) {
             $dichotomy = $value->shrink();
 
             $this->assertTrue($dichotomy->a()->isImmutable());
@@ -200,7 +203,7 @@ class SetTest extends TestCase
             DataSet\Integers::between(1, 100),
         );
 
-        foreach ($sets->values() as $value) {
+        foreach ($sets->values(new RandomInt) as $value) {
             $dichotomy = $value->shrink();
 
             $this->assertFalse($dichotomy->a()->isImmutable());

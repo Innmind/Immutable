@@ -4,7 +4,10 @@ declare(strict_types = 1);
 namespace Tests\Innmind\Immutable\Fixtures;
 
 use Innmind\Immutable\Sequence as Structure;
-use Innmind\BlackBox\Set;
+use Innmind\BlackBox\{
+    Set,
+    Random\RandomInt,
+};
 use Fixtures\Innmind\Immutable\Sequence;
 use PHPUnit\Framework\TestCase;
 
@@ -22,10 +25,10 @@ class SequenceTest extends TestCase
     {
         $sequences = Sequence::of('string', new Set\Chars);
 
-        $this->assertInstanceOf(\Generator::class, $sequences->values());
-        $this->assertCount(100, \iterator_to_array($sequences->values()));
+        $this->assertInstanceOf(\Generator::class, $sequences->values(new RandomInt));
+        $this->assertCount(100, \iterator_to_array($sequences->values(new RandomInt)));
 
-        foreach ($sequences->values() as $sequence) {
+        foreach ($sequences->values(new RandomInt) as $sequence) {
             $this->assertInstanceOf(Set\Value::class, $sequence);
             $this->assertInstanceOf(Structure::class, $sequence->unwrap());
             $this->assertSame('string', (string) $sequence->unwrap()->type());
@@ -41,7 +44,7 @@ class SequenceTest extends TestCase
         );
         $sizes = [];
 
-        foreach ($sequences->values() as $sequence) {
+        foreach ($sequences->values(new RandomInt) as $sequence) {
             $sizes[] = $sequence->unwrap()->size();
         }
 
@@ -55,8 +58,8 @@ class SequenceTest extends TestCase
 
         $this->assertNotSame($sequences1, $sequences2);
         $this->assertInstanceOf(Set::class, $sequences2);
-        $this->assertCount(100, \iterator_to_array($sequences1->values()));
-        $this->assertCount(50, \iterator_to_array($sequences2->values()));
+        $this->assertCount(100, \iterator_to_array($sequences1->values(new RandomInt)));
+        $this->assertCount(50, \iterator_to_array($sequences2->values(new RandomInt)));
     }
 
     public function testFilter()
@@ -71,14 +74,14 @@ class SequenceTest extends TestCase
 
         $this->assertTrue(
             \array_reduce(
-                \iterator_to_array($sequences->values()),
+                \iterator_to_array($sequences->values(new RandomInt)),
                 $hasOddSequence,
                 false,
             ),
         );
         $this->assertFalse(
             \array_reduce(
-                \iterator_to_array($sequences2->values()),
+                \iterator_to_array($sequences2->values(new RandomInt)),
                 $hasOddSequence,
                 false,
             ),
@@ -95,7 +98,7 @@ class SequenceTest extends TestCase
             ),
         );
 
-        foreach ($sequences->values() as $sequence) {
+        foreach ($sequences->values(new RandomInt) as $sequence) {
             $this->assertFalse($sequence->isImmutable());
             $this->assertNotSame($sequence->unwrap(), $sequence->unwrap());
             $this->assertSame($sequence->unwrap()->size(), $sequence->unwrap()->size());
@@ -106,7 +109,7 @@ class SequenceTest extends TestCase
     {
         $sequences = Sequence::of('string', Set\Chars::any(), Set\Integers::between(1, 100));
 
-        foreach ($sequences->values() as $value) {
+        foreach ($sequences->values(new RandomInt) as $value) {
             $this->assertTrue($value->shrinkable());
         }
     }
@@ -115,7 +118,7 @@ class SequenceTest extends TestCase
     {
         $sequences = Sequence::of('string', Set\Chars::any(), Set\Integers::below(1));
 
-        foreach ($sequences->values() as $value) {
+        foreach ($sequences->values(new RandomInt) as $value) {
             if (!$value->unwrap()->empty()) {
                 // as it can generate sequences of 1 element
                 continue;
@@ -129,7 +132,7 @@ class SequenceTest extends TestCase
     {
         $sequences = Sequence::of('string', Set\Chars::any(), Set\Integers::between(3, 100));
 
-        foreach ($sequences->values() as $value) {
+        foreach ($sequences->values(new RandomInt) as $value) {
             if ($value->unwrap()->size() === 3) {
                 // when generating the lower bound it will shrink identity values
                 continue;
@@ -147,7 +150,7 @@ class SequenceTest extends TestCase
     {
         $sequences = Sequence::of('string', Set\Chars::any(), Set\Integers::between(2, 100));
 
-        foreach ($sequences->values() as $value) {
+        foreach ($sequences->values(new RandomInt) as $value) {
             if ($value->unwrap()->size() < 4) {
                 // otherwise strategy A will return it's identity since 3/2 won't
                 // match the predicate of minimum size 2, so strategy will return
@@ -166,7 +169,7 @@ class SequenceTest extends TestCase
     {
         $sequences = Sequence::of('string', Set\Chars::any(), Set\Integers::between(3, 100));
 
-        foreach ($sequences->values() as $value) {
+        foreach ($sequences->values(new RandomInt) as $value) {
             if ($value->unwrap()->size() < 6) {
                 // otherwise strategy A will return it's identity since 5/2 won't
                 // match the predicate of minimum size 3, so strategy will return
@@ -184,7 +187,7 @@ class SequenceTest extends TestCase
     {
         $sequences = Sequence::of('string', Set\Chars::any(), Set\Integers::between(1, 100));
 
-        foreach ($sequences->values() as $value) {
+        foreach ($sequences->values(new RandomInt) as $value) {
             $dichotomy = $value->shrink();
 
             $this->assertTrue($dichotomy->a()->isImmutable());
@@ -200,7 +203,7 @@ class SequenceTest extends TestCase
             Set\Integers::between(1, 100),
         );
 
-        foreach ($sequences->values() as $value) {
+        foreach ($sequences->values(new RandomInt) as $value) {
             $dichotomy = $value->shrink();
 
             $this->assertFalse($dichotomy->a()->isImmutable());
