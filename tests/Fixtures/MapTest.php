@@ -226,7 +226,6 @@ class MapTest extends TestCase
 
             $this->assertLessThan($value->unwrap()->size(), $dichotomy->a()->unwrap()->size());
             $this->assertLessThan($value->unwrap()->size(), $dichotomy->b()->unwrap()->size());
-            return;
         }
     }
 
