@@ -66,7 +66,15 @@ final class Accumulate implements \Iterator
 
     public function valid(): bool
     {
-        return !$this->reachedCacheEnd() || $this->generator->valid();
+        $valid = !$this->reachedCacheEnd() || $this->generator->valid();
+
+        if (!$valid) {
+            // once the "true" end has been reached we automatically rewind this
+            // iterator so it is always in a clean state
+            $this->rewind();
+        }
+
+        return $valid;
     }
 
     private function reachedCacheEnd(): bool

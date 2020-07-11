@@ -51,4 +51,25 @@ class AccumulateTest extends TestCase
         $this->assertFalse($loaded);
         $this->assertSame([1, 2, 3, 4], \iterator_to_array($iterator));
     }
+
+    public function testMixingPartialIterationsInGeneratorsCompositionDoesntTamperIteration()
+    {
+        $initial = new Accumulate((function() {
+            yield 1;
+            yield 2;
+        })());
+        $decorate = (function($initial) {
+            foreach ($initial as $i) {
+                yield $i;
+            }
+
+            yield 3;
+        })($initial);
+        $iterator = new Accumulate($decorate);
+        $iterator->rewind();
+
+        $this->assertTrue($iterator->valid());
+        $this->assertSame([1, 2], \iterator_to_array($initial));
+        $this->assertSame([1, 2, 3], \iterator_to_array($iterator));
+    }
 }
