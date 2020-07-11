@@ -20,6 +20,7 @@ final class Primitive implements Implementation
 {
     private string $type;
     private ValidateArgument $validate;
+    /** @var Sequence\Implementation<T> */
     private Sequence\Implementation $values;
 
     /**
@@ -29,6 +30,7 @@ final class Primitive implements Implementation
     {
         $this->type = $type;
         $this->validate = Type::of($type);
+        /** @var Sequence\Implementation<T> */
         $this->values = (new Sequence\Primitive($type, ...$values))->distinct();
     }
 
@@ -214,7 +216,7 @@ final class Primitive implements Implementation
             return $returned;
         };
 
-        /** @psalm-suppress MissingParamType */
+        /** @psalm-suppress MissingClosureParamType */
         return $this->reduce(
             $this->clear(),
             static fn(self $carry, $value): self => ($carry)($function($value)),

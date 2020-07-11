@@ -483,13 +483,14 @@ final class Primitive implements Implementation
      */
     public function toSequenceOf(string $type, callable $mapper = null): Sequence
     {
-        /** @psalm-suppress MissingParamType */
+        /** @psalm-suppress MissingClosureParamType */
         $mapper ??= static fn($v): \Generator => yield $v;
 
         /** @var Sequence<ST> */
         $sequence = Sequence::of($type);
 
         foreach ($this->values as $value) {
+            /** @var ST $newValue */
             foreach ($mapper($value) as $newValue) {
                 $sequence = ($sequence)($newValue);
             }
@@ -507,13 +508,14 @@ final class Primitive implements Implementation
      */
     public function toSetOf(string $type, callable $mapper = null): Set
     {
-        /** @psalm-suppress MissingParamType */
+        /** @psalm-suppress MissingClosureParamType */
         $mapper ??= static fn($v): \Generator => yield $v;
 
         /** @var Set<ST> */
         $set = Set::of($type);
 
         foreach ($this->values as $value) {
+            /** @var ST $newValue */
             foreach ($mapper($value) as $newValue) {
                 $set = ($set)($newValue);
             }

@@ -421,13 +421,17 @@ final class Primitive implements Implementation
      */
     public function toMapOf(string $key, string $value, callable $mapper = null): Map
     {
-        /** @psalm-suppress MissingParamType */
+        /** @psalm-suppress MissingClosureParamType */
         $mapper ??= static fn($k, $v): \Generator => yield $k => $v;
 
         /** @var Map<MT, MS> */
         $map = Map::of($key, $value);
 
         foreach ($this->values as $key => $value) {
+            /**
+             * @var MT $newKey
+             * @var MS $newValue
+             */
             foreach ($mapper($key, $value) as $newKey => $newValue) {
                 $map = ($map)($newKey, $newValue);
             }

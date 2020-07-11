@@ -250,7 +250,7 @@ final class ObjectKeys implements Implementation
      */
     public function keys(): Set
     {
-        /** @psalm-suppress MissingParamType */
+        /** @psalm-suppress MissingClosureParamType */
         return $this->reduce(
             Set::of($this->keyType),
             static fn(Set $keys, $key): Set => ($keys)($key),
@@ -262,7 +262,7 @@ final class ObjectKeys implements Implementation
      */
     public function values(): Sequence
     {
-        /** @psalm-suppress MissingParamType */
+        /** @psalm-suppress MissingClosureParamType */
         return $this->reduce(
             Sequence::of($this->valueType),
             static fn(Sequence $values, $key, $value): Sequence => ($values)($value),
@@ -464,7 +464,7 @@ final class ObjectKeys implements Implementation
      */
     public function toMapOf(string $key, string $value, callable $mapper = null): Map
     {
-        /** @psalm-suppress MissingParamType */
+        /** @psalm-suppress MissingClosureParamType */
         $mapper ??= static fn($k, $v): \Generator => yield $k => $v;
 
         /** @var Map<MT, MS> */
@@ -476,6 +476,10 @@ final class ObjectKeys implements Implementation
             /** @var S $v */
             $v = $this->values[$k];
 
+            /**
+             * @var MT $newKey
+             * @var MS $newValue
+             */
             foreach ($mapper($key, $v) as $newKey => $newValue) {
                 $map = ($map)($newKey, $newValue);
             }

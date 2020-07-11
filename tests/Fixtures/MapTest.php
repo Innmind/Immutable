@@ -199,7 +199,7 @@ class MapTest extends TestCase
         );
 
         foreach ($maps->values(new RandomInt) as $value) {
-            if ($value->unwrap()->size() < 4) {
+            if ($value->unwrap()->size() < 6) {
                 // when generating the lower bound it will shrink identity values
                 continue;
             }

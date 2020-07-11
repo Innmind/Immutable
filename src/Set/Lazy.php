@@ -20,6 +20,7 @@ final class Lazy implements Implementation
 {
     private string $type;
     private ValidateArgument $validate;
+    /** @var Sequence\Implementation<T> */
     private Sequence\Implementation $values;
 
     /**
@@ -29,6 +30,7 @@ final class Lazy implements Implementation
     {
         $this->type = $type;
         $this->validate = Type::of($type);
+        /** @var Sequence\Implementation<T> */
         $this->values = (new Sequence\Lazy($type, $generator))->distinct();
     }
 

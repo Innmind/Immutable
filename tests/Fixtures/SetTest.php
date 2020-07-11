@@ -138,7 +138,7 @@ class SetTest extends TestCase
         $sets = Set::of('string', DataSet\Chars::any(), DataSet\Integers::between(3, 100));
 
         foreach ($sets->values(new RandomInt) as $value) {
-            if ($value->unwrap()->size() === 3) {
+            if ($value->unwrap()->size() < 6) {
                 // when generating the lower bound it will shrink identity values
                 continue;
             }

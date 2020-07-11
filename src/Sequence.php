@@ -18,8 +18,12 @@ final class Sequence implements \Countable
 {
     private string $type;
     private ValidateArgument $validate;
+    /** @var Sequence\Implementation<T> */
     private Sequence\Implementation $implementation;
 
+    /**
+     * @param Sequence\Implementation<T> $implementation
+     */
     private function __construct(string $type, Sequence\Implementation $implementation)
     {
         $this->type = $type;
@@ -381,7 +385,7 @@ final class Sequence implements \Countable
     {
         /**
          * @psalm-suppress MixedArgument
-         * @psalm-suppress MissingParamType
+         * @psalm-suppress MissingClosureParamType
          */
         return $this->toSequenceOf(
             $type,
