@@ -15,6 +15,7 @@ final class Set implements \Countable
 {
     private string $type;
     private ValidateArgument $validate;
+    /** @var Set\Implementation<T> */
     private Set\Implementation $implementation;
 
     /**
@@ -338,7 +339,7 @@ final class Set implements \Countable
     {
         /**
          * @psalm-suppress MixedArgument
-         * @psalm-suppress MissingParamType
+         * @psalm-suppress MissingClosureParamType
          */
         return $this->toSetOf(
             $type,

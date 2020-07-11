@@ -593,7 +593,7 @@ final class Lazy implements Implementation
      */
     public function toSequenceOf(string $type, callable $mapper = null): Sequence
     {
-        /** @psalm-suppress MissingParamType */
+        /** @psalm-suppress MissingClosureParamType */
         $mapper ??= static fn($v): \Generator => yield $v;
         $values = $this->values;
 
@@ -621,7 +621,7 @@ final class Lazy implements Implementation
      */
     public function toSetOf(string $type, callable $mapper = null): Set
     {
-        /** @psalm-suppress MissingParamType */
+        /** @psalm-suppress MissingClosureParamType */
         $mapper ??= static fn($v): \Generator => yield $v;
         $values = $this->values;
 

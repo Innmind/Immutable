@@ -491,9 +491,12 @@ final class Defer implements Implementation
         return new self(
             $this->type,
             (static function(\Iterator $values, callable $function): \Generator {
-                /** @var callable(T, T): int $function */
+                /** @var callable(T, T): int $sorter */
+                $sorter = $function;
+
+                /** @var list<T> */
                 $values = \iterator_to_array($values);
-                \usort($values, $function);
+                \usort($values, $sorter);
 
                 /** @var T $value */
                 foreach ($values as $value) {
@@ -559,7 +562,7 @@ final class Defer implements Implementation
      */
     public function toSequenceOf(string $type, callable $mapper = null): Sequence
     {
-        /** @psalm-suppress MissingParamType */
+        /** @psalm-suppress MissingClosureParamType */
         $mapper ??= static fn($v): \Generator => yield $v;
 
         /** @psalm-suppress MissingClosureParamType */
@@ -586,7 +589,7 @@ final class Defer implements Implementation
      */
     public function toSetOf(string $type, callable $mapper = null): Set
     {
-        /** @psalm-suppress MissingParamType */
+        /** @psalm-suppress MissingClosureParamType */
         $mapper ??= static fn($v): \Generator => yield $v;
 
         /** @psalm-suppress MissingClosureParamType */
