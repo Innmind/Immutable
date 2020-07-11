@@ -133,7 +133,7 @@ class SequenceTest extends TestCase
         $sequences = Sequence::of('string', Set\Chars::any(), Set\Integers::between(3, 100));
 
         foreach ($sequences->values(new RandomInt) as $value) {
-            if ($value->unwrap()->size() === 3) {
+            if ($value->unwrap()->size() < 6) {
                 // when generating the lower bound it will shrink identity values
                 continue;
             }
