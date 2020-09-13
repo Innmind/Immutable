@@ -225,6 +225,39 @@ final class Map implements \Countable
     }
 
     /**
+     * Return a new map of pairs' sequences grouped by keys determined with the given
+     * discriminator function
+     *
+     * @template D
+     * @param string $type D
+     * @param callable(T, S): D $discriminator
+     *
+     * @return self<D, self<T, S>>
+     */
+    public function group(string $type, callable $discriminator): self
+    {
+        /**
+         * @psalm-suppress MissingClosureParamType
+         * @var self<D, self<T, S>>
+         */
+        return $this->reduce(
+            self::of($type, self::class),
+            function(self $groups, $key, $value) use ($discriminator): Map {
+                /**
+                 * @var T $key
+                 * @var S $value
+                 */
+
+                $discriminant = $discriminator($key, $value);
+                /** @var self<T, S> */
+                $group = $groups->contains($discriminant) ? $groups->get($discriminant) : $this->clear();
+
+                return ($groups)($discriminant, ($group)($key, $value));
+            },
+        );
+    }
+
+    /**
      * Return all keys
      *
      * @return Set<T>
@@ -361,5 +394,35 @@ final class Map implements \Countable
     public function toMapOf(string $key, string $value, callable $mapper = null): self
     {
         return $this->implementation->toMapOf($key, $value, $mapper);
+    }
+
+    /**
+     * @param callable(T, S): bool $predicate
+     */
+    public function matches(callable $predicate): bool
+    {
+        /**
+         * @psalm-suppress MixedArgument
+         * @psalm-suppress MissingClosureParamType
+         */
+        return $this->reduce(
+            true,
+            static fn(bool $matches, $key, $value): bool => $matches && $predicate($key, $value),
+        );
+    }
+
+    /**
+     * @param callable(T, S): bool $predicate
+     */
+    public function any(callable $predicate): bool
+    {
+        /**
+         * @psalm-suppress MixedArgument
+         * @psalm-suppress MissingClosureParamType
+         */
+        return $this->reduce(
+            false,
+            static fn(bool $any, $key, $value): bool => $any || $predicate($key, $value),
+        );
     }
 }

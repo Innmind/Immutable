@@ -311,6 +311,36 @@ final class Set implements \Countable
     }
 
     /**
+     * Return a new map of pairs grouped by keys determined with the given
+     * discriminator function
+     *
+     * @template D
+     * @param string $type D
+     * @param callable(T): D $discriminator
+     *
+     * @return Map<D, self<T>>
+     */
+    public function group(string $type, callable $discriminator): Map
+    {
+        /**
+         * @psalm-suppress MissingClosureParamType
+         * @var Map<D, self<T>>
+         */
+        return $this->reduce(
+            Map::of($type, Set::class),
+            function(Map $groups, $value) use ($discriminator): Map {
+                /** @var T $value */
+
+                $key = $discriminator($value);
+                /** @var self<T> */
+                $group = $groups->contains($key) ? $groups->get($key) : $this->clear();
+
+                return ($groups)($key, ($group)($value));
+            },
+        );
+    }
+
+    /**
      * Return a new set by applying the given function to all elements
      *
      * @param callable(T): T $function
@@ -470,5 +500,34 @@ final class Set implements \Countable
     {
         /** @var T */
         return $this->implementation->find($predicate);
+    }
+
+    /**
+     * @param callable(T): bool $predicate
+     */
+    public function matches(callable $predicate): bool
+    {
+        /**
+         * @psalm-suppress MixedArgument
+         * @psalm-suppress MissingClosureParamType
+         */
+        return $this->reduce(
+            true,
+            static fn(bool $matches, $value): bool => $matches && $predicate($value),
+        );
+    }
+
+    /**
+     * @param callable(T): bool $predicate
+     */
+    public function any(callable $predicate): bool
+    {
+        try {
+            $this->find($predicate);
+
+            return true;
+        } catch (NoElementMatchingPredicateFound $e) {
+            return false;
+        }
     }
 }
