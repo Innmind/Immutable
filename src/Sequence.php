@@ -656,4 +656,19 @@ final class Sequence implements \Countable
         /** @var T */
         return $this->implementation->find($predicate);
     }
+
+    /**
+     * @param callable(T): bool $predicate
+     */
+    public function matches(callable $predicate): bool
+    {
+        /**
+         * @psalm-suppress MixedArgument
+         * @psalm-suppress MissingClosureParamType
+         */
+        return $this->reduce(
+            true,
+            static fn(bool $matches, $value): bool => $matches && $predicate($value),
+        );
+    }
 }

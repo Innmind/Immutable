@@ -527,4 +527,12 @@ class SetTest extends TestCase
 
         $sequence->find(fn($i) => $i === 0);
     }
+
+    public function testMatches()
+    {
+        $set = Set::ints(1, 2, 3);
+
+        $this->assertTrue($set->matches(fn($i) => $i % 1 === 0));
+        $this->assertFalse($set->matches(fn($i) => $i % 2 === 0));
+    }
 }

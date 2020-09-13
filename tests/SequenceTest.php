@@ -770,4 +770,12 @@ class SequenceTest extends TestCase
 
         $sequence->find(fn($i) => $i === 0);
     }
+
+    public function testMatches()
+    {
+        $sequence = Sequence::ints(1, 2, 3);
+
+        $this->assertTrue($sequence->matches(fn($i) => $i % 1 === 0));
+        $this->assertFalse($sequence->matches(fn($i) => $i % 2 === 0));
+    }
 }

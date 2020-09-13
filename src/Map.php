@@ -362,4 +362,19 @@ final class Map implements \Countable
     {
         return $this->implementation->toMapOf($key, $value, $mapper);
     }
+
+    /**
+     * @param callable(T, S): bool $predicate
+     */
+    public function matches(callable $predicate): bool
+    {
+        /**
+         * @psalm-suppress MixedArgument
+         * @psalm-suppress MissingClosureParamType
+         */
+        return $this->reduce(
+            true,
+            static fn(bool $matches, $key, $value): bool => $matches && $predicate($key, $value),
+        );
+    }
 }

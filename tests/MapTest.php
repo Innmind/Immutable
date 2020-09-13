@@ -509,4 +509,14 @@ class MapTest extends TestCase
                 ->isOfType('stdClass', 'int')
         );
     }
+
+    public function testMatches()
+    {
+        $map = Map::of('int', 'int')
+            (1, 2)
+            (3, 4);
+
+        $this->assertTrue($map->matches(fn($key, $value) => $value % 2 === 0));
+        $this->assertFalse($map->matches(fn($key, $value) => $key % 2 === 0));
+    }
 }
