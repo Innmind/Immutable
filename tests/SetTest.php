@@ -535,4 +535,12 @@ class SetTest extends TestCase
         $this->assertTrue($set->matches(fn($i) => $i % 1 === 0));
         $this->assertFalse($set->matches(fn($i) => $i % 2 === 0));
     }
+
+    public function testAny()
+    {
+        $set = Set::ints(1, 2, 3);
+
+        $this->assertTrue($set->any(fn($i) => $i === 2));
+        $this->assertFalse($set->any(fn($i) => $i === 0));
+    }
 }

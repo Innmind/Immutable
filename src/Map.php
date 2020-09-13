@@ -377,4 +377,19 @@ final class Map implements \Countable
             static fn(bool $matches, $key, $value): bool => $matches && $predicate($key, $value),
         );
     }
+
+    /**
+     * @param callable(T, S): bool $predicate
+     */
+    public function any(callable $predicate): bool
+    {
+        /**
+         * @psalm-suppress MixedArgument
+         * @psalm-suppress MissingClosureParamType
+         */
+        return $this->reduce(
+            false,
+            static fn(bool $any, $key, $value): bool => $any || $predicate($key, $value),
+        );
+    }
 }

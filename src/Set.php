@@ -486,4 +486,18 @@ final class Set implements \Countable
             static fn(bool $matches, $value): bool => $matches && $predicate($value),
         );
     }
+
+    /**
+     * @param callable(T): bool $predicate
+     */
+    public function any(callable $predicate): bool
+    {
+        try {
+            $this->find($predicate);
+
+            return true;
+        } catch (NoElementMatchingPredicateFound $e) {
+            return false;
+        }
+    }
 }

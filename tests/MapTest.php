@@ -519,4 +519,16 @@ class MapTest extends TestCase
         $this->assertTrue($map->matches(fn($key, $value) => $value % 2 === 0));
         $this->assertFalse($map->matches(fn($key, $value) => $key % 2 === 0));
     }
+
+    public function testAny()
+    {
+        $map = Map::of('int', 'int')
+            (1, 2)
+            (3, 4);
+
+        $this->assertTrue($map->any(fn($key, $value) => $value === 4));
+        $this->assertTrue($map->any(fn($key, $value) => $key === 1));
+        $this->assertFalse($map->any(fn($key, $value) => $key === 0));
+        $this->assertFalse($map->any(fn($key, $value) => $value === 1));
+    }
 }
