@@ -293,6 +293,34 @@ class SequenceTest extends TestCase
         $this->assertSame(10, $sum);
     }
 
+    public function testGroup()
+    {
+        $sequence = Sequence::of('int')
+            ->add(1)
+            ->add(2)
+            ->add(3)
+            ->add(4);
+        $map = $sequence->group('int', function(int $value): int {
+            return $value % 3;
+        });
+
+        $this->assertInstanceOf(Map::class, $map);
+        $this->assertSame('int', $map->keyType());
+        $this->assertSame(Sequence::class, $map->valueType());
+        $this->assertCount(3, $map);
+        $this->assertSame('int', $map->get(0)->type());
+        $this->assertSame('int', $map->get(1)->type());
+        $this->assertSame('int', $map->get(2)->type());
+        $this->assertSame([3], unwrap($map->get(0)));
+        $this->assertSame([1, 4], unwrap($map->get(1)));
+        $this->assertSame([2], unwrap($map->get(2)));
+
+        $groups = Sequence::ints()->group('string', fn() => '');
+
+        $this->assertTrue($groups->isOfType('string', Sequence::class));
+        $this->assertTrue($groups->empty());
+    }
+
     public function testGroupBy()
     {
         $sequence = Sequence::of('int')

@@ -296,6 +296,36 @@ final class Sequence implements \Countable
     }
 
     /**
+     * Return a new map of pairs grouped by keys determined with the given
+     * discriminator function
+     *
+     * @template D
+     * @param string $type D
+     * @param callable(T): D $discriminator
+     *
+     * @return Map<D, self<T>>
+     */
+    public function group(string $type, callable $discriminator): Map
+    {
+        /**
+         * @psalm-suppress MissingClosureParamType
+         * @var Map<D, self<T>>
+         */
+        return $this->reduce(
+            Map::of($type, self::class),
+            function(Map $groups, $value) use ($discriminator): Map {
+                /** @var T $value */
+
+                $key = $discriminator($value);
+                /** @var self<T> */
+                $group = $groups->contains($key) ? $groups->get($key) : $this->clear();
+
+                return ($groups)($key, ($group)($value));
+            },
+        );
+    }
+
+    /**
      * Return the first element
      *
      * @return T

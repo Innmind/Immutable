@@ -228,6 +228,44 @@ class MapTest extends TestCase
         Map::of('int', 'int')->groupBy(function() {});
     }
 
+    public function testGroup()
+    {
+        $m = Map::of('int', 'int')
+            ->put(0, 1)
+            ->put(1, 2)
+            ->put(2, 3)
+            ->put(4, 5);
+
+        $m2 = $m->group('int', function(int $key, int $value) {
+            return ($key + $value) % 3;
+        });
+        $this->assertNotSame($m, $m2);
+        $this->assertInstanceOf(Map::class, $m2);
+        $this->assertSame('int', $m2->keyType());
+        $this->assertSame(Map::class, $m2->valueType());
+        $this->assertTrue($m2->contains(0));
+        $this->assertTrue($m2->contains(1));
+        $this->assertTrue($m2->contains(2));
+        $this->assertSame(2, $m2->get(0)->size());
+        $this->assertSame(1, $m2->get(1)->size());
+        $this->assertSame(1, $m2->get(2)->size());
+        $this->assertSame('int', $m2->get(0)->keyType());
+        $this->assertSame('int', $m2->get(0)->valueType());
+        $this->assertSame('int', $m2->get(1)->keyType());
+        $this->assertSame('int', $m2->get(1)->valueType());
+        $this->assertSame('int', $m2->get(2)->keyType());
+        $this->assertSame('int', $m2->get(2)->valueType());
+        $this->assertSame(1, $m2->get(1)->get(0));
+        $this->assertSame(2, $m2->get(0)->get(1));
+        $this->assertSame(3, $m2->get(2)->get(2));
+        $this->assertSame(5, $m2->get(0)->get(4));
+
+        $groups = Map::of('int', 'int')->group('string', fn() => '');
+
+        $this->assertTrue($groups->isOfType('string', Map::class));
+        $this->assertTrue($groups->empty());
+    }
+
     public function testGroupBy()
     {
         $m = Map::of('int', 'int')
@@ -260,6 +298,7 @@ class MapTest extends TestCase
         $this->assertSame(3, $m2->get(2)->get(2));
         $this->assertSame(5, $m2->get(0)->get(4));
     }
+
     public function testKeys()
     {
         $m = Map::of('int', 'int')

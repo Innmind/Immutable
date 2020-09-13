@@ -288,6 +288,32 @@ class SetTest extends TestCase
         $this->assertSame(4, $count);
     }
 
+    public function testGroup()
+    {
+        $s = Set::of('int')
+            ->add(1)
+            ->add(2)
+            ->add(3)
+            ->add(4);
+
+        $m = $s->group('int', function(int $v) {
+            return $v % 2;
+        });
+        $this->assertInstanceOf(Map::class, $m);
+        $this->assertSame('int', $m->keyType());
+        $this->assertSame(Set::class, $m->valueType());
+        $this->assertSame('int', $m->get(0)->type());
+        $this->assertSame('int', $m->get(1)->type());
+        $this->assertSame([1, 0], unwrap($m->keys()));
+        $this->assertSame([1, 3], unwrap($m->get(1)));
+        $this->assertSame([2, 4], unwrap($m->get(0)));
+
+        $groups = Set::ints()->group('string', fn() => '');
+
+        $this->assertTrue($groups->isOfType('string', Set::class));
+        $this->assertTrue($groups->empty());
+    }
+
     public function testGroupBy()
     {
         $s = Set::of('int')
