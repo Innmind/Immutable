@@ -44,7 +44,8 @@ return PhpCsFixer\Config::create()
         'modernize_types_casting' => true,
         'native_constant_invocation' => ['scope' => 'all'],
         'native_function_invocation' => [
-            'include' => ['@all'],
+            'exclude' => ['join'],
+            'include' => ['@internal'],
             'scope' => 'all',
         ],
         'new_with_braces' => false,
@@ -63,7 +64,9 @@ return PhpCsFixer\Config::create()
         'no_short_bool_cast' => true,
         'no_short_echo_tag' => true,
         'no_singleline_whitespace_before_semicolons' => true,
-        'no_spaces_around_offset' => ['positions' => ['inside', 'outside']],
+        'no_spaces_around_offset' => true,
+        'method_argument_space' => ['on_multiline' => 'ignore'],
+        'no_spaces_after_function_name' => false,
         'no_superfluous_phpdoc_tags' => [
             'allow_mixed' => true,
             'remove_inheritdoc' => true,
