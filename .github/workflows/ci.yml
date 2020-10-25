@@ -9,7 +9,7 @@ jobs:
       matrix:
         os: [ubuntu-latest, macOS-latest]
         php-version: ['7.4']
-    name: 'PHPUnit - PHP/${{ matrix.php-version }} - OS/${{ matrix.os }}'
+    name: 'PHPUnit'
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -40,7 +40,7 @@ jobs:
     strategy:
       matrix:
         php-version: ['7.4']
-    name: 'Psalm - PHP/${{ matrix.php-version }}'
+    name: 'Psalm'
     steps:
       - name: Checkout
         uses: actions/checkout@v2
