@@ -62,3 +62,30 @@ jobs:
         run: composer install --no-progress
       - name: Psalm
         run: vendor/bin/psalm --output-format=github --shepherd
+  cs:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php-version: ['7.4']
+    name: 'CS'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          extensions: mbstring, intl
+      - name: Get Composer Cache Directory
+        id: composer-cache
+        run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
+          restore-keys: ${{ runner.os }}-composer-
+      - name: Install Dependencies
+        run: composer install --no-progress
+      - name: CS
+        run: vendor/bin/php-cs-fixer fix --diff --dry-run --diff-format udiff
