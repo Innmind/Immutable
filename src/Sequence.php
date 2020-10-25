@@ -574,7 +574,6 @@ final class Sequence implements \Countable
         $self->implementation = ($this->implementation)($element);
 
         return $self;
-        return $this->add($element);
     }
 
     /**
