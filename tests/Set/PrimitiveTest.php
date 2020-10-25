@@ -105,7 +105,7 @@ class PrimitiveTest extends TestCase
     public function testFilter()
     {
         $a = new Primitive('int', 1, 2, 3, 4);
-        $b = $a->filter(fn($i) => $i % 2 === 0);
+        $b = $a->filter(static fn($i) => $i % 2 === 0);
 
         $this->assertSame([1, 2, 3, 4], \iterator_to_array($a->iterator()));
         $this->assertInstanceOf(Primitive::class, $b);
@@ -118,7 +118,7 @@ class PrimitiveTest extends TestCase
         $calls = 0;
         $sum = 0;
 
-        $this->assertNull($set->foreach(function($i) use (&$calls, &$sum) {
+        $this->assertNull($set->foreach(static function($i) use (&$calls, &$sum) {
             ++$calls;
             $sum += $i;
         }));
@@ -130,7 +130,7 @@ class PrimitiveTest extends TestCase
     public function testGroupBy()
     {
         $set = new Primitive('int', 1, 2, 3, 4);
-        $groups = $set->groupBy(fn($i) => $i % 2);
+        $groups = $set->groupBy(static fn($i) => $i % 2);
 
         $this->assertSame([1, 2, 3, 4], \iterator_to_array($set->iterator()));
         $this->assertInstanceOf(Map::class, $groups);
@@ -145,7 +145,7 @@ class PrimitiveTest extends TestCase
     public function testMap()
     {
         $a = new Primitive('int', 1, 2, 3);
-        $b = $a->map(fn($i) => $i * 2);
+        $b = $a->map(static fn($i) => $i * 2);
 
         $this->assertSame([1, 2, 3], \iterator_to_array($a->iterator()));
         $this->assertInstanceOf(Primitive::class, $b);
@@ -157,13 +157,13 @@ class PrimitiveTest extends TestCase
         $this->expectException(\TypeError::class);
         $this->expectExceptionMessage('Argument 1 must be of type int, string given');
 
-        (new Primitive('int', 1))->map(fn($i) => (string) $i);
+        (new Primitive('int', 1))->map(static fn($i) => (string) $i);
     }
 
     public function testPartition()
     {
         $set = new Primitive('int', 1, 2, 3, 4);
-        $groups = $set->partition(fn($i) => $i % 2 === 0);
+        $groups = $set->partition(static fn($i) => $i % 2 === 0);
 
         $this->assertSame([1, 2, 3, 4], \iterator_to_array($set->iterator()));
         $this->assertInstanceOf(Map::class, $groups);
@@ -178,7 +178,7 @@ class PrimitiveTest extends TestCase
     public function testSort()
     {
         $set = new Primitive('int', 1, 4, 3, 2);
-        $sorted = $set->sort(fn($a, $b) => $a > $b);
+        $sorted = $set->sort(static fn($a, $b) => $a > $b);
 
         $this->assertSame([1, 4, 3, 2], \iterator_to_array($set->iterator()));
         $this->assertInstanceOf(Sequence::class, $sorted);
@@ -201,7 +201,7 @@ class PrimitiveTest extends TestCase
     {
         $set = new Primitive('int', 1, 2, 3, 4);
 
-        $this->assertSame(10, $set->reduce(0, fn($sum, $i) => $sum + $i));
+        $this->assertSame(10, $set->reduce(0, static fn($sum, $i) => $sum + $i));
     }
 
     public function testClear()
@@ -223,7 +223,7 @@ class PrimitiveTest extends TestCase
     public function testToSequenceOf()
     {
         $set = new Primitive('int', 1, 2, 3);
-        $sequence = $set->toSequenceOf('string|int', function($i) {
+        $sequence = $set->toSequenceOf('string|int', static function($i) {
             yield (string) $i;
             yield $i;
         });
@@ -238,7 +238,7 @@ class PrimitiveTest extends TestCase
     public function testToSetOf()
     {
         $set = new Primitive('int', 1, 2, 3);
-        $set = $set->toSetOf('string|int', function($i) {
+        $set = $set->toSetOf('string|int', static function($i) {
             yield (string) $i;
             yield $i;
         });
@@ -253,7 +253,7 @@ class PrimitiveTest extends TestCase
     public function testToMapOf()
     {
         $set = new Primitive('int', 1, 2, 3);
-        $map = $set->toMapOf('string', 'int', fn($i) => yield (string) $i => $i);
+        $map = $set->toMapOf('string', 'int', static fn($i) => yield (string) $i => $i);
 
         $this->assertInstanceOf(Map::class, $map);
         $this->assertCount(3, $map);
@@ -266,12 +266,12 @@ class PrimitiveTest extends TestCase
     {
         $sequence = new Primitive('int', 1, 2, 3);
 
-        $this->assertSame(1, $sequence->find(fn($i) => $i === 1));
-        $this->assertSame(2, $sequence->find(fn($i) => $i === 2));
-        $this->assertSame(3, $sequence->find(fn($i) => $i === 3));
+        $this->assertSame(1, $sequence->find(static fn($i) => $i === 1));
+        $this->assertSame(2, $sequence->find(static fn($i) => $i === 2));
+        $this->assertSame(3, $sequence->find(static fn($i) => $i === 3));
 
         $this->expectException(NoElementMatchingPredicateFound::class);
 
-        $sequence->find(fn($i) => $i === 0);
+        $sequence->find(static fn($i) => $i === 0);
     }
 }

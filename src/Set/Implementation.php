@@ -18,6 +18,15 @@ use Innmind\Immutable\{
 interface Implementation extends \Countable
 {
     /**
+     * Add a element to the set
+     *
+     * @param T $element
+     *
+     * @return self<T>
+     */
+    public function __invoke($element): self;
+
+    /**
      * Return the type of this set
      */
     public function type(): string;
@@ -36,15 +45,6 @@ interface Implementation extends \Countable
      * @return self<T>
      */
     public function intersect(self $set): self;
-
-    /**
-     * Add a element to the set
-     *
-     * @param T $element
-     *
-     * @return self<T>
-     */
-    public function __invoke($element): self;
 
     /**
      * Check if the set contains the given element
@@ -191,9 +191,9 @@ interface Implementation extends \Countable
     public function toMapOf(string $key, string $value, callable $mapper): Map;
 
     /**
-     * @throws NoElementMatchingPredicateFound
-     *
      * @param callable(T): bool $predicate
+     *
+     * @throws NoElementMatchingPredicateFound
      *
      * @return T
      */

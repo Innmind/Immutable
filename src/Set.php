@@ -18,14 +18,33 @@ final class Set implements \Countable
     /** @var Set\Implementation<T> */
     private Set\Implementation $implementation;
 
-    /**
-     * {@inheritdoc}
-     */
     private function __construct(string $type, Set\Implementation $implementation)
     {
         $this->type = $type;
         $this->validate = Type::of($type);
         $this->implementation = $implementation;
+    }
+
+    /**
+     * Add an element to the set
+     *
+     * Example:
+     * <code>
+     * Set::of('int')(1)(3)
+     * </code>
+     *
+     * @param T $element
+     *
+     * @return self<T>
+     */
+    public function __invoke($element): self
+    {
+        ($this->validate)($element, 1);
+
+        $self = clone $this;
+        $self->implementation = ($this->implementation)($element);
+
+        return $self;
     }
 
     /**
@@ -148,9 +167,6 @@ final class Set implements \Countable
         return $this->implementation->size();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function count(): int
     {
         return $this->implementation->size();
@@ -185,28 +201,6 @@ final class Set implements \Countable
     public function add($element): self
     {
         return ($this)($element);
-    }
-
-    /**
-     * Add an element to the set
-     *
-     * Example:
-     * <code>
-     * Set::of('int')(1)(3)
-     * </code>
-     *
-     * @param T $element
-     *
-     * @return self<T>
-     */
-    public function __invoke($element): self
-    {
-        ($this->validate)($element, 1);
-
-        $self = clone $this;
-        $self->implementation = ($this->implementation)($element);
-
-        return $self;
     }
 
     /**
@@ -327,10 +321,9 @@ final class Set implements \Countable
          * @var Map<D, self<T>>
          */
         return $this->reduce(
-            Map::of($type, Set::class),
+            Map::of($type, self::class),
             function(Map $groups, $value) use ($discriminator): Map {
                 /** @var T $value */
-
                 $key = $discriminator($value);
                 /** @var self<T> */
                 $group = $groups->contains($key) ? $groups->get($key) : $this->clear();
@@ -490,9 +483,9 @@ final class Set implements \Countable
     }
 
     /**
-     * @throws NoElementMatchingPredicateFound
-     *
      * @param callable(T): bool $predicate
+     *
+     * @throws NoElementMatchingPredicateFound
      *
      * @return T
      */

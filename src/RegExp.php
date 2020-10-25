@@ -40,7 +40,6 @@ final class RegExp
         return (bool) $value;
     }
 
-
     /**
      * @throws RegexException
      *

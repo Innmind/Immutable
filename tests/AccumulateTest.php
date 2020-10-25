@@ -12,13 +12,13 @@ class AccumulateTest extends TestCase
     {
         $this->assertInstanceOf(
             \Iterator::class,
-            new Accumulate((function() {
+            new Accumulate((static function() {
                 yield 1;
             })()),
         );
 
         $loaded = false;
-        $iterator = new Accumulate((function() use (&$loaded) {
+        $iterator = new Accumulate((static function() use (&$loaded) {
             yield 1;
             yield 2;
             yield 3;
@@ -34,7 +34,7 @@ class AccumulateTest extends TestCase
     public function testSupportsPartialIterations()
     {
         $loaded = false;
-        $iterator = new Accumulate((function() use (&$loaded) {
+        $iterator = new Accumulate((static function() use (&$loaded) {
             yield 1;
             yield 2;
             yield 3;
@@ -54,11 +54,11 @@ class AccumulateTest extends TestCase
 
     public function testMixingPartialIterationsInGeneratorsCompositionDoesntTamperIteration()
     {
-        $initial = new Accumulate((function() {
+        $initial = new Accumulate((static function() {
             yield 1;
             yield 2;
         })());
-        $decorate = (function($initial) {
+        $decorate = (static function($initial) {
             foreach ($initial as $i) {
                 yield $i;
             }

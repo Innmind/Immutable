@@ -24,9 +24,6 @@ final class UnionType implements ValidateArgument
         $this->types = [$first, $second, ...$rest];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function __invoke($value, int $position): void
     {
         foreach ($this->types as $validate) {

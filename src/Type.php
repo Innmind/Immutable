@@ -61,8 +61,6 @@ final class Type
      * Return the type of the given value
      *
      * @param mixed $value
-     *
-     * @return string
      */
     public static function determine($value): string
     {

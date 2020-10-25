@@ -38,7 +38,7 @@ class SetTest extends TestCase
     public function testDefer()
     {
         $loaded = false;
-        $set = Set::defer('int', (function() use (&$loaded) {
+        $set = Set::defer('int', (static function() use (&$loaded) {
             yield 1;
             yield 2;
             yield 3;
@@ -54,7 +54,7 @@ class SetTest extends TestCase
     public function testLazy()
     {
         $loaded = false;
-        $set = Set::lazy('int', function() use (&$loaded) {
+        $set = Set::lazy('int', static function() use (&$loaded) {
             yield 1;
             yield 2;
             yield 3;
@@ -263,7 +263,7 @@ class SetTest extends TestCase
             ->add(3)
             ->add(4);
 
-        $s2 = $s->filter(function(int $v) {
+        $s2 = $s->filter(static function(int $v) {
             return $v % 2 === 0;
         });
         $this->assertNotSame($s, $s2);
@@ -296,7 +296,7 @@ class SetTest extends TestCase
             ->add(3)
             ->add(4);
 
-        $m = $s->group('int', function(int $v) {
+        $m = $s->group('int', static function(int $v) {
             return $v % 2;
         });
         $this->assertInstanceOf(Map::class, $m);
@@ -308,7 +308,7 @@ class SetTest extends TestCase
         $this->assertSame([1, 3], unwrap($m->get(1)));
         $this->assertSame([2, 4], unwrap($m->get(0)));
 
-        $groups = Set::ints()->group('string', fn() => '');
+        $groups = Set::ints()->group('string', static fn() => '');
 
         $this->assertTrue($groups->isOfType('string', Set::class));
         $this->assertTrue($groups->empty());
@@ -322,7 +322,7 @@ class SetTest extends TestCase
             ->add(3)
             ->add(4);
 
-        $m = $s->groupBy(function(int $v) {
+        $m = $s->groupBy(static function(int $v) {
             return $v % 2;
         });
         $this->assertInstanceOf(Map::class, $m);
@@ -343,7 +343,7 @@ class SetTest extends TestCase
             ->add(3)
             ->add(4);
 
-        $s2 = $s->map(function(int $v) {
+        $s2 = $s->map(static function(int $v) {
             return $v**2;
         });
         $this->assertNotSame($s, $s2);
@@ -356,7 +356,7 @@ class SetTest extends TestCase
     public function testMapTo()
     {
         $a = Set::ints(1, 2, 3, 4);
-        $b = $a->mapTo('string', fn($i) => (string) $i);
+        $b = $a->mapTo('string', static fn($i) => (string) $i);
 
         $this->assertInstanceOf(Set::class, $b);
         $this->assertNotSame($a, $b);
@@ -371,7 +371,7 @@ class SetTest extends TestCase
 
         Set::of('int')
             ->add(1)
-            ->map(function(int $value) {
+            ->map(static function(int $value) {
                 return (string) $value;
             });
     }
@@ -384,7 +384,7 @@ class SetTest extends TestCase
             ->add(3)
             ->add(4);
 
-        $s2 = $s->partition(function(int $v) {
+        $s2 = $s->partition(static function(int $v) {
             return $v % 2 === 0;
         });
         $this->assertNotSame($s, $s2);
@@ -408,7 +408,7 @@ class SetTest extends TestCase
             ->add(3)
             ->add(4);
 
-        $s2 = $s->sort(function(int $a, int $b) {
+        $s2 = $s->sort(static function(int $a, int $b) {
             return $a < $b;
         });
         $this->assertInstanceOf(Sequence::class, $s2);
@@ -463,7 +463,7 @@ class SetTest extends TestCase
 
         $v = $s->reduce(
             42,
-            function (float $carry, int $value): float {
+            static function(float $carry, int $value): float {
                 return $carry / $value;
             }
         );
@@ -494,7 +494,7 @@ class SetTest extends TestCase
     public function testToSequenceOf()
     {
         $set = Set::ints(1, 2, 3);
-        $sequence = $set->toSequenceOf('string|int', function($i) {
+        $sequence = $set->toSequenceOf('string|int', static function($i) {
             yield (string) $i;
             yield $i;
         });
@@ -513,7 +513,7 @@ class SetTest extends TestCase
     public function testToSetOf()
     {
         $initial = Set::ints(1, 2, 3);
-        $set = $initial->toSetOf('string|int', function($i) {
+        $set = $initial->toSetOf('string|int', static function($i) {
             yield (string) $i;
             yield $i;
         });
@@ -532,7 +532,7 @@ class SetTest extends TestCase
     public function testToMapOf()
     {
         $set = Set::ints(1, 2, 3);
-        $map = $set->toMapOf('string', 'int', fn($i) => yield (string) $i => $i);
+        $map = $set->toMapOf('string', 'int', static fn($i) => yield (string) $i => $i);
 
         $this->assertInstanceOf(Map::class, $map);
         $this->assertCount(3, $map);
@@ -545,28 +545,28 @@ class SetTest extends TestCase
     {
         $sequence = Set::ints(1, 2, 3);
 
-        $this->assertSame(1, $sequence->find(fn($i) => $i === 1));
-        $this->assertSame(2, $sequence->find(fn($i) => $i === 2));
-        $this->assertSame(3, $sequence->find(fn($i) => $i === 3));
+        $this->assertSame(1, $sequence->find(static fn($i) => $i === 1));
+        $this->assertSame(2, $sequence->find(static fn($i) => $i === 2));
+        $this->assertSame(3, $sequence->find(static fn($i) => $i === 3));
 
         $this->expectException(NoElementMatchingPredicateFound::class);
 
-        $sequence->find(fn($i) => $i === 0);
+        $sequence->find(static fn($i) => $i === 0);
     }
 
     public function testMatches()
     {
         $set = Set::ints(1, 2, 3);
 
-        $this->assertTrue($set->matches(fn($i) => $i % 1 === 0));
-        $this->assertFalse($set->matches(fn($i) => $i % 2 === 0));
+        $this->assertTrue($set->matches(static fn($i) => $i % 1 === 0));
+        $this->assertFalse($set->matches(static fn($i) => $i % 2 === 0));
     }
 
     public function testAny()
     {
         $set = Set::ints(1, 2, 3);
 
-        $this->assertTrue($set->any(fn($i) => $i === 2));
-        $this->assertFalse($set->any(fn($i) => $i === 0));
+        $this->assertTrue($set->any(static fn($i) => $i === 2));
+        $this->assertFalse($set->any(static fn($i) => $i === 0));
     }
 }

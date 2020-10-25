@@ -34,6 +34,23 @@ final class Primitive implements Implementation
         $this->values = (new Sequence\Primitive($type, ...$values))->distinct();
     }
 
+    /**
+     * @param T $element
+     *
+     * @return self<T>
+     */
+    public function __invoke($element): self
+    {
+        if ($this->contains($element)) {
+            return $this;
+        }
+
+        $set = clone $this;
+        $set->values = ($this->values)($element);
+
+        return $set;
+    }
+
     public function type(): string
     {
         return $this->type;
@@ -44,9 +61,6 @@ final class Primitive implements Implementation
         return $this->values->size();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function count(): int
     {
         return $this->values->size();
@@ -73,23 +87,6 @@ final class Primitive implements Implementation
         );
 
         return $self;
-    }
-
-    /**
-     * @param T $element
-     *
-     * @return self<T>
-     */
-    public function __invoke($element): self
-    {
-        if ($this->contains($element)) {
-            return $this;
-        }
-
-        $set = clone $this;
-        $set->values = ($this->values)($element);
-
-        return $set;
     }
 
     /**

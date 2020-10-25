@@ -32,7 +32,7 @@ final class Defer implements Implementation
     {
         $this->type = $type;
         $validate = Type::of($type);
-        $this->values = new Accumulate((function(\Generator $generator, ValidateArgument $validate): \Generator {
+        $this->values = new Accumulate((static function(\Generator $generator, ValidateArgument $validate): \Generator {
             /** @var T $value */
             foreach ($generator as $value) {
                 $validate($value, 1);
@@ -40,6 +40,27 @@ final class Defer implements Implementation
             }
         })($generator, $validate));
         $this->validate = $validate;
+    }
+
+    /**
+     * @param T $element
+     *
+     * @return Implementation<T>
+     */
+    public function __invoke($element): Implementation
+    {
+        /** @psalm-suppress MissingClosureParamType */
+        return new self(
+            $this->type,
+            (static function($values, $element): \Generator {
+                /** @var T $value */
+                foreach ($values as $value) {
+                    yield $value;
+                }
+
+                yield $element;
+            })($this->values, $element),
+        );
     }
 
     public function type(): string
@@ -140,6 +161,7 @@ final class Defer implements Implementation
                 foreach ($values as $value) {
                     if ($dropped < $toDrop) {
                         ++$dropped;
+
                         continue;
                     }
 
@@ -457,27 +479,6 @@ final class Defer implements Implementation
             /** @var T $value */
             return $sequence->contains($value);
         });
-    }
-
-    /**
-     * @param T $element
-     *
-     * @return Implementation<T>
-     */
-    public function __invoke($element): Implementation
-    {
-        /** @psalm-suppress MissingClosureParamType */
-        return new self(
-            $this->type,
-            (static function($values, $element): \Generator {
-                /** @var T $value */
-                foreach ($values as $value) {
-                    yield $value;
-                }
-
-                yield $element;
-            })($this->values, $element),
-        );
     }
 
     /**

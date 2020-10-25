@@ -21,6 +21,16 @@ use Innmind\Immutable\{
 interface Implementation extends \Countable
 {
     /**
+     * Set a new key/value pair
+     *
+     * @param T $key
+     * @param S $value
+     *
+     * @return self<T, S>
+     */
+    public function __invoke($key, $value): self;
+
+    /**
      * Return the key type for this map
      */
     public function keyType(): string;
@@ -31,16 +41,6 @@ interface Implementation extends \Countable
     public function valueType(): string;
 
     public function size(): int;
-
-    /**
-     * Set a new key/value pair
-     *
-     * @param T $key
-     * @param S $value
-     *
-     * @return self<T, S>
-     */
-    public function __invoke($key, $value): self;
 
     /**
      * Return the element with the given key

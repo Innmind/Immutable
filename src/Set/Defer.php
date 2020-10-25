@@ -34,6 +34,19 @@ final class Defer implements Implementation
         $this->values = (new Sequence\Defer($type, $generator))->distinct();
     }
 
+    /**
+     * @param T $element
+     *
+     * @return self<T>
+     */
+    public function __invoke($element): self
+    {
+        $set = clone $this;
+        $set->values = ($this->values)($element)->distinct();
+
+        return $set;
+    }
+
     public function type(): string
     {
         return $this->type;
@@ -44,9 +57,6 @@ final class Defer implements Implementation
         return $this->values->size();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function count(): int
     {
         return $this->values->size();
@@ -87,19 +97,6 @@ final class Defer implements Implementation
         );
 
         return $self;
-    }
-
-    /**
-     * @param T $element
-     *
-     * @return self<T>
-     */
-    public function __invoke($element): self
-    {
-        $set = clone $this;
-        $set->values = ($this->values)($element)->distinct();
-
-        return $set;
     }
 
     /**

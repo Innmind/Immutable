@@ -10,9 +10,6 @@ use Innmind\Immutable\{
 
 final class ResourceType implements ValidateArgument
 {
-    /**
-     * {@inheritdoc}
-     */
     public function __invoke($value, int $position): void
     {
         if (\is_resource($value)) {

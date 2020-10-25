@@ -38,6 +38,20 @@ final class Primitive implements Implementation
         $this->values = $values;
     }
 
+    /**
+     * @param T $element
+     *
+     * @return self<T>
+     */
+    public function __invoke($element): self
+    {
+        $self = clone $this;
+        $self->values[] = $element;
+        $self->size = $this->size() + 1;
+
+        return $self;
+    }
+
     public function type(): string
     {
         return $this->type;
@@ -411,20 +425,6 @@ final class Primitive implements Implementation
     }
 
     /**
-     * @param T $element
-     *
-     * @return self<T>
-     */
-    public function __invoke($element): self
-    {
-        $self = clone $this;
-        $self->values[] = $element;
-        $self->size = $this->size() + 1;
-
-        return $self;
-    }
-
-    /**
      * @param callable(T, T): int $function
      *
      * @return self<T>
@@ -523,8 +523,6 @@ final class Primitive implements Implementation
 
         return $set;
     }
-
-
 
     /**
      * @template MT

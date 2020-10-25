@@ -43,29 +43,6 @@ final class ObjectKeys implements Implementation
         $this->values = new \SplObjectStorage;
     }
 
-    public function keyType(): string
-    {
-        return $this->keyType;
-    }
-
-    public function valueType(): string
-    {
-        return $this->valueType;
-    }
-
-    public function size(): int
-    {
-        return $this->values->count();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function count(): int
-    {
-        return $this->size();
-    }
-
     /**
      * @param T $key
      * @param S $value
@@ -83,6 +60,26 @@ final class ObjectKeys implements Implementation
         $map->values[$key] = $value;
 
         return $map;
+    }
+
+    public function keyType(): string
+    {
+        return $this->keyType;
+    }
+
+    public function valueType(): string
+    {
+        return $this->valueType;
+    }
+
+    public function size(): int
+    {
+        return $this->values->count();
+    }
+
+    public function count(): int
+    {
+        return $this->size();
     }
 
     /**

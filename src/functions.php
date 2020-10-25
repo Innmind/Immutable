@@ -65,16 +65,16 @@ function join(string $separator, $structure): Str
 /**
  * @template T
  *
- * @throws EmptySet
  *
  * @param Set<T> $set
+ * @throws EmptySet
  *
  * @return T
  */
 function first(Set $set)
 {
     try {
-        return $set->find(fn(): bool => true);
+        return $set->find(static fn(): bool => true);
     } catch (NoElementMatchingPredicateFound $e) {
         throw new EmptySet;
     }
