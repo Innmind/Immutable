@@ -14,9 +14,6 @@ final class NullableType implements ValidateArgument
         $this->validate = $validate;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function __invoke($value, int $position): void
     {
         if (\is_null($value)) {

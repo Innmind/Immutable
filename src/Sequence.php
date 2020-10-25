@@ -32,6 +32,28 @@ final class Sequence implements \Countable
     }
 
     /**
+     * Add the given element at the end of the sequence
+     *
+     * Example:
+     * <code>
+     * Sequence::of('int')(1)(3)
+     * </code>
+     *
+     * @param T $element
+     *
+     * @return self<T>
+     */
+    public function __invoke($element): self
+    {
+        ($this->validate)($element, 1);
+
+        $self = clone $this;
+        $self->implementation = ($this->implementation)($element);
+
+        return $self;
+    }
+
+    /**
      * @template V
      *
      * @param V $values
@@ -161,9 +183,6 @@ final class Sequence implements \Countable
         return $this->implementation->size();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function count(): int
     {
         return $this->implementation->size();
@@ -315,7 +334,6 @@ final class Sequence implements \Countable
             Map::of($type, self::class),
             function(Map $groups, $value) use ($discriminator): Map {
                 /** @var T $value */
-
                 $key = $discriminator($value);
                 /** @var self<T> */
                 $group = $groups->contains($key) ? $groups->get($key) : $this->clear();
@@ -555,29 +573,6 @@ final class Sequence implements \Countable
     }
 
     /**
-     * Add the given element at the end of the sequence
-     *
-     * Example:
-     * <code>
-     * Sequence::of('int')(1)(3)
-     * </code>
-     *
-     * @param T $element
-     *
-     * @return self<T>
-     */
-    public function __invoke($element): self
-    {
-        ($this->validate)($element, 1);
-
-        $self = clone $this;
-        $self->implementation = ($this->implementation)($element);
-
-        return $self;
-        return $this->add($element);
-    }
-
-    /**
      * Sort the sequence in a different order
      *
      * @param callable(T, T): int $function
@@ -675,9 +670,9 @@ final class Sequence implements \Countable
     }
 
     /**
-     * @throws NoElementMatchingPredicateFound
-     *
      * @param callable(T): bool $predicate
+     *
+     * @throws NoElementMatchingPredicateFound
      *
      * @return T
      */

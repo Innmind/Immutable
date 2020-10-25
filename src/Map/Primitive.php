@@ -34,37 +34,13 @@ final class Primitive implements Implementation
     {
         $this->validateKey = Type::of($keyType);
 
-        if (!in_array($keyType, ['int', 'integer', 'string'], true)) {
+        if (!\in_array($keyType, ['int', 'integer', 'string'], true)) {
             throw new LogicException;
         }
 
         $this->validateValue = Type::of($valueType);
         $this->keyType = $keyType;
         $this->valueType = $valueType;
-    }
-
-    public function keyType(): string
-    {
-        return $this->keyType;
-    }
-
-    public function valueType(): string
-    {
-        return $this->valueType;
-    }
-
-    public function size(): int
-    {
-        /** @psalm-suppress MixedArgumentTypeCoercion */
-        return $this->size ?? $this->size = \count($this->values);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function count(): int
-    {
-        return $this->size();
     }
 
     /**
@@ -83,6 +59,27 @@ final class Primitive implements Implementation
         $map->values[$key] = $value;
 
         return $map;
+    }
+
+    public function keyType(): string
+    {
+        return $this->keyType;
+    }
+
+    public function valueType(): string
+    {
+        return $this->valueType;
+    }
+
+    public function size(): int
+    {
+        /** @psalm-suppress MixedArgumentTypeCoercion */
+        return $this->size ?? $this->size = \count($this->values);
+    }
+
+    public function count(): int
+    {
+        return $this->size();
     }
 
     /**

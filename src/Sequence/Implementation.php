@@ -21,6 +21,15 @@ use Innmind\Immutable\{
 interface Implementation extends \Countable
 {
     /**
+     * Add the given element at the end of the sequence
+     *
+     * @param T $element
+     *
+     * @return self<T>
+     */
+    public function __invoke($element): self;
+
+    /**
      * Type of the elements
      */
     public function type(): string;
@@ -221,15 +230,6 @@ interface Implementation extends \Countable
     public function intersect(self $sequence): self;
 
     /**
-     * Add the given element at the end of the sequence
-     *
-     * @param T $element
-     *
-     * @return self<T>
-     */
-    public function __invoke($element): self;
-
-    /**
      * Sort the sequence in a different order
      *
      * @param callable(T, T): int $function
@@ -294,9 +294,9 @@ interface Implementation extends \Countable
     public function toMapOf(string $key, string $value, callable $mapper): Map;
 
     /**
-     * @throws NoElementMatchingPredicateFound
-     *
      * @param callable(T): bool $predicate
+     *
+     * @throws NoElementMatchingPredicateFound
      *
      * @return T
      */

@@ -17,6 +17,9 @@ class ElementNotFoundTest extends TestCase
         $this->assertSame('array', (new ElementNotFound([1, 2]))->getMessage());
         $this->assertSame('true', (new ElementNotFound(true))->getMessage());
         $this->assertSame('false', (new ElementNotFound(false))->getMessage());
-        $this->assertRegExp('~^object\(stdClass\)\#\d+$~', (new ElementNotFound(new \stdClass))->getMessage());
+        $this->assertMatchesRegularExpression(
+            '~^object\(stdClass\)\#\d+$~',
+            (new ElementNotFound(new \stdClass))->getMessage(),
+        );
     }
 }

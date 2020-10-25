@@ -41,7 +41,7 @@ class SequenceTest extends TestCase
     public function testDefer()
     {
         $loaded = false;
-        $sequence = Sequence::defer('int', (function() use (&$loaded) {
+        $sequence = Sequence::defer('int', (static function() use (&$loaded) {
             yield 1;
             yield 2;
             yield 3;
@@ -57,7 +57,7 @@ class SequenceTest extends TestCase
     public function testLazy()
     {
         $loaded = false;
-        $sequence = Sequence::lazy('int', function() use (&$loaded) {
+        $sequence = Sequence::lazy('int', static function() use (&$loaded) {
             yield 1;
             yield 2;
             yield 3;
@@ -266,7 +266,7 @@ class SequenceTest extends TestCase
             ->add(2)
             ->add(3)
             ->add(4);
-        $b = $a->filter(function(int $value): bool {
+        $b = $a->filter(static function(int $value): bool {
             return $value % 2 === 0;
         });
 
@@ -286,7 +286,7 @@ class SequenceTest extends TestCase
             ->add(2)
             ->add(3)
             ->add(4)
-            ->foreach(function(int $value) use (&$sum) {
+            ->foreach(static function(int $value) use (&$sum) {
                 $sum += $value;
             });
 
@@ -300,7 +300,7 @@ class SequenceTest extends TestCase
             ->add(2)
             ->add(3)
             ->add(4);
-        $map = $sequence->group('int', function(int $value): int {
+        $map = $sequence->group('int', static function(int $value): int {
             return $value % 3;
         });
 
@@ -315,7 +315,7 @@ class SequenceTest extends TestCase
         $this->assertSame([1, 4], unwrap($map->get(1)));
         $this->assertSame([2], unwrap($map->get(2)));
 
-        $groups = Sequence::ints()->group('string', fn() => '');
+        $groups = Sequence::ints()->group('string', static fn() => '');
 
         $this->assertTrue($groups->isOfType('string', Sequence::class));
         $this->assertTrue($groups->empty());
@@ -328,7 +328,7 @@ class SequenceTest extends TestCase
             ->add(2)
             ->add(3)
             ->add(4);
-        $map = $sequence->groupBy(function(int $value): int {
+        $map = $sequence->groupBy(static function(int $value): int {
             return $value % 3;
         });
 
@@ -348,7 +348,7 @@ class SequenceTest extends TestCase
     {
         $this->expectException(CannotGroupEmptyStructure::class);
 
-        Sequence::of('int')->groupBy(function() {});
+        Sequence::of('int')->groupBy(static function() {});
     }
 
     public function testFirst()
@@ -428,7 +428,7 @@ class SequenceTest extends TestCase
             ->add(2)
             ->add(3)
             ->add(4);
-        $b = $a->map(function(int $value): int {
+        $b = $a->map(static function(int $value): int {
             return $value**2;
         });
 
@@ -443,7 +443,7 @@ class SequenceTest extends TestCase
     public function testMapTo()
     {
         $a = Sequence::ints(1, 2, 3, 4);
-        $b = $a->mapTo('string', fn($i) => (string) $i);
+        $b = $a->mapTo('string', static fn($i) => (string) $i);
 
         $this->assertInstanceOf(Sequence::class, $b);
         $this->assertNotSame($a, $b);
@@ -461,7 +461,7 @@ class SequenceTest extends TestCase
             ->add(2)
             ->add(3)
             ->add(4)
-            ->map(function(int $value) {
+            ->map(static function(int $value) {
                 return (string) $value;
             });
     }
@@ -496,7 +496,7 @@ class SequenceTest extends TestCase
             ->add(2)
             ->add(3)
             ->add(4)
-            ->partition(function(int $value): bool {
+            ->partition(static function(int $value): bool {
                 return $value % 2 === 0;
             });
 
@@ -672,7 +672,7 @@ class SequenceTest extends TestCase
             ->add(3)
             ->add(3)
             ->add(4);
-        $b = $a->sort(function(int $a, int $b): bool {
+        $b = $a->sort(static function(int $a, int $b): bool {
             return $b > $a;
         });
 
@@ -693,7 +693,7 @@ class SequenceTest extends TestCase
             ->add(4)
             ->reduce(
                 0,
-                function(int $carry, int $value): int {
+                static function(int $carry, int $value): int {
                     return $carry + $value;
                 }
             );
@@ -739,7 +739,7 @@ class SequenceTest extends TestCase
     public function testToSequenceOf()
     {
         $initial = Sequence::ints(1, 2, 3);
-        $sequence = $initial->toSequenceOf('string|int', function($i) {
+        $sequence = $initial->toSequenceOf('string|int', static function($i) {
             yield (string) $i;
             yield $i;
         });
@@ -758,7 +758,7 @@ class SequenceTest extends TestCase
     public function testToSetOf()
     {
         $sequence = Sequence::ints(1, 2, 3);
-        $set = $sequence->toSetOf('string|int', function($i) {
+        $set = $sequence->toSetOf('string|int', static function($i) {
             yield (string) $i;
             yield $i;
         });
@@ -777,7 +777,7 @@ class SequenceTest extends TestCase
     public function testToMapOf()
     {
         $sequence = Sequence::ints(1, 2, 3);
-        $map = $sequence->toMapOf('string', 'int', fn($i) => yield (string) $i => $i);
+        $map = $sequence->toMapOf('string', 'int', static fn($i) => yield (string) $i => $i);
 
         $this->assertInstanceOf(Map::class, $map);
         $this->assertCount(3, $map);
@@ -790,28 +790,28 @@ class SequenceTest extends TestCase
     {
         $sequence = Sequence::ints(1, 2, 3);
 
-        $this->assertSame(1, $sequence->find(fn($i) => $i === 1));
-        $this->assertSame(2, $sequence->find(fn($i) => $i === 2));
-        $this->assertSame(3, $sequence->find(fn($i) => $i === 3));
+        $this->assertSame(1, $sequence->find(static fn($i) => $i === 1));
+        $this->assertSame(2, $sequence->find(static fn($i) => $i === 2));
+        $this->assertSame(3, $sequence->find(static fn($i) => $i === 3));
 
         $this->expectException(NoElementMatchingPredicateFound::class);
 
-        $sequence->find(fn($i) => $i === 0);
+        $sequence->find(static fn($i) => $i === 0);
     }
 
     public function testMatches()
     {
         $sequence = Sequence::ints(1, 2, 3);
 
-        $this->assertTrue($sequence->matches(fn($i) => $i % 1 === 0));
-        $this->assertFalse($sequence->matches(fn($i) => $i % 2 === 0));
+        $this->assertTrue($sequence->matches(static fn($i) => $i % 1 === 0));
+        $this->assertFalse($sequence->matches(static fn($i) => $i % 2 === 0));
     }
 
     public function testAny()
     {
         $sequence = Sequence::ints(1, 2, 3);
 
-        $this->assertTrue($sequence->any(fn($i) => $i === 2));
-        $this->assertFalse($sequence->any(fn($i) => $i === 0));
+        $this->assertTrue($sequence->any(static fn($i) => $i === 2));
+        $this->assertFalse($sequence->any(static fn($i) => $i === 0));
     }
 }

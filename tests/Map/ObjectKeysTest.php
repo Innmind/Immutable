@@ -136,7 +136,7 @@ class ObjectKeysTest extends TestCase
             ($c = new \stdClass, 3)
             ($d = new \stdClass, 4);
 
-        $m2 = $m->filter(function(\stdClass $key, int $value) {
+        $m2 = $m->filter(static function(\stdClass $key, int $value) {
             return $value % 2 === 0;
         });
 
@@ -172,7 +172,7 @@ class ObjectKeysTest extends TestCase
     {
         $this->expectException(CannotGroupEmptyStructure::class);
 
-        (new ObjectKeys('stdClass', 'int'))->groupBy(function() {});
+        (new ObjectKeys('stdClass', 'int'))->groupBy(static function() {});
     }
 
     public function testGroupBy()
@@ -183,7 +183,7 @@ class ObjectKeysTest extends TestCase
             ($c = new \stdClass, 3)
             ($d = new \stdClass, 4);
 
-        $m2 = $m->groupBy(function(\stdClass $key, int $value) {
+        $m2 = $m->groupBy(static function(\stdClass $key, int $value) {
             return $value % 2;
         });
         $this->assertNotSame($m, $m2);
@@ -242,7 +242,7 @@ class ObjectKeysTest extends TestCase
             ($c = new \stdClass, 3)
             ($d = new \stdClass, 4);
 
-        $m2 = $m->map(function(\stdClass $key, int $value) {
+        $m2 = $m->map(static function(\stdClass $key, int $value) {
             if ($value % 2 === 0) {
                 return new Pair($key, $value + 10);
             }
@@ -264,11 +264,9 @@ class ObjectKeysTest extends TestCase
         $this->expectException(\TypeError::class);
         $this->expectExceptionMessage('Argument 2 must be of type int, string given');
 
-        (new ObjectKeys('stdClass', 'int'))
-            (new \stdClass, 2)
-            ->map(function(\stdClass $key, int $value) {
-                return (string) $value;
-            });
+        (new ObjectKeys('stdClass', 'int'))(new \stdClass, 2)->map(static function(\stdClass $key, int $value) {
+            return (string) $value;
+        });
     }
 
     public function testThrowWhenTryingToModifyKeyTypeInTheMap()
@@ -276,11 +274,9 @@ class ObjectKeysTest extends TestCase
         $this->expectException(\TypeError::class);
         $this->expectExceptionMessage('Argument 1 must be of type stdClass, int given');
 
-        (new ObjectKeys('stdClass', 'int'))
-            (new \stdClass, 2)
-            ->map(function(\stdClass $key, int $value) {
-                return new Pair(42, $value);
-            });
+        (new ObjectKeys('stdClass', 'int'))(new \stdClass, 2)->map(static function(\stdClass $key, int $value) {
+            return new Pair(42, $value);
+        });
     }
 
     public function testRemove()
@@ -357,7 +353,7 @@ class ObjectKeysTest extends TestCase
             ($d = new \stdClass, 4)
             ($e = new \stdClass, 5);
 
-        $p = $m->partition(function(\stdClass $i, int $v) {
+        $p = $m->partition(static function(\stdClass $i, int $v) {
             return $v % 2 === 0;
         });
 
@@ -398,7 +394,7 @@ class ObjectKeysTest extends TestCase
 
         $v = $m->reduce(
             42,
-            function (float $carry, \stdClass $key, int $value): float {
+            static function(float $carry, \stdClass $key, int $value): float {
                 return $carry / $value;
             }
         );
@@ -424,7 +420,7 @@ class ObjectKeysTest extends TestCase
         $map = (new ObjectKeys('object', 'int'))
             (new \stdClass, 2)
             (new \stdClass, 4);
-        $sequence = $map->toSequenceOf('int', fn($k, $v) => yield $v);
+        $sequence = $map->toSequenceOf('int', static fn($k, $v) => yield $v);
 
         $this->assertInstanceOf(Sequence::class, $sequence);
         $this->assertSame(
@@ -438,7 +434,7 @@ class ObjectKeysTest extends TestCase
         $map = (new ObjectKeys('object', 'int'))
             (new \stdClass, 2)
             (new \stdClass, 4);
-        $set = $map->toSetOf('int', fn($k, $v) => yield $v);
+        $set = $map->toSetOf('int', static fn($k, $v) => yield $v);
 
         $this->assertInstanceOf(Set::class, $set);
         $this->assertSame(
@@ -452,7 +448,7 @@ class ObjectKeysTest extends TestCase
         $map = (new ObjectKeys('object', 'int'))
             ($a = new \stdClass, 2)
             ($b = new \stdClass, 4);
-        $map = $map->toMapOf('int', 'object', fn($i, $j) => yield $j => $i);
+        $map = $map->toMapOf('int', 'object', static fn($i, $j) => yield $j => $i);
 
         $this->assertInstanceOf(Map::class, $map);
         $this->assertCount(2, $map);

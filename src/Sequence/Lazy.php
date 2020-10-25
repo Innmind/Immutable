@@ -43,6 +43,29 @@ final class Lazy implements Implementation
         $this->validate = $validate;
     }
 
+    /**
+     * @param T $element
+     *
+     * @return Implementation<T>
+     */
+    public function __invoke($element): Implementation
+    {
+        $values = $this->values;
+
+        /** @psalm-suppress MissingClosureParamType */
+        return new self(
+            $this->type,
+            static function() use ($values, $element): \Generator {
+                /** @var T $value */
+                foreach ($values() as $value) {
+                    yield $value;
+                }
+
+                yield $element;
+            },
+        );
+    }
+
     public function type(): string
     {
         return $this->type;
@@ -155,6 +178,7 @@ final class Lazy implements Implementation
                 foreach ($values() as $value) {
                     if ($dropped < $size) {
                         ++$dropped;
+
                         continue;
                     }
 
@@ -194,7 +218,7 @@ final class Lazy implements Implementation
         /** @psalm-suppress MissingClosureParamType */
         return new self(
             $this->type,
-            static function() use($values, $predicate): \Generator {
+            static function() use ($values, $predicate): \Generator {
                 /** @var T $value */
                 foreach ($values() as $value) {
                     /** @psalm-suppress InvalidArgument */
@@ -488,29 +512,6 @@ final class Lazy implements Implementation
             /** @var T $value */
             return $sequence->contains($value);
         });
-    }
-
-    /**
-     * @param T $element
-     *
-     * @return Implementation<T>
-     */
-    public function __invoke($element): Implementation
-    {
-        $values = $this->values;
-
-        /** @psalm-suppress MissingClosureParamType */
-        return new self(
-            $this->type,
-            static function() use ($values, $element): \Generator {
-                /** @var T $value */
-                foreach ($values() as $value) {
-                    yield $value;
-                }
-
-                yield $element;
-            },
-        );
     }
 
     /**

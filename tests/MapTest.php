@@ -188,7 +188,7 @@ class MapTest extends TestCase
             ->put(2, 3)
             ->put(4, 5);
 
-        $m2 = $m->filter(function(int $key, int $value) {
+        $m2 = $m->filter(static function(int $key, int $value) {
             return ($key + $value) % 3 === 0;
         });
 
@@ -225,7 +225,7 @@ class MapTest extends TestCase
     {
         $this->expectException(CannotGroupEmptyStructure::class);
 
-        Map::of('int', 'int')->groupBy(function() {});
+        Map::of('int', 'int')->groupBy(static function() {});
     }
 
     public function testGroup()
@@ -236,7 +236,7 @@ class MapTest extends TestCase
             ->put(2, 3)
             ->put(4, 5);
 
-        $m2 = $m->group('int', function(int $key, int $value) {
+        $m2 = $m->group('int', static function(int $key, int $value) {
             return ($key + $value) % 3;
         });
         $this->assertNotSame($m, $m2);
@@ -260,7 +260,7 @@ class MapTest extends TestCase
         $this->assertSame(3, $m2->get(2)->get(2));
         $this->assertSame(5, $m2->get(0)->get(4));
 
-        $groups = Map::of('int', 'int')->group('string', fn() => '');
+        $groups = Map::of('int', 'int')->group('string', static fn() => '');
 
         $this->assertTrue($groups->isOfType('string', Map::class));
         $this->assertTrue($groups->empty());
@@ -274,7 +274,7 @@ class MapTest extends TestCase
             ->put(2, 3)
             ->put(4, 5);
 
-        $m2 = $m->groupBy(function(int $key, int $value) {
+        $m2 = $m->groupBy(static function(int $key, int $value) {
             return ($key + $value) % 3;
         });
         $this->assertNotSame($m, $m2);
@@ -338,7 +338,7 @@ class MapTest extends TestCase
             ->put(2, 3)
             ->put(4, 5);
 
-        $m2 = $m->map(function(int $key, int $value) {
+        $m2 = $m->map(static function(int $key, int $value) {
             if ($key % 2 === 0) {
                 return new Pair($key + 10, $value);
             }
@@ -362,7 +362,7 @@ class MapTest extends TestCase
 
         Map::of('int', 'int')
             ->put(1, 2)
-            ->map(function(int $key, int $value) {
+            ->map(static function(int $key, int $value) {
                 return (string) $value;
             });
     }
@@ -374,7 +374,7 @@ class MapTest extends TestCase
 
         Map::of('int', 'int')
             ->put(1, 2)
-            ->map(function(int $key, int $value) {
+            ->map(static function(int $key, int $value) {
                 return new Pair((string) $key, $value);
             });
     }
@@ -461,7 +461,7 @@ class MapTest extends TestCase
             ->put(3, 4)
             ->put(4, 5);
 
-        $p = $m->partition(function(int $i, int $v) {
+        $p = $m->partition(static function(int $i, int $v) {
             return ($i + $v) % 3 === 0;
         });
 
@@ -502,7 +502,7 @@ class MapTest extends TestCase
 
         $v = $m->reduce(
             42,
-            function (float $carry, int $key, int $value): float {
+            static function(float $carry, int $key, int $value): float {
                 return $carry / ($key * $value);
             }
         );
@@ -517,7 +517,7 @@ class MapTest extends TestCase
         $map = Map::of('int', 'int')
             (1, 2)
             (3, 4);
-        $set = $map->toSetOf('int', function($k, $v) {
+        $set = $map->toSetOf('int', static function($k, $v) {
             yield $k;
             yield $v;
         });
@@ -534,7 +534,7 @@ class MapTest extends TestCase
         $map = Map::of('int', 'int')
             (1, 2)
             (3, 4);
-        $map = $map->toMapOf('string', 'int', fn($i, $j) => yield (string) $j => $i);
+        $map = $map->toMapOf('string', 'int', static fn($i, $j) => yield (string) $j => $i);
 
         $this->assertInstanceOf(Map::class, $map);
         $this->assertCount(2, $map);
@@ -543,7 +543,7 @@ class MapTest extends TestCase
 
         $this->assertTrue(
             Map::of('object', 'int')
-                (new \stdClass, 1)
+                ->put(new \stdClass, 1)
                 ->toMapOf('stdClass', 'int')
                 ->isOfType('stdClass', 'int')
         );
@@ -555,8 +555,8 @@ class MapTest extends TestCase
             (1, 2)
             (3, 4);
 
-        $this->assertTrue($map->matches(fn($key, $value) => $value % 2 === 0));
-        $this->assertFalse($map->matches(fn($key, $value) => $key % 2 === 0));
+        $this->assertTrue($map->matches(static fn($key, $value) => $value % 2 === 0));
+        $this->assertFalse($map->matches(static fn($key, $value) => $key % 2 === 0));
     }
 
     public function testAny()
@@ -565,9 +565,9 @@ class MapTest extends TestCase
             (1, 2)
             (3, 4);
 
-        $this->assertTrue($map->any(fn($key, $value) => $value === 4));
-        $this->assertTrue($map->any(fn($key, $value) => $key === 1));
-        $this->assertFalse($map->any(fn($key, $value) => $key === 0));
-        $this->assertFalse($map->any(fn($key, $value) => $value === 1));
+        $this->assertTrue($map->any(static fn($key, $value) => $value === 4));
+        $this->assertTrue($map->any(static fn($key, $value) => $key === 1));
+        $this->assertFalse($map->any(static fn($key, $value) => $key === 0));
+        $this->assertFalse($map->any(static fn($key, $value) => $value === 1));
     }
 }

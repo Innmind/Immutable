@@ -21,9 +21,6 @@ final class PrimitiveType implements ValidateArgument
         $this->type = $type;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function __invoke($value, int $position): void
     {
         if (($this->function)($value) === false) {

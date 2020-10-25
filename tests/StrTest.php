@@ -168,12 +168,12 @@ class StrTest extends TestCase
         $this->assertSame('bar', $splits->get(1)->toString());
 
         $splits = $str->toEncoding('ASCII')->split(
-            mb_substr('🙏', 0, 1, 'ASCII')
+            \mb_substr('🙏', 0, 1, 'ASCII')
         );
 
         $this->assertSame('foo', $splits->get(0)->toString());
         $this->assertSame(
-            mb_substr('🙏', 1, null, 'ASCII').'bar',
+            \mb_substr('🙏', 1, null, 'ASCII').'bar',
             $splits->get(1)->toString()
         );
     }
@@ -216,11 +216,11 @@ class StrTest extends TestCase
 
         $this->assertSame('foo', $splits->get(0)->toString());
         $this->assertSame(
-            mb_substr('🙏', 0, 3, 'ASCII'),
+            \mb_substr('🙏', 0, 3, 'ASCII'),
             $splits->get(1)->toString()
         );
         $this->assertSame(
-            mb_substr('🙏', 3, 4, 'ASCII').'ba',
+            \mb_substr('🙏', 3, 4, 'ASCII').'ba',
             $splits->get(2)->toString()
         );
         $this->assertSame('r', $splits->get(3)->toString());
@@ -266,10 +266,10 @@ class StrTest extends TestCase
         $str = S::of('foo🙏🙏🙏bar');
 
         $str2 = $str->replace(
-            mb_substr('🙏', 0, 1, 'ASCII'),
+            \mb_substr('🙏', 0, 1, 'ASCII'),
             'baz'
         );
-        $remaining = mb_substr('🙏', 1, null, 'ASCII');
+        $remaining = \mb_substr('🙏', 1, null, 'ASCII');
         $this->assertSame('foo🙏🙏🙏bar', $str->toString());
         $this->assertSame(
             'foobaz'.$remaining.'baz'.$remaining.'baz'.$remaining.'bar',
@@ -277,11 +277,11 @@ class StrTest extends TestCase
         );
 
         $str3 = $str->toEncoding('ASCII')->replace(
-            mb_substr('🙏', 0, 1, 'ASCII'),
+            \mb_substr('🙏', 0, 1, 'ASCII'),
             'baz'
         );
         $this->assertSame('foo🙏🙏🙏bar', $str->toString());
-        $subPray = mb_substr('🙏', 1, null, 'ASCII');
+        $subPray = \mb_substr('🙏', 1, null, 'ASCII');
         $this->assertSame(
             'foobaz'.$subPray.'baz'.$subPray.'baz'.$subPray.'bar',
             $str3->toString()
@@ -303,7 +303,7 @@ class StrTest extends TestCase
     {
         $str = S::of('foo🙏bar');
 
-        $str2 = $str->toEncoding('ASCII')->str(mb_substr('🙏', 0, 1, 'ASCII'));
+        $str2 = $str->toEncoding('ASCII')->str(\mb_substr('🙏', 0, 1, 'ASCII'));
         $this->assertSame('foo🙏bar', $str->toString());
         $this->assertSame('🙏bar', $str2->toString());
     }
@@ -363,7 +363,7 @@ class StrTest extends TestCase
         $this->assertSame('🙏oof', $str2->toString());
         $this->assertSame('foo🙏', $str->toString());
         $this->assertSame(
-            strrev('🙏').'oof',
+            \strrev('🙏').'oof',
             $str->toEncoding('ASCII')->reverse()->toString()
         );
     }
@@ -416,8 +416,8 @@ class StrTest extends TestCase
         $this->assertSame(3, $str->cspn('🙏'));
         $this->assertSame(0, $str->cspn('🙏', 4));
         $this->assertSame(3, $str->cspn('🙏', 0, 4));
-        $this->assertSame(3, $str->cspn(mb_substr('🙏', 0, 1, 'ASCII'), 0, 4));
-        $this->assertSame(3, $str->toEncoding('ASCII')->cspn(mb_substr('🙏', 0, 1, 'ASCII'), 0, 4));
+        $this->assertSame(3, $str->cspn(\mb_substr('🙏', 0, 1, 'ASCII'), 0, 4));
+        $this->assertSame(3, $str->toEncoding('ASCII')->cspn(\mb_substr('🙏', 0, 1, 'ASCII'), 0, 4));
     }
 
     public function testRepeat()
@@ -570,7 +570,7 @@ class StrTest extends TestCase
         $this->expectException(RegexException::class);
         $this->expectExceptionMessage('Backtrack limit error');
 
-        S::of(str_repeat("x", 1000000))->matches('/x+x+y/');
+        S::of(\str_repeat('x', 1000000))->matches('/x+x+y/');
     }
 
     public function testCapture()
@@ -612,7 +612,7 @@ class StrTest extends TestCase
         $this->expectException(RegexException::class);
         $this->expectExceptionMessage('Backtrack limit error');
 
-        S::of(str_repeat("x", 1000000))->capture('/x+x+y/');
+        S::of(\str_repeat('x', 1000000))->capture('/x+x+y/');
     }
 
     public function testPregReplace()
@@ -702,7 +702,7 @@ class StrTest extends TestCase
         $this->assertSame('🙏bar', $str->substring(3)->toString());
         $this->assertSame('🙏', $str->substring(3, 4)->toString());
         $this->assertSame(
-            mb_substr('🙏', 0, 1, 'ASCII'),
+            \mb_substr('🙏', 0, 1, 'ASCII'),
             $str->substring(3, 1)->toString()
         );
     }

@@ -17,9 +17,6 @@ final class ClassType implements ValidateArgument
         $this->class = $class;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function __invoke($value, int $position): void
     {
         if (!$value instanceof $this->class) {

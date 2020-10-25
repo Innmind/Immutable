@@ -45,26 +45,6 @@ final class DoubleIndex implements Implementation
         $this->pairs = new Sequence\Primitive(Pair::class);
     }
 
-    public function keyType(): string
-    {
-        return $this->keyType;
-    }
-
-    public function valueType(): string
-    {
-        return $this->valueType;
-    }
-
-    public function size(): int
-    {
-        return $this->keys->size();
-    }
-
-    public function count(): int
-    {
-        return $this->keys->count();
-    }
-
     /**
      * @param T $key
      * @param S $value
@@ -96,6 +76,26 @@ final class DoubleIndex implements Implementation
         }
 
         return $map;
+    }
+
+    public function keyType(): string
+    {
+        return $this->keyType;
+    }
+
+    public function valueType(): string
+    {
+        return $this->valueType;
+    }
+
+    public function size(): int
+    {
+        return $this->keys->size();
+    }
+
+    public function count(): int
+    {
+        return $this->keys->count();
     }
 
     /**

@@ -70,12 +70,12 @@ class SetTest extends TestCase
     public function testFilter()
     {
         $sets = Set::of('string', DataSet\Chars::any());
-        $sets2 = $sets->filter(fn($set) => $set->size() % 2 === 0);
+        $sets2 = $sets->filter(static fn($set) => $set->size() % 2 === 0);
 
         $this->assertInstanceOf(DataSet::class, $sets2);
         $this->assertNotSame($sets, $sets2);
 
-        $hasOddSet = fn(bool $hasOddSet, $set) => $hasOddSet || $set->unwrap()->size() % 2 === 1;
+        $hasOddSet = static fn(bool $hasOddSet, $set) => $hasOddSet || $set->unwrap()->size() % 2 === 1;
 
         $this->assertTrue(
             \array_reduce(
@@ -98,7 +98,7 @@ class SetTest extends TestCase
         $sets = Set::of(
             'object',
             DataSet\Decorate::mutable(
-                fn() => new \stdClass,
+                static fn() => new \stdClass,
                 new DataSet\Chars,
             ),
         );
@@ -202,7 +202,7 @@ class SetTest extends TestCase
         $sets = Set::of(
             'object',
             DataSet\Decorate::mutable(
-                fn() => new \stdClass,
+                static fn() => new \stdClass,
                 new DataSet\Chars,
             ),
             DataSet\Integers::between(1, 100),

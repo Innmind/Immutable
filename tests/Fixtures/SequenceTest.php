@@ -65,12 +65,12 @@ class SequenceTest extends TestCase
     public function testFilter()
     {
         $sequences = Sequence::of('string', Set\Chars::any());
-        $sequences2 = $sequences->filter(fn($sequence) => $sequence->size() % 2 === 0);
+        $sequences2 = $sequences->filter(static fn($sequence) => $sequence->size() % 2 === 0);
 
         $this->assertInstanceOf(Set::class, $sequences2);
         $this->assertNotSame($sequences, $sequences2);
 
-        $hasOddSequence = fn(bool $hasOddSequence, $sequence) => $hasOddSequence || $sequence->unwrap()->size() % 2 === 1;
+        $hasOddSequence = static fn(bool $hasOddSequence, $sequence) => $hasOddSequence || $sequence->unwrap()->size() % 2 === 1;
 
         $this->assertTrue(
             \array_reduce(
@@ -93,7 +93,7 @@ class SequenceTest extends TestCase
         $sequences = Sequence::of(
             'object',
             Set\Decorate::mutable(
-                fn() => new \stdClass,
+                static fn() => new \stdClass,
                 new Set\Chars,
             ),
         );
@@ -197,7 +197,7 @@ class SequenceTest extends TestCase
         $sequences = Sequence::of(
             'object',
             Set\Decorate::mutable(
-                fn() => new \stdClass,
+                static fn() => new \stdClass,
                 new Set\Chars,
             ),
             Set\Integers::between(1, 100),

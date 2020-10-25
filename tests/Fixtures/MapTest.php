@@ -93,12 +93,12 @@ class MapTest extends TestCase
             Set\Chars::any(),
             Set\Chars::any(),
         );
-        $maps2 = $maps->filter(fn($map) => $map->size() % 2 === 0);
+        $maps2 = $maps->filter(static fn($map) => $map->size() % 2 === 0);
 
         $this->assertInstanceOf(Set::class, $maps2);
         $this->assertNotSame($maps, $maps2);
 
-        $hasOddMap = fn(bool $hasOddMap, $map) => $hasOddMap || $map->unwrap()->size() % 2 === 1;
+        $hasOddMap = static fn(bool $hasOddMap, $map) => $hasOddMap || $map->unwrap()->size() % 2 === 1;
 
         $this->assertTrue(
             \array_reduce(
@@ -122,7 +122,7 @@ class MapTest extends TestCase
             'object',
             'string',
             Set\Decorate::mutable(
-                fn() => new \stdClass,
+                static fn() => new \stdClass,
                 Set\Chars::any(),
             ),
             Set\Chars::any(),
@@ -142,7 +142,7 @@ class MapTest extends TestCase
             'object',
             Set\Chars::any(),
             Set\Decorate::mutable(
-                fn() => new \stdClass,
+                static fn() => new \stdClass,
                 Set\Chars::any(),
             ),
         );
@@ -280,7 +280,7 @@ class MapTest extends TestCase
             'object',
             Set\Chars::any(),
             Set\Decorate::mutable(
-                fn() => new \stdClass,
+                static fn() => new \stdClass,
                 Set\Chars::any(),
             ),
             Set\Integers::between(1, 100),

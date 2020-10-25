@@ -36,6 +36,32 @@ final class Map implements \Countable
     }
 
     /**
+     * Set a new key/value pair
+     *
+     * Example:
+     * <code>
+     * Map::of('int', 'int')
+     *     (1, 2)
+     *     (3, 4)
+     * </code>
+     *
+     * @param T $key
+     * @param S $value
+     *
+     * @return self<T, S>
+     */
+    public function __invoke($key, $value): self
+    {
+        ($this->validateKey)($key, 1);
+        ($this->validateValue)($value, 2);
+
+        $map = clone $this;
+        $map->implementation = ($this->implementation)($key, $value);
+
+        return $map;
+    }
+
+    /**
      * @template U
      * @template V
      *
@@ -46,14 +72,14 @@ final class Map implements \Countable
         $type = Type::of($key);
 
         if ($type instanceof ClassType || $key === 'object') {
-            $implementation = new Map\ObjectKeys($key, $value);
-        } else if (\in_array($key, ['int', 'integer', 'string'], true)) {
-            $implementation = new Map\Primitive($key, $value);
-        } else {
-            $implementation = new Map\DoubleIndex($key, $value);
+            return new self($key, $value, new Map\ObjectKeys($key, $value));
         }
 
-        return new self($key, $value, $implementation);
+        if (\in_array($key, ['int', 'integer', 'string'], true)) {
+            return new self($key, $value, new Map\Primitive($key, $value));
+        }
+
+        return new self($key, $value, new Map\DoubleIndex($key, $value));
     }
 
     public function isOfType(string $key, string $value): bool
@@ -82,9 +108,6 @@ final class Map implements \Countable
         return $this->implementation->size();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function count(): int
     {
         return $this->implementation->count();
@@ -101,32 +124,6 @@ final class Map implements \Countable
     public function put($key, $value): self
     {
         return ($this)($key, $value);
-    }
-
-    /**
-     * Set a new key/value pair
-     *
-     * Example:
-     * <code>
-     * Map::of('int', 'int')
-     *     (1, 2)
-     *     (3, 4)
-     * </code>
-     *
-     * @param T $key
-     * @param S $value
-     *
-     * @return self<T, S>
-     */
-    public function __invoke($key, $value): self
-    {
-        ($this->validateKey)($key, 1);
-        ($this->validateValue)($value, 2);
-
-        $map = clone $this;
-        $map->implementation = ($this->implementation)($key, $value);
-
-        return $map;
     }
 
     /**
@@ -242,12 +239,11 @@ final class Map implements \Countable
          */
         return $this->reduce(
             self::of($type, self::class),
-            function(self $groups, $key, $value) use ($discriminator): Map {
+            function(self $groups, $key, $value) use ($discriminator): self {
                 /**
                  * @var T $key
                  * @var S $value
                  */
-
                 $discriminant = $discriminator($key, $value);
                 /** @var self<T, S> */
                 $group = $groups->contains($discriminant) ? $groups->get($discriminant) : $this->clear();

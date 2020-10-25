@@ -7,9 +7,6 @@ use Innmind\Immutable\ValidateArgument;
 
 final class MixedType implements ValidateArgument
 {
-    /**
-     * {@inheritdoc}
-     */
     public function __invoke($value, int $position): void
     {
         //pass

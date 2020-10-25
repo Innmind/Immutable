@@ -26,9 +26,6 @@ final class Str
         return new self($value, $encoding);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function toString(): string
     {
         return $this->value;
@@ -119,7 +116,7 @@ final class Str
          */
         $parts = $this
             ->split($search)
-            ->toSequenceOf('string', fn($v) => yield $v->toString());
+            ->toSequenceOf('string', static fn($v) => yield $v->toString());
 
         return join($replacement, $parts);
     }
@@ -184,7 +181,7 @@ final class Str
         $parts = $this
             ->chunk()
             ->reverse()
-            ->toSequenceOf('string', fn($v) => yield $v->toString());
+            ->toSequenceOf('string', static fn($v) => yield $v->toString());
 
         return join('', $parts)->toEncoding($this->encoding);
     }
@@ -249,7 +246,7 @@ final class Str
         $parts = unwrap(
             $this
                 ->chunk()
-                ->toSequenceOf('string', fn($v) => yield $v->toString()),
+                ->toSequenceOf('string', static fn($v) => yield $v->toString()),
         );
         \shuffle($parts);
 
@@ -439,10 +436,10 @@ final class Str
          */
         $words = $this
             ->pregSplit('/_| /')
-            ->map(function(self $part) {
+            ->map(static function(self $part) {
                 return $part->ucfirst();
             })
-            ->toSequenceOf('string', fn($v) => yield $v->toString());
+            ->toSequenceOf('string', static fn($v) => yield $v->toString());
 
         return join('', $words)
             ->lcfirst()
