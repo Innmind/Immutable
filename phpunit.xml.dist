@@ -1,20 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<phpunit colors="true" bootstrap="vendor/autoload.php">
-    <testsuites>
-        <testsuite name="Immutable primitive wrappers test suite">
-            <directory>./tests</directory>
-        </testsuite>
-    </testsuites>
-
-    <filter>
-        <whitelist>
-            <directory>.</directory>
-            <exclude>
-                <directory>./tests</directory>
-                <directory>./vendor</directory>
-                <directory>./benchmarks</directory>
-            </exclude>
-        </whitelist>
-    </filter>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" colors="true" bootstrap="vendor/autoload.php" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd">
+  <coverage>
+    <include>
+      <directory>.</directory>
+    </include>
+    <exclude>
+      <directory>./tests</directory>
+      <directory>./vendor</directory>
+      <directory>./benchmarks</directory>
+    </exclude>
+  </coverage>
+  <testsuites>
+    <testsuite name="Immutable primitive wrappers test suite">
+      <directory>./tests</directory>
+    </testsuite>
+  </testsuites>
 </phpunit>
