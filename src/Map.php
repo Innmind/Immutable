@@ -72,14 +72,14 @@ final class Map implements \Countable
         $type = Type::of($key);
 
         if ($type instanceof ClassType || $key === 'object') {
-            $implementation = new Map\ObjectKeys($key, $value);
-        } else if (\in_array($key, ['int', 'integer', 'string'], true)) {
-            $implementation = new Map\Primitive($key, $value);
-        } else {
-            $implementation = new Map\DoubleIndex($key, $value);
+            return new self($key, $value, new Map\ObjectKeys($key, $value));
         }
 
-        return new self($key, $value, $implementation);
+        if (\in_array($key, ['int', 'integer', 'string'], true)) {
+            return new self($key, $value, new Map\Primitive($key, $value));
+        }
+
+        return new self($key, $value, new Map\DoubleIndex($key, $value));
     }
 
     public function isOfType(string $key, string $value): bool

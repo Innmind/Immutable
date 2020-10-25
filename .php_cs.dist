@@ -8,6 +8,9 @@ $finder = PhpCsFixer\Finder::create()
 return PhpCsFixer\Config::create()
     ->setRules([
         '@PSR2' => true,
+        'braces' => [
+            'allow_single_line_closure' => true,
+        ],
         'array_syntax' => ['syntax' => 'short'],
         'psr0' => false,
         'psr4' => true,
