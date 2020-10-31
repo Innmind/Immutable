@@ -15,7 +15,7 @@
         "issues": "http://github.com/Innmind/Immutable/issues"
     },
     "require": {
-        "php": "~7.4|~8.0"
+        "php": "~7.4"
     },
     "autoload": {
         "psr-4": {
