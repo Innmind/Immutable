@@ -113,7 +113,6 @@ final class Primitive implements Implementation
             $this->clear(),
             static function(self $values, $value): self {
                 /** @var T $value */
-
                 if ($values->contains($value)) {
                     return $values;
                 }
