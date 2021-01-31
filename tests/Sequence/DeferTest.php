@@ -622,7 +622,7 @@ class DeferTest extends TestCase
             yield 3;
             yield 2;
         })());
-        $b = $a->sort(static fn($a, $b) => $a > $b);
+        $b = $a->sort(static fn($a, $b) => (int) ($a > $b));
 
         $this->assertSame([1, 4, 3, 2], \iterator_to_array($a->iterator()));
         $this->assertInstanceOf(Defer::class, $b);

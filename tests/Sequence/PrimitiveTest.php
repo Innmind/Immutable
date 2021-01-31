@@ -350,7 +350,7 @@ class PrimitiveTest extends TestCase
     public function testSort()
     {
         $a = new Primitive('int', 1, 4, 3, 2);
-        $b = $a->sort(static fn($a, $b) => $a > $b);
+        $b = $a->sort(static fn($a, $b) => (int) ($a > $b));
 
         $this->assertSame([1, 4, 3, 2], \iterator_to_array($a->iterator()));
         $this->assertInstanceOf(Primitive::class, $b);
