@@ -316,6 +316,7 @@ final class DoubleIndex implements Implementation
      */
     public function merge(Implementation $map): self
     {
+        /** @psalm-suppress MixedArgument For some reason it no longer recognize templates for $key and $value */
         return $map->reduce(
             $this,
             static fn(self $carry, $key, $value): self => ($carry)($key, $value),

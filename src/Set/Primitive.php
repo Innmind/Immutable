@@ -267,6 +267,7 @@ final class Primitive implements Implementation
      */
     public function merge(Implementation $set): self
     {
+        /** @psalm-suppress MixedArgument For some reason it no longer recognize the template for $value */
         return $set->reduce(
             $this,
             static fn(self $carry, $value): self => ($carry)($value),

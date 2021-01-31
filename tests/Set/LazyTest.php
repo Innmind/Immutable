@@ -309,7 +309,7 @@ class LazyTest extends TestCase
             yield 2;
             $loaded = true;
         });
-        $sorted = $set->sort(static fn($a, $b) => $a > $b);
+        $sorted = $set->sort(static fn($a, $b) => $a > $b ? 1 : -1);
 
         $this->assertFalse($loaded);
         $this->assertSame([1, 4, 3, 2], \iterator_to_array($set->iterator()));

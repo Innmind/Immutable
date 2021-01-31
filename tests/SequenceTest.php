@@ -672,8 +672,8 @@ class SequenceTest extends TestCase
             ->add(3)
             ->add(3)
             ->add(4);
-        $b = $a->sort(static function(int $a, int $b): bool {
-            return $b > $a;
+        $b = $a->sort(static function(int $a, int $b): int {
+            return ($b > $a) ? 1 : -1;
         });
 
         $this->assertInstanceOf(Sequence::class, $b);

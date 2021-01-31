@@ -58,6 +58,7 @@ final class RegExp
         $map = Map::of('scalar', Str::class);
 
         foreach ($matches as $key => $match) {
+            /** @psalm-suppress RedundantCast Don't trust the types of preg_match */
             $map = ($map)(
                 $key,
                 Str::of(
