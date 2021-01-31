@@ -38,7 +38,10 @@ class StrTest extends TestCase
     public function testThrowWhenInvalidType()
     {
         $this->expectException(\TypeError::class);
-        $this->expectExceptionMessage('must be of the type string, int given');
+        // message tested with 2 assertions as the message contains a "the"
+        // between the 2 strings in PHP 7.4 but no longer is there in 8.0
+        $this->expectExceptionMessage('must be of');
+        $this->expectExceptionMessage('type string, int given');
 
         S::of(42);
     }
