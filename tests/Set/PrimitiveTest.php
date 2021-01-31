@@ -178,7 +178,7 @@ class PrimitiveTest extends TestCase
     public function testSort()
     {
         $set = new Primitive('int', 1, 4, 3, 2);
-        $sorted = $set->sort(static fn($a, $b) => (int) ($a > $b));
+        $sorted = $set->sort(static fn($a, $b) => $a > $b ? 1 : -1);
 
         $this->assertSame([1, 4, 3, 2], \iterator_to_array($set->iterator()));
         $this->assertInstanceOf(Sequence::class, $sorted);

@@ -409,7 +409,7 @@ class SetTest extends TestCase
             ->add(4);
 
         $s2 = $s->sort(static function(int $a, int $b) {
-            return (int) ($a < $b);
+            return ($a < $b) ? 1 : -1;
         });
         $this->assertInstanceOf(Sequence::class, $s2);
         $this->assertSame('int', $s2->type());
