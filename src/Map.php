@@ -241,13 +241,18 @@ final class Map implements \Countable
             self::of($type, self::class),
             function(self $groups, $key, $value) use ($discriminator): self {
                 /**
+                 * @var self<D, self<T, S>> $groups
                  * @var T $key
                  * @var S $value
                  */
                 $discriminant = $discriminator($key, $value);
-                /** @var self<T, S> */
+                /**
+                 * @psalm-suppress InvalidArgument Psalm doesn't read correctly the templates for $groups
+                 * @var self<T, S>
+                 */
                 $group = $groups->contains($discriminant) ? $groups->get($discriminant) : $this->clear();
 
+                /** @psalm-suppress InvalidArgument */
                 return ($groups)($discriminant, ($group)($key, $value));
             },
         );

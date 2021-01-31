@@ -98,7 +98,7 @@ final class Str
             ));
         }
 
-        return (int) $position;
+        return $position;
     }
 
     /**
@@ -226,7 +226,7 @@ final class Str
             );
         }
 
-        return (int) $value;
+        return $value;
     }
 
     /**
