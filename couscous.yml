@@ -30,6 +30,9 @@ menu:
         map:
             text: Map
             relativeUrl: map.html
+        string:
+            text: Str
+            relativeUrl: str.html
         types:
             text: Types
             relativeUrl: types.html
