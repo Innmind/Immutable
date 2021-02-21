@@ -1,0 +1,20 @@
+template:
+    url: https://github.com/CouscousPHP/Template-ReadTheDocs
+
+include:
+    - docs
+
+baseUrl: https://innmind.github.io/immutable
+
+github:
+    user: innmind
+    repo: immutable
+
+title: Immutable
+subTitle: Immutable data structures.
+
+menu:
+    items:
+        home:
+            text: Getting Started
+            relativeUrl: index.html
