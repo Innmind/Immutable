@@ -21,3 +21,15 @@ menu:
         philosophy:
             text: Philosophy
             relativeUrl: philosophy.html
+        sequence:
+            text: Sequence
+            relativeUrl: sequence.html
+        set:
+            text: Set
+            relativeUrl: set.html
+        map:
+            text: Map
+            relativeUrl: map.html
+        types:
+            text: Types
+            relativeUrl: types.html
