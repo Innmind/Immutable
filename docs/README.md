@@ -1,0 +1,23 @@
+# Getting Started
+
+This project brings a set of immutable data structure to bring a uniformity on how to handle data.
+
+## Installation
+
+```sh
+composer require innmind/immutable
+```
+
+## Usage
+
+This library provides the 5 following structures:
+
+- [`Sequence`](SEQUENCE.md)
+- [`Set`](SET.md)
+- [`Map`](MAP.md)
+- [`Str`](STR.md)
+- [`RegExp`](REGEXP.md)
+
+See the documentation for each structure to understand how to use them.
+
+`Sequence`, `Set` and `Map` will ask to provide the types of the elements they contains, you can see [here](TYPES.md) which types you can use.
