@@ -1,0 +1,26 @@
+name: Documentation
+
+on:
+  push:
+    branches: [master]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    name: 'Publish documentation'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '7.4'
+      - name: Install halsey/journal
+        run: composer global require halsey/journal
+      - name: Generate
+        run: composer global exec 'journal generate'
+      - name: Push
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./.tmp_journal/
