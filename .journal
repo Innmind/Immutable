@@ -45,6 +45,10 @@ return static function(Config $config): Config
                 Path::of('TYPES.md'),
             ),
             Entry::markdown(
+                'Blackbox',
+                Path::of('BLACKBOX.md'),
+            ),
+            Entry::markdown(
                 'Philosophy',
                 Path::of('PHILOSOPHY.md'),
             ),
