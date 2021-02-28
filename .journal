@@ -10,7 +10,7 @@ use Innmind\Url\Path;
 return static function(Config $config): Config
 {
     return $config
-        ->package('innmind', 'immutable')
+        ->package('innmind', 'immutable', null, 'Immutable')
         ->locatedAt(Path::of('docs/'))
         ->menu(
             Entry::markdown(
