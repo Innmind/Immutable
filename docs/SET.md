@@ -1,7 +1,3 @@
----
-currentMenu: set
----
-
 # `Set`
 
 A set is an unordered list of unique elements.

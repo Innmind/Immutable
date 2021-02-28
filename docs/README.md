@@ -1,7 +1,3 @@
----
-currentMenu: home
----
-
 # Getting Started
 
 This project brings a set of immutable data structure to bring a uniformity on how to handle data.
@@ -16,12 +12,12 @@ composer require innmind/immutable
 
 This library provides the 5 following structures:
 
-- • [`Sequence`](sequence.html)
-- • [`Set`](set.html)
-- • [`Map`](map.html)
-- • [`Str`](str.html)
-- • [`RegExp`](regexp.html)
+- [`Sequence`](SEQUENCE.md)
+- [`Set`](SET.md)
+- [`Map`](MAP.md)
+- [`Str`](STR.md)
+- [`RegExp`](REGEXP.md)
 
 See the documentation for each structure to understand how to use them.
 
-`Sequence`, `Set` and `Map` will ask to provide the types of the elements they contains, you can see [here](types.html) which types you can use.
+`Sequence`, `Set` and `Map` will ask to provide the types of the elements they contains, you can see [here](TYPES.md) which types you can use.

@@ -1,7 +1,3 @@
----
-currentMenu: regexp
----
-
 # `RegExp`
 
 This class is here to help make sure that a string is a regular expression so you can safely type against this class.

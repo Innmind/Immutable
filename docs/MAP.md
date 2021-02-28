@@ -1,7 +1,3 @@
----
-currentMenu: map
----
-
 # `Map`
 
 A map is an unordered list of pair of elements, think of it like an associative array or a `array<T, S>` in the [Psalm](http://psalm.dev) nomenclature. But with the added benefit that the keys can be of any type, even objects!
@@ -10,7 +6,7 @@ A map is always typed in order to be sure it only contains elements of the type 
 
 ## `::of()`
 
-The `of` static method allows you to create a new map of the given [types](types.html):
+The `of` static method allows you to create a new map of the given [types](TYPES.md):
 
 ```php
 use Innmind\Immutable\Map;
@@ -198,7 +194,7 @@ $map->get('ftp')->equals(
 
 ## `->keys()`
 
-Return a [`Set`](set.html) of all the keys of the map.
+Return a [`Set`](SET.md) of all the keys of the map.
 
 ```php
 $keys = Map::of('int', 'int')(24, 1)(42, 2)->keys();
@@ -207,7 +203,7 @@ $keys->equals(Set::of(24, 42)); // true
 
 ## `->values()`
 
-Return a [`Sequence`](sequence.html) of all the values of the map.
+Return a [`Sequence`](SEQUENCE.md) of all the values of the map.
 
 ```php
 $values = Map::of('int', 'int')(24, 1)(42, 2)->values();
@@ -318,7 +314,7 @@ $sequence->equals(Sequence::of('int|string', 1, 2, 3, 4)); // true
 
 ## `->toSetOf()`
 
-Similar to `->toSequenceOf()` but it returns a [`Set`](set.html) instead.
+Similar to `->toSequenceOf()` but it returns a [`Set`](SET.md) instead.
 
 ```php
 $set = Map::of('int', 'int')(1, 2)(3, 4)->toSetOf(

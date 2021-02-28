@@ -1,7 +1,3 @@
----
-currentMenu: sequence
----
-
 # `Sequence`
 
 A sequence is an ordered list of elements, think of it like an array such as `[1, 'a', new stdClass]` or a `list<T>` in the [Psalm](http://psalm.dev) nomenclature.

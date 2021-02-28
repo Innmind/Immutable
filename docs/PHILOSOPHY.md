@@ -1,12 +1,8 @@
----
-currentMenu: philosophy
----
-
 # Philosophy
 
 This project was born after working with other programming languages (like [Scala](https://scala-lang.org)) and discovering [functional programming](https://en.wikipedia.org/wiki/Functional_programming). This taught me 2 things:
-- • higher order functions on data structures
-- • immutability
+- higher order functions on data structures
+- immutability
 
 ## Higher order functions
 

@@ -1,7 +1,3 @@
----
-currentMenu: string
----
-
 # `Str`
 
 This class gives a higher api to manipulate strings.
