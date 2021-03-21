@@ -39,6 +39,10 @@ return static function(Config $config): Config
                     'RegExp',
                     Path::of('REGEXP.md'),
                 ),
+                Entry::markdown(
+                    'Maybe',
+                    Path::of('MAYBE.md'),
+                ),
             )->alwaysOpen(),
             Entry::markdown(
                 'Types',
