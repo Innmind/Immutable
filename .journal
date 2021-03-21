@@ -43,6 +43,10 @@ return static function(Config $config): Config
                     'Maybe',
                     Path::of('MAYBE.md'),
                 ),
+                Entry::markdown(
+                    'Either',
+                    Path::of('EITHER.md'),
+                ),
             )->alwaysOpen(),
             Entry::markdown(
                 'Types',
