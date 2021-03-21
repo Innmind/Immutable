@@ -204,7 +204,7 @@ class MaybeTest extends TestCase
 
     public function testFilterPredicateIsNotCalledWhenNoValue()
     {
-        $this->assertInstanceOf(Maybe::class, Maybe::nothing()->filter(function() {
+        $this->assertInstanceOf(Maybe::class, Maybe::nothing()->filter(static function() {
             throw new \Exception;
         }));
     }
