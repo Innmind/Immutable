@@ -259,7 +259,7 @@ final class ObjectKeys implements Implementation
         /** @psalm-suppress MissingClosureParamType */
         return $this->reduce(
             Sequence::of($this->valueType),
-            static fn(Sequence $values, $key, $value): Sequence => ($values)($value),
+            static fn(Sequence $values, $_, $value): Sequence => ($values)($value),
         );
     }
 
