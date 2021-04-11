@@ -110,10 +110,6 @@ final class Str
             return $this;
         }
 
-        /**
-         * @psalm-suppress InvalidArgument
-         * @var Sequence<string>
-         */
         $parts = $this
             ->split($search)
             ->toSequenceOf('string', static fn($v) => yield $v->toString());
@@ -174,10 +170,6 @@ final class Str
      */
     public function reverse(): self
     {
-        /**
-         * @psalm-suppress InvalidArgument
-         * @var Sequence<string>
-         */
         $parts = $this
             ->chunk()
             ->reverse()
@@ -430,10 +422,6 @@ final class Str
      */
     public function camelize(): self
     {
-        /**
-         * @psalm-suppress InvalidArgument
-         * @var Sequence<string>
-         */
         $words = $this
             ->pregSplit('/_| /')
             ->map(static function(self $part) {

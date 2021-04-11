@@ -95,10 +95,8 @@ final class Defer implements Implementation
     {
         $iteration = 0;
 
-        /** @var T $value */
         foreach ($this->values as $value) {
             if ($index === $iteration) {
-                /** @var T */
                 return $value;
             }
 
@@ -311,8 +309,7 @@ final class Defer implements Implementation
             'int',
             (static function($values): \Generator {
                 $index = 0;
-                /** @var T $value */
-                foreach ($values as $value) {
+                foreach ($values as $_) {
                     yield $index++;
                 }
             })($this->values),
@@ -499,7 +496,6 @@ final class Defer implements Implementation
                 $values = \iterator_to_array($values);
                 \usort($values, $sorter);
 
-                /** @var T $value */
                 foreach ($values as $value) {
                     yield $value;
                 }

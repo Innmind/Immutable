@@ -398,10 +398,7 @@ final class Sequence implements \Countable
      */
     public function indices(): self
     {
-        /** @var self<int> */
-        $self = new self('int', $this->implementation->indices());
-
-        return $self;
+        return new self('int', $this->implementation->indices());
     }
 
     /**

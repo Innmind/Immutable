@@ -224,14 +224,11 @@ final class ObjectKeys implements Implementation
             }
 
             if ($groups->contains($discriminant)) {
-                /** @var Map<T, S> */
                 $group = $groups->get($discriminant);
-                /** @var Map<T, S> */
                 $group = ($group)($key, $v);
 
                 $groups = ($groups)($discriminant, $group);
             } else {
-                /** @var Map<T, S> */
                 $group = $this->clearMap()($key, $v);
 
                 $groups = ($groups)($discriminant, $group);

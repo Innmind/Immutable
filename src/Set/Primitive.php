@@ -176,7 +176,6 @@ final class Primitive implements Implementation
      */
     public function groupBy(callable $discriminator): Map
     {
-        /** @var Map<D, Sequence<T>> */
         $map = $this->values->groupBy($discriminator);
 
         /**

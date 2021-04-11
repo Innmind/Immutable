@@ -245,10 +245,7 @@ final class Map implements \Countable
                  * @var S $value
                  */
                 $discriminant = $discriminator($key, $value);
-                /**
-                 * @psalm-suppress InvalidArgument Psalm doesn't read correctly the templates for $groups
-                 * @var self<T, S>
-                 */
+                /** @psalm-suppress InvalidArgument Psalm doesn't read correctly the templates for $groups */
                 $group = $groups->contains($discriminant) ? $groups->get($discriminant) : $this->clear();
 
                 /** @psalm-suppress InvalidArgument */

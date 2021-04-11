@@ -206,9 +206,7 @@ final class Primitive implements Implementation
             }
 
             if ($groups->contains($key)) {
-                /** @var Sequence<T> */
                 $group = $groups->get($key);
-                /** @var Sequence<T> */
                 $group = ($group)($value);
 
                 $groups = ($groups)($key, $group);
@@ -336,9 +334,7 @@ final class Primitive implements Implementation
             }
         }
 
-        /** @var Sequence<T> */
         $true = Sequence::of($this->type, ...$truthy);
-        /** @var Sequence<T> */
         $false = Sequence::of($this->type, ...$falsy);
 
         /**
