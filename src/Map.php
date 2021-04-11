@@ -27,7 +27,6 @@ final class Map implements \Countable
         string $valueType,
         Map\Implementation $implementation
     ) {
-        $type = Type::of($keyType);
         $this->implementation = $implementation;
         $this->keyType = $keyType;
         $this->valueType = $valueType;
