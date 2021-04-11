@@ -35,6 +35,7 @@ final class Primitive implements Implementation
     {
         $this->type = $type;
         $this->validate = Type::of($type);
+        /** @var list<T> */
         $this->values = $values;
     }
 

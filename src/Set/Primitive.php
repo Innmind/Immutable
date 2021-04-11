@@ -82,6 +82,7 @@ final class Primitive implements Implementation
     public function intersect(Implementation $set): self
     {
         $self = $this->clear();
+        /** @psalm-suppress InvalidArgument */
         $self->values = $this->values->intersect(
             new Sequence\Primitive($this->type, ...$set->iterator()),
         );
@@ -126,6 +127,7 @@ final class Primitive implements Implementation
     public function diff(Implementation $set): self
     {
         $self = clone $this;
+        /** @psalm-suppress InvalidArgument */
         $self->values = $this->values->diff(
             new Sequence\Primitive($this->type, ...$set->iterator()),
         );

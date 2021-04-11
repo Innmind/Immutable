@@ -21,6 +21,7 @@ final class UnionType implements ValidateArgument
         ValidateArgument ...$rest
     ) {
         $this->type = $type;
+        /** @psalm-suppress DuplicateArrayKey */
         $this->types = [$first, $second, ...$rest];
     }
 
