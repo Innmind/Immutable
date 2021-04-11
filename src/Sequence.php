@@ -68,7 +68,7 @@ final class Sequence implements \Countable
             static function(int $position, $element) use ($self): int {
                 ($self->validate)($element, $position);
 
-                return ++$position;
+                return $position + 1;
             }
         );
 
