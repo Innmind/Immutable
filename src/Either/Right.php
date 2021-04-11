@@ -35,6 +35,19 @@ final class Right implements Implementation
         return $map($this->value);
     }
 
+    /**
+     * @template T
+     *
+     * @param callable(L1): T $map
+     *
+     * @return self<T, R1>
+     */
+    public function leftMap(callable $map): self
+    {
+        /** @var self<T, R1> */
+        return $this;
+    }
+
     public function match(callable $left, callable $right)
     {
         return $right($this->value);

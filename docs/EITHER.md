@@ -134,3 +134,13 @@ identify($request)
         fn(User $user) => doSomething($user), // here we know the user is allowed
     );
 ```
+
+## `->leftMap()`
+
+This is similar to the `->map()` function but will be applied on the left value only.
+
+```php
+/** @var Either<ErrorResponse, User> */
+$either = identify($request)
+    ->leftMap(fn(Error $error) => new ErrorResponse($error));
+```

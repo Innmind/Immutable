@@ -82,6 +82,18 @@ final class Either
     /**
      * @template T
      *
+     * @param callable(L): T $map
+     *
+     * @return self<T, R>
+     */
+    public function leftMap(callable $map): self
+    {
+        return new self($this->either->leftMap($map));
+    }
+
+    /**
+     * @template T
+     *
      * @param callable(L): T $left
      * @param callable(R): T $right
      *
