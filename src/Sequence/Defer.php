@@ -309,6 +309,7 @@ final class Defer implements Implementation
             'int',
             (static function($values): \Generator {
                 $index = 0;
+
                 foreach ($values as $_) {
                     yield $index++;
                 }

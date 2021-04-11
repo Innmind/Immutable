@@ -326,6 +326,7 @@ final class Lazy implements Implementation
             'int',
             static function() use ($values): \Generator {
                 $index = 0;
+
                 foreach ($values() as $_) {
                     yield $index++;
                 }
@@ -406,6 +407,7 @@ final class Lazy implements Implementation
             $this->type,
             static function() use ($values, $from, $until): \Generator {
                 $index = 0;
+
                 foreach ($values() as $value) {
                     if ($index >= $from && $index < $until) {
                         yield $value;
@@ -439,6 +441,7 @@ final class Lazy implements Implementation
             $this->type,
             static function() use ($values, $size): \Generator {
                 $taken = 0;
+
                 foreach ($values() as $value) {
                     if ($taken >= $size) {
                         return;
