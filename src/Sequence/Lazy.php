@@ -56,7 +56,6 @@ final class Lazy implements Implementation
         return new self(
             $this->type,
             static function() use ($values, $element): \Generator {
-                /** @var T $value */
                 foreach ($values() as $value) {
                     yield $value;
                 }
@@ -108,10 +107,8 @@ final class Lazy implements Implementation
     {
         $iteration = 0;
 
-        /** @var T $value */
         foreach ($this->iterator() as $value) {
             if ($index === $iteration) {
-                /** @var T */
                 return $value;
             }
 
@@ -149,7 +146,6 @@ final class Lazy implements Implementation
                 /** @var list<T> */
                 $uniques = [];
 
-                /** @var T $value */
                 foreach ($values() as $value) {
                     if (!\in_array($value, $uniques, true)) {
                         $uniques[] = $value;
@@ -174,7 +170,6 @@ final class Lazy implements Implementation
             static function() use ($values, $size): \Generator {
                 $dropped = 0;
 
-                /** @var T $value */
                 foreach ($values() as $value) {
                     if ($dropped < $size) {
                         ++$dropped;
@@ -219,9 +214,7 @@ final class Lazy implements Implementation
         return new self(
             $this->type,
             static function() use ($values, $predicate): \Generator {
-                /** @var T $value */
                 foreach ($values() as $value) {
-                    /** @psalm-suppress InvalidArgument */
                     if ($predicate($value)) {
                         yield $value;
                     }
@@ -333,8 +326,8 @@ final class Lazy implements Implementation
             'int',
             static function() use ($values): \Generator {
                 $index = 0;
-                /** @var T $value */
-                foreach ($values() as $value) {
+
+                foreach ($values() as $_) {
                     yield $index++;
                 }
             },
@@ -355,9 +348,7 @@ final class Lazy implements Implementation
         return new self(
             $this->type,
             static function() use ($values, $function, $validate): \Generator {
-                /** @var T $value */
                 foreach ($values() as $value) {
-                    /** @psalm-suppress InvalidArgument */
                     $value = $function($value);
                     $validate($value, 1);
 
@@ -380,7 +371,6 @@ final class Lazy implements Implementation
         return new self(
             $this->type,
             static function() use ($values, $size, $element): \Generator {
-                /** @var T $value */
                 foreach ($values() as $value) {
                     yield $value;
                     --$size;
@@ -417,7 +407,7 @@ final class Lazy implements Implementation
             $this->type,
             static function() use ($values, $from, $until): \Generator {
                 $index = 0;
-                /** @var T $value */
+
                 foreach ($values() as $value) {
                     if ($index >= $from && $index < $until) {
                         yield $value;
@@ -451,7 +441,7 @@ final class Lazy implements Implementation
             $this->type,
             static function() use ($values, $size): \Generator {
                 $taken = 0;
-                /** @var T $value */
+
                 foreach ($values() as $value) {
                     if ($taken >= $size) {
                         return;
@@ -487,12 +477,10 @@ final class Lazy implements Implementation
         return new self(
             $this->type,
             static function() use ($values, $sequence): \Generator {
-                /** @var T $value */
                 foreach ($values() as $value) {
                     yield $value;
                 }
 
-                /** @var T $value */
                 foreach ($sequence->iterator() as $value) {
                     yield $value;
                 }
@@ -530,7 +518,6 @@ final class Lazy implements Implementation
                 $values = \iterator_to_array($values());
                 \usort($values, $function);
 
-                /** @var T $value */
                 foreach ($values as $value) {
                     yield $value;
                 }
@@ -602,7 +589,6 @@ final class Lazy implements Implementation
         return Sequence::lazy(
             $type,
             static function() use ($values, $mapper): \Generator {
-                /** @var T $value */
                 foreach ($values() as $value) {
                     /** @var ST $newValue */
                     foreach ($mapper($value) as $newValue) {
@@ -630,7 +616,6 @@ final class Lazy implements Implementation
         return Set::lazy(
             $type,
             static function() use ($values, $mapper): \Generator {
-                /** @var T $value */
                 foreach ($values() as $value) {
                     /** @var ST $newValue */
                     foreach ($mapper($value) as $newValue) {

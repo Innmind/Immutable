@@ -43,6 +43,11 @@ final class Left implements Implementation
         return Either::left($this->value);
     }
 
+    public function leftMap(callable $map): self
+    {
+        return new self($map($this->value));
+    }
+
     public function match(callable $left, callable $right)
     {
         return $left($this->value);

@@ -34,6 +34,15 @@ interface Implementation
     /**
      * @template T
      *
+     * @param callable(L): T $map
+     *
+     * @return self<T, R>
+     */
+    public function leftMap(callable $map): self;
+
+    /**
+     * @template T
+     *
      * @param callable(L): T $left
      * @param callable(R): T $right
      *

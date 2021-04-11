@@ -60,18 +60,11 @@ final class DoubleIndex implements Implementation
 
         if ($this->keys->contains($key)) {
             $index = $this->keys->indexOf($key);
-            /** @psalm-suppress MixedArgumentTypeCoercion */
             $map->values = $this->values->take($index)($value)->append($this->values->drop($index + 1));
-            /**
-             * @psalm-suppress MixedArgumentTypeCoercion
-             * @var Sequence\Implementation<Pair<T, S>>
-             */
             $map->pairs = $this->pairs->take($index)(new Pair($key, $value))->append($this->pairs->drop($index + 1));
         } else {
-            /** @var Sequence\Implementation<T> */
             $map->keys = ($this->keys)($key);
             $map->values = ($this->values)($value);
-            /** @var Sequence\Implementation<Pair<T, S>> */
             $map->pairs = ($this->pairs)(new Pair($key, $value));
         }
 
@@ -166,11 +159,8 @@ final class DoubleIndex implements Implementation
 
         foreach ($this->pairs->iterator() as $pair) {
             if ($predicate($pair->key(), $pair->value()) === true) {
-                /** @var Sequence\Implementation<T> */
                 $map->keys = ($map->keys)($pair->key());
-                /** @var Sequence\Implementation<S> */
                 $map->values = ($map->values)($pair->value());
-                /** @var Sequence\Implementation<Pair<T, S>> */
                 $map->pairs = ($map->pairs)($pair);
             }
         }
@@ -216,14 +206,11 @@ final class DoubleIndex implements Implementation
             }
 
             if ($groups->contains($key)) {
-                /** @var Map<T, S> */
                 $group = $groups->get($key);
-                /** @var Map<T, S> */
                 $group = ($group)($pair->key(), $pair->value());
 
                 $groups = ($groups)($key, $group);
             } else {
-                /** @var Map<T, S> */
                 $group = $this->clearMap()($pair->key(), $pair->value());
 
                 $groups = ($groups)($key, $group);
@@ -291,7 +278,6 @@ final class DoubleIndex implements Implementation
 
         $index = $this->keys->indexOf($key);
         $map = clone $this;
-        /** @var Sequence\Implementation<T> */
         $map->keys = $this
             ->keys
             ->slice(0, $index)
@@ -300,7 +286,6 @@ final class DoubleIndex implements Implementation
             ->values
             ->slice(0, $index)
             ->append($this->values->slice($index + 1, $this->values->size()));
-        /** @var Sequence\Implementation<Pair<T, S>> */
         $map->pairs = $this
             ->pairs
             ->slice(0, $index)

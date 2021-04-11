@@ -283,4 +283,49 @@ class EitherTest extends TestCase
                 );
             });
     }
+
+    public function testRightValueIsNotLeftMapped()
+    {
+        $this
+            ->forAll(Set\AnyType::any())
+            ->then(function($initial) {
+                $either = Either::right($initial)->leftMap(static function() {
+                    throw new \Exception;
+                });
+
+                $this->assertInstanceOf(Either::class, $either);
+                $this->assertSame(
+                    $initial,
+                    $either->match(
+                        static fn($value) => $value,
+                        static fn($value) => $value,
+                    ),
+                );
+            });
+    }
+
+    public function testLeftValueIsLeftMapped()
+    {
+        $this
+            ->forAll(
+                Set\AnyType::any(),
+                Set\AnyType::any(),
+            )
+            ->then(function($initial, $mapped) {
+                $either = Either::left($initial)->leftMap(function($value) use ($initial, $mapped) {
+                    $this->assertSame($initial, $value);
+
+                    return $mapped;
+                });
+
+                $this->assertInstanceOf(Either::class, $either);
+                $this->assertSame(
+                    $mapped,
+                    $either->match(
+                        static fn($value) => $value,
+                        static fn($value) => $value,
+                    ),
+                );
+            });
+    }
 }

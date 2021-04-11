@@ -111,7 +111,7 @@ $regexp->capture(Str::of('foo123bar')); // Map<scalar, Str> with index `i` set t
 
 ## [BlackBox](https://github.com/innmind/blackbox/)
 
-This library provides 3 `Set`s that can be used with [`innmind/back-box`](https://packagist.org/packages/innmind/black-box).
+This library provides 3 `Set`s that can be used with [`innmind/black-box`](https://packagist.org/packages/innmind/black-box).
 
 You can use them as follow:
 

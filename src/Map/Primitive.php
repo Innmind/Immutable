@@ -185,11 +185,8 @@ final class Primitive implements Implementation
 
         $groups = null;
 
-        foreach ($this->values as $k => $v) {
-            /** @var T */
+        foreach ($this->values as $k => $value) {
             $key = $this->normalizeKey($k);
-            /** @var S */
-            $value = $v;
             $discriminant = $discriminator($key, $value);
 
             if ($groups === null) {
@@ -201,14 +198,11 @@ final class Primitive implements Implementation
             }
 
             if ($groups->contains($discriminant)) {
-                /** @var Map<T, S> */
                 $group = $groups->get($discriminant);
-                /** @var Map<T, S> */
                 $group = ($group)($key, $value);
 
                 $groups = ($groups)($discriminant, $group);
             } else {
-                /** @var Map<T, S> */
                 $group = $this->clearMap()($key, $value);
 
                 $groups = ($groups)($discriminant, $group);

@@ -27,7 +27,6 @@ final class Map implements \Countable
         string $valueType,
         Map\Implementation $implementation
     ) {
-        $type = Type::of($keyType);
         $this->implementation = $implementation;
         $this->keyType = $keyType;
         $this->valueType = $valueType;
@@ -246,10 +245,7 @@ final class Map implements \Countable
                  * @var S $value
                  */
                 $discriminant = $discriminator($key, $value);
-                /**
-                 * @psalm-suppress InvalidArgument Psalm doesn't read correctly the templates for $groups
-                 * @var self<T, S>
-                 */
+                /** @psalm-suppress InvalidArgument Psalm doesn't read correctly the templates for $groups */
                 $group = $groups->contains($discriminant) ? $groups->get($discriminant) : $this->clear();
 
                 /** @psalm-suppress InvalidArgument */
