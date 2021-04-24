@@ -184,14 +184,6 @@ Repeat the original string the number of given times.
 Str::of('foo')->repeat(3)->equals(Str::of('foofoofoo'));
 ```
 
-## `->shuffle()`
-
-Randomly reorder the string.
-
-```php
-Str::of('foobar')->shuffle()->equals(Str::of('obaofr')); // maybe true
-```
-
 ## `->stripSlashes()`
 
 Same behaviour as the native `stripslashes` function.

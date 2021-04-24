@@ -229,22 +229,6 @@ final class Str
         return new self(\str_repeat($this->value, $repeat), $this->encoding);
     }
 
-    /**
-     * Shuffle the string
-     */
-    public function shuffle(): self
-    {
-        /** @psalm-suppress InvalidArgument */
-        $parts = unwrap(
-            $this
-                ->chunk()
-                ->toSequenceOf('string', static fn($v) => yield $v->toString()),
-        );
-        \shuffle($parts);
-
-        return new self(\implode('', $parts), $this->encoding);
-    }
-
     public function stripSlashes(): self
     {
         return new self(\stripslashes($this->value), $this->encoding);

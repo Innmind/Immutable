@@ -436,41 +436,6 @@ class StrTest extends TestCase
         $this->assertSame('🙏🙏', S::of('🙏')->toEncoding('ASCII')->repeat(2)->toString());
     }
 
-    public function testShuffle()
-    {
-        $str = S::of('shuffle🙏');
-
-        $str2 = $str->shuffle();
-        $this->assertInstanceOf(S::class, $str2);
-        $this->assertNotSame($str, $str2);
-        $this->assertSame('shuffle🙏', $str->toString());
-        $this->assertSame(8, $str2->length());
-
-        try {
-            foreach ($str2->split() as $char) {
-                $str->position($char->toString());
-            }
-        } catch (\Exception $e) {
-            $this->fail('every character should be in the original string');
-        }
-    }
-
-    public function testShuffleEmoji()
-    {
-        $str = S::of('🙏');
-
-        try {
-            $this->assertSame('🙏 ', $str->shuffle()->toString());
-        } catch (ExpectationFailedException $e) {
-            // sometimes it shuffles to the same order so the tests fails
-            $this->assertSame('🙏', $str->shuffle()->toString());
-        }
-        $this->assertNotSame(
-            '🙏',
-            $str->toEncoding('ASCII')->shuffle()->toString()
-        );
-    }
-
     public function testStripSlashes()
     {
         $str = S::of("Is your name O\'reilly?");
