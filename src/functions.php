@@ -17,13 +17,6 @@ use Innmind\Immutable\Exception\{
  */
 function unwrap($structure): array
 {
-    /** @psalm-suppress DocblockTypeContradiction */
-    if (!$structure instanceof Set && !$structure instanceof Sequence) {
-        $given = Type::determine($structure);
-
-        throw new \TypeError("Argument 1 must be of type Set|Sequence, $given given");
-    }
-
     /**
      * @psalm-suppress MixedAssignment
      *
@@ -46,13 +39,6 @@ function unwrap($structure): array
  */
 function join(string $separator, $structure): Str
 {
-    /** @psalm-suppress DocblockTypeContradiction */
-    if (!$structure instanceof Set && !$structure instanceof Sequence) {
-        $given = Type::determine($structure);
-
-        throw new \TypeError("Argument 2 must be of type Set|Sequence, $given given");
-    }
-
     return Str::of(\implode($separator, unwrap($structure)));
 }
 

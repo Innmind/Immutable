@@ -35,22 +35,6 @@ class FunctionsTest extends TestCase
         );
     }
 
-    public function testThrowWhenUnwrappingNotOfExpectedType()
-    {
-        $this->expectException(\TypeError::class);
-        $this->expectExceptionMessage('Argument 1 must be of type Set|Sequence, stdClass given');
-
-        unwrap(new \stdClass);
-    }
-
-    public function testThrowWhenJoiningNotOfExpectedType()
-    {
-        $this->expectException(\TypeError::class);
-        $this->expectExceptionMessage('Argument 2 must be of type Set|Sequence, stdClass given');
-
-        join('|', new \stdClass);
-    }
-
     public function testJoinSet()
     {
         $str = join('|', Set::of('1', '2', '3'));
