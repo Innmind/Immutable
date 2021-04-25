@@ -250,7 +250,7 @@ final class ObjectKeys implements Implementation
     }
 
     /**
-     * @param callable(T, S): (S|Pair<T, S>) $function
+     * @param callable(T, S): S $function
      *
      * @return self<T, S>
      */
@@ -264,19 +264,7 @@ final class ObjectKeys implements Implementation
             /** @var S */
             $v = $this->values[$k];
 
-            $return = $function($key, $v);
-
-            if ($return instanceof Pair) {
-                /** @var object */
-                $key = $return->key();
-                /** @var S */
-                $value = $return->value();
-            } else {
-                $key = $k;
-                $value = $return;
-            }
-
-            $map->values[$key] = $value;
+            $map->values[$k] = $function($key, $v);
         }
 
         return $map;

@@ -143,7 +143,7 @@ final class Uninitialized implements Implementation
     }
 
     /**
-     * @param callable(T, S): (S|Pair<T, S>) $function
+     * @param callable(T, S): S $function
      *
      * @return self<T, S>
      */

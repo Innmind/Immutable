@@ -225,18 +225,14 @@ class PrimitiveTest extends TestCase
             (4, 5);
 
         $m2 = $m->map(static function(int $key, int $value) {
-            if ($key % 2 === 0) {
-                return new Pair($key + 10, $value);
-            }
-
             return $value**2;
         });
         $this->assertNotSame($m, $m2);
         $this->assertInstanceOf(Primitive::class, $m2);
         $this->assertSame([0, 1, 2, 4], unwrap($m->keys()));
         $this->assertSame([1, 2, 3, 5], unwrap($m->values()));
-        $this->assertSame([10, 1, 12, 14], unwrap($m2->keys()));
-        $this->assertSame([1, 4, 3, 5], unwrap($m2->values()));
+        $this->assertSame([0, 1, 2, 4], unwrap($m2->keys()));
+        $this->assertSame([1, 4, 9, 25], unwrap($m2->values()));
     }
 
     public function testRemove()

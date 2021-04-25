@@ -219,7 +219,7 @@ final class DoubleIndex implements Implementation
     }
 
     /**
-     * @param callable(T, S): (S|Pair<T, S>) $function
+     * @param callable(T, S): S $function
      *
      * @return self<T, S>
      */
@@ -228,19 +228,10 @@ final class DoubleIndex implements Implementation
         $map = $this->clear();
 
         foreach ($this->pairs->iterator() as $pair) {
-            $return = $function($pair->key(), $pair->value());
-
-            if ($return instanceof Pair) {
-                /** @var T */
-                $key = $return->key();
-                /** @var S */
-                $value = $return->value();
-            } else {
-                $key = $pair->key();
-                $value = $return;
-            }
-
-            $map = ($map)($key, $value);
+            $map = ($map)(
+                $pair->key(),
+                $function($pair->key(), $pair->value()),
+            );
         }
 
         return $map;

@@ -231,7 +231,7 @@ final class Primitive implements Implementation
     }
 
     /**
-     * @param callable(T, S): (S|Pair<T, S>) $function
+     * @param callable(T, S): S $function
      *
      * @return self<T, S>
      */
@@ -240,19 +240,7 @@ final class Primitive implements Implementation
         $map = $this->clear();
 
         foreach ($this->values as $k => $v) {
-            $return = $function($k, $v);
-
-            if ($return instanceof Pair) {
-                /** @var T */
-                $key = $return->key();
-                /** @var S */
-                $value = $return->value();
-            } else {
-                $key = $k;
-                $value = $return;
-            }
-
-            $map->values[$key] = $value;
+            $map->values[$k] = $function($k, $v);
         }
 
         return $map;

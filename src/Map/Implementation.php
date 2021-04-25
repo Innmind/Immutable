@@ -108,9 +108,7 @@ interface Implementation extends \Countable
     /**
      * Apply the given function on all elements and return a new map
      *
-     * Keys can't be modified
-     *
-     * @param callable(T, S): (S|Pair<T, S>) $function
+     * @param callable(T, S): S $function
      *
      * @return self<T, S>
      */

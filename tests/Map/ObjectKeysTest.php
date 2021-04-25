@@ -205,10 +205,6 @@ class ObjectKeysTest extends TestCase
             ($d = new \stdClass, 4);
 
         $m2 = $m->map(static function(\stdClass $key, int $value) {
-            if ($value % 2 === 0) {
-                return new Pair($key, $value + 10);
-            }
-
             return $value**2;
         });
         $this->assertNotSame($m, $m2);
@@ -216,7 +212,7 @@ class ObjectKeysTest extends TestCase
         $this->assertSame([$a, $b, $c, $d], unwrap($m->keys()));
         $this->assertSame([1, 2, 3, 4], unwrap($m->values()));
         $this->assertSame([$a, $b, $c, $d], unwrap($m2->keys()));
-        $this->assertSame([1, 12, 9, 14], unwrap($m2->values()));
+        $this->assertSame([1, 4, 9, 16], unwrap($m2->values()));
     }
 
     public function testRemove()
