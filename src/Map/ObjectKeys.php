@@ -31,10 +31,14 @@ final class ObjectKeys implements Implementation
      * @param T $key
      * @param S $value
      *
-     * @return self<T, S>
+     * @return Implementation<T, S>
      */
     public function __invoke($key, $value): Implementation
     {
+        if (!\is_object($key)) {
+            return (new DoubleIndex)->merge($this)($key, $value);
+        }
+
         $map = clone $this;
         $map->values = clone $this->values;
         /** @psalm-suppress MixedArgumentTypeCoercion */
@@ -301,14 +305,14 @@ final class ObjectKeys implements Implementation
     /**
      * @param Implementation<T, S> $map
      *
-     * @return self<T, S>
+     * @return Implementation<T, S>
      */
-    public function merge(Implementation $map): self
+    public function merge(Implementation $map): Implementation
     {
         /** @psalm-suppress MixedArgument For some reason it no longer recognize templates for $key and $value */
         return $map->reduce(
             $this,
-            static fn(self $carry, $key, $value): self => ($carry)($key, $value),
+            static fn(Implementation $carry, $key, $value): Implementation => ($carry)($key, $value),
         );
     }
 

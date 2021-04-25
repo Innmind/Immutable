@@ -5,6 +5,7 @@ namespace Tests\Innmind\Immutable\Map;
 
 use Innmind\Immutable\{
     Map\ObjectKeys,
+    Map\DoubleIndex,
     Map\Implementation,
     Map,
     Pair,
@@ -379,5 +380,13 @@ class ObjectKeysTest extends TestCase
         $this->assertCount(2, $map);
         $this->assertSame($a, $map->get(2));
         $this->assertSame($b, $map->get(4));
+    }
+
+    public function testSwitchImplementationWhenAddingNonKeyObject()
+    {
+        $map = (new ObjectKeys)(1, 2);
+
+        $this->assertInstanceOf(DoubleIndex::class, $map);
+        $this->assertCount(1, $map);
     }
 }
