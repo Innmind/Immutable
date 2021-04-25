@@ -49,7 +49,6 @@ final class Uninitialized implements Implementation
      */
     public static function open(string $keyType, string $valueType, $key, $value): Implementation
     {
-        /** @psalm-suppress InvalidArgument */
         return ObjectKeys::of($keyType, $valueType, $key, $value)
             ->otherwise(static fn() => Primitive::of($keyType, $valueType, $key, $value))
             ->match(

@@ -61,7 +61,7 @@ final class ObjectKeys implements Implementation
      * @param A $key
      * @param B $value
      *
-     * @return Maybe<self<A, B>>
+     * @return Maybe<Implementation<A, B>>
      */
     public static function of(string $keyType, string $valueType, $key, $value): Maybe
     {
@@ -71,10 +71,11 @@ final class ObjectKeys implements Implementation
             /** @var self<A, B> */
             $self = new self($keyType, $valueType);
 
+            /** @var Maybe<Implementation<A, B>> */
             return Maybe::just(($self)($key, $value));
         }
 
-        /** @var Maybe<self<A, B>> */
+        /** @var Maybe<Implementation<A, B>> */
         return Maybe::nothing();
     }
 

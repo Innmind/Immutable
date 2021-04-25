@@ -42,10 +42,19 @@ final class Primitive implements Implementation
      * @param T $key
      * @param S $value
      *
-     * @return self<T, S>
+     * @return Implementation<T, S>
      */
-    public function __invoke($key, $value): self
+    public function __invoke($key, $value): Implementation
     {
+        /** @psalm-suppress DocblockTypeContradiction */
+        if (\is_string($key) && \is_numeric($key)) {
+            // numeric-string keys are casted to ints by php, so when iterating
+            // over the array afterward the type is not conserved so we switch
+            // the implementation to DoubleIndex so keep the type
+            return (new DoubleIndex($this->keyType, $this->valueType))
+                ->merge($this)($key, $value);
+        }
+
         $map = clone $this;
         $map->size = null;
         $map->values[$key] = $value;
@@ -60,7 +69,7 @@ final class Primitive implements Implementation
      * @param A $key
      * @param B $value
      *
-     * @return Maybe<self<A, B>>
+     * @return Maybe<Implementation<A, B>>
      */
     public static function of(string $keyType, string $valueType, $key, $value): Maybe
     {
@@ -71,7 +80,7 @@ final class Primitive implements Implementation
             return Maybe::just(($self)($key, $value));
         }
 
-        /** @var Maybe<self<A, B>> */
+        /** @var Maybe<Implementation<A, B>> */
         return Maybe::nothing();
     }
 
@@ -165,7 +174,7 @@ final class Primitive implements Implementation
         $map = $this->clear();
 
         foreach ($this->values as $k => $v) {
-            if ($predicate($this->normalizeKey($k), $v) === true) {
+            if ($predicate($k, $v) === true) {
                 $map->values[$k] = $v;
             }
         }
@@ -179,7 +188,7 @@ final class Primitive implements Implementation
     public function foreach(callable $function): void
     {
         foreach ($this->values as $k => $v) {
-            $function($this->normalizeKey($k), $v);
+            $function($k, $v);
         }
     }
 
@@ -199,8 +208,7 @@ final class Primitive implements Implementation
 
         $groups = null;
 
-        foreach ($this->values as $k => $value) {
-            $key = $this->normalizeKey($k);
+        foreach ($this->values as $key => $value) {
             $discriminant = $discriminator($key, $value);
 
             if ($groups === null) {
@@ -235,13 +243,7 @@ final class Primitive implements Implementation
         /** @psalm-suppress MixedArgumentTypeCoercion */
         $keys = \array_keys($this->values);
 
-        return Set::of(
-            $this->keyType,
-            ...\array_map(
-                fn($key) => $this->normalizeKey($key),
-                $keys,
-            ),
-        );
+        return Set::of($this->keyType, ...$keys);
     }
 
     /**
@@ -265,7 +267,7 @@ final class Primitive implements Implementation
         $map = $this->clear();
 
         foreach ($this->values as $k => $v) {
-            $return = $function($this->normalizeKey($k), $v);
+            $return = $function($k, $v);
 
             if ($return instanceof Pair) {
                 /** @var T */
@@ -305,14 +307,14 @@ final class Primitive implements Implementation
     /**
      * @param Implementation<T, S> $map
      *
-     * @return self<T, S>
+     * @return Implementation<T, S>
      */
-    public function merge(Implementation $map): self
+    public function merge(Implementation $map): Implementation
     {
         /** @psalm-suppress MixedArgument For some reason it no longer recognize templates for $key and $value */
         return $map->reduce(
             $this,
-            static fn(self $carry, $key, $value): self => ($carry)($key, $value),
+            static fn(Implementation $carry, $key, $value): Implementation => ($carry)($key, $value),
         );
     }
 
@@ -327,7 +329,7 @@ final class Primitive implements Implementation
         $falsy = $this->clearMap();
 
         foreach ($this->values as $k => $v) {
-            $return = $predicate($this->normalizeKey($k), $v);
+            $return = $predicate($k, $v);
 
             if ($return === true) {
                 $truthy = ($truthy)($k, $v);
@@ -356,7 +358,7 @@ final class Primitive implements Implementation
     public function reduce($carry, callable $reducer)
     {
         foreach ($this->values as $k => $v) {
-            $carry = $reducer($carry, $this->normalizeKey($k), $v);
+            $carry = $reducer($carry, $k, $v);
         }
 
         return $carry;
@@ -440,22 +442,6 @@ final class Primitive implements Implementation
         }
 
         return $map;
-    }
-
-    /**
-     * @param mixed $value
-     *
-     * @return T
-     */
-    private function normalizeKey($value)
-    {
-        if ($this->keyType === 'string' && !\is_null($value)) {
-            /** @var T */
-            return (string) $value;
-        }
-
-        /** @var T */
-        return $value;
     }
 
     /**
