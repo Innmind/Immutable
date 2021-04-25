@@ -19,13 +19,13 @@ use Innmind\Immutable\{
  */
 final class Lazy implements Implementation
 {
-    /** @var \Closure(): \Generator<T> */
+    /** @var \Closure(): \Generator<int, T> */
     private \Closure $values;
     private ?int $size = null;
 
     public function __construct(callable $generator)
     {
-        /** @var \Closure(): \Generator<T> */
+        /** @var \Closure(): \Generator<int, T> */
         $this->values = \Closure::fromCallable(static function() use ($generator): \Generator {
             /** @var T $value */
             foreach ($generator() as $value) {
@@ -75,7 +75,7 @@ final class Lazy implements Implementation
     }
 
     /**
-     * @return \Iterator<T>
+     * @return \Iterator<int, T>
      */
     public function iterator(): \Iterator
     {

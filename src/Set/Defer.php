@@ -61,7 +61,7 @@ final class Defer implements Implementation
     }
 
     /**
-     * @return \Iterator<T>
+     * @return \Iterator<int, T>
      */
     public function iterator(): \Iterator
     {

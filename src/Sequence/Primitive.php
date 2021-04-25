@@ -24,11 +24,12 @@ final class Primitive implements Implementation
     private ?int $size = null;
 
     /**
+     * @no-named-arguments
+     *
      * @param T $values
      */
     public function __construct(...$values)
     {
-        /** @var list<T> */
         $this->values = $values;
     }
 
@@ -57,7 +58,7 @@ final class Primitive implements Implementation
     }
 
     /**
-     * @return \Iterator<T>
+     * @return \Iterator<int, T>
      */
     public function iterator(): \Iterator
     {
@@ -362,7 +363,6 @@ final class Primitive implements Implementation
     public function append(Implementation $sequence): self
     {
         $self = $this->clear();
-        /** @var list<T> */
         $self->values = \array_merge($this->values, \iterator_to_array($sequence->iterator()));
 
         return $self;

@@ -20,6 +20,8 @@ final class Primitive implements Implementation
     private Sequence\Implementation $values;
 
     /**
+     * @no-named-arguments
+     *
      * @param T $values
      */
     public function __construct(...$values)
@@ -56,7 +58,7 @@ final class Primitive implements Implementation
     }
 
     /**
-     * @return \Iterator<T>
+     * @return \Iterator<int, T>
      */
     public function iterator(): \Iterator
     {
@@ -71,7 +73,6 @@ final class Primitive implements Implementation
     public function intersect(Implementation $set): self
     {
         $self = $this->clear();
-        /** @psalm-suppress InvalidArgument */
         $self->values = $this->values->intersect(
             new Sequence\Primitive(...$set->iterator()),
         );
@@ -116,7 +117,6 @@ final class Primitive implements Implementation
     public function diff(Implementation $set): self
     {
         $self = clone $this;
-        /** @psalm-suppress InvalidArgument */
         $self->values = $this->values->diff(
             new Sequence\Primitive(...$set->iterator()),
         );

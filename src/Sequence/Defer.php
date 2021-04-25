@@ -20,11 +20,12 @@ use Innmind\Immutable\{
  */
 final class Defer implements Implementation
 {
-    /** @var \Iterator<T> */
+    /** @var \Iterator<int, T> */
     private \Iterator $values;
 
     public function __construct(\Generator $generator)
     {
+        /** @var \Iterator<int, T> */
         $this->values = new Accumulate((static function(\Generator $generator): \Generator {
             /** @var T $value */
             foreach ($generator as $value) {
@@ -64,7 +65,7 @@ final class Defer implements Implementation
     }
 
     /**
-     * @return \Iterator<T>
+     * @return \Iterator<int, T>
      */
     public function iterator(): \Iterator
     {

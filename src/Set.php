@@ -42,6 +42,7 @@ final class Set implements \Countable
 
     /**
      * @template V
+     * @no-named-arguments
      *
      * @param V $values
      *
@@ -89,6 +90,8 @@ final class Set implements \Countable
     }
 
     /**
+     * @no-named-arguments
+     *
      * @param mixed $values
      *
      * @return self<mixed>
@@ -99,6 +102,8 @@ final class Set implements \Countable
     }
 
     /**
+     * @no-named-arguments
+     *
      * @return self<int>
      */
     public static function ints(int ...$values): self
@@ -110,6 +115,8 @@ final class Set implements \Countable
     }
 
     /**
+     * @no-named-arguments
+     *
      * @return self<float>
      */
     public static function floats(float ...$values): self
@@ -121,6 +128,8 @@ final class Set implements \Countable
     }
 
     /**
+     * @no-named-arguments
+     *
      * @return self<string>
      */
     public static function strings(string ...$values): self
@@ -132,6 +141,8 @@ final class Set implements \Countable
     }
 
     /**
+     * @no-named-arguments
+     *
      * @return self<object>
      */
     public static function objects(object ...$values): self
