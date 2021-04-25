@@ -5,7 +5,6 @@ namespace Innmind\Immutable;
 
 use Innmind\Immutable\Exception\{
     LogicException,
-    CannotGroupEmptyStructure,
     ElementNotFound,
     OutOfBoundException,
     NoElementMatchingPredicateFound,
