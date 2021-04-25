@@ -10,6 +10,7 @@ use Innmind\Immutable\{
     Sequence,
     Set,
     Pair,
+    Maybe,
     ValidateArgument,
     Exception\LogicException,
     Exception\ElementNotFound,
@@ -59,6 +60,28 @@ final class Primitive implements Implementation
         $map->values[$key] = $value;
 
         return $map;
+    }
+
+    /**
+     * @template A
+     * @template B
+     *
+     * @param A $key
+     * @param B $value
+     *
+     * @return Maybe<self<A, B>>
+     */
+    public static function of(string $keyType, string $valueType, $key, $value): Maybe
+    {
+        if (\in_array($keyType, ['int', 'integer', 'string'], true)) {
+            /** @var self<A, B> */
+            $self = new self($keyType, $valueType);
+
+            return Maybe::just(($self)($key, $value));
+        }
+
+        /** @var Maybe<self<A, B>> */
+        return Maybe::nothing();
     }
 
     public function keyType(): string

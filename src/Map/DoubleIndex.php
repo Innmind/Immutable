@@ -71,6 +71,23 @@ final class DoubleIndex implements Implementation
         return $map;
     }
 
+    /**
+     * @template A
+     * @template B
+     *
+     * @param A $key
+     * @param B $value
+     *
+     * @return self<A, B>
+     */
+    public static function of(string $keyType, string $valueType, $key, $value): self
+    {
+        /** @var self<A, B> */
+        $self = new self($keyType, $valueType);
+
+        return ($self)($key, $value);
+    }
+
     public function keyType(): string
     {
         return $this->keyType;

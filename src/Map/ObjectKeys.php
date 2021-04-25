@@ -10,6 +10,7 @@ use Innmind\Immutable\{
     Sequence,
     Set,
     Pair,
+    Maybe,
     ValidateArgument,
     ValidateArgument\ClassType,
     Exception\LogicException,
@@ -60,6 +61,30 @@ final class ObjectKeys implements Implementation
         $map->values[$key] = $value;
 
         return $map;
+    }
+
+    /**
+     * @template A
+     * @template B
+     *
+     * @param A $key
+     * @param B $value
+     *
+     * @return Maybe<self<A, B>>
+     */
+    public static function of(string $keyType, string $valueType, $key, $value): Maybe
+    {
+        $type = Type::of($keyType);
+
+        if ($type instanceof ClassType || $keyType === 'object') {
+            /** @var self<A, B> */
+            $self = new self($keyType, $valueType);
+
+            return Maybe::just(($self)($key, $value));
+        }
+
+        /** @var Maybe<self<A, B>> */
+        return Maybe::nothing();
     }
 
     public function keyType(): string
