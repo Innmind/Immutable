@@ -21,22 +21,20 @@ class MapTest extends TestCase
 {
     public function testInterface()
     {
-        $m = Map::of('int', 'float');
+        $m = Map::of();
 
         $this->assertInstanceOf(\Countable::class, $m);
-        $this->assertSame('int', $m->keyType());
-        $this->assertSame('float', $m->valueType());
     }
 
     public function testOf()
     {
-        $map = Map::of('int', 'float')
+        $map = Map::of()
             (1, 1.1)
             (2, 2.1);
 
         $this->assertTrue(
             $map->equals(
-                Map::of('int', 'float')
+                Map::of()
                     ->put(1, 1.1)
                     ->put(2, 2.1)
             )
@@ -45,12 +43,12 @@ class MapTest extends TestCase
 
     public function testEmptyOf()
     {
-        $this->assertTrue(Map::of('int', 'int')->equals(Map::of('int', 'int')));
+        $this->assertTrue(Map::of()->equals(Map::of()));
     }
 
     public function testPut()
     {
-        $m = Map::of('int', 'int');
+        $m = Map::of();
 
         $this->assertSame(0, $m->size());
         $m2 = $m->put(42, 42);
@@ -58,7 +56,7 @@ class MapTest extends TestCase
         $this->assertSame(0, $m->size());
         $this->assertSame(1, $m2->size());
 
-        $m = Map::of('int', 'int');
+        $m = Map::of();
         $m = $m
             ->put(23, 24)
             ->put(41, 42)
@@ -75,10 +73,10 @@ class MapTest extends TestCase
 
     public function testTupleLikeInjection()
     {
-        $map = Map::of('int', 'int')
+        $map = Map::of()
             (1, 2)
             (3, 4);
-        $expected = Map::of('int', 'int')
+        $expected = Map::of()
             ->put(1, 2)
             ->put(3, 4);
 
@@ -87,7 +85,7 @@ class MapTest extends TestCase
 
     public function testGet()
     {
-        $m = Map::of('int', 'int');
+        $m = Map::of();
         $m = $m->put(23, 24);
 
         $this->assertSame(24, $m->get(23));
@@ -97,12 +95,12 @@ class MapTest extends TestCase
     {
         $this->expectException(ElementNotFound::class);
 
-        Map::of('int', 'int')->get(24);
+        Map::of()->get(24);
     }
 
     public function testContains()
     {
-        $m = Map::of('int', 'int');
+        $m = Map::of();
         $m = $m->put(23, 24);
 
         $this->assertFalse($m->contains(24));
@@ -111,7 +109,7 @@ class MapTest extends TestCase
 
     public function testClear()
     {
-        $m = Map::of('int', 'float');
+        $m = Map::of();
         $m = $m->put(24, 42.0);
 
         $m2 = $m->clear();
@@ -119,44 +117,42 @@ class MapTest extends TestCase
         $this->assertInstanceOf(Map::class, $m2);
         $this->assertSame(1, $m->size());
         $this->assertSame(0, $m2->size());
-        $this->assertSame('int', $m2->keyType());
-        $this->assertSame('float', $m2->valueType());
     }
 
     public function testEquals()
     {
-        $m = Map::of('int', 'int')->put(24, 42);
-        $m2 = Map::of('int', 'int')->put(24, 42);
+        $m = Map::of()->put(24, 42);
+        $m2 = Map::of()->put(24, 42);
 
         $this->assertTrue($m->equals($m2));
         $this->assertFalse($m->equals($m2->put(65, 66)));
         $this->assertFalse($m->equals($m2->put(24, 24)));
         $this->assertFalse(
-            Map::of('string', 'string')
+            Map::of()
                 ->put('foo_res', 'res')
                 ->put('foo_bar_res', 'res')
                 ->equals(
-                    Map::of('string', 'string')
+                    Map::of()
                         ->put('foo_res', 'res')
                         ->put('bar_res', 'res')
                 )
         );
 
-        $m = Map::of('int', 'int')
+        $m = Map::of()
             ->put(24, 42)
             ->put(42, 24);
-        $m2 = Map::of('int', 'int')
+        $m2 = Map::of()
             ->put(42, 24)
             ->put(24, 42);
 
         $this->assertTrue($m->equals($m2));
 
-        $this->assertTrue(Map::of('int', 'int')->equals(Map::of('int', 'int')));
+        $this->assertTrue(Map::of()->equals(Map::of()));
     }
 
     public function testFilter()
     {
-        $m = Map::of('int', 'int')
+        $m = Map::of()
             ->put(0, 1)
             ->put(1, 2)
             ->put(2, 3)
@@ -168,8 +164,6 @@ class MapTest extends TestCase
 
         $this->assertNotSame($m, $m2);
         $this->assertInstanceOf(Map::class, $m2);
-        $this->assertSame($m->keyType(), $m2->keyType());
-        $this->assertSame($m->valueType(), $m2->valueType());
         $this->assertSame(4, $m->size());
         $this->assertSame(2, $m2->size());
         $this->assertTrue($m2->contains(1));
@@ -180,7 +174,7 @@ class MapTest extends TestCase
 
     public function testForeach()
     {
-        $m = Map::of('int', 'int')
+        $m = Map::of()
             ->put(0, 1)
             ->put(1, 2)
             ->put(2, 3)
@@ -199,12 +193,12 @@ class MapTest extends TestCase
     {
         $this->expectException(CannotGroupEmptyStructure::class);
 
-        Map::of('int', 'int')->groupBy(static function() {});
+        Map::of()->groupBy(static function() {});
     }
 
     public function testGroup()
     {
-        $m = Map::of('int', 'int')
+        $m = Map::of()
             ->put(0, 1)
             ->put(1, 2)
             ->put(2, 3)
@@ -215,34 +209,25 @@ class MapTest extends TestCase
         });
         $this->assertNotSame($m, $m2);
         $this->assertInstanceOf(Map::class, $m2);
-        $this->assertSame('int', $m2->keyType());
-        $this->assertSame(Map::class, $m2->valueType());
         $this->assertTrue($m2->contains(0));
         $this->assertTrue($m2->contains(1));
         $this->assertTrue($m2->contains(2));
         $this->assertSame(2, $m2->get(0)->size());
         $this->assertSame(1, $m2->get(1)->size());
         $this->assertSame(1, $m2->get(2)->size());
-        $this->assertSame('int', $m2->get(0)->keyType());
-        $this->assertSame('int', $m2->get(0)->valueType());
-        $this->assertSame('int', $m2->get(1)->keyType());
-        $this->assertSame('int', $m2->get(1)->valueType());
-        $this->assertSame('int', $m2->get(2)->keyType());
-        $this->assertSame('int', $m2->get(2)->valueType());
         $this->assertSame(1, $m2->get(1)->get(0));
         $this->assertSame(2, $m2->get(0)->get(1));
         $this->assertSame(3, $m2->get(2)->get(2));
         $this->assertSame(5, $m2->get(0)->get(4));
 
-        $groups = Map::of('int', 'int')->group('string', static fn() => '');
+        $groups = Map::of()->group('string', static fn() => '');
 
-        $this->assertTrue($groups->isOfType('string', Map::class));
         $this->assertTrue($groups->empty());
     }
 
     public function testGroupBy()
     {
-        $m = Map::of('int', 'int')
+        $m = Map::of()
             ->put(0, 1)
             ->put(1, 2)
             ->put(2, 3)
@@ -253,20 +238,12 @@ class MapTest extends TestCase
         });
         $this->assertNotSame($m, $m2);
         $this->assertInstanceOf(Map::class, $m2);
-        $this->assertSame('int', $m2->keyType());
-        $this->assertSame(Map::class, $m2->valueType());
         $this->assertTrue($m2->contains(0));
         $this->assertTrue($m2->contains(1));
         $this->assertTrue($m2->contains(2));
         $this->assertSame(2, $m2->get(0)->size());
         $this->assertSame(1, $m2->get(1)->size());
         $this->assertSame(1, $m2->get(2)->size());
-        $this->assertSame('int', $m2->get(0)->keyType());
-        $this->assertSame('int', $m2->get(0)->valueType());
-        $this->assertSame('int', $m2->get(1)->keyType());
-        $this->assertSame('int', $m2->get(1)->valueType());
-        $this->assertSame('int', $m2->get(2)->keyType());
-        $this->assertSame('int', $m2->get(2)->valueType());
         $this->assertSame(1, $m2->get(1)->get(0));
         $this->assertSame(2, $m2->get(0)->get(1));
         $this->assertSame(3, $m2->get(2)->get(2));
@@ -275,7 +252,7 @@ class MapTest extends TestCase
 
     public function testKeys()
     {
-        $m = Map::of('int', 'int')
+        $m = Map::of()
             ->put(0, 1)
             ->put(1, 2)
             ->put(2, 3)
@@ -283,14 +260,13 @@ class MapTest extends TestCase
 
         $k = $m->keys();
         $this->assertInstanceOf(Set::class, $k);
-        $this->assertSame('int', $k->type());
         $this->assertSame([0, 1, 2, 4], unwrap($k));
         $this->assertTrue($k->equals($m->keys()));
     }
 
     public function testValues()
     {
-        $m = Map::of('int', 'int')
+        $m = Map::of()
             ->put(0, 1)
             ->put(1, 2)
             ->put(2, 3)
@@ -299,14 +275,13 @@ class MapTest extends TestCase
 
         $v = $m->values();
         $this->assertInstanceOf(Sequence::class, $v);
-        $this->assertSame('int', $v->type());
         $this->assertSame([1, 2, 3, 5, 5], unwrap($v));
         $this->assertTrue($v->equals($m->values()));
     }
 
     public function testMap()
     {
-        $m = Map::of('int', 'int')
+        $m = Map::of()
             ->put(0, 1)
             ->put(1, 2)
             ->put(2, 3)
@@ -321,8 +296,6 @@ class MapTest extends TestCase
         });
         $this->assertNotSame($m, $m2);
         $this->assertInstanceOf(Map::class, $m2);
-        $this->assertSame($m->keyType(), $m2->keyType());
-        $this->assertSame($m->valueType(), $m2->valueType());
         $this->assertSame([0, 1, 2, 4], unwrap($m->keys()));
         $this->assertSame([1, 2, 3, 5], unwrap($m->values()));
         $this->assertSame([10, 1, 12, 14], unwrap($m2->keys()));
@@ -331,7 +304,7 @@ class MapTest extends TestCase
 
     public function testRemove()
     {
-        $m = Map::of('int', 'int')
+        $m = Map::of()
             ->put(0, 1)
             ->put(1, 2)
             ->put(2, 3)
@@ -370,10 +343,10 @@ class MapTest extends TestCase
 
     public function testMerge()
     {
-        $m = Map::of(\stdClass::class, 'int')
+        $m = Map::of()
             ->put($s = new \stdClass, 24)
             ->put($s2 = new \stdClass, 42);
-        $m2 = Map::of(\stdClass::class, 'int')
+        $m2 = Map::of()
             ->put($s3 = new \stdClass, 24)
             ->put($s2, 66)
             ->put($s4 = new \stdClass, 42);
@@ -382,8 +355,6 @@ class MapTest extends TestCase
         $this->assertNotSame($m, $m3);
         $this->assertNotSame($m2, $m3);
         $this->assertInstanceOf(Map::class, $m3);
-        $this->assertSame($m->keyType(), $m3->keyType());
-        $this->assertSame($m->valueType(), $m3->valueType());
         $this->assertSame(4, $m3->size());
         $this->assertSame([$s, $s2], unwrap($m->keys()));
         $this->assertSame([24, 42], unwrap($m->values()));
@@ -396,7 +367,7 @@ class MapTest extends TestCase
 
     public function testPartition()
     {
-        $m = Map::of('int', 'int')
+        $m = Map::of()
             ->put(0, 1)
             ->put(1, 2)
             ->put(2, 3)
@@ -409,16 +380,10 @@ class MapTest extends TestCase
 
         $this->assertInstanceOf(Map::class, $p);
         $this->assertNotSame($p, $m);
-        $this->assertSame('bool', $p->keyType());
-        $this->assertSame(Map::class, $p->valueType());
         $this->assertSame(
             [true, false],
             unwrap($p->keys())
         );
-        $this->assertSame('int', $p->get(true)->keyType());
-        $this->assertSame('int', $p->get(true)->valueType());
-        $this->assertSame('int', $p->get(false)->keyType());
-        $this->assertSame('int', $p->get(false)->valueType());
         $this->assertSame(
             [1, 4],
             unwrap($p->get(true)->keys())
@@ -439,8 +404,7 @@ class MapTest extends TestCase
 
     public function testReduce()
     {
-        $m = Map::of('int', 'int')
-            ->put(4, 4);
+        $m = Map::of()->put(4, 4);
 
         $v = $m->reduce(
             42,
@@ -456,7 +420,7 @@ class MapTest extends TestCase
 
     public function testToSetOf()
     {
-        $map = Map::of('int', 'int')
+        $map = Map::of()
             (1, 2)
             (3, 4);
         $set = $map->toSetOf('int', static function($k, $v) {
@@ -473,7 +437,7 @@ class MapTest extends TestCase
 
     public function testToMapOf()
     {
-        $map = Map::of('int', 'int')
+        $map = Map::of()
             (1, 2)
             (3, 4);
         $map = $map->toMapOf('string', 'int', static fn($i, $j) => yield (string) $j => $i);
@@ -482,18 +446,11 @@ class MapTest extends TestCase
         $this->assertCount(2, $map);
         $this->assertSame(1, $map->get('2'));
         $this->assertSame(3, $map->get('4'));
-
-        $this->assertTrue(
-            Map::of('object', 'int')
-                ->put(new \stdClass, 1)
-                ->toMapOf('stdClass', 'int')
-                ->isOfType('stdClass', 'int')
-        );
     }
 
     public function testMatches()
     {
-        $map = Map::of('int', 'int')
+        $map = Map::of()
             (1, 2)
             (3, 4);
 
@@ -503,7 +460,7 @@ class MapTest extends TestCase
 
     public function testAny()
     {
-        $map = Map::of('int', 'int')
+        $map = Map::of()
             (1, 2)
             (3, 4);
 

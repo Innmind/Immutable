@@ -22,20 +22,12 @@ use Innmind\Immutable\{
  */
 final class Primitive implements Implementation
 {
-    private string $keyType;
-    private string $valueType;
     /** @var array<T, S> */
     private array $values = [];
     private ?int $size = null;
 
-    public function __construct(string $keyType, string $valueType)
+    public function __construct()
     {
-        if (!\in_array($keyType, ['int', 'integer', 'string'], true)) {
-            throw new LogicException;
-        }
-
-        $this->keyType = $keyType;
-        $this->valueType = $valueType;
     }
 
     /**
@@ -51,8 +43,7 @@ final class Primitive implements Implementation
             // numeric-string keys are casted to ints by php, so when iterating
             // over the array afterward the type is not conserved so we switch
             // the implementation to DoubleIndex so keep the type
-            return (new DoubleIndex($this->keyType, $this->valueType))
-                ->merge($this)($key, $value);
+            return (new DoubleIndex)->merge($this)($key, $value);
         }
 
         $map = clone $this;
@@ -71,27 +62,23 @@ final class Primitive implements Implementation
      *
      * @return Maybe<Implementation<A, B>>
      */
-    public static function of(string $keyType, string $valueType, $key, $value): Maybe
+    public static function of($key, $value): Maybe
     {
-        if (\in_array($keyType, ['int', 'integer', 'string'], true)) {
+        /** @psalm-suppress DocblockTypeContradiction */
+        if (\is_string($key) && \is_numeric($key)) {
+            /** @var Maybe<Implementation<A, B>> */
+            return Maybe::nothing();
+        }
+
+        if (\is_string($key) || \is_int($key)) {
             /** @var self<A, B> */
-            $self = new self($keyType, $valueType);
+            $self = new self;
 
             return Maybe::just(($self)($key, $value));
         }
 
         /** @var Maybe<Implementation<A, B>> */
         return Maybe::nothing();
-    }
-
-    public function keyType(): string
-    {
-        return $this->keyType;
-    }
-
-    public function valueType(): string
-    {
-        return $this->valueType;
     }
 
     public function size(): int
@@ -213,10 +200,7 @@ final class Primitive implements Implementation
 
             if ($groups === null) {
                 /** @var Map<D, Map<T, S>> */
-                $groups = Map::of(
-                    Type::determine($discriminant),
-                    Map::class,
-                );
+                $groups = Map::of();
             }
 
             if ($groups->contains($discriminant)) {
@@ -243,7 +227,7 @@ final class Primitive implements Implementation
         /** @psalm-suppress MixedArgumentTypeCoercion */
         $keys = \array_keys($this->values);
 
-        return Set::of($this->keyType, ...$keys);
+        return Set::of(...$keys);
     }
 
     /**
@@ -254,7 +238,7 @@ final class Primitive implements Implementation
         /** @psalm-suppress MixedArgumentTypeCoercion */
         $values = \array_values($this->values);
 
-        return Sequence::of($this->valueType, ...$values);
+        return Sequence::of(...$values);
     }
 
     /**
@@ -343,7 +327,7 @@ final class Primitive implements Implementation
          * @psalm-suppress InvalidArgument
          * @var Map<bool, Map<T, S>>
          */
-        return Map::of('bool', Map::class)
+        return Map::of()
             (true, $truthy)
             (false, $falsy);
     }
@@ -383,7 +367,7 @@ final class Primitive implements Implementation
     public function toSequenceOf(string $type, callable $mapper): Sequence
     {
         /** @var Sequence<ST> */
-        $sequence = Sequence::of($type);
+        $sequence = Sequence::of();
 
         foreach ($this->values as $key => $value) {
             foreach ($mapper($key, $value) as $newValue) {
@@ -404,7 +388,7 @@ final class Primitive implements Implementation
     public function toSetOf(string $type, callable $mapper): Set
     {
         /** @var Set<ST> */
-        $set = Set::of($type);
+        $set = Set::of();
 
         foreach ($this->values as $key => $value) {
             foreach ($mapper($key, $value) as $newValue) {
@@ -429,7 +413,7 @@ final class Primitive implements Implementation
         $mapper ??= static fn($k, $v): \Generator => yield $k => $v;
 
         /** @var Map<MT, MS> */
-        $map = Map::of($key, $value);
+        $map = Map::of();
 
         foreach ($this->values as $key => $value) {
             /**
@@ -449,6 +433,6 @@ final class Primitive implements Implementation
      */
     private function clearMap(): Map
     {
-        return Map::of($this->keyType, $this->valueType);
+        return Map::of();
     }
 }

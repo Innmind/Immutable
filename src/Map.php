@@ -17,17 +17,10 @@ use Innmind\Immutable\{
 final class Map implements \Countable
 {
     private Map\Implementation $implementation;
-    private string $keyType;
-    private string $valueType;
 
-    private function __construct(
-        string $keyType,
-        string $valueType,
-        Map\Implementation $implementation
-    ) {
+    private function __construct(Map\Implementation $implementation)
+    {
         $this->implementation = $implementation;
-        $this->keyType = $keyType;
-        $this->valueType = $valueType;
     }
 
     /**
@@ -59,30 +52,9 @@ final class Map implements \Countable
      *
      * @return self<U, V>
      */
-    public static function of(string $key, string $value): self
+    public static function of(): self
     {
-        return new self($key, $value, new Map\Uninitialized($key, $value));
-    }
-
-    public function isOfType(string $key, string $value): bool
-    {
-        return $this->keyType === $key && $this->valueType === $value;
-    }
-
-    /**
-     * Return the key type for this map
-     */
-    public function keyType(): string
-    {
-        return $this->implementation->keyType();
-    }
-
-    /**
-     * Return the value type for this map
-     */
-    public function valueType(): string
-    {
-        return $this->implementation->valueType();
+        return new self(new Map\Uninitialized);
     }
 
     public function size(): int
@@ -214,7 +186,7 @@ final class Map implements \Countable
          * @var self<D, self<T, S>>
          */
         return $this->reduce(
-            self::of($type, self::class),
+            self::of(),
             function(self $groups, $key, $value) use ($discriminator): self {
                 /**
                  * @var self<D, self<T, S>> $groups

@@ -17,18 +17,16 @@ use Innmind\Immutable\{
  */
 final class Lazy implements Implementation
 {
-    private string $type;
     /** @var Sequence\Implementation<T> */
     private Sequence\Implementation $values;
 
     /**
      * @param callable(): \Generator<T> $generator
      */
-    public function __construct(string $type, callable $generator)
+    public function __construct(callable $generator)
     {
-        $this->type = $type;
         /** @var Sequence\Implementation<T> */
-        $this->values = (new Sequence\Lazy($type, $generator))->distinct();
+        $this->values = (new Sequence\Lazy($generator))->distinct();
     }
 
     /**
@@ -42,11 +40,6 @@ final class Lazy implements Implementation
         $set->values = ($this->values)($element)->distinct();
 
         return $set;
-    }
-
-    public function type(): string
-    {
-        return $this->type;
     }
 
     public function size(): int
@@ -83,7 +76,6 @@ final class Lazy implements Implementation
         $self = clone $this;
         $self->values = $this->values->intersect(
             new Sequence\Defer(
-                $this->type,
                 (static function(\Iterator $values): \Generator {
                     /** @var T $value */
                     foreach ($values as $value) {
@@ -135,7 +127,6 @@ final class Lazy implements Implementation
         $self = clone $this;
         $self->values = $this->values->diff(
             new Sequence\Defer(
-                $this->type,
                 (static function(\Iterator $values): \Generator {
                     /** @var T $value */
                     foreach ($values as $value) {
@@ -198,10 +189,10 @@ final class Lazy implements Implementation
          * @var Map<D, Set<T>>
          */
         return $map->reduce(
-            Map::of($map->keyType(), Set::class),
+            Map::of(),
             fn(Map $carry, $key, Sequence $values): Map => ($carry)(
                 $key,
-                $values->toSetOf($this->type),
+                $values->toSetOf('T'),
             ),
         );
     }
@@ -242,18 +233,18 @@ final class Lazy implements Implementation
         /** @var Set<T> */
         $truthy = $partitions
             ->get(true)
-            ->toSetOf($this->type);
+            ->toSetOf('T');
         /** @var Set<T> */
         $falsy = $partitions
             ->get(false)
-            ->toSetOf($this->type);
+            ->toSetOf('T');
 
         /**
          * @psalm-suppress InvalidScalarArgument
          * @psalm-suppress InvalidArgument
          * @var Map<bool, Set<T>>
          */
-        return Map::of('bool', Set::class)
+        return Map::of()
             (true, $truthy)
             (false, $falsy);
     }
@@ -268,7 +259,7 @@ final class Lazy implements Implementation
         return $this
             ->values
             ->sort($function)
-            ->toSequenceOf($this->type);
+            ->toSequenceOf('T');
     }
 
     /**
@@ -280,7 +271,6 @@ final class Lazy implements Implementation
     {
         $self = clone $this;
         $self->values = new Sequence\Defer(
-            $this->type,
             (static function(\Iterator $self, \Iterator $set): \Generator {
                 /** @var T $value */
                 foreach ($self as $value) {
@@ -315,7 +305,7 @@ final class Lazy implements Implementation
      */
     public function clear(): Implementation
     {
-        return new Primitive($this->type);
+        return new Primitive;
     }
 
     public function empty(): bool

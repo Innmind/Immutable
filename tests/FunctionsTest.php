@@ -53,7 +53,7 @@ class FunctionsTest extends TestCase
 
     public function testJoinSet()
     {
-        $str = join('|', Set::of('string', '1', '2', '3'));
+        $str = join('|', Set::of('1', '2', '3'));
 
         $this->assertInstanceOf(Str::class, $str);
         $this->assertSame('1|2|3', $str->toString());
@@ -61,7 +61,7 @@ class FunctionsTest extends TestCase
 
     public function testJoinSequence()
     {
-        $str = join('|', Sequence::of('string', '1', '2', '3'));
+        $str = join('|', Sequence::of('1', '2', '3'));
 
         $this->assertInstanceOf(Str::class, $str);
         $this->assertSame('1|2|3', $str->toString());
@@ -71,7 +71,7 @@ class FunctionsTest extends TestCase
     {
         $this->expectException(EmptySet::class);
 
-        first(Set::of('int'));
+        first(Set::of());
     }
 
     public function testAccessFirstValueOfASet()

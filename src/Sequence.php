@@ -16,16 +16,14 @@ use Innmind\Immutable\Exception\{
  */
 final class Sequence implements \Countable
 {
-    private string $type;
     /** @var Sequence\Implementation<T> */
     private Sequence\Implementation $implementation;
 
     /**
      * @param Sequence\Implementation<T> $implementation
      */
-    private function __construct(string $type, Sequence\Implementation $implementation)
+    private function __construct(Sequence\Implementation $implementation)
     {
-        $this->type = $type;
         $this->implementation = $implementation;
     }
 
@@ -56,9 +54,9 @@ final class Sequence implements \Countable
      *
      * @return self<V>
      */
-    public static function of(string $type, ...$values): self
+    public static function of(...$values): self
     {
-        return new self($type, new Sequence\Primitive($type, ...$values));
+        return new self(new Sequence\Primitive(...$values));
     }
 
     /**
@@ -73,9 +71,9 @@ final class Sequence implements \Countable
      *
      * @return self<V>
      */
-    public static function defer(string $type, \Generator $generator): self
+    public static function defer(\Generator $generator): self
     {
-        return new self($type, new Sequence\Defer($type, $generator));
+        return new self(new Sequence\Defer($generator));
     }
 
     /**
@@ -92,9 +90,9 @@ final class Sequence implements \Countable
      *
      * @return self<V>
      */
-    public static function lazy(string $type, callable $generator): self
+    public static function lazy(callable $generator): self
     {
-        return new self($type, new Sequence\Lazy($type, $generator));
+        return new self(new Sequence\Lazy($generator));
     }
 
     /**
@@ -104,7 +102,7 @@ final class Sequence implements \Countable
      */
     public static function mixed(...$values): self
     {
-        return new self('mixed', new Sequence\Primitive('mixed', ...$values));
+        return new self(new Sequence\Primitive(...$values));
     }
 
     /**
@@ -113,7 +111,7 @@ final class Sequence implements \Countable
     public static function ints(int ...$values): self
     {
         /** @var self<int> */
-        $self = new self('int', new Sequence\Primitive('int', ...$values));
+        $self = new self(new Sequence\Primitive(...$values));
 
         return $self;
     }
@@ -124,7 +122,7 @@ final class Sequence implements \Countable
     public static function floats(float ...$values): self
     {
         /** @var self<float> */
-        $self = new self('float', new Sequence\Primitive('float', ...$values));
+        $self = new self(new Sequence\Primitive(...$values));
 
         return $self;
     }
@@ -135,7 +133,7 @@ final class Sequence implements \Countable
     public static function strings(string ...$values): self
     {
         /** @var self<string> */
-        $self = new self('string', new Sequence\Primitive('string', ...$values));
+        $self = new self(new Sequence\Primitive(...$values));
 
         return $self;
     }
@@ -146,22 +144,9 @@ final class Sequence implements \Countable
     public static function objects(object ...$values): self
     {
         /** @var self<object> */
-        $self = new self('object', new Sequence\Primitive('object', ...$values));
+        $self = new self(new Sequence\Primitive(...$values));
 
         return $self;
-    }
-
-    public function isOfType(string $type): bool
-    {
-        return $this->type === $type;
-    }
-
-    /**
-     * Type of the elements
-     */
-    public function type(): string
-    {
-        return $this->type;
     }
 
     public function size(): int
@@ -313,7 +298,7 @@ final class Sequence implements \Countable
          * @var Map<D, self<T>>
          */
         return $this->reduce(
-            Map::of($type, self::class),
+            Map::of(),
             function(Map $groups, $value) use ($discriminator): Map {
                 /** @var T $value */
                 $key = $discriminator($value);
@@ -376,7 +361,7 @@ final class Sequence implements \Countable
      */
     public function indices(): self
     {
-        return new self('int', $this->implementation->indices());
+        return new self($this->implementation->indices());
     }
 
     /**
@@ -578,7 +563,7 @@ final class Sequence implements \Countable
     public function clear(): self
     {
         $self = clone $this;
-        $self->implementation = new Sequence\Primitive($this->type);
+        $self->implementation = new Sequence\Primitive;
 
         return $self;
     }

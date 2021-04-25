@@ -18,15 +18,6 @@ use Innmind\Immutable\{
  */
 final class Uninitialized implements Implementation
 {
-    private string $keyType;
-    private string $valueType;
-
-    public function __construct(string $keyType, string $valueType)
-    {
-        $this->keyType = $keyType;
-        $this->valueType = $valueType;
-    }
-
     /**
      * @param T $key
      * @param S $value
@@ -35,7 +26,7 @@ final class Uninitialized implements Implementation
      */
     public function __invoke($key, $value): Implementation
     {
-        return self::open($this->keyType, $this->valueType, $key, $value);
+        return self::open($key, $value);
     }
 
     /**
@@ -47,24 +38,14 @@ final class Uninitialized implements Implementation
      *
      * @return Implementation<A, B>
      */
-    public static function open(string $keyType, string $valueType, $key, $value): Implementation
+    public static function open($key, $value): Implementation
     {
-        return ObjectKeys::of($keyType, $valueType, $key, $value)
-            ->otherwise(static fn() => Primitive::of($keyType, $valueType, $key, $value))
+        return ObjectKeys::of($key, $value)
+            ->otherwise(static fn() => Primitive::of($key, $value))
             ->match(
                 static fn($implementation) => $implementation,
-                static fn() => DoubleIndex::of($keyType, $valueType, $key, $value),
+                static fn() => DoubleIndex::of($key, $value),
             );
-    }
-
-    public function keyType(): string
-    {
-        return $this->keyType;
-    }
-
-    public function valueType(): string
-    {
-        return $this->valueType;
     }
 
     public function size(): int
@@ -150,7 +131,7 @@ final class Uninitialized implements Implementation
     public function keys(): Set
     {
         /** @var Set<T> */
-        return Set::of($this->keyType);
+        return Set::of();
     }
 
     /**
@@ -159,7 +140,7 @@ final class Uninitialized implements Implementation
     public function values(): Sequence
     {
         /** @var Sequence<S> */
-        return Sequence::of($this->valueType);
+        return Sequence::of();
     }
 
     /**
@@ -204,7 +185,7 @@ final class Uninitialized implements Implementation
          * @psalm-suppress InvalidArgument
          * @var Map<bool, Map<T, S>>
          */
-        return Map::of('bool', Map::class)
+        return Map::of()
             (true, $this->clearMap())
             (false, $this->clearMap());
     }
@@ -236,7 +217,7 @@ final class Uninitialized implements Implementation
     public function toSequenceOf(string $type, callable $mapper): Sequence
     {
         /** @var Sequence<ST> */
-        return Sequence::of($type);
+        return Sequence::of();
     }
 
     /**
@@ -249,7 +230,7 @@ final class Uninitialized implements Implementation
     public function toSetOf(string $type, callable $mapper): Set
     {
         /** @var Set<ST> */
-        return Set::of($type);
+        return Set::of();
     }
 
     /**
@@ -263,7 +244,7 @@ final class Uninitialized implements Implementation
     public function toMapOf(string $key, string $value, callable $mapper = null): Map
     {
         /** @var Map<MT, MS> */
-        return Map::of($key, $value);
+        return Map::of();
     }
 
     /**
@@ -271,6 +252,6 @@ final class Uninitialized implements Implementation
      */
     private function clearMap(): Map
     {
-        return Map::of($this->keyType, $this->valueType);
+        return Map::of();
     }
 }

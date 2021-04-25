@@ -21,8 +21,6 @@ use Innmind\Immutable\{
  */
 final class DoubleIndex implements Implementation
 {
-    private string $keyType;
-    private string $valueType;
     /** @var Sequence\Implementation<T> */
     private Sequence\Implementation $keys;
     /** @var Sequence\Implementation<S> */
@@ -30,14 +28,12 @@ final class DoubleIndex implements Implementation
     /** @var Sequence\Implementation<Pair<T, S>> */
     private Sequence\Implementation $pairs;
 
-    public function __construct(string $keyType, string $valueType)
+    public function __construct()
     {
-        $this->keyType = $keyType;
-        $this->valueType = $valueType;
-        $this->keys = new Sequence\Primitive($keyType);
-        $this->values = new Sequence\Primitive($valueType);
+        $this->keys = new Sequence\Primitive;
+        $this->values = new Sequence\Primitive;
         /** @var Sequence\Implementation<Pair<T, S>> */
-        $this->pairs = new Sequence\Primitive(Pair::class);
+        $this->pairs = new Sequence\Primitive;
     }
 
     /**
@@ -72,22 +68,12 @@ final class DoubleIndex implements Implementation
      *
      * @return self<A, B>
      */
-    public static function of(string $keyType, string $valueType, $key, $value): self
+    public static function of($key, $value): self
     {
         /** @var self<A, B> */
-        $self = new self($keyType, $valueType);
+        $self = new self;
 
         return ($self)($key, $value);
-    }
-
-    public function keyType(): string
-    {
-        return $this->keyType;
-    }
-
-    public function valueType(): string
-    {
-        return $this->valueType;
     }
 
     public function size(): int
@@ -208,10 +194,7 @@ final class DoubleIndex implements Implementation
 
             if ($groups === null) {
                 /** @var Map<D, Map<T, S>> */
-                $groups = Map::of(
-                    Type::determine($key),
-                    Map::class,
-                );
+                $groups = Map::of();
             }
 
             if ($groups->contains($key)) {
@@ -235,7 +218,7 @@ final class DoubleIndex implements Implementation
      */
     public function keys(): Set
     {
-        return $this->keys->toSetOf($this->keyType);
+        return $this->keys->toSetOf('T');
     }
 
     /**
@@ -243,7 +226,7 @@ final class DoubleIndex implements Implementation
      */
     public function values(): Sequence
     {
-        return $this->values->toSequenceOf($this->valueType);
+        return $this->values->toSequenceOf('S');
     }
 
     /**
@@ -345,7 +328,7 @@ final class DoubleIndex implements Implementation
          * @psalm-suppress InvalidArgument
          * @var Map<bool, Map<T, S>>
          */
-        return Map::of('bool', Map::class)
+        return Map::of()
             (true, $truthy)
             (false, $falsy);
     }
@@ -381,7 +364,7 @@ final class DoubleIndex implements Implementation
     public function toSequenceOf(string $type, callable $mapper): Sequence
     {
         /** @var Sequence<ST> */
-        $sequence = Sequence::of($type);
+        $sequence = Sequence::of();
 
         foreach ($this->pairs->iterator() as $pair) {
             foreach ($mapper($pair->key(), $pair->value()) as $newValue) {
@@ -402,7 +385,7 @@ final class DoubleIndex implements Implementation
     public function toSetOf(string $type, callable $mapper): Set
     {
         /** @var Set<ST> */
-        $set = Set::of($type);
+        $set = Set::of();
 
         foreach ($this->pairs->iterator() as $pair) {
             foreach ($mapper($pair->key(), $pair->value()) as $newValue) {
@@ -427,7 +410,7 @@ final class DoubleIndex implements Implementation
         $mapper ??= static fn($k, $v): \Generator => yield $k => $v;
 
         /** @var Map<MT, MS> */
-        $map = Map::of($key, $value);
+        $map = Map::of();
 
         foreach ($this->pairs->iterator() as $pair) {
             /**
@@ -447,6 +430,6 @@ final class DoubleIndex implements Implementation
      */
     private function clearMap(): Map
     {
-        return Map::of($this->keyType, $this->valueType);
+        return Map::of();
     }
 }

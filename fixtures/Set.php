@@ -18,10 +18,10 @@ final class Set
      *
      * @return Set<Structure<I>>
      */
-    public static function of(string $type, DataSet $set, DataSet\Integers $sizes = null): DataSet
+    public static function of(DataSet $set, DataSet\Integers $sizes = null): DataSet
     {
         return DataSet\Decorate::immutable(
-            static fn(array $values): Structure => Structure::of($type, ...$values),
+            static fn(array $values): Structure => Structure::of(...$values),
             DataSet\Sequence::of(
                 $set,
                 $sizes,

@@ -54,7 +54,7 @@ final class Str
 
         $parts = \explode($delimiter, $this->value);
         /** @var Sequence<self> */
-        $sequence = Sequence::of(self::class);
+        $sequence = Sequence::of();
 
         foreach ($parts as $part) {
             $sequence = ($sequence)(new self($part, $this->encoding));
@@ -71,7 +71,7 @@ final class Str
     public function chunk(int $size = 1): Sequence
     {
         /** @var Sequence<self> */
-        $sequence = Sequence::of(self::class);
+        $sequence = Sequence::of();
         /** @var list<string> */
         $parts = \mb_str_split($this->value, $size, $this->encoding);
 
@@ -264,7 +264,7 @@ final class Str
         /** @var list<string> */
         $words = \str_word_count($this->value, 2, $charlist);
         /** @var Map<int, self> */
-        $map = Map::of('int', self::class);
+        $map = Map::of();
 
         foreach ($words as $position => $word) {
             $map = ($map)($position, new self($word, $this->encoding));
@@ -282,7 +282,7 @@ final class Str
     {
         $strings = \preg_split($regex, $this->value, $limit);
         /** @var Sequence<self> */
-        $sequence = Sequence::of(self::class);
+        $sequence = Sequence::of();
 
         foreach ($strings as $string) {
             $sequence = ($sequence)(new self($string, $this->encoding));

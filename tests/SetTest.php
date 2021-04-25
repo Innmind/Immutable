@@ -17,17 +17,14 @@ class SetTest extends TestCase
 {
     public function testInterface()
     {
-        $s = Set::of('int');
-
-        $this->assertInstanceOf(\Countable::class, $s);
-        $this->assertSame('int', $s->type());
+        $this->assertInstanceOf(\Countable::class, Set::of());
     }
 
     public function testOf()
     {
         $this->assertTrue(
-            Set::of('int', 1, 1, 2, 3)->equals(
-                Set::of('int')
+            Set::of(1, 1, 2, 3)->equals(
+                Set::of()
                     ->add(1)
                     ->add(2)
                     ->add(3)
@@ -38,7 +35,7 @@ class SetTest extends TestCase
     public function testDefer()
     {
         $loaded = false;
-        $set = Set::defer('int', (static function() use (&$loaded) {
+        $set = Set::defer((static function() use (&$loaded) {
             yield 1;
             yield 2;
             yield 3;
@@ -54,7 +51,7 @@ class SetTest extends TestCase
     public function testLazy()
     {
         $loaded = false;
-        $set = Set::lazy('int', static function() use (&$loaded) {
+        $set = Set::lazy(static function() use (&$loaded) {
             yield 1;
             yield 2;
             yield 3;
@@ -72,7 +69,6 @@ class SetTest extends TestCase
         $set = Set::mixed(1, '2', 3, 1);
 
         $this->assertInstanceOf(Set::class, $set);
-        $this->assertSame('mixed', $set->type());
         $this->assertSame([1, '2', 3], unwrap($set));
     }
 
@@ -81,7 +77,6 @@ class SetTest extends TestCase
         $set = Set::ints(1, 2, 3, 1);
 
         $this->assertInstanceOf(Set::class, $set);
-        $this->assertSame('int', $set->type());
         $this->assertSame([1, 2, 3], unwrap($set));
     }
 
@@ -90,7 +85,6 @@ class SetTest extends TestCase
         $set = Set::floats(1, 2, 3.2, 1);
 
         $this->assertInstanceOf(Set::class, $set);
-        $this->assertSame('float', $set->type());
         $this->assertSame([1.0, 2.0, 3.2], unwrap($set));
     }
 
@@ -99,7 +93,6 @@ class SetTest extends TestCase
         $set = Set::strings('1', '2', '3', '1');
 
         $this->assertInstanceOf(Set::class, $set);
-        $this->assertSame('string', $set->type());
         $this->assertSame(['1', '2', '3'], unwrap($set));
     }
 
@@ -111,15 +104,14 @@ class SetTest extends TestCase
         $set = Set::objects($a, $b, $c, $a);
 
         $this->assertInstanceOf(Set::class, $set);
-        $this->assertSame('object', $set->type());
         $this->assertSame([$a, $b, $c], unwrap($set));
     }
 
     public function testAdd()
     {
-        $this->assertSame(0, Set::of('in')->size());
+        $this->assertSame(0, Set::of()->size());
 
-        $s = Set::of('int')->add(42);
+        $s = Set::of()->add(42);
 
         $this->assertSame(1, $s->size());
         $this->assertSame(1, $s->count());
@@ -140,22 +132,21 @@ class SetTest extends TestCase
 
     public function testIntersect()
     {
-        $s = Set::of('int')
+        $s = Set::of()
             ->add(24)
             ->add(42)
             ->add(66);
 
-        $s2 = $s->intersect(Set::of('int')->add(42));
+        $s2 = $s->intersect(Set::of()->add(42));
         $this->assertNotSame($s, $s2);
         $this->assertInstanceOf(Set::class, $s2);
-        $this->assertSame($s->type(), $s2->type());
         $this->assertSame([24, 42, 66], unwrap($s));
         $this->assertSame([42], unwrap($s2));
     }
 
     public function testContains()
     {
-        $s = Set::of('int');
+        $s = Set::of();
 
         $this->assertFalse($s->contains(42));
         $s = $s->add(42);
@@ -164,7 +155,7 @@ class SetTest extends TestCase
 
     public function testRemove()
     {
-        $s = Set::of('int')
+        $s = Set::of()
             ->add(24)
             ->add(42)
             ->add(66)
@@ -174,7 +165,6 @@ class SetTest extends TestCase
         $s2 = $s->remove(42);
         $this->assertNotSame($s, $s2);
         $this->assertInstanceOf(Set::class, $s2);
-        $this->assertSame($s->type(), $s2->type());
         $this->assertSame([24, 42, 66, 90, 114], unwrap($s));
         $this->assertSame([24, 66, 90, 114], unwrap($s2));
         $this->assertSame([42, 66, 90, 114], unwrap($s->remove(24)));
@@ -185,38 +175,37 @@ class SetTest extends TestCase
 
     public function testDiff()
     {
-        $s = Set::of('int')
+        $s = Set::of()
             ->add(24)
             ->add(42)
             ->add(66);
 
-        $s2 = $s->diff(Set::of('int')->add(42));
+        $s2 = $s->diff(Set::of()->add(42));
         $this->assertNotSame($s, $s2);
         $this->assertInstanceOf(Set::class, $s2);
-        $this->assertSame($s->type(), $s2->type());
         $this->assertSame([24, 42, 66], unwrap($s));
         $this->assertSame([24, 66], unwrap($s2));
     }
 
     public function testEquals()
     {
-        $s = Set::of('int')
+        $s = Set::of()
             ->add(24)
             ->add(42)
             ->add(66);
 
         $this->assertTrue(
             $s->equals(
-                Set::of('int')
+                Set::of()
                     ->add(24)
                     ->add(66)
                     ->add(42)
             )
         );
-        $this->assertTrue(Set::of('int')->equals(Set::of('int')));
+        $this->assertTrue(Set::of()->equals(Set::of()));
         $this->assertFalse(
             $s->equals(
-                Set::of('int')
+                Set::of()
                     ->add(24)
                     ->add(66)
             )
@@ -225,7 +214,7 @@ class SetTest extends TestCase
 
     public function testFilter()
     {
-        $s = Set::of('int')
+        $s = Set::of()
             ->add(1)
             ->add(2)
             ->add(3)
@@ -236,14 +225,13 @@ class SetTest extends TestCase
         });
         $this->assertNotSame($s, $s2);
         $this->assertInstanceOf(Set::class, $s2);
-        $this->assertSame($s->type(), $s2->type());
         $this->assertSame([1, 2, 3, 4], unwrap($s));
         $this->assertSame([2, 4], unwrap($s2));
     }
 
     public function testForeach()
     {
-        $s = Set::of('int')
+        $s = Set::of()
             ->add(1)
             ->add(2)
             ->add(3)
@@ -258,7 +246,7 @@ class SetTest extends TestCase
 
     public function testGroup()
     {
-        $s = Set::of('int')
+        $s = Set::of()
             ->add(1)
             ->add(2)
             ->add(3)
@@ -268,23 +256,18 @@ class SetTest extends TestCase
             return $v % 2;
         });
         $this->assertInstanceOf(Map::class, $m);
-        $this->assertSame('int', $m->keyType());
-        $this->assertSame(Set::class, $m->valueType());
-        $this->assertSame('int', $m->get(0)->type());
-        $this->assertSame('int', $m->get(1)->type());
         $this->assertSame([1, 0], unwrap($m->keys()));
         $this->assertSame([1, 3], unwrap($m->get(1)));
         $this->assertSame([2, 4], unwrap($m->get(0)));
 
         $groups = Set::ints()->group('string', static fn() => '');
 
-        $this->assertTrue($groups->isOfType('string', Set::class));
         $this->assertTrue($groups->empty());
     }
 
     public function testGroupBy()
     {
-        $s = Set::of('int')
+        $s = Set::of()
             ->add(1)
             ->add(2)
             ->add(3)
@@ -294,10 +277,6 @@ class SetTest extends TestCase
             return $v % 2;
         });
         $this->assertInstanceOf(Map::class, $m);
-        $this->assertSame('int', $m->keyType());
-        $this->assertSame(Set::class, $m->valueType());
-        $this->assertSame('int', $m->get(0)->type());
-        $this->assertSame('int', $m->get(1)->type());
         $this->assertSame([1, 0], unwrap($m->keys()));
         $this->assertSame([1, 3], unwrap($m->get(1)));
         $this->assertSame([2, 4], unwrap($m->get(0)));
@@ -305,7 +284,7 @@ class SetTest extends TestCase
 
     public function testMap()
     {
-        $s = Set::of('int')
+        $s = Set::of()
             ->add(1)
             ->add(2)
             ->add(3)
@@ -316,7 +295,6 @@ class SetTest extends TestCase
         });
         $this->assertNotSame($s, $s2);
         $this->assertInstanceOf(Set::class, $s2);
-        $this->assertSame($s->type(), $s2->type());
         $this->assertSame([1, 2, 3, 4], unwrap($s));
         $this->assertSame([1, 4, 9, 16], unwrap($s2));
     }
@@ -328,13 +306,12 @@ class SetTest extends TestCase
 
         $this->assertInstanceOf(Set::class, $b);
         $this->assertNotSame($a, $b);
-        $this->assertSame('string', $b->type());
         $this->assertSame(['1', '2', '3', '4'], unwrap($b));
     }
 
     public function testPartition()
     {
-        $s = Set::of('int')
+        $s = Set::of()
             ->add(1)
             ->add(2)
             ->add(3)
@@ -345,20 +322,16 @@ class SetTest extends TestCase
         });
         $this->assertNotSame($s, $s2);
         $this->assertInstanceOf(Map::class, $s2);
-        $this->assertSame('bool', $s2->keyType());
-        $this->assertSame(Set::class, $s2->valueType());
         $this->assertSame([1, 2, 3, 4], unwrap($s));
         $this->assertInstanceOf(Set::class, $s2->get(true));
         $this->assertInstanceOf(Set::class, $s2->get(false));
-        $this->assertSame($s->type(), $s2->get(true)->type());
-        $this->assertSame($s->type(), $s2->get(false)->type());
         $this->assertSame([2, 4], unwrap($s2->get(true)));
         $this->assertSame([1, 3], unwrap($s2->get(false)));
     }
 
     public function testSort()
     {
-        $s = Set::of('int')
+        $s = Set::of()
             ->add(1)
             ->add(2)
             ->add(3)
@@ -368,14 +341,13 @@ class SetTest extends TestCase
             return ($a < $b) ? 1 : -1;
         });
         $this->assertInstanceOf(Sequence::class, $s2);
-        $this->assertSame('int', $s2->type());
         $this->assertSame([1, 2, 3, 4], unwrap($s));
         $this->assertSame([4, 3, 2, 1], unwrap($s2));
     }
 
     public function testMerge()
     {
-        $s = Set::of('int')
+        $s = Set::of()
             ->add(24)
             ->add(42)
             ->add(66);
@@ -383,7 +355,7 @@ class SetTest extends TestCase
         $this->assertTrue(
             $s
                 ->merge(
-                    Set::of('int')
+                    Set::of()
                         ->add(24)
                         ->add(42)
                         ->add(66)
@@ -393,18 +365,17 @@ class SetTest extends TestCase
         $this->assertSame(
             [24, 42, 66, 90, 114],
             unwrap($s->merge(
-                Set::of('int')
+                Set::of()
                     ->add(90)
                     ->add(114)
             )),
         );
         $this->assertSame([24, 42, 66], unwrap($s));
-        $this->assertSame($s->type(), $s->merge(Set::of('int'))->type());
     }
 
     public function testReduce()
     {
-        $s = Set::of('int')
+        $s = Set::of()
             ->add(4)
             ->add(3)
             ->add(2);
@@ -424,7 +395,7 @@ class SetTest extends TestCase
     {
         $this->assertSame(
             ['foo', 42, 42.1, true, []],
-            unwrap(Set::of('variable')
+            unwrap(Set::of()
                 ->add('foo')
                 ->add(42)
                 ->add(42.1)
@@ -435,8 +406,8 @@ class SetTest extends TestCase
 
     public function testEmpty()
     {
-        $this->assertTrue(Set::of('int')->empty());
-        $this->assertFalse(Set::of('int', 1)->empty());
+        $this->assertTrue(Set::of()->empty());
+        $this->assertFalse(Set::of(1)->empty());
     }
 
     public function testToSequenceOf()

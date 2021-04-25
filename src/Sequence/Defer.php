@@ -22,13 +22,11 @@ use Innmind\Immutable\{
  */
 final class Defer implements Implementation
 {
-    private string $type;
     /** @var \Iterator<T> */
     private \Iterator $values;
 
-    public function __construct(string $type, \Generator $generator)
+    public function __construct(\Generator $generator)
     {
-        $this->type = $type;
         $this->values = new Accumulate((static function(\Generator $generator): \Generator {
             /** @var T $value */
             foreach ($generator as $value) {
@@ -46,7 +44,6 @@ final class Defer implements Implementation
     {
         /** @psalm-suppress MissingClosureParamType */
         return new self(
-            $this->type,
             (static function($values, $element): \Generator {
                 /** @var T $value */
                 foreach ($values as $value) {
@@ -56,11 +53,6 @@ final class Defer implements Implementation
                 yield $element;
             })($this->values, $element),
         );
-    }
-
-    public function type(): string
-    {
-        return $this->type;
     }
 
     public function size(): int
@@ -122,7 +114,6 @@ final class Defer implements Implementation
     {
         /** @psalm-suppress MissingClosureParamType */
         return new self(
-            $this->type,
             (static function($values): \Generator {
                 /** @var list<T> */
                 $uniques = [];
@@ -146,7 +137,6 @@ final class Defer implements Implementation
     {
         /** @psalm-suppress MissingClosureParamType */
         return new self(
-            $this->type,
             (static function($values, $toDrop): \Generator {
                 $dropped = 0;
 
@@ -191,7 +181,6 @@ final class Defer implements Implementation
     {
         /** @psalm-suppress MissingClosureParamType */
         return new self(
-            $this->type,
             (static function($values, callable $predicate): \Generator {
                 /** @var T $value */
                 foreach ($values as $value) {
@@ -301,7 +290,6 @@ final class Defer implements Implementation
          * @var Implementation<int>
          */
         return new self(
-            'int',
             (static function($values): \Generator {
                 $index = 0;
 
@@ -321,7 +309,6 @@ final class Defer implements Implementation
     {
         /** @psalm-suppress MissingClosureParamType */
         return new self(
-            $this->type,
             (static function($values, callable $map): \Generator {
                 /** @var T $value */
                 foreach ($values as $value) {
@@ -343,7 +330,6 @@ final class Defer implements Implementation
     {
         /** @psalm-suppress MissingClosureParamType */
         return new self(
-            $this->type,
             (static function($values, int $toPad, $element): \Generator {
                 /** @var T $value */
                 foreach ($values as $value) {
@@ -377,7 +363,6 @@ final class Defer implements Implementation
     {
         /** @psalm-suppress MissingClosureParamType */
         return new self(
-            $this->type,
             (static function($values, int $from, int $until): \Generator {
                 $index = 0;
                 /** @var T $value */
@@ -409,7 +394,6 @@ final class Defer implements Implementation
     {
         /** @psalm-suppress MissingClosureParamType */
         return new self(
-            $this->type,
             (static function($values, int $size): \Generator {
                 $taken = 0;
                 /** @var T $value */
@@ -444,7 +428,6 @@ final class Defer implements Implementation
     {
         /** @psalm-suppress MissingClosureParamType */
         return new self(
-            $this->type,
             (static function($values, Implementation $sequence): \Generator {
                 /** @var T $value */
                 foreach ($values as $value) {
@@ -482,7 +465,6 @@ final class Defer implements Implementation
     {
         /** @psalm-suppress MissingClosureParamType */
         return new self(
-            $this->type,
             (static function(\Iterator $values, callable $function): \Generator {
                 /** @var callable(T, T): int $sorter */
                 $sorter = $function;
@@ -519,7 +501,7 @@ final class Defer implements Implementation
      */
     public function clear(): Implementation
     {
-        return new Primitive($this->type);
+        return new Primitive;
     }
 
     /**
@@ -529,7 +511,6 @@ final class Defer implements Implementation
     {
         /** @psalm-suppress MissingClosureParamType */
         return new self(
-            $this->type,
             (static function(\Iterator $values): \Generator {
                 $values = \iterator_to_array($values);
 
@@ -559,7 +540,6 @@ final class Defer implements Implementation
 
         /** @psalm-suppress MissingClosureParamType */
         return Sequence::defer(
-            $type,
             (static function($values, callable $mapper): \Generator {
                 /** @var T $value */
                 foreach ($values as $value) {
@@ -586,7 +566,6 @@ final class Defer implements Implementation
 
         /** @psalm-suppress MissingClosureParamType */
         return Set::defer(
-            $type,
             (static function($values, callable $mapper): \Generator {
                 /** @var T $value */
                 foreach ($values as $value) {
@@ -628,9 +607,6 @@ final class Defer implements Implementation
      */
     private function load(): Implementation
     {
-        return new Primitive(
-            $this->type,
-            ...\iterator_to_array($this->values),
-        );
+        return new Primitive(...\iterator_to_array($this->values));
     }
 }

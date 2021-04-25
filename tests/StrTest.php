@@ -71,7 +71,6 @@ class StrTest extends TestCase
 
         $sequence = $str->split();
         $this->assertInstanceOf(Sequence::class, $sequence);
-        $this->assertSame(S::class, $sequence->type());
         $this->assertCount(3, $sequence);
 
         foreach ($sequence as $part) {
@@ -94,7 +93,6 @@ class StrTest extends TestCase
 
         $sequence = $str->split('');
         $this->assertInstanceOf(Sequence::class, $sequence);
-        $this->assertSame(S::class, $sequence->type());
         $this->assertCount(3, $sequence);
 
         foreach ($sequence as $part) {
@@ -108,7 +106,6 @@ class StrTest extends TestCase
         $str = S::of('f|o|o');
         $sequence = $str->split('|');
         $this->assertInstanceOf(Sequence::class, $sequence);
-        $this->assertSame(S::class, $sequence->type());
         $this->assertCount(3, $sequence);
 
         foreach ($sequence as $part) {
@@ -187,7 +184,6 @@ class StrTest extends TestCase
 
         $sequence = $str->chunk(4);
         $this->assertInstanceOf(Sequence::class, $sequence);
-        $this->assertSame(S::class, $sequence->type());
         $this->assertInstanceOf(S::class, $sequence->get(0));
         $this->assertInstanceOf(S::class, $sequence->get(1));
         $this->assertInstanceOf(S::class, $sequence->get(2));
@@ -474,8 +470,6 @@ class StrTest extends TestCase
 
         $map = $str->words();
         $this->assertInstanceOf(Map::class, $map);
-        $this->assertSame('int', $map->keyType());
-        $this->assertSame(S::class, $map->valueType());
         $words = [
             0 => 'Hello',
             6 => 'fri',
@@ -493,8 +487,6 @@ class StrTest extends TestCase
 
         $map = $str->words('àáãç3');
         $this->assertInstanceOf(Map::class, $map);
-        $this->assertSame('int', $map->keyType());
-        $this->assertSame(S::class, $map->valueType());
         $words = [
             0 => 'Hello',
             6 => 'fri3nd',
@@ -516,7 +508,6 @@ class StrTest extends TestCase
 
         $c = $str->pregSplit('/[\s,]+/');
         $this->assertInstanceOf(Sequence::class, $c);
-        $this->assertSame(S::class, $c->type());
         $this->assertSame('hypertext', $c->get(0)->toString());
         $this->assertSame('language', $c->get(1)->toString());
         $this->assertSame('programming', $c->get(2)->toString());
@@ -547,8 +538,6 @@ class StrTest extends TestCase
 
         $map = $str->capture('@^(?:http://)?(?P<host>[^/]+)@i');
         $this->assertInstanceOf(Map::class, $map);
-        $this->assertSame('scalar', $map->keyType());
-        $this->assertSame(S::class, $map->valueType());
         $this->assertCount(3, $map);
         $this->assertSame('http://www.php.net', $map->get(0)->toString());
         $this->assertSame('www.php.net', $map->get(1)->toString());
@@ -561,8 +550,6 @@ class StrTest extends TestCase
 
         $matches = $str->capture('~(?<lang>([a-zA-Z0-9]+(-[a-zA-Z0-9]+)*|\*))(; ?q=(?<quality>\d+(\.\d+)?))?~');
         $this->assertInstanceOf(Map::class, $matches);
-        $this->assertSame('scalar', $matches->keyType());
-        $this->assertSame(S::class, $matches->valueType());
         $this->assertCount(9, $matches);
         $this->assertSame('en;q=0.7', $matches->get(0)->toString());
         $this->assertSame('en', $matches->get(1)->toString());

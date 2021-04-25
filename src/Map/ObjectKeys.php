@@ -23,18 +23,10 @@ use Innmind\Immutable\{
  */
 final class ObjectKeys implements Implementation
 {
-    private string $keyType;
-    private string $valueType;
     private \SplObjectStorage $values;
 
-    public function __construct(string $keyType, string $valueType)
+    public function __construct()
     {
-        if (!Type::of($keyType) instanceof ClassType && $keyType !== 'object') {
-            throw new LogicException;
-        }
-
-        $this->keyType = $keyType;
-        $this->valueType = $valueType;
         $this->values = new \SplObjectStorage;
     }
 
@@ -63,13 +55,11 @@ final class ObjectKeys implements Implementation
      *
      * @return Maybe<Implementation<A, B>>
      */
-    public static function of(string $keyType, string $valueType, $key, $value): Maybe
+    public static function of($key, $value): Maybe
     {
-        $type = Type::of($keyType);
-
-        if ($type instanceof ClassType || $keyType === 'object') {
+        if (\is_object($key)) {
             /** @var self<A, B> */
-            $self = new self($keyType, $valueType);
+            $self = new self;
 
             /** @var Maybe<Implementation<A, B>> */
             return Maybe::just(($self)($key, $value));
@@ -77,16 +67,6 @@ final class ObjectKeys implements Implementation
 
         /** @var Maybe<Implementation<A, B>> */
         return Maybe::nothing();
-    }
-
-    public function keyType(): string
-    {
-        return $this->keyType;
-    }
-
-    public function valueType(): string
-    {
-        return $this->valueType;
     }
 
     public function size(): int
@@ -234,10 +214,7 @@ final class ObjectKeys implements Implementation
 
             if ($groups === null) {
                 /** @var Map<D, Map<T, S>> */
-                $groups = Map::of(
-                    Type::determine($discriminant),
-                    Map::class,
-                );
+                $groups = Map::of();
             }
 
             if ($groups->contains($discriminant)) {
@@ -263,7 +240,7 @@ final class ObjectKeys implements Implementation
     {
         /** @psalm-suppress MissingClosureParamType */
         return $this->reduce(
-            Set::of($this->keyType),
+            Set::of(),
             static fn(Set $keys, $key): Set => ($keys)($key),
         );
     }
@@ -275,7 +252,7 @@ final class ObjectKeys implements Implementation
     {
         /** @psalm-suppress MissingClosureParamType */
         return $this->reduce(
-            Sequence::of($this->valueType),
+            Sequence::of(),
             static fn(Sequence $values, $_, $value): Sequence => ($values)($value),
         );
     }
@@ -377,7 +354,7 @@ final class ObjectKeys implements Implementation
          * @psalm-suppress InvalidArgument
          * @var Map<bool, Map<T, S>>
          */
-        return Map::of('bool', Map::class)
+        return Map::of()
             (true, $truthy)
             (false, $falsy);
     }
@@ -420,7 +397,7 @@ final class ObjectKeys implements Implementation
     public function toSequenceOf(string $type, callable $mapper): Sequence
     {
         /** @var Sequence<ST> */
-        $sequence = Sequence::of($type);
+        $sequence = Sequence::of();
 
         foreach ($this->values as $k) {
             /** @var T $key */
@@ -446,7 +423,7 @@ final class ObjectKeys implements Implementation
     public function toSetOf(string $type, callable $mapper): Set
     {
         /** @var Set<ST> */
-        $set = Set::of($type);
+        $set = Set::of();
 
         foreach ($this->values as $k) {
             /** @var T $key */
@@ -476,7 +453,7 @@ final class ObjectKeys implements Implementation
         $mapper ??= static fn($k, $v): \Generator => yield $k => $v;
 
         /** @var Map<MT, MS> */
-        $map = Map::of($key, $value);
+        $map = Map::of();
 
         foreach ($this->values as $k) {
             /** @var T $key */
@@ -501,6 +478,6 @@ final class ObjectKeys implements Implementation
      */
     private function clearMap(): Map
     {
-        return Map::of($this->keyType, $this->valueType);
+        return Map::of();
     }
 }

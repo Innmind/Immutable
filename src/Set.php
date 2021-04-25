@@ -13,13 +13,11 @@ use Innmind\Immutable\Exception\{
  */
 final class Set implements \Countable
 {
-    private string $type;
     /** @var Set\Implementation<T> */
     private Set\Implementation $implementation;
 
-    private function __construct(string $type, Set\Implementation $implementation)
+    private function __construct(Set\Implementation $implementation)
     {
-        $this->type = $type;
         $this->implementation = $implementation;
     }
 
@@ -50,9 +48,9 @@ final class Set implements \Countable
      *
      * @return self<V>
      */
-    public static function of(string $type, ...$values): self
+    public static function of(...$values): self
     {
-        return new self($type, new Set\Primitive($type, ...$values));
+        return new self(new Set\Primitive(...$values));
     }
 
     /**
@@ -67,9 +65,9 @@ final class Set implements \Countable
      *
      * @return self<V>
      */
-    public static function defer(string $type, \Generator $generator): self
+    public static function defer(\Generator $generator): self
     {
-        return new self($type, new Set\Defer($type, $generator));
+        return new self(new Set\Defer($generator));
     }
 
     /**
@@ -86,9 +84,9 @@ final class Set implements \Countable
      *
      * @return self<V>
      */
-    public static function lazy(string $type, callable $generator): self
+    public static function lazy(callable $generator): self
     {
-        return new self($type, new Set\Lazy($type, $generator));
+        return new self(new Set\Lazy($generator));
     }
 
     /**
@@ -98,7 +96,7 @@ final class Set implements \Countable
      */
     public static function mixed(...$values): self
     {
-        return new self('mixed', new Set\Primitive('mixed', ...$values));
+        return new self(new Set\Primitive(...$values));
     }
 
     /**
@@ -107,7 +105,7 @@ final class Set implements \Countable
     public static function ints(int ...$values): self
     {
         /** @var self<int> */
-        $self = new self('int', new Set\Primitive('int', ...$values));
+        $self = new self(new Set\Primitive(...$values));
 
         return $self;
     }
@@ -118,7 +116,7 @@ final class Set implements \Countable
     public static function floats(float ...$values): self
     {
         /** @var self<float> */
-        $self = new self('float', new Set\Primitive('float', ...$values));
+        $self = new self(new Set\Primitive(...$values));
 
         return $self;
     }
@@ -129,7 +127,7 @@ final class Set implements \Countable
     public static function strings(string ...$values): self
     {
         /** @var self<string> */
-        $self = new self('string', new Set\Primitive('string', ...$values));
+        $self = new self(new Set\Primitive(...$values));
 
         return $self;
     }
@@ -140,22 +138,9 @@ final class Set implements \Countable
     public static function objects(object ...$values): self
     {
         /** @var self<object> */
-        $self = new self('object', new Set\Primitive('object', ...$values));
+        $self = new self(new Set\Primitive(...$values));
 
         return $self;
-    }
-
-    public function isOfType(string $type): bool
-    {
-        return $this->type === $type;
-    }
-
-    /**
-     * Return the type of this set
-     */
-    public function type(): string
-    {
-        return $this->type;
     }
 
     public function size(): int
@@ -307,7 +292,7 @@ final class Set implements \Countable
          * @var Map<D, self<T>>
          */
         return $this->reduce(
-            Map::of($type, self::class),
+            Map::of(),
             function(Map $groups, $value) use ($discriminator): Map {
                 /** @var T $value */
                 $key = $discriminator($value);

@@ -29,11 +29,6 @@ interface Implementation extends \Countable
      */
     public function __invoke($element): self;
 
-    /**
-     * Type of the elements
-     */
-    public function type(): string;
-
     public function size(): int;
 
     /**

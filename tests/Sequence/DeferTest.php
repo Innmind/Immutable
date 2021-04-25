@@ -24,14 +24,14 @@ class DeferTest extends TestCase
     {
         $this->assertInstanceOf(
             Implementation::class,
-            new Defer('mixed', (static fn() => yield)()),
+            new Defer((static fn() => yield)()),
         );
     }
 
     public function testGeneratorNotLoadedAtInstanciation()
     {
         $loaded = false;
-        $sequence = new Defer('int', (static function() use (&$loaded) {
+        $sequence = new Defer((static function() use (&$loaded) {
             yield 1;
             $loaded = true;
         })());
@@ -39,14 +39,9 @@ class DeferTest extends TestCase
         $this->assertFalse($loaded);
     }
 
-    public function testType()
-    {
-        $this->assertSame('int', (new Defer('int', (static fn() => yield)()))->type());
-    }
-
     public function testSize()
     {
-        $sequence = new Defer('int', (static function() {
+        $sequence = new Defer((static function() {
             yield 1;
             yield 1;
         })());
@@ -57,7 +52,7 @@ class DeferTest extends TestCase
 
     public function testIterator()
     {
-        $sequence = new Defer('int', (static function() {
+        $sequence = new Defer((static function() {
             yield 1;
             yield 2;
             yield 3;
@@ -71,7 +66,7 @@ class DeferTest extends TestCase
 
     public function testGet()
     {
-        $sequence = new Defer('int', (static function() {
+        $sequence = new Defer((static function() {
             yield 1;
             yield 42;
             yield 3;
@@ -84,7 +79,7 @@ class DeferTest extends TestCase
     {
         $this->expectException(OutOfBoundException::class);
 
-        $sequence = new Defer('int', (static function() {
+        $sequence = new Defer((static function() {
             if (false) {
                 yield 1;
             }
@@ -97,12 +92,12 @@ class DeferTest extends TestCase
     {
         $aLoaded = false;
         $bLoaded = false;
-        $a = new Defer('int', (static function() use (&$aLoaded) {
+        $a = new Defer((static function() use (&$aLoaded) {
             yield 1;
             yield 2;
             $aLoaded = true;
         })());
-        $b = new Defer('int', (static function() use (&$bLoaded) {
+        $b = new Defer((static function() use (&$bLoaded) {
             yield 2;
             yield 3;
             $bLoaded = true;
@@ -122,7 +117,7 @@ class DeferTest extends TestCase
     public function testDistinct()
     {
         $loaded = false;
-        $a = new Defer('int', (static function() use (&$loaded) {
+        $a = new Defer((static function() use (&$loaded) {
             yield 1;
             yield 2;
             yield 1;
@@ -140,7 +135,7 @@ class DeferTest extends TestCase
     public function testDrop()
     {
         $loaded = false;
-        $a = new Defer('int', (static function() use (&$loaded) {
+        $a = new Defer((static function() use (&$loaded) {
             yield 1;
             yield 2;
             yield 3;
@@ -158,7 +153,7 @@ class DeferTest extends TestCase
 
     public function testDropEnd()
     {
-        $a = new Defer('int', (static function() {
+        $a = new Defer((static function() {
             yield 1;
             yield 2;
             yield 3;
@@ -173,11 +168,11 @@ class DeferTest extends TestCase
 
     public function testEquals()
     {
-        $a = new Defer('int', (static function() {
+        $a = new Defer((static function() {
             yield 1;
             yield 2;
         })());
-        $b = new Defer('int', (static function() {
+        $b = new Defer((static function() {
             yield 1;
             yield 2;
             yield 3;
@@ -189,7 +184,7 @@ class DeferTest extends TestCase
     public function testFilter()
     {
         $loaded = false;
-        $a = new Defer('int', (static function() use (&$loaded) {
+        $a = new Defer((static function() use (&$loaded) {
             yield 1;
             yield 2;
             yield 3;
@@ -207,7 +202,7 @@ class DeferTest extends TestCase
 
     public function testForeach()
     {
-        $sequence = new Defer('int', (static function() {
+        $sequence = new Defer((static function() {
             yield 1;
             yield 2;
             yield 3;
@@ -228,7 +223,7 @@ class DeferTest extends TestCase
     {
         $this->expectException(CannotGroupEmptyStructure::class);
 
-        $sequence = new Defer('int', (static function() {
+        $sequence = new Defer((static function() {
             if (false) {
                 yield 1;
             }
@@ -239,7 +234,7 @@ class DeferTest extends TestCase
 
     public function testGroupBy()
     {
-        $sequence = new Defer('int', (static function() {
+        $sequence = new Defer((static function() {
             yield 1;
             yield 2;
             yield 3;
@@ -249,10 +244,7 @@ class DeferTest extends TestCase
 
         $this->assertSame([1, 2, 3, 4], \iterator_to_array($sequence->iterator()));
         $this->assertInstanceOf(Map::class, $groups);
-        $this->assertTrue($groups->isOfType('int', Sequence::class));
         $this->assertCount(2, $groups);
-        $this->assertTrue($groups->get(0)->isOfType('int'));
-        $this->assertTrue($groups->get(1)->isOfType('int'));
         $this->assertSame([2, 4], unwrap($groups->get(0)));
         $this->assertSame([1, 3], unwrap($groups->get(1)));
     }
@@ -261,7 +253,7 @@ class DeferTest extends TestCase
     {
         $this->expectException(OutOfBoundException::class);
 
-        $sequence = new Defer('int', (static function() {
+        $sequence = new Defer((static function() {
             if (false) {
                 yield 1;
             }
@@ -274,7 +266,7 @@ class DeferTest extends TestCase
     {
         $this->expectException(OutOfBoundException::class);
 
-        $sequence = new Defer('int', (static function() {
+        $sequence = new Defer((static function() {
             if (false) {
                 yield 1;
             }
@@ -285,7 +277,7 @@ class DeferTest extends TestCase
 
     public function testFirst()
     {
-        $sequence = new Defer('int', (static function() {
+        $sequence = new Defer((static function() {
             yield 2;
             yield 3;
             yield 4;
@@ -296,7 +288,7 @@ class DeferTest extends TestCase
 
     public function testLast()
     {
-        $sequence = new Defer('int', (static function() {
+        $sequence = new Defer((static function() {
             yield 1;
             yield 2;
             yield 3;
@@ -307,7 +299,7 @@ class DeferTest extends TestCase
 
     public function testContains()
     {
-        $sequence = new Defer('int', (static function() {
+        $sequence = new Defer((static function() {
             yield 1;
             yield 2;
             yield 3;
@@ -319,7 +311,7 @@ class DeferTest extends TestCase
 
     public function testIndexOf()
     {
-        $sequence = new Defer('int', (static function() {
+        $sequence = new Defer((static function() {
             yield 1;
             yield 2;
             yield 4;
@@ -333,7 +325,7 @@ class DeferTest extends TestCase
     {
         $this->expectException(ElementNotFound::class);
 
-        $sequence = new Defer('int', (static function() {
+        $sequence = new Defer((static function() {
             if (false) {
                 yield 1;
             }
@@ -345,7 +337,7 @@ class DeferTest extends TestCase
     public function testIndices()
     {
         $loaded = false;
-        $a = new Defer('string', (static function() use (&$loaded) {
+        $a = new Defer((static function() use (&$loaded) {
             yield '1';
             yield '2';
             $loaded = true;
@@ -355,14 +347,13 @@ class DeferTest extends TestCase
         $this->assertFalse($loaded);
         $this->assertSame(['1', '2'], \iterator_to_array($a->iterator()));
         $this->assertInstanceOf(Defer::class, $b);
-        $this->assertSame('int', $b->type());
         $this->assertSame([0, 1], \iterator_to_array($b->iterator()));
         $this->assertTrue($loaded);
     }
 
     public function testIndicesOnEmptySequence()
     {
-        $a = new Defer('string', (static function() {
+        $a = new Defer((static function() {
             if (false) {
                 yield 1;
             }
@@ -371,14 +362,13 @@ class DeferTest extends TestCase
 
         $this->assertSame([], \iterator_to_array($a->iterator()));
         $this->assertInstanceOf(Defer::class, $b);
-        $this->assertSame('int', $b->type());
         $this->assertSame([], \iterator_to_array($b->iterator()));
     }
 
     public function testMap()
     {
         $loaded = false;
-        $a = new Defer('int', (static function() use (&$loaded) {
+        $a = new Defer((static function() use (&$loaded) {
             yield 1;
             yield 2;
             yield 3;
@@ -396,7 +386,7 @@ class DeferTest extends TestCase
     public function testPad()
     {
         $loaded = false;
-        $a = new Defer('int', (static function() use (&$loaded) {
+        $a = new Defer((static function() use (&$loaded) {
             yield 1;
             yield 2;
             $loaded = true;
@@ -415,7 +405,7 @@ class DeferTest extends TestCase
 
     public function testPartition()
     {
-        $sequence = new Defer('int', (static function() {
+        $sequence = new Defer((static function() {
             yield 1;
             yield 2;
             yield 3;
@@ -425,10 +415,7 @@ class DeferTest extends TestCase
 
         $this->assertSame([1, 2, 3, 4], \iterator_to_array($sequence->iterator()));
         $this->assertInstanceOf(Map::class, $partition);
-        $this->assertTrue($partition->isOfType('bool', Sequence::class));
         $this->assertCount(2, $partition);
-        $this->assertTrue($partition->get(true)->isOfType('int'));
-        $this->assertTrue($partition->get(false)->isOfType('int'));
         $this->assertSame([2, 4], unwrap($partition->get(true)));
         $this->assertSame([1, 3], unwrap($partition->get(false)));
     }
@@ -436,7 +423,7 @@ class DeferTest extends TestCase
     public function testSlice()
     {
         $loaded = false;
-        $a = new Defer('int', (static function() use (&$loaded) {
+        $a = new Defer((static function() use (&$loaded) {
             yield 2;
             yield 3;
             yield 4;
@@ -454,7 +441,7 @@ class DeferTest extends TestCase
 
     public function testSplitAt()
     {
-        $sequence = new Defer('int', (static function() {
+        $sequence = new Defer((static function() {
             yield 2;
             yield 3;
             yield 4;
@@ -464,10 +451,7 @@ class DeferTest extends TestCase
 
         $this->assertSame([2, 3, 4, 5], \iterator_to_array($sequence->iterator()));
         $this->assertInstanceOf(Sequence::class, $parts);
-        $this->assertTrue($parts->isOfType(Sequence::class));
         $this->assertCount(2, $parts);
-        $this->assertTrue($parts->first()->isOfType('int'));
-        $this->assertTrue($parts->last()->isOfType('int'));
         $this->assertSame([2, 3], unwrap($parts->first()));
         $this->assertSame([4, 5], unwrap($parts->last()));
     }
@@ -475,7 +459,7 @@ class DeferTest extends TestCase
     public function testTake()
     {
         $loaded = false;
-        $a = new Defer('int', (static function() use (&$loaded) {
+        $a = new Defer((static function() use (&$loaded) {
             yield 2;
             yield 3;
             yield 4;
@@ -493,7 +477,7 @@ class DeferTest extends TestCase
     public function testSequenceNotCompletelyLoadedWhenTakingFewerThanItsSize()
     {
         $loaded = false;
-        $a = new Defer('int', (static function() use (&$loaded) {
+        $a = new Defer((static function() use (&$loaded) {
             yield 2;
             yield 3;
             yield 4;
@@ -509,7 +493,7 @@ class DeferTest extends TestCase
 
     public function testTakeEnd()
     {
-        $a = new Defer('int', (static function() {
+        $a = new Defer((static function() {
             yield 2;
             yield 3;
             yield 4;
@@ -525,12 +509,12 @@ class DeferTest extends TestCase
     {
         $aLoaded = false;
         $bLoaded = false;
-        $a = new Defer('int', (static function() use (&$aLoaded) {
+        $a = new Defer((static function() use (&$aLoaded) {
             yield 1;
             yield 2;
             $aLoaded = true;
         })());
-        $b = new Defer('int', (static function() use (&$bLoaded) {
+        $b = new Defer((static function() use (&$bLoaded) {
             yield 3;
             yield 4;
             $bLoaded = true;
@@ -551,12 +535,12 @@ class DeferTest extends TestCase
     {
         $aLoaded = false;
         $bLoaded = false;
-        $a = new Defer('int', (static function() use (&$aLoaded) {
+        $a = new Defer((static function() use (&$aLoaded) {
             yield 1;
             yield 2;
             $aLoaded = true;
         })());
-        $b = new Defer('int', (static function() use (&$bLoaded) {
+        $b = new Defer((static function() use (&$bLoaded) {
             yield 2;
             yield 3;
             $bLoaded = true;
@@ -576,7 +560,7 @@ class DeferTest extends TestCase
     public function testAdd()
     {
         $loaded = false;
-        $a = new Defer('int', (static function() use (&$loaded) {
+        $a = new Defer((static function() use (&$loaded) {
             yield 1;
             $loaded = true;
         })());
@@ -591,7 +575,7 @@ class DeferTest extends TestCase
 
     public function testSort()
     {
-        $a = new Defer('int', (static function() {
+        $a = new Defer((static function() {
             yield 1;
             yield 4;
             yield 3;
@@ -606,7 +590,7 @@ class DeferTest extends TestCase
 
     public function testReduce()
     {
-        $sequence = new Defer('int', (static function() {
+        $sequence = new Defer((static function() {
             yield 1;
             yield 2;
             yield 3;
@@ -619,7 +603,7 @@ class DeferTest extends TestCase
     public function testClear()
     {
         $loaded = false;
-        $a = new Defer('int', (static function() use (&$loaded) {
+        $a = new Defer((static function() use (&$loaded) {
             yield 1;
             yield 2;
             $loaded = true;
@@ -636,7 +620,7 @@ class DeferTest extends TestCase
     public function testReverse()
     {
         $loaded = false;
-        $a = new Defer('int', (static function() use (&$loaded) {
+        $a = new Defer((static function() use (&$loaded) {
             yield 1;
             yield 2;
             yield 3;
@@ -656,11 +640,11 @@ class DeferTest extends TestCase
     {
         $aLoaded = false;
         $bLoaded = false;
-        $a = new Defer('int', (static function() use (&$aLoaded) {
+        $a = new Defer((static function() use (&$aLoaded) {
             yield 1;
             $aLoaded = true;
         })());
-        $b = new Defer('int', (static function() use (&$bLoaded) {
+        $b = new Defer((static function() use (&$bLoaded) {
             if (false) {
                 yield 1;
             }
@@ -678,7 +662,7 @@ class DeferTest extends TestCase
     public function testToSequenceOf()
     {
         $loaded = false;
-        $sequence = new Defer('int', (static function() use (&$loaded) {
+        $sequence = new Defer((static function() use (&$loaded) {
             yield 1;
             yield 2;
             yield 3;
@@ -700,7 +684,7 @@ class DeferTest extends TestCase
 
     public function testToSetOf()
     {
-        $sequence = new Defer('int', (static function() {
+        $sequence = new Defer((static function() {
             yield 1;
             yield 2;
             yield 3;
@@ -719,7 +703,7 @@ class DeferTest extends TestCase
 
     public function testToMapOf()
     {
-        $sequence = new Defer('int', (static function() {
+        $sequence = new Defer((static function() {
             yield 1;
             yield 2;
             yield 3;
@@ -736,7 +720,7 @@ class DeferTest extends TestCase
     public function testFind()
     {
         $count = 0;
-        $sequence = new Defer('int', (static function() use (&$count) {
+        $sequence = new Defer((static function() use (&$count) {
             ++$count;
             yield 1;
             ++$count;

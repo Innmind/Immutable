@@ -17,18 +17,16 @@ use Innmind\Immutable\{
  */
 final class Primitive implements Implementation
 {
-    private string $type;
     /** @var Sequence\Implementation<T> */
     private Sequence\Implementation $values;
 
     /**
      * @param T $values
      */
-    public function __construct(string $type, ...$values)
+    public function __construct(...$values)
     {
-        $this->type = $type;
         /** @var Sequence\Implementation<T> */
-        $this->values = (new Sequence\Primitive($type, ...$values))->distinct();
+        $this->values = (new Sequence\Primitive(...$values))->distinct();
     }
 
     /**
@@ -46,11 +44,6 @@ final class Primitive implements Implementation
         $set->values = ($this->values)($element);
 
         return $set;
-    }
-
-    public function type(): string
-    {
-        return $this->type;
     }
 
     public function size(): int
@@ -81,7 +74,7 @@ final class Primitive implements Implementation
         $self = $this->clear();
         /** @psalm-suppress InvalidArgument */
         $self->values = $this->values->intersect(
-            new Sequence\Primitive($this->type, ...$set->iterator()),
+            new Sequence\Primitive(...$set->iterator()),
         );
 
         return $self;
@@ -126,7 +119,7 @@ final class Primitive implements Implementation
         $self = clone $this;
         /** @psalm-suppress InvalidArgument */
         $self->values = $this->values->diff(
-            new Sequence\Primitive($this->type, ...$set->iterator()),
+            new Sequence\Primitive(...$set->iterator()),
         );
 
         return $self;
@@ -182,10 +175,10 @@ final class Primitive implements Implementation
          * @var Map<D, Set<T>>
          */
         return $map->reduce(
-            Map::of($map->keyType(), Set::class),
+            Map::of(),
             fn(Map $carry, $key, Sequence $values): Map => ($carry)(
                 $key,
-                $values->toSetOf($this->type),
+                $values->toSetOf('T'),
             ),
         );
     }
@@ -224,18 +217,18 @@ final class Primitive implements Implementation
         /** @var Set<T> */
         $truthy = $partitions
             ->get(true)
-            ->toSetOf($this->type);
+            ->toSetOf('T');
         /** @var Set<T> */
         $falsy = $partitions
             ->get(false)
-            ->toSetOf($this->type);
+            ->toSetOf('T');
 
         /**
          * @psalm-suppress InvalidScalarArgument
          * @psalm-suppress InvalidArgument
          * @var Map<bool, Set<T>>
          */
-        return Map::of('bool', Set::class)
+        return Map::of()
             (true, $truthy)
             (false, $falsy);
     }
@@ -250,7 +243,7 @@ final class Primitive implements Implementation
         return $this
             ->values
             ->sort($function)
-            ->toSequenceOf($this->type);
+            ->toSequenceOf('T');
     }
 
     /**
@@ -284,7 +277,7 @@ final class Primitive implements Implementation
      */
     public function clear(): self
     {
-        return new self($this->type);
+        return new self;
     }
 
     public function empty(): bool

@@ -30,16 +30,6 @@ interface Implementation extends \Countable
      */
     public function __invoke($key, $value): self;
 
-    /**
-     * Return the key type for this map
-     */
-    public function keyType(): string;
-
-    /**
-     * Return the value type for this map
-     */
-    public function valueType(): string;
-
     public function size(): int;
 
     /**

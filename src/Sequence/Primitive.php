@@ -21,7 +21,6 @@ use Innmind\Immutable\{
  */
 final class Primitive implements Implementation
 {
-    private string $type;
     /** @var list<T> */
     private array $values;
     private ?int $size = null;
@@ -29,9 +28,8 @@ final class Primitive implements Implementation
     /**
      * @param T $values
      */
-    public function __construct(string $type, ...$values)
+    public function __construct(...$values)
     {
-        $this->type = $type;
         /** @var list<T> */
         $this->values = $values;
     }
@@ -48,11 +46,6 @@ final class Primitive implements Implementation
         $self->size = $this->size() + 1;
 
         return $self;
-    }
-
-    public function type(): string
-    {
-        return $this->type;
     }
 
     public function size(): int
@@ -197,10 +190,7 @@ final class Primitive implements Implementation
 
             if ($groups === null) {
                 /** @var Map<D, Sequence<T>> */
-                $groups = Map::of(
-                    Type::determine($key),
-                    Sequence::class,
-                );
+                $groups = Map::of();
             }
 
             if ($groups->contains($key)) {
@@ -209,7 +199,7 @@ final class Primitive implements Implementation
 
                 $groups = ($groups)($key, $group);
             } else {
-                $groups = ($groups)($key, Sequence::of($this->type, $value));
+                $groups = ($groups)($key, Sequence::of($value));
             }
         }
 
@@ -266,11 +256,11 @@ final class Primitive implements Implementation
     {
         if ($this->empty()) {
             /** @var self<int> */
-            return new self('int');
+            return new self;
         }
 
         /** @var self<int> */
-        return new self('int', ...\range(0, $this->size() - 1));
+        return new self(...\range(0, $this->size() - 1));
     }
 
     /**
@@ -328,15 +318,15 @@ final class Primitive implements Implementation
             }
         }
 
-        $true = Sequence::of($this->type, ...$truthy);
-        $false = Sequence::of($this->type, ...$falsy);
+        $true = Sequence::of(...$truthy);
+        $false = Sequence::of(...$falsy);
 
         /**
          * @psalm-suppress InvalidScalarArgument
          * @psalm-suppress InvalidArgument
          * @var Map<bool, Sequence<T>>
          */
-        return Map::of('bool', Sequence::class)
+        return Map::of()
             (true, $true)
             (false, $false);
     }
@@ -365,9 +355,8 @@ final class Primitive implements Implementation
     {
         /** @var Sequence<Sequence<T>> */
         return Sequence::of(
-            Sequence::class,
-            $this->slice(0, $index)->toSequenceOf($this->type),
-            $this->slice($index, $this->size())->toSequenceOf($this->type),
+            $this->slice(0, $index)->toSequenceOf('T'),
+            $this->slice($index, $this->size())->toSequenceOf('T'),
         );
     }
 
@@ -446,7 +435,7 @@ final class Primitive implements Implementation
      */
     public function clear(): Implementation
     {
-        return new self($this->type);
+        return new self;
     }
 
     /**
@@ -478,7 +467,7 @@ final class Primitive implements Implementation
         $mapper ??= static fn($v): \Generator => yield $v;
 
         /** @var Sequence<ST> */
-        $sequence = Sequence::of($type);
+        $sequence = Sequence::of();
 
         foreach ($this->values as $value) {
             /** @var ST $newValue */
@@ -503,7 +492,7 @@ final class Primitive implements Implementation
         $mapper ??= static fn($v): \Generator => yield $v;
 
         /** @var Set<ST> */
-        $set = Set::of($type);
+        $set = Set::of();
 
         foreach ($this->values as $value) {
             /** @var ST $newValue */
@@ -526,7 +515,7 @@ final class Primitive implements Implementation
     public function toMapOf(string $key, string $value, callable $mapper): Map
     {
         /** @var Map<MT, MS> */
-        $map = Map::of($key, $value);
+        $map = Map::of();
 
         foreach ($this->values as $value) {
             foreach ($mapper($value) as $newKey => $newValue) {
