@@ -14,14 +14,12 @@ use Innmind\Immutable\Exception\{
 final class Set implements \Countable
 {
     private string $type;
-    private ValidateArgument $validate;
     /** @var Set\Implementation<T> */
     private Set\Implementation $implementation;
 
     private function __construct(string $type, Set\Implementation $implementation)
     {
         $this->type = $type;
-        $this->validate = Type::of($type);
         $this->implementation = $implementation;
     }
 
@@ -39,8 +37,6 @@ final class Set implements \Countable
      */
     public function __invoke($element): self
     {
-        ($this->validate)($element, 1);
-
         $self = clone $this;
         $self->implementation = ($this->implementation)($element);
 
@@ -181,8 +177,6 @@ final class Set implements \Countable
      */
     public function intersect(self $set): self
     {
-        assertSet($this->type, $set, 1);
-
         $newSet = clone $this;
         $newSet->implementation = $this->implementation->intersect(
             $set->implementation,
@@ -210,8 +204,6 @@ final class Set implements \Countable
      */
     public function contains($element): bool
     {
-        ($this->validate)($element, 1);
-
         return $this->implementation->contains($element);
     }
 
@@ -224,8 +216,6 @@ final class Set implements \Countable
      */
     public function remove($element): self
     {
-        ($this->validate)($element, 1);
-
         $self = clone $this;
         $self->implementation = $this->implementation->remove($element);
 
@@ -241,8 +231,6 @@ final class Set implements \Countable
      */
     public function diff(self $set): self
     {
-        assertSet($this->type, $set, 1);
-
         $self = clone $this;
         $self->implementation = $this->implementation->diff(
             $set->implementation,
@@ -258,8 +246,6 @@ final class Set implements \Countable
      */
     public function equals(self $set): bool
     {
-        assertSet($this->type, $set, 1);
-
         return $this->implementation->equals($set->implementation);
     }
 
@@ -403,8 +389,6 @@ final class Set implements \Countable
      */
     public function merge(self $set): self
     {
-        assertSet($this->type, $set, 1);
-
         $self = clone $this;
         $self->implementation = $this->implementation->merge(
             $set->implementation,

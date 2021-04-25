@@ -8,7 +8,6 @@ use Innmind\Immutable\{
     Sequence,
     Set,
     Type,
-    ValidateArgument,
     Str,
     Exception\CannotGroupEmptyStructure,
 };
@@ -19,7 +18,6 @@ use Innmind\Immutable\{
 final class Defer implements Implementation
 {
     private string $type;
-    private ValidateArgument $validate;
     /** @var Sequence\Implementation<T> */
     private Sequence\Implementation $values;
 
@@ -29,7 +27,6 @@ final class Defer implements Implementation
     public function __construct(string $type, \Generator $generator)
     {
         $this->type = $type;
-        $this->validate = Type::of($type);
         /** @var Sequence\Implementation<T> */
         $this->values = (new Sequence\Defer($type, $generator))->distinct();
     }
@@ -216,18 +213,13 @@ final class Defer implements Implementation
      */
     public function map(callable $function): self
     {
-        $validate = $this->validate;
-
         /**
          * @psalm-suppress MissingClosureParamType
          * @psalm-suppress MissingClosureReturnType
          */
-        $function = static function($value) use ($validate, $function) {
+        $function = static function($value) use ($function) {
             /** @var T $value */
-            $returned = $function($value);
-            ($validate)($returned, 1);
-
-            return $returned;
+            return $function($value);
         };
 
         $self = clone $this;

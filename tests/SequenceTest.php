@@ -251,14 +251,6 @@ class SequenceTest extends TestCase
         $this->assertFalse($a->equals($b));
     }
 
-    public function testThrowWhenTryingToTestEqualityForDifferentTypes()
-    {
-        $this->expectException(\TypeError::class);
-        $this->expectExceptionMessage('Argument 1 must be of type Sequence<int>, Sequence<stdClass> given');
-
-        Sequence::of('int')->equals(Sequence::of('stdClass'));
-    }
-
     public function testFilter()
     {
         $a = Sequence::of('int')
@@ -451,21 +443,6 @@ class SequenceTest extends TestCase
         $this->assertSame(['1', '2', '3', '4'], unwrap($b));
     }
 
-    public function testThrowWhenTryingToModifyValueTypeInMap()
-    {
-        $this->expectException(\TypeError::class);
-        $this->expectExceptionMessage('Argument 1 must be of type int, string given');
-
-        Sequence::of('int')
-            ->add(1)
-            ->add(2)
-            ->add(3)
-            ->add(4)
-            ->map(static function(int $value) {
-                return (string) $value;
-            });
-    }
-
     public function testPad()
     {
         $a = Sequence::of('int')
@@ -479,14 +456,6 @@ class SequenceTest extends TestCase
         $this->assertSame('int', $b->type());
         $this->assertSame([1, 2], unwrap($a));
         $this->assertSame([1, 2, 0, 0], unwrap($b));
-    }
-
-    public function testThrowWhenPaddingWithDifferentType()
-    {
-        $this->expectException(\TypeError::class);
-        $this->expectExceptionMessage('Argument 2 must be of type int, string given');
-
-        Sequence::of('int')->pad(2, '0');
     }
 
     public function testPartition()
@@ -601,14 +570,6 @@ class SequenceTest extends TestCase
         $this->assertSame([3, 4, 1, 2], unwrap($c));
     }
 
-    public function testThrowWhenAppendingDifferentTypes()
-    {
-        $this->expectException(\TypeError::class);
-        $this->expectExceptionMessage('Argument 1 must be of type Sequence<int>, Sequence<stdClass> given');
-
-        Sequence::of('int')->append(Sequence::of('stdClass'));
-    }
-
     public function testIntersect()
     {
         $a = Sequence::of('int')
@@ -630,14 +591,6 @@ class SequenceTest extends TestCase
         $this->assertSame([2], unwrap($c));
     }
 
-    public function testThrowWhenIntersectingDifferentTypes()
-    {
-        $this->expectException(\TypeError::class);
-        $this->expectExceptionMessage('Argument 1 must be of type Sequence<int>, Sequence<stdClass> given');
-
-        Sequence::of('int')->intersect(Sequence::of('stdClass'));
-    }
-
     public function testAdd()
     {
         $a = Sequence::of('int');
@@ -654,14 +607,6 @@ class SequenceTest extends TestCase
             [1, 2, 3],
             unwrap(Sequence::ints(1)(2)(3)),
         );
-    }
-
-    public function testThrowWhenAddingInvalidType()
-    {
-        $this->expectException(\TypeError::class);
-        $this->expectExceptionMessage('Argument 1 must be of type int, float given');
-
-        Sequence::of('int')->add(4.2);
     }
 
     public function testSort()

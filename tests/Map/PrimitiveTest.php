@@ -69,24 +69,6 @@ class PrimitiveTest extends TestCase
         $this->assertSame(4, $m->size());
     }
 
-    public function testThrowWhenKeyDoesntMatchType()
-    {
-        $this->expectException(\TypeError::class);
-        $this->expectExceptionMessage('Argument 1 must be of type int, string given');
-
-        $m = new Primitive('int', 'int');
-        ($m)('24', 42);
-    }
-
-    public function testThrowWhenValueDoesntMatchType()
-    {
-        $this->expectException(\TypeError::class);
-        $this->expectExceptionMessage('Argument 2 must be of type int, float given');
-
-        $m = new Primitive('int', 'int');
-        ($m)(24, 42.0);
-    }
-
     public function testGet()
     {
         $m = new Primitive('int', 'int');
@@ -287,26 +269,6 @@ class PrimitiveTest extends TestCase
         $this->assertSame([1, 2, 3, 5], unwrap($m->values()));
         $this->assertSame([10, 1, 12, 14], unwrap($m2->keys()));
         $this->assertSame([1, 4, 3, 5], unwrap($m2->values()));
-    }
-
-    public function testThrowWhenTryingToModifyValueTypeInTheMap()
-    {
-        $this->expectException(\TypeError::class);
-        $this->expectExceptionMessage('Argument 2 must be of type int, string given');
-
-        (new Primitive('int', 'int'))(1, 2)->map(static function(int $key, int $value) {
-            return (string) $value;
-        });
-    }
-
-    public function testThrowWhenTryingToModifyKeyTypeInTheMap()
-    {
-        $this->expectException(\TypeError::class);
-        $this->expectExceptionMessage('Argument 1 must be of type int, string given');
-
-        (new Primitive('int', 'int'))(1, 2)->map(static function(int $key, int $value) {
-            return new Pair((string) $key, $value);
-        });
     }
 
     public function testRemove()

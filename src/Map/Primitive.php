@@ -11,7 +11,6 @@ use Innmind\Immutable\{
     Set,
     Pair,
     Maybe,
-    ValidateArgument,
     Exception\LogicException,
     Exception\ElementNotFound,
     Exception\CannotGroupEmptyStructure,
@@ -25,21 +24,16 @@ final class Primitive implements Implementation
 {
     private string $keyType;
     private string $valueType;
-    private ValidateArgument $validateKey;
-    private ValidateArgument $validateValue;
     /** @var array<T, S> */
     private array $values = [];
     private ?int $size = null;
 
     public function __construct(string $keyType, string $valueType)
     {
-        $this->validateKey = Type::of($keyType);
-
         if (!\in_array($keyType, ['int', 'integer', 'string'], true)) {
             throw new LogicException;
         }
 
-        $this->validateValue = Type::of($valueType);
         $this->keyType = $keyType;
         $this->valueType = $valueType;
     }
@@ -52,9 +46,6 @@ final class Primitive implements Implementation
      */
     public function __invoke($key, $value): self
     {
-        ($this->validateKey)($key, 1);
-        ($this->validateValue)($value, 2);
-
         $map = clone $this;
         $map->size = null;
         $map->values[$key] = $value;
@@ -277,8 +268,6 @@ final class Primitive implements Implementation
             $return = $function($this->normalizeKey($k), $v);
 
             if ($return instanceof Pair) {
-                ($this->validateKey)($return->key(), 1);
-
                 /** @var T */
                 $key = $return->key();
                 /** @var S */
@@ -287,8 +276,6 @@ final class Primitive implements Implementation
                 $key = $k;
                 $value = $return;
             }
-
-            ($this->validateValue)($value, 2);
 
             $map->values[$key] = $value;
         }

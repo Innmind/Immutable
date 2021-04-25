@@ -152,14 +152,6 @@ class PrimitiveTest extends TestCase
         $this->assertSame([2, 4, 6], \iterator_to_array($b->iterator()));
     }
 
-    public function testThrowWhenTryingToModifyTheTypeWhenMapping()
-    {
-        $this->expectException(\TypeError::class);
-        $this->expectExceptionMessage('Argument 1 must be of type int, string given');
-
-        (new Primitive('int', 1))->map(static fn($i) => (string) $i);
-    }
-
     public function testPartition()
     {
         $set = new Primitive('int', 1, 2, 3, 4);

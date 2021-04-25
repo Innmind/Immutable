@@ -9,7 +9,6 @@ use Innmind\Immutable\{
     Str,
     Set,
     Accumulate,
-    ValidateArgument,
     Type,
     Exception\LogicException,
     Exception\CannotGroupEmptyStructure,
@@ -26,20 +25,16 @@ final class Defer implements Implementation
     private string $type;
     /** @var \Iterator<T> */
     private \Iterator $values;
-    private ValidateArgument $validate;
 
     public function __construct(string $type, \Generator $generator)
     {
         $this->type = $type;
-        $validate = Type::of($type);
-        $this->values = new Accumulate((static function(\Generator $generator, ValidateArgument $validate): \Generator {
+        $this->values = new Accumulate((static function(\Generator $generator): \Generator {
             /** @var T $value */
             foreach ($generator as $value) {
-                $validate($value, 1);
                 yield $value;
             }
-        })($generator, $validate));
-        $this->validate = $validate;
+        })($generator));
     }
 
     /**
@@ -327,16 +322,15 @@ final class Defer implements Implementation
         /** @psalm-suppress MissingClosureParamType */
         return new self(
             $this->type,
-            (static function($values, callable $map, ValidateArgument $validate): \Generator {
+            (static function($values, callable $map): \Generator {
                 /** @var T $value */
                 foreach ($values as $value) {
                     /** @var T */
                     $value = $map($value);
-                    $validate($value, 1);
 
                     yield $value;
                 }
-            })($this->values, $function, $this->validate),
+            })($this->values, $function),
         );
     }
 

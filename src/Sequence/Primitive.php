@@ -9,7 +9,6 @@ use Innmind\Immutable\{
     Str,
     Set,
     Type,
-    ValidateArgument,
     Exception\OutOfBoundException,
     Exception\LogicException,
     Exception\ElementNotFound,
@@ -23,7 +22,6 @@ use Innmind\Immutable\{
 final class Primitive implements Implementation
 {
     private string $type;
-    private ValidateArgument $validate;
     /** @var list<T> */
     private array $values;
     private ?int $size = null;
@@ -34,7 +32,6 @@ final class Primitive implements Implementation
     public function __construct(string $type, ...$values)
     {
         $this->type = $type;
-        $this->validate = Type::of($type);
         /** @var list<T> */
         $this->values = $values;
     }
@@ -283,17 +280,13 @@ final class Primitive implements Implementation
      */
     public function map(callable $function): self
     {
-        $validate = $this->validate;
         /**
          * @psalm-suppress MissingClosureParamType
          * @psalm-suppress MissingClosureReturnType
          */
-        $function = static function($value) use ($validate, $function) {
+        $function = static function($value) use ($function) {
             /** @var T $value */
-            $returned = $function($value);
-            ($validate)($returned, 1);
-
-            return $returned;
+            return $function($value);
         };
 
         $self = clone $this;

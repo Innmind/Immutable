@@ -10,7 +10,6 @@ use Innmind\Immutable\{
     Sequence,
     Set,
     Pair,
-    ValidateArgument,
     Exception\LogicException,
     Exception\ElementNotFound,
     Exception\CannotGroupEmptyStructure,
@@ -24,8 +23,6 @@ final class DoubleIndex implements Implementation
 {
     private string $keyType;
     private string $valueType;
-    private ValidateArgument $validateKey;
-    private ValidateArgument $validateValue;
     /** @var Sequence\Implementation<T> */
     private Sequence\Implementation $keys;
     /** @var Sequence\Implementation<S> */
@@ -35,8 +32,6 @@ final class DoubleIndex implements Implementation
 
     public function __construct(string $keyType, string $valueType)
     {
-        $this->validateKey = Type::of($keyType);
-        $this->validateValue = Type::of($valueType);
         $this->keyType = $keyType;
         $this->valueType = $valueType;
         $this->keys = new Sequence\Primitive($keyType);
@@ -53,9 +48,6 @@ final class DoubleIndex implements Implementation
      */
     public function __invoke($key, $value): self
     {
-        ($this->validateKey)($key, 1);
-        ($this->validateValue)($value, 2);
-
         $map = clone $this;
 
         if ($this->keys->contains($key)) {

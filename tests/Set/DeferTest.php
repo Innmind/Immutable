@@ -27,17 +27,6 @@ class DeferTest extends TestCase
         );
     }
 
-    public function testThrowWhenYieldingInvalidType()
-    {
-        $this->expectException(\TypeError::class);
-        $this->expectExceptionMessage('Argument 1 must be of type int, string given');
-
-        $sequence = new Defer('int', (static function() {
-            yield '1';
-        })());
-        \iterator_to_array($sequence->iterator());
-    }
-
     public function testType()
     {
         $this->assertSame(
@@ -265,18 +254,6 @@ class DeferTest extends TestCase
         $this->assertInstanceOf(Defer::class, $b);
         $this->assertSame([2, 4, 6], \iterator_to_array($b->iterator()));
         $this->assertTrue($loaded);
-    }
-
-    public function testThrowWhenTryingToModifyTheTypeWhenMapping()
-    {
-        $this->expectException(\TypeError::class);
-        $this->expectExceptionMessage('Argument 1 must be of type int, string given');
-
-        $set = new Defer('int', (static function() {
-            yield 1;
-        })());
-
-        \iterator_to_array($set->map(static fn($i) => (string) $i)->iterator());
     }
 
     public function testPartition()

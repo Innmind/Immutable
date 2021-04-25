@@ -138,14 +138,6 @@ class SetTest extends TestCase
         );
     }
 
-    public function testThrowWhenAddindInvalidElementType()
-    {
-        $this->expectException(\TypeError::class);
-        $this->expectExceptionMessage('Argument 1 must be of type int, float given');
-
-        Set::of('int')->add(42.0);
-    }
-
     public function testIntersect()
     {
         $s = Set::of('int')
@@ -159,14 +151,6 @@ class SetTest extends TestCase
         $this->assertSame($s->type(), $s2->type());
         $this->assertSame([24, 42, 66], unwrap($s));
         $this->assertSame([42], unwrap($s2));
-    }
-
-    public function testThrowWhenIntersectingSetsOfDifferentTypes()
-    {
-        $this->expectException(\TypeError::class);
-        $this->expectExceptionMessage('Argument 1 must be of type Set<int>, Set<float> given');
-
-        Set::of('int')->intersect(Set::of('float'));
     }
 
     public function testContains()
@@ -214,14 +198,6 @@ class SetTest extends TestCase
         $this->assertSame([24, 66], unwrap($s2));
     }
 
-    public function testThrowWhenDiffingSetsOfDifferentType()
-    {
-        $this->expectException(\TypeError::class);
-        $this->expectExceptionMessage('Argument 1 must be of type Set<int>, Set<float> given');
-
-        Set::of('int')->diff(Set::of('float'));
-    }
-
     public function testEquals()
     {
         $s = Set::of('int')
@@ -245,14 +221,6 @@ class SetTest extends TestCase
                     ->add(66)
             )
         );
-    }
-
-    public function testThrowWhenCheckingEqualityBetweenSetsOfDifferentType()
-    {
-        $this->expectException(\TypeError::class);
-        $this->expectExceptionMessage('Argument 1 must be of type Set<int>, Set<float> given');
-
-        Set::of('int')->equals(Set::of('float'));
     }
 
     public function testFilter()
@@ -364,18 +332,6 @@ class SetTest extends TestCase
         $this->assertSame(['1', '2', '3', '4'], unwrap($b));
     }
 
-    public function testThrowWhenTryingToModifyValueTypeInMap()
-    {
-        $this->expectException(\TypeError::class);
-        $this->expectExceptionMessage('Argument 1 must be of type int, string given');
-
-        Set::of('int')
-            ->add(1)
-            ->map(static function(int $value) {
-                return (string) $value;
-            });
-    }
-
     public function testPartition()
     {
         $s = Set::of('int')
@@ -444,14 +400,6 @@ class SetTest extends TestCase
         );
         $this->assertSame([24, 42, 66], unwrap($s));
         $this->assertSame($s->type(), $s->merge(Set::of('int'))->type());
-    }
-
-    public function testThrowWhenMergingSetsOfDifferentType()
-    {
-        $this->expectException(\TypeError::class);
-        $this->expectExceptionMessage('Argument 1 must be of type Set<int>, Set<float> given');
-
-        Set::of('int')->merge(Set::of('float'));
     }
 
     public function testReduce()

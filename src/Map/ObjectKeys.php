@@ -11,7 +11,6 @@ use Innmind\Immutable\{
     Set,
     Pair,
     Maybe,
-    ValidateArgument,
     ValidateArgument\ClassType,
     Exception\LogicException,
     Exception\ElementNotFound,
@@ -26,19 +25,14 @@ final class ObjectKeys implements Implementation
 {
     private string $keyType;
     private string $valueType;
-    private ValidateArgument $validateKey;
-    private ValidateArgument $validateValue;
     private \SplObjectStorage $values;
 
     public function __construct(string $keyType, string $valueType)
     {
-        $this->validateKey = Type::of($keyType);
-
-        if (!$this->validateKey instanceof ClassType && $keyType !== 'object') {
+        if (!Type::of($keyType) instanceof ClassType && $keyType !== 'object') {
             throw new LogicException;
         }
 
-        $this->validateValue = Type::of($valueType);
         $this->keyType = $keyType;
         $this->valueType = $valueType;
         $this->values = new \SplObjectStorage;
@@ -52,9 +46,6 @@ final class ObjectKeys implements Implementation
      */
     public function __invoke($key, $value): Implementation
     {
-        ($this->validateKey)($key, 1);
-        ($this->validateValue)($value, 2);
-
         $map = clone $this;
         $map->values = clone $this->values;
         /** @psalm-suppress MixedArgumentTypeCoercion */
@@ -306,8 +297,6 @@ final class ObjectKeys implements Implementation
             $return = $function($key, $v);
 
             if ($return instanceof Pair) {
-                ($this->validateKey)($return->key(), 1);
-
                 /** @var object */
                 $key = $return->key();
                 /** @var S */
@@ -316,8 +305,6 @@ final class ObjectKeys implements Implementation
                 $key = $k;
                 $value = $return;
             }
-
-            ($this->validateValue)($value, 2);
 
             $map->values[$key] = $value;
         }

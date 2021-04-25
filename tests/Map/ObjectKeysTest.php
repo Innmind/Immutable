@@ -62,24 +62,6 @@ class ObjectKeysTest extends TestCase
         $this->assertSame(4, $m->size());
     }
 
-    public function testThrowWhenKeyDoesntMatchType()
-    {
-        $this->expectException(\TypeError::class);
-        $this->expectExceptionMessage('Argument 1 must be of type stdClass, string given');
-
-        $m = new ObjectKeys('stdClass', 'int');
-        ($m)('stdClass', 42);
-    }
-
-    public function testThrowWhenValueDoesntMatchType()
-    {
-        $this->expectException(\TypeError::class);
-        $this->expectExceptionMessage('Argument 2 must be of type int, float given');
-
-        $m = new ObjectKeys('stdClass', 'int');
-        ($m)(new \stdClass, 42.0);
-    }
-
     public function testGet()
     {
         $m = new ObjectKeys('stdClass', 'int');
@@ -257,26 +239,6 @@ class ObjectKeysTest extends TestCase
         $this->assertSame([1, 2, 3, 4], unwrap($m->values()));
         $this->assertSame([$a, $b, $c, $d], unwrap($m2->keys()));
         $this->assertSame([1, 12, 9, 14], unwrap($m2->values()));
-    }
-
-    public function testThrowWhenTryingToModifyValueTypeInTheMap()
-    {
-        $this->expectException(\TypeError::class);
-        $this->expectExceptionMessage('Argument 2 must be of type int, string given');
-
-        (new ObjectKeys('stdClass', 'int'))(new \stdClass, 2)->map(static function(\stdClass $key, int $value) {
-            return (string) $value;
-        });
-    }
-
-    public function testThrowWhenTryingToModifyKeyTypeInTheMap()
-    {
-        $this->expectException(\TypeError::class);
-        $this->expectExceptionMessage('Argument 1 must be of type stdClass, int given');
-
-        (new ObjectKeys('stdClass', 'int'))(new \stdClass, 2)->map(static function(\stdClass $key, int $value) {
-            return new Pair(42, $value);
-        });
     }
 
     public function testRemove()

@@ -8,7 +8,6 @@ use Innmind\Immutable\{
     Sequence,
     Str,
     Set,
-    ValidateArgument,
     Type,
     Exception\LogicException,
     Exception\CannotGroupEmptyStructure,
@@ -25,22 +24,18 @@ final class Lazy implements Implementation
     private string $type;
     /** @var \Closure(): \Generator<T> */
     private \Closure $values;
-    private ValidateArgument $validate;
     private ?int $size = null;
 
     public function __construct(string $type, callable $generator)
     {
         $this->type = $type;
-        $validate = Type::of($type);
         /** @var \Closure(): \Generator<T> */
-        $this->values = \Closure::fromCallable(static function() use ($generator, $validate): \Generator {
+        $this->values = \Closure::fromCallable(static function() use ($generator): \Generator {
             /** @var T $value */
             foreach ($generator() as $value) {
-                $validate($value, 1);
                 yield $value;
             }
         });
-        $this->validate = $validate;
     }
 
     /**
@@ -342,15 +337,13 @@ final class Lazy implements Implementation
     public function map(callable $function): Implementation
     {
         $values = $this->values;
-        $validate = $this->validate;
 
         /** @psalm-suppress MissingClosureParamType */
         return new self(
             $this->type,
-            static function() use ($values, $function, $validate): \Generator {
+            static function() use ($values, $function): \Generator {
                 foreach ($values() as $value) {
                     $value = $function($value);
-                    $validate($value, 1);
 
                     yield $value;
                 }

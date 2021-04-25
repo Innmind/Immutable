@@ -17,7 +17,6 @@ use Innmind\Immutable\Exception\{
 final class Sequence implements \Countable
 {
     private string $type;
-    private ValidateArgument $validate;
     /** @var Sequence\Implementation<T> */
     private Sequence\Implementation $implementation;
 
@@ -27,7 +26,6 @@ final class Sequence implements \Countable
     private function __construct(string $type, Sequence\Implementation $implementation)
     {
         $this->type = $type;
-        $this->validate = Type::of($type);
         $this->implementation = $implementation;
     }
 
@@ -45,8 +43,6 @@ final class Sequence implements \Countable
      */
     public function __invoke($element): self
     {
-        ($this->validate)($element, 1);
-
         $self = clone $this;
         $self->implementation = ($this->implementation)($element);
 
@@ -62,17 +58,7 @@ final class Sequence implements \Countable
      */
     public static function of(string $type, ...$values): self
     {
-        $self = new self($type, new Sequence\Primitive($type, ...$values));
-        $self->implementation->reduce(
-            1,
-            static function(int $position, $element) use ($self): int {
-                ($self->validate)($element, $position);
-
-                return $position + 1;
-            }
-        );
-
-        return $self;
+        return new self($type, new Sequence\Primitive($type, ...$values));
     }
 
     /**
@@ -210,8 +196,6 @@ final class Sequence implements \Countable
      */
     public function diff(self $sequence): self
     {
-        assertSequence($this->type, $sequence, 1);
-
         $self = clone $this;
         $self->implementation = $this->implementation->diff(
             $sequence->implementation,
@@ -266,8 +250,6 @@ final class Sequence implements \Countable
      */
     public function equals(self $sequence): bool
     {
-        assertSequence($this->type, $sequence, 1);
-
         return $this->implementation->equals(
             $sequence->implementation,
         );
@@ -372,8 +354,6 @@ final class Sequence implements \Countable
      */
     public function contains($element): bool
     {
-        ($this->validate)($element, 1);
-
         return $this->implementation->contains($element);
     }
 
@@ -386,8 +366,6 @@ final class Sequence implements \Countable
      */
     public function indexOf($element): int
     {
-        ($this->validate)($element, 1);
-
         return $this->implementation->indexOf($element);
     }
 
@@ -447,8 +425,6 @@ final class Sequence implements \Countable
      */
     public function pad(int $size, $element): self
     {
-        ($this->validate)($element, 2);
-
         $self = clone $this;
         $self->implementation = $this->implementation->pad($size, $element);
 
@@ -527,8 +503,6 @@ final class Sequence implements \Countable
      */
     public function append(self $sequence): self
     {
-        assertSequence($this->type, $sequence, 1);
-
         $self = clone $this;
         $self->implementation = $this->implementation->append(
             $sequence->implementation,
@@ -547,8 +521,6 @@ final class Sequence implements \Countable
      */
     public function intersect(self $sequence): self
     {
-        assertSequence($this->type, $sequence, 1);
-
         $self = clone $this;
         $self->implementation = $this->implementation->intersect(
             $sequence->implementation,

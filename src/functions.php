@@ -53,12 +53,6 @@ function join(string $separator, $structure): Str
         throw new \TypeError("Argument 2 must be of type Set|Sequence, $given given");
     }
 
-    if ($structure instanceof Set) {
-        assertSet('string', $structure, 2);
-    } else {
-        assertSequence('string', $structure, 2);
-    }
-
     return Str::of(\implode($separator, unwrap($structure)));
 }
 
@@ -77,35 +71,5 @@ function first(Set $set)
         return $set->find(static fn(): bool => true);
     } catch (NoElementMatchingPredicateFound $e) {
         throw new EmptySet;
-    }
-}
-
-/**
- * @throws \TypeError
- */
-function assertSet(string $type, Set $set, int $position): void
-{
-    if (!$set->isOfType($type)) {
-        throw new \TypeError("Argument $position must be of type Set<$type>, Set<{$set->type()}> given");
-    }
-}
-
-/**
- * @throws \TypeError
- */
-function assertMap(string $key, string $value, Map $map, int $position): void
-{
-    if (!$map->isOfType($key, $value)) {
-        throw new \TypeError("Argument $position must be of type Map<$key, $value>, Map<{$map->keyType()}, {$map->valueType()}> given");
-    }
-}
-
-/**
- * @throws \TypeError
- */
-function assertSequence(string $type, Sequence $sequence, int $position): void
-{
-    if (!$sequence->isOfType($type)) {
-        throw new \TypeError("Argument $position must be of type Sequence<$type>, Sequence<{$sequence->type()}> given");
     }
 }

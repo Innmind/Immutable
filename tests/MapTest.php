@@ -85,24 +85,6 @@ class MapTest extends TestCase
         $this->assertTrue($map->equals($expected));
     }
 
-    public function testThrowWhenKeyDoesntMatchType()
-    {
-        $this->expectException(\TypeError::class);
-        $this->expectExceptionMessage('Argument 1 must be of type int, string given');
-
-        $m = Map::of('int', 'int');
-        $m->put('24', 42);
-    }
-
-    public function testThrowWhenValueDoesntMatchType()
-    {
-        $this->expectException(\TypeError::class);
-        $this->expectExceptionMessage('Argument 2 must be of type int, float given');
-
-        $m = Map::of('int', 'int');
-        $m->put(24, 42.0);
-    }
-
     public function testGet()
     {
         $m = Map::of('int', 'int');
@@ -139,14 +121,6 @@ class MapTest extends TestCase
         $this->assertSame(0, $m2->size());
         $this->assertSame('int', $m2->keyType());
         $this->assertSame('float', $m2->valueType());
-    }
-
-    public function testThrowWhenTryingToCheckIfMapsOfDifferentTypesAreEqual()
-    {
-        $this->expectException(\TypeError::class);
-        $this->expectExceptionMessage('Argument 1 must be of type Map<int, int>');
-
-        Map::of('int', 'int')->equals(Map::of('float', 'int'));
     }
 
     public function testEquals()
@@ -355,30 +329,6 @@ class MapTest extends TestCase
         $this->assertSame([1, 4, 3, 5], unwrap($m2->values()));
     }
 
-    public function testTrhowWhenTryingToModifyValueTypeInTheMap()
-    {
-        $this->expectException(\TypeError::class);
-        $this->expectExceptionMessage('Argument 2 must be of type int, string given');
-
-        Map::of('int', 'int')
-            ->put(1, 2)
-            ->map(static function(int $key, int $value) {
-                return (string) $value;
-            });
-    }
-
-    public function testTrhowWhenTryingToModifyKeyTypeInTheMap()
-    {
-        $this->expectException(\TypeError::class);
-        $this->expectExceptionMessage('Argument 1 must be of type int, string given');
-
-        Map::of('int', 'int')
-            ->put(1, 2)
-            ->map(static function(int $key, int $value) {
-                return new Pair((string) $key, $value);
-            });
-    }
-
     public function testRemove()
     {
         $m = Map::of('int', 'int')
@@ -442,14 +392,6 @@ class MapTest extends TestCase
         $this->assertSame([$s, $s2, $s3, $s4], unwrap($m3->keys()));
         $this->assertSame([24, 66, 24, 42], unwrap($m3->values()));
         $this->assertFalse($m3->equals($m2->merge($m)));
-    }
-
-    public function testThrowWhenMergingMapsOfDifferentType()
-    {
-        $this->expectException(\TypeError::class);
-        $this->expectExceptionMessage('Argument 1 must be of type Map<int, int>');
-
-        Map::of('int', 'int')->merge(Map::of('float', 'int'));
     }
 
     public function testPartition()

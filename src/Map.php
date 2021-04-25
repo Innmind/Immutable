@@ -19,8 +19,6 @@ final class Map implements \Countable
     private Map\Implementation $implementation;
     private string $keyType;
     private string $valueType;
-    private ValidateArgument $validateKey;
-    private ValidateArgument $validateValue;
 
     private function __construct(
         string $keyType,
@@ -30,8 +28,6 @@ final class Map implements \Countable
         $this->implementation = $implementation;
         $this->keyType = $keyType;
         $this->valueType = $valueType;
-        $this->validateKey = Type::of($keyType);
-        $this->validateValue = Type::of($valueType);
     }
 
     /**
@@ -51,9 +47,6 @@ final class Map implements \Countable
      */
     public function __invoke($key, $value): self
     {
-        ($this->validateKey)($key, 1);
-        ($this->validateValue)($value, 2);
-
         $map = clone $this;
         $map->implementation = ($this->implementation)($key, $value);
 
@@ -126,8 +119,6 @@ final class Map implements \Countable
      */
     public function get($key)
     {
-        ($this->validateKey)($key, 1);
-
         /** @var S */
         return $this->implementation->get($key);
     }
@@ -139,8 +130,6 @@ final class Map implements \Countable
      */
     public function contains($key): bool
     {
-        ($this->validateKey)($key, 1);
-
         return $this->implementation->contains($key);
     }
 
@@ -164,8 +153,6 @@ final class Map implements \Countable
      */
     public function equals(self $map): bool
     {
-        assertMap($this->keyType, $this->valueType, $map, 1);
-
         return $this->implementation->equals($map->implementation);
     }
 
@@ -290,8 +277,6 @@ final class Map implements \Countable
      */
     public function remove($key): self
     {
-        ($this->validateKey)($key, 1);
-
         $map = clone $this;
         $map->implementation = $this->implementation->remove($key);
 
@@ -307,8 +292,6 @@ final class Map implements \Countable
      */
     public function merge(self $map): self
     {
-        assertMap($this->keyType, $this->valueType, $map, 1);
-
         $self = clone $this;
         $self->implementation = $this->implementation->merge($map->implementation);
 
