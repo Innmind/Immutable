@@ -9,8 +9,6 @@ use Innmind\Immutable\{
     Str,
     Set,
     Type,
-    Exception\LogicException,
-    Exception\CannotGroupEmptyStructure,
     Exception\ElementNotFound,
     Exception\OutOfBoundException,
     Exception\NoElementMatchingPredicateFound,
@@ -221,8 +219,6 @@ final class Lazy implements Implementation
      * @template D
      * @param callable(T): D $discriminator
      *
-     * @throws CannotGroupEmptyStructure
-     *
      * @return Map<D, Sequence<T>>
      */
     public function groupBy(callable $discriminator): Map
@@ -318,9 +314,11 @@ final class Lazy implements Implementation
     }
 
     /**
-     * @param callable(T): T $function
+     * @template S
      *
-     * @return Implementation<T>
+     * @param callable(T): S $function
+     *
+     * @return Implementation<S>
      */
     public function map(callable $function): Implementation
     {

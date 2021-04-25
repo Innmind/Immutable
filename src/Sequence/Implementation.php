@@ -8,8 +8,6 @@ use Innmind\Immutable\{
     Sequence,
     Str,
     Set,
-    Exception\LogicException,
-    Exception\CannotGroupEmptyStructure,
     Exception\ElementNotFound,
     Exception\OutOfBoundException,
     Exception\NoElementMatchingPredicateFound,
@@ -105,8 +103,6 @@ interface Implementation extends \Countable
      * @template D
      * @param callable(T): D $discriminator
      *
-     * @throws CannotGroupEmptyStructure
-     *
      * @return Map<D, Sequence<T>>
      */
     public function groupBy(callable $discriminator): Map;
@@ -151,9 +147,11 @@ interface Implementation extends \Countable
     /**
      * Return a new sequence by applying the given function to all elements
      *
-     * @param callable(T): T $function
+     * @template S
      *
-     * @return self<T>
+     * @param callable(T): S $function
+     *
+     * @return self<S>
      */
     public function map(callable $function): self;
 

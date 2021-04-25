@@ -11,9 +11,7 @@ use Innmind\Immutable\{
     Str,
     Set,
     Sequence,
-    Exception\LogicException,
     Exception\ElementNotFound,
-    Exception\CannotGroupEmptyStructure,
 };
 use function Innmind\Immutable\unwrap;
 use PHPUnit\Framework\TestCase;
@@ -156,11 +154,13 @@ class PrimitiveTest extends TestCase
         $this->assertSame(4, $count);
     }
 
-    public function testThrowWhenGroupingAnEmptyMap()
+    public function testGroupEmptyMap()
     {
-        $this->expectException(CannotGroupEmptyStructure::class);
-
-        (new Primitive)->groupBy(static function() {});
+        $this->assertTrue(
+            (new Primitive)
+                ->groupBy(static function() {})
+                ->equals(Map::of()),
+        );
     }
 
     public function testGroupBy()

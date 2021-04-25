@@ -10,8 +10,6 @@ use Innmind\Immutable\{
     Set,
     Accumulate,
     Type,
-    Exception\LogicException,
-    Exception\CannotGroupEmptyStructure,
     Exception\ElementNotFound,
     Exception\OutOfBoundException,
     Exception\NoElementMatchingPredicateFound,
@@ -206,8 +204,6 @@ final class Defer implements Implementation
      * @template D
      * @param callable(T): D $discriminator
      *
-     * @throws CannotGroupEmptyStructure
-     *
      * @return Map<D, Sequence<T>>
      */
     public function groupBy(callable $discriminator): Map
@@ -301,9 +297,11 @@ final class Defer implements Implementation
     }
 
     /**
-     * @param callable(T): T $function
+     * @template S
      *
-     * @return Implementation<T>
+     * @param callable(T): S $function
+     *
+     * @return Implementation<S>
      */
     public function map(callable $function): Implementation
     {
@@ -312,7 +310,7 @@ final class Defer implements Implementation
             (static function($values, callable $map): \Generator {
                 /** @var T $value */
                 foreach ($values as $value) {
-                    /** @var T */
+                    /** @var S */
                     $value = $map($value);
 
                     yield $value;

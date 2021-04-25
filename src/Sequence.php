@@ -270,44 +270,14 @@ final class Sequence implements \Countable
      * discriminator function
      *
      * @template D
-     * @param callable(T): D $discriminator
      *
-     * @throws CannotGroupEmptyStructure
+     * @param callable(T): D $discriminator
      *
      * @return Map<D, self<T>>
      */
     public function groupBy(callable $discriminator): Map
     {
         return $this->implementation->groupBy($discriminator);
-    }
-
-    /**
-     * Return a new map of pairs grouped by keys determined with the given
-     * discriminator function
-     *
-     * @template D
-     * @param string $type D
-     * @param callable(T): D $discriminator
-     *
-     * @return Map<D, self<T>>
-     */
-    public function group(string $type, callable $discriminator): Map
-    {
-        /**
-         * @psalm-suppress MissingClosureParamType
-         * @var Map<D, self<T>>
-         */
-        return $this->reduce(
-            Map::of(),
-            function(Map $groups, $value) use ($discriminator): Map {
-                /** @var T $value */
-                $key = $discriminator($value);
-                /** @var self<T> */
-                $group = $groups->contains($key) ? $groups->get($key) : $this->clear();
-
-                return ($groups)($key, ($group)($value));
-            },
-        );
     }
 
     /**
@@ -367,38 +337,15 @@ final class Sequence implements \Countable
     /**
      * Return a new sequence by applying the given function to all elements
      *
-     * @param callable(T): T $function
-     *
-     * @return self<T>
-     */
-    public function map(callable $function): self
-    {
-        $self = clone $this;
-        $self->implementation = $this->implementation->map($function);
-
-        return $self;
-    }
-
-    /**
-     * Create a new Sequence with the exact same number of elements but with a
-     * new type transformed via the given function
-     *
      * @template S
      *
-     * @param callable(T): S $map
+     * @param callable(T): S $function
      *
      * @return self<S>
      */
-    public function mapTo(string $type, callable $map): self
+    public function map(callable $function): self
     {
-        /**
-         * @psalm-suppress MixedArgument
-         * @psalm-suppress MissingClosureParamType
-         */
-        return $this->toSequenceOf(
-            $type,
-            static fn($value): \Generator => yield $map($value),
-        );
+        return new self($this->implementation->map($function));
     }
 
     /**
@@ -545,6 +492,7 @@ final class Sequence implements \Countable
      * Reduce the sequence to a single value
      *
      * @template R
+     *
      * @param R $carry
      * @param callable(R, T): R $reducer
      *

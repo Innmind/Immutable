@@ -11,10 +11,7 @@ use Innmind\Immutable\{
     Set,
     Pair,
     Maybe,
-    ValidateArgument\ClassType,
-    Exception\LogicException,
     Exception\ElementNotFound,
-    Exception\CannotGroupEmptyStructure,
 };
 
 /**
@@ -190,19 +187,15 @@ final class ObjectKeys implements Implementation
 
     /**
      * @template D
-     * @param callable(T, S): D $discriminator
      *
-     * @throws CannotGroupEmptyStructure
+     * @param callable(T, S): D $discriminator
      *
      * @return Map<D, Map<T, S>>
      */
     public function groupBy(callable $discriminator): Map
     {
-        if ($this->empty()) {
-            throw new CannotGroupEmptyStructure;
-        }
-
-        $groups = null;
+        /** @var Map<D, Map<T, S>> */
+        $groups = Map::of();
 
         foreach ($this->values as $k) {
             /** @var T $key */
@@ -211,11 +204,6 @@ final class ObjectKeys implements Implementation
             $v = $this->values[$k];
 
             $discriminant = $discriminator($key, $v);
-
-            if ($groups === null) {
-                /** @var Map<D, Map<T, S>> */
-                $groups = Map::of();
-            }
 
             if ($groups->contains($discriminant)) {
                 $group = $groups->get($discriminant);

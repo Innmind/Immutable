@@ -126,11 +126,13 @@ class PrimitiveTest extends TestCase
         $this->assertSame(10, $sum);
     }
 
-    public function testThrowWhenTryingToGroupEmptySequence()
+    public function testGroupEmptySequence()
     {
-        $this->expectException(CannotGroupEmptyStructure::class);
-
-        (new Primitive)->groupBy(static fn($i) => $i);
+        $this->assertTrue(
+            (new Primitive)
+                ->groupBy(static fn($i) => $i)
+                ->equals(Map::of()),
+        );
     }
 
     public function testGroupBy()

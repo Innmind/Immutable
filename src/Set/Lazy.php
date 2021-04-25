@@ -9,7 +9,6 @@ use Innmind\Immutable\{
     Set,
     Type,
     Str,
-    Exception\CannotGroupEmptyStructure,
 };
 
 /**
@@ -21,12 +20,24 @@ final class Lazy implements Implementation
     private Sequence\Implementation $values;
 
     /**
-     * @param callable(): \Generator<T> $generator
+     * @param Sequence\Implementation<T> $generator
      */
-    public function __construct(callable $generator)
+    public function __construct(Sequence\Implementation $values)
     {
         /** @var Sequence\Implementation<T> */
-        $this->values = (new Sequence\Lazy($generator))->distinct();
+        $this->values = $values->distinct();
+    }
+
+    /**
+     * @template A
+     *
+     * @param callable(): \Generator<A> $generator
+     *
+     * @return self<A>
+     */
+    public static function of(callable $generator): self
+    {
+        return new self(new Sequence\Lazy($generator));
     }
 
     /**
@@ -36,10 +47,7 @@ final class Lazy implements Implementation
      */
     public function __invoke($element): self
     {
-        $set = clone $this;
-        $set->values = ($this->values)($element)->distinct();
-
-        return $set;
+        return new self(($this->values)($element));
     }
 
     public function size(): int
@@ -73,19 +81,18 @@ final class Lazy implements Implementation
             return $this;
         }
 
-        $self = clone $this;
-        $self->values = $this->values->intersect(
-            new Sequence\Defer(
-                (static function(\Iterator $values): \Generator {
-                    /** @var T $value */
-                    foreach ($values as $value) {
-                        yield $value;
-                    }
-                })($set->iterator()),
+        return new self(
+            $this->values->intersect(
+                new Sequence\Defer(
+                    (static function(\Iterator $values): \Generator {
+                        /** @var T $value */
+                        foreach ($values as $value) {
+                            yield $value;
+                        }
+                    })($set->iterator()),
+                ),
             ),
         );
-
-        return $self;
     }
 
     /**
@@ -108,13 +115,13 @@ final class Lazy implements Implementation
         }
 
         $index = $this->values->indexOf($element);
-        $set = clone $this;
-        $set->values = $this
-            ->values
-            ->slice(0, $index)
-            ->append($this->values->slice($index + 1, $this->size()));
 
-        return $set;
+        return new self(
+            $this
+                ->values
+                ->slice(0, $index)
+                ->append($this->values->slice($index + 1, $this->size())),
+        );
     }
 
     /**
@@ -124,19 +131,18 @@ final class Lazy implements Implementation
      */
     public function diff(Implementation $set): self
     {
-        $self = clone $this;
-        $self->values = $this->values->diff(
-            new Sequence\Defer(
-                (static function(\Iterator $values): \Generator {
-                    /** @var T $value */
-                    foreach ($values as $value) {
-                        yield $value;
-                    }
-                })($set->iterator()),
+        return new self(
+            $this->values->diff(
+                new Sequence\Defer(
+                    (static function(\Iterator $values): \Generator {
+                        /** @var T $value */
+                        foreach ($values as $value) {
+                            yield $value;
+                        }
+                    })($set->iterator()),
+                ),
             ),
         );
-
-        return $self;
     }
 
     /**
@@ -158,10 +164,7 @@ final class Lazy implements Implementation
      */
     public function filter(callable $predicate): self
     {
-        $set = clone $this;
-        $set->values = $this->values->filter($predicate);
-
-        return $set;
+        return new self($this->values->filter($predicate));
     }
 
     /**
@@ -174,9 +177,8 @@ final class Lazy implements Implementation
 
     /**
      * @template D
-     * @param callable(T): D $discriminator
      *
-     * @throws CannotGroupEmptyStructure
+     * @param callable(T): D $discriminator
      *
      * @return Map<D, Set<T>>
      */
@@ -198,28 +200,20 @@ final class Lazy implements Implementation
     }
 
     /**
-     * @param callable(T): T $function
+     * @template S
      *
-     * @return self<T>
+     * @param callable(T): S $function
+     *
+     * @return self<S>
      */
     public function map(callable $function): self
     {
-        /**
-         * @psalm-suppress MissingClosureParamType
-         * @psalm-suppress MissingClosureReturnType
-         */
-        $function = static function($value) use ($function) {
-            /** @var T $value */
-            return $function($value);
-        };
-
-        $self = clone $this;
-        $self->values = $this
-            ->values
-            ->map($function)
-            ->distinct();
-
-        return $self;
+        return new self(
+            $this
+                ->values
+                ->map($function)
+                ->distinct(),
+        );
     }
 
     /**
@@ -269,23 +263,21 @@ final class Lazy implements Implementation
      */
     public function merge(Implementation $set): self
     {
-        $self = clone $this;
-        $self->values = new Sequence\Defer(
-            (static function(\Iterator $self, \Iterator $set): \Generator {
-                /** @var T $value */
-                foreach ($self as $value) {
-                    yield $value;
-                }
+        return new self(
+            new Sequence\Defer(
+                (static function(\Iterator $self, \Iterator $set): \Generator {
+                    /** @var T $value */
+                    foreach ($self as $value) {
+                        yield $value;
+                    }
 
-                /** @var T $value */
-                foreach ($set as $value) {
-                    yield $value;
-                }
-            })($this->values->iterator(), $set->iterator()),
+                    /** @var T $value */
+                    foreach ($set as $value) {
+                        yield $value;
+                    }
+                })($this->values->iterator(), $set->iterator()),
+            ),
         );
-        $self->values = $self->values->distinct();
-
-        return $self;
     }
 
     /**

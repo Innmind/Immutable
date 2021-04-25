@@ -10,9 +10,7 @@ use Innmind\Immutable\{
     Sequence,
     Set,
     Pair,
-    Exception\LogicException,
     Exception\ElementNotFound,
-    Exception\CannotGroupEmptyStructure,
 };
 
 /**
@@ -175,27 +173,18 @@ final class DoubleIndex implements Implementation
 
     /**
      * @template D
-     * @param callable(T, S): D $discriminator
      *
-     * @throws CannotGroupEmptyStructure
+     * @param callable(T, S): D $discriminator
      *
      * @return Map<D, Map<T, S>>
      */
     public function groupBy(callable $discriminator): Map
     {
-        if ($this->empty()) {
-            throw new CannotGroupEmptyStructure;
-        }
-
-        $groups = null;
+        /** @var Map<D, Map<T, S>> */
+        $groups = Map::of();
 
         foreach ($this->pairs->iterator() as $pair) {
             $key = $discriminator($pair->key(), $pair->value());
-
-            if ($groups === null) {
-                /** @var Map<D, Map<T, S>> */
-                $groups = Map::of();
-            }
 
             if ($groups->contains($key)) {
                 $group = $groups->get($key);

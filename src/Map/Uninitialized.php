@@ -9,7 +9,6 @@ use Innmind\Immutable\{
     Set,
     Pair,
     Exception\ElementNotFound,
-    Exception\CannotGroupEmptyStructure,
 };
 
 /**
@@ -114,15 +113,15 @@ final class Uninitialized implements Implementation
 
     /**
      * @template D
-     * @param callable(T, S): D $discriminator
      *
-     * @throws CannotGroupEmptyStructure
+     * @param callable(T, S): D $discriminator
      *
      * @return Map<D, Map<T, S>>
      */
     public function groupBy(callable $discriminator): Map
     {
-        throw new CannotGroupEmptyStructure;
+        /** @var Map<D, Map<T, S>> */
+        return Map::of();
     }
 
     /**

@@ -7,7 +7,6 @@ use Innmind\Immutable\{
     ValidateArgument\ClassType,
     Exception\LogicException,
     Exception\ElementNotFound,
-    Exception\CannotGroupEmptyStructure,
 };
 
 /**
@@ -158,49 +157,14 @@ final class Map implements \Countable
      * discriminator function
      *
      * @template D
-     * @param callable(T, S): D $discriminator
      *
-     * @throws CannotGroupEmptyStructure
+     * @param callable(T, S): D $discriminator
      *
      * @return self<D, self<T, S>>
      */
     public function groupBy(callable $discriminator): self
     {
         return $this->implementation->groupBy($discriminator);
-    }
-
-    /**
-     * Return a new map of pairs' sequences grouped by keys determined with the given
-     * discriminator function
-     *
-     * @template D
-     * @param string $type D
-     * @param callable(T, S): D $discriminator
-     *
-     * @return self<D, self<T, S>>
-     */
-    public function group(string $type, callable $discriminator): self
-    {
-        /**
-         * @psalm-suppress MissingClosureParamType
-         * @var self<D, self<T, S>>
-         */
-        return $this->reduce(
-            self::of(),
-            function(self $groups, $key, $value) use ($discriminator): self {
-                /**
-                 * @var self<D, self<T, S>> $groups
-                 * @var T $key
-                 * @var S $value
-                 */
-                $discriminant = $discriminator($key, $value);
-                /** @psalm-suppress InvalidArgument Psalm doesn't read correctly the templates for $groups */
-                $group = $groups->contains($discriminant) ? $groups->get($discriminant) : $this->clear();
-
-                /** @psalm-suppress InvalidArgument */
-                return ($groups)($discriminant, ($group)($key, $value));
-            },
-        );
     }
 
     /**

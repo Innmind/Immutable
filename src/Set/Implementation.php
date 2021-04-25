@@ -8,7 +8,6 @@ use Innmind\Immutable\{
     Sequence,
     Set,
     Str,
-    Exception\CannotGroupEmptyStructure,
     Exception\NoElementMatchingPredicateFound,
 };
 
@@ -95,9 +94,8 @@ interface Implementation extends \Countable
      * discriminator function
      *
      * @template D
-     * @param callable(T): D $discriminator
      *
-     * @throws CannotGroupEmptyStructure
+     * @param callable(T): D $discriminator
      *
      * @return Map<D, Set<T>>
      */
@@ -106,9 +104,11 @@ interface Implementation extends \Countable
     /**
      * Return a new set by applying the given function to all elements
      *
-     * @param callable(T): T $function
+     * @template S
      *
-     * @return self<T>
+     * @param callable(T): S $function
+     *
+     * @return self<S>
      */
     public function map(callable $function): self;
 

@@ -10,9 +10,7 @@ use Innmind\Immutable\{
     Str,
     Set,
     Sequence,
-    Exception\LogicException,
     Exception\ElementNotFound,
-    Exception\CannotGroupEmptyStructure,
 };
 use function Innmind\Immutable\unwrap;
 use PHPUnit\Framework\TestCase;
@@ -189,40 +187,13 @@ class MapTest extends TestCase
         $this->assertSame(4, $count);
     }
 
-    public function testThrowWhenGroupingAnEmptyMap()
+    public function testGroupEmptyMap()
     {
-        $this->expectException(CannotGroupEmptyStructure::class);
-
-        Map::of()->groupBy(static function() {});
-    }
-
-    public function testGroup()
-    {
-        $m = Map::of()
-            ->put(0, 1)
-            ->put(1, 2)
-            ->put(2, 3)
-            ->put(4, 5);
-
-        $m2 = $m->group('int', static function(int $key, int $value) {
-            return ($key + $value) % 3;
-        });
-        $this->assertNotSame($m, $m2);
-        $this->assertInstanceOf(Map::class, $m2);
-        $this->assertTrue($m2->contains(0));
-        $this->assertTrue($m2->contains(1));
-        $this->assertTrue($m2->contains(2));
-        $this->assertSame(2, $m2->get(0)->size());
-        $this->assertSame(1, $m2->get(1)->size());
-        $this->assertSame(1, $m2->get(2)->size());
-        $this->assertSame(1, $m2->get(1)->get(0));
-        $this->assertSame(2, $m2->get(0)->get(1));
-        $this->assertSame(3, $m2->get(2)->get(2));
-        $this->assertSame(5, $m2->get(0)->get(4));
-
-        $groups = Map::of()->group('string', static fn() => '');
-
-        $this->assertTrue($groups->empty());
+        $this->assertTrue(
+            Map::of()
+                ->groupBy(static function() {})
+                ->equals(Map::of()),
+        );
     }
 
     public function testGroupBy()

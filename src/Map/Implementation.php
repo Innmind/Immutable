@@ -9,7 +9,6 @@ use Innmind\Immutable\{
     Set,
     Sequence,
     Pair,
-    Exception\CannotGroupEmptyStructure,
     Exception\ElementNotFound,
 };
 
@@ -85,9 +84,8 @@ interface Implementation extends \Countable
      * discriminator function
      *
      * @template D
-     * @param callable(T, S): D $discriminator
      *
-     * @throws CannotGroupEmptyStructure
+     * @param callable(T, S): D $discriminator
      *
      * @return Map<D, Map<T, S>>
      */

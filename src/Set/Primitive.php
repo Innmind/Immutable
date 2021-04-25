@@ -9,7 +9,6 @@ use Innmind\Immutable\{
     Set,
     Type,
     Str,
-    Exception\CannotGroupEmptyStructure,
 };
 
 /**
@@ -160,9 +159,8 @@ final class Primitive implements Implementation
 
     /**
      * @template D
-     * @param callable(T): D $discriminator
      *
-     * @throws CannotGroupEmptyStructure
+     * @param callable(T): D $discriminator
      *
      * @return Map<D, Set<T>>
      */
@@ -184,24 +182,21 @@ final class Primitive implements Implementation
     }
 
     /**
-     * @param callable(T): T $function
+     * @template S
      *
-     * @return self<T>
+     * @param callable(T): S $function
+     *
+     * @return self<S>
      */
     public function map(callable $function): self
     {
         /**
          * @psalm-suppress MissingClosureParamType
-         * @psalm-suppress MissingClosureReturnType
+         * @psalm-suppress MixedArgument
+         * @psalm-suppress InvalidArgument
          */
-        $function = static function($value) use ($function) {
-            /** @var T $value */
-            return $function($value);
-        };
-
-        /** @psalm-suppress MissingClosureParamType */
         return $this->reduce(
-            $this->clear(),
+            new self,
             static fn(self $carry, $value): self => ($carry)($function($value)),
         );
     }

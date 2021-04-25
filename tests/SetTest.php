@@ -244,27 +244,6 @@ class SetTest extends TestCase
         $this->assertSame(4, $count);
     }
 
-    public function testGroup()
-    {
-        $s = Set::of()
-            ->add(1)
-            ->add(2)
-            ->add(3)
-            ->add(4);
-
-        $m = $s->group('int', static function(int $v) {
-            return $v % 2;
-        });
-        $this->assertInstanceOf(Map::class, $m);
-        $this->assertSame([1, 0], unwrap($m->keys()));
-        $this->assertSame([1, 3], unwrap($m->get(1)));
-        $this->assertSame([2, 4], unwrap($m->get(0)));
-
-        $groups = Set::ints()->group('string', static fn() => '');
-
-        $this->assertTrue($groups->empty());
-    }
-
     public function testGroupBy()
     {
         $s = Set::of()
@@ -297,16 +276,6 @@ class SetTest extends TestCase
         $this->assertInstanceOf(Set::class, $s2);
         $this->assertSame([1, 2, 3, 4], unwrap($s));
         $this->assertSame([1, 4, 9, 16], unwrap($s2));
-    }
-
-    public function testMapTo()
-    {
-        $a = Set::ints(1, 2, 3, 4);
-        $b = $a->mapTo('string', static fn($i) => (string) $i);
-
-        $this->assertInstanceOf(Set::class, $b);
-        $this->assertNotSame($a, $b);
-        $this->assertSame(['1', '2', '3', '4'], unwrap($b));
     }
 
     public function testPartition()

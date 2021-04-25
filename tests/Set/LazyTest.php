@@ -21,7 +21,7 @@ class LazyTest extends TestCase
     {
         $this->assertInstanceOf(
             Implementation::class,
-            new Lazy(static function() {
+            Lazy::of(static function() {
                 yield;
             }),
         );
@@ -29,7 +29,7 @@ class LazyTest extends TestCase
 
     public function testSize()
     {
-        $set = new Lazy(static function() {
+        $set = Lazy::of(static function() {
             yield 1;
             yield 2;
         });
@@ -40,7 +40,7 @@ class LazyTest extends TestCase
 
     public function testIterator()
     {
-        $set = new Lazy(static function() {
+        $set = Lazy::of(static function() {
             yield 1;
             yield 2;
         });
@@ -52,12 +52,12 @@ class LazyTest extends TestCase
     {
         $aLoaded = false;
         $bLoaded = false;
-        $a = new Lazy(static function() use (&$aLoaded) {
+        $a = Lazy::of(static function() use (&$aLoaded) {
             yield 1;
             yield 2;
             $aLoaded = true;
         });
-        $b = new Lazy(static function() use (&$bLoaded) {
+        $b = Lazy::of(static function() use (&$bLoaded) {
             yield 2;
             yield 3;
             $bLoaded = true;
@@ -77,7 +77,7 @@ class LazyTest extends TestCase
     public function testAdd()
     {
         $loaded = false;
-        $a = new Lazy(static function() use (&$loaded) {
+        $a = Lazy::of(static function() use (&$loaded) {
             yield 1;
             $loaded = true;
         });
@@ -93,7 +93,7 @@ class LazyTest extends TestCase
 
     public function testContains()
     {
-        $set = new Lazy(static function() {
+        $set = Lazy::of(static function() {
             yield 1;
         });
 
@@ -103,7 +103,7 @@ class LazyTest extends TestCase
 
     public function testRemove()
     {
-        $a = new Lazy(static function() {
+        $a = Lazy::of(static function() {
             yield 1;
             yield 2;
             yield 3;
@@ -120,14 +120,14 @@ class LazyTest extends TestCase
     public function testDiff()
     {
         $aLoaded = false;
-        $a = new Lazy(static function() use (&$aLoaded) {
+        $a = Lazy::of(static function() use (&$aLoaded) {
             yield 1;
             yield 2;
             yield 3;
             $aLoaded = true;
         });
         $bLoaded = false;
-        $b = new Lazy(static function() use (&$bLoaded) {
+        $b = Lazy::of(static function() use (&$bLoaded) {
             yield 2;
             yield 4;
             $bLoaded = true;
@@ -146,18 +146,18 @@ class LazyTest extends TestCase
 
     public function testEquals()
     {
-        $a = new Lazy(static function() {
+        $a = Lazy::of(static function() {
             yield 1;
             yield 2;
         });
-        $aBis = new Lazy(static function() {
+        $aBis = Lazy::of(static function() {
             yield 1;
             yield 2;
         });
-        $b = new Lazy(static function() {
+        $b = Lazy::of(static function() {
             yield 1;
         });
-        $c = new Lazy(static function() {
+        $c = Lazy::of(static function() {
             yield 1;
             yield 2;
             yield 3;
@@ -172,7 +172,7 @@ class LazyTest extends TestCase
     public function testFilter()
     {
         $loaded = false;
-        $a = new Lazy(static function() use (&$loaded) {
+        $a = Lazy::of(static function() use (&$loaded) {
             yield 1;
             yield 2;
             yield 3;
@@ -190,7 +190,7 @@ class LazyTest extends TestCase
 
     public function testForeach()
     {
-        $set = new Lazy(static function() {
+        $set = Lazy::of(static function() {
             yield 1;
             yield 2;
             yield 3;
@@ -210,7 +210,7 @@ class LazyTest extends TestCase
 
     public function testGroupBy()
     {
-        $set = new Lazy(static function() {
+        $set = Lazy::of(static function() {
             yield 1;
             yield 2;
             yield 3;
@@ -228,7 +228,7 @@ class LazyTest extends TestCase
     public function testMap()
     {
         $loaded = false;
-        $a = new Lazy(static function() use (&$loaded) {
+        $a = Lazy::of(static function() use (&$loaded) {
             yield 1;
             yield 2;
             yield 3;
@@ -245,7 +245,7 @@ class LazyTest extends TestCase
 
     public function testPartition()
     {
-        $set = new Lazy(static function() {
+        $set = Lazy::of(static function() {
             yield 1;
             yield 2;
             yield 3;
@@ -263,7 +263,7 @@ class LazyTest extends TestCase
     public function testSort()
     {
         $loaded = false;
-        $set = new Lazy(static function() use (&$loaded) {
+        $set = Lazy::of(static function() use (&$loaded) {
             yield 1;
             yield 4;
             yield 3;
@@ -282,13 +282,13 @@ class LazyTest extends TestCase
     public function testMerge()
     {
         $aLoaded = false;
-        $a = new Lazy(static function() use (&$aLoaded) {
+        $a = Lazy::of(static function() use (&$aLoaded) {
             yield 1;
             yield 2;
             $aLoaded = true;
         });
         $bLoaded = false;
-        $b = new Lazy(static function() use (&$bLoaded) {
+        $b = Lazy::of(static function() use (&$bLoaded) {
             yield 2;
             yield 3;
             $bLoaded = true;
@@ -307,7 +307,7 @@ class LazyTest extends TestCase
 
     public function testReduce()
     {
-        $set = new Lazy(static function() {
+        $set = Lazy::of(static function() {
             yield 1;
             yield 2;
             yield 3;
@@ -319,7 +319,7 @@ class LazyTest extends TestCase
 
     public function testClear()
     {
-        $a = new Lazy(static function() {
+        $a = Lazy::of(static function() {
             yield 1;
         });
         $b = $a->clear();
@@ -331,10 +331,10 @@ class LazyTest extends TestCase
 
     public function testEmpty()
     {
-        $a = new Lazy(static function() {
+        $a = Lazy::of(static function() {
             yield 1;
         });
-        $b = new Lazy(static function() {
+        $b = Lazy::of(static function() {
             if (false) {
                 yield 1;
             }
@@ -347,7 +347,7 @@ class LazyTest extends TestCase
     public function testToSequenceOf()
     {
         $loaded = false;
-        $set = new Lazy(static function() use (&$loaded) {
+        $set = Lazy::of(static function() use (&$loaded) {
             yield 1;
             yield 2;
             yield 3;
@@ -370,7 +370,7 @@ class LazyTest extends TestCase
     public function testToSetOf()
     {
         $loaded = false;
-        $set = new Lazy(static function() use (&$loaded) {
+        $set = Lazy::of(static function() use (&$loaded) {
             yield 1;
             yield 2;
             yield 3;
@@ -392,7 +392,7 @@ class LazyTest extends TestCase
 
     public function testToMapOf()
     {
-        $set = new Lazy(static function() {
+        $set = Lazy::of(static function() {
             yield 1;
             yield 2;
             yield 3;
@@ -409,7 +409,7 @@ class LazyTest extends TestCase
     public function testFind()
     {
         $count = 0;
-        $sequence = new Lazy(static function() use (&$count) {
+        $sequence = Lazy::of(static function() use (&$count) {
             ++$count;
             yield 1;
             ++$count;

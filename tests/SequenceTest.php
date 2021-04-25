@@ -10,7 +10,6 @@ use Innmind\Immutable\{
     Map,
     Exception\OutOfBoundException,
     Exception\LogicException,
-    Exception\CannotGroupEmptyStructure,
     Exception\NoElementMatchingPredicateFound,
 };
 use function Innmind\Immutable\unwrap;
@@ -262,28 +261,6 @@ class SequenceTest extends TestCase
         $this->assertSame(10, $sum);
     }
 
-    public function testGroup()
-    {
-        $sequence = Sequence::of()
-            ->add(1)
-            ->add(2)
-            ->add(3)
-            ->add(4);
-        $map = $sequence->group('int', static function(int $value): int {
-            return $value % 3;
-        });
-
-        $this->assertInstanceOf(Map::class, $map);
-        $this->assertCount(3, $map);
-        $this->assertSame([3], unwrap($map->get(0)));
-        $this->assertSame([1, 4], unwrap($map->get(1)));
-        $this->assertSame([2], unwrap($map->get(2)));
-
-        $groups = Sequence::ints()->group('string', static fn() => '');
-
-        $this->assertTrue($groups->empty());
-    }
-
     public function testGroupBy()
     {
         $sequence = Sequence::of()
@@ -302,11 +279,13 @@ class SequenceTest extends TestCase
         $this->assertSame([2], unwrap($map->get(2)));
     }
 
-    public function testThrowWhenGroupingEmptySequence()
+    public function testGroupEmptySequence()
     {
-        $this->expectException(CannotGroupEmptyStructure::class);
-
-        Sequence::of()->groupBy(static function() {});
+        $this->assertTrue(
+            Sequence::of()
+                ->groupBy(static function() {})
+                ->equals(Map::of()),
+        );
     }
 
     public function testFirst()
@@ -392,16 +371,6 @@ class SequenceTest extends TestCase
         $this->assertNotSame($a, $b);
         $this->assertSame([1, 2, 3, 4], unwrap($a));
         $this->assertSame([1, 4, 9, 16], unwrap($b));
-    }
-
-    public function testMapTo()
-    {
-        $a = Sequence::ints(1, 2, 3, 4);
-        $b = $a->mapTo('string', static fn($i) => (string) $i);
-
-        $this->assertInstanceOf(Sequence::class, $b);
-        $this->assertNotSame($a, $b);
-        $this->assertSame(['1', '2', '3', '4'], unwrap($b));
     }
 
     public function testPad()

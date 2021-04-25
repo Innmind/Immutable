@@ -10,9 +10,7 @@ use Innmind\Immutable\{
     Set,
     Type,
     Exception\OutOfBoundException,
-    Exception\LogicException,
     Exception\ElementNotFound,
-    Exception\CannotGroupEmptyStructure,
     Exception\NoElementMatchingPredicateFound,
 };
 
@@ -173,25 +171,15 @@ final class Primitive implements Implementation
      * @template D
      * @param callable(T): D $discriminator
      *
-     * @throws CannotGroupEmptyStructure
-     *
      * @return Map<D, Sequence<T>>
      */
     public function groupBy(callable $discriminator): Map
     {
-        if ($this->empty()) {
-            throw new CannotGroupEmptyStructure;
-        }
-
-        $groups = null;
+        /** @var Map<D, Sequence<T>> */
+        $groups = Map::of();
 
         foreach ($this->values as $value) {
             $key = $discriminator($value);
-
-            if ($groups === null) {
-                /** @var Map<D, Sequence<T>> */
-                $groups = Map::of();
-            }
 
             if ($groups->contains($key)) {
                 $group = $groups->get($key);
@@ -264,9 +252,11 @@ final class Primitive implements Implementation
     }
 
     /**
-     * @param callable(T): T $function
+     * @template S
      *
-     * @return self<T>
+     * @param callable(T): S $function
+     *
+     * @return self<S>
      */
     public function map(callable $function): self
     {
@@ -279,10 +269,7 @@ final class Primitive implements Implementation
             return $function($value);
         };
 
-        $self = clone $this;
-        $self->values = \array_map($function, $this->values);
-
-        return $self;
+        return new self(...\array_map($function, $this->values));
     }
 
     /**
