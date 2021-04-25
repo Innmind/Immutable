@@ -107,7 +107,7 @@ final class Primitive implements Implementation
                 }
 
                 return ($values)($value);
-            }
+            },
         );
     }
 
@@ -260,15 +260,6 @@ final class Primitive implements Implementation
      */
     public function map(callable $function): self
     {
-        /**
-         * @psalm-suppress MissingClosureParamType
-         * @psalm-suppress MissingClosureReturnType
-         */
-        $function = static function($value) use ($function) {
-            /** @var T $value */
-            return $function($value);
-        };
-
         return new self(...\array_map($function, $this->values));
     }
 

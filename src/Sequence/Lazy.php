@@ -43,7 +43,6 @@ final class Lazy implements Implementation
     {
         $values = $this->values;
 
-        /** @psalm-suppress MissingClosureParamType */
         return new self(
             static function() use ($values, $element): \Generator {
                 foreach ($values() as $value) {
@@ -124,7 +123,6 @@ final class Lazy implements Implementation
     {
         $values = $this->values;
 
-        /** @psalm-suppress MissingClosureParamType */
         return new self(
             static function() use ($values): \Generator {
                 /** @var list<T> */
@@ -148,7 +146,6 @@ final class Lazy implements Implementation
     {
         $values = $this->values;
 
-        /** @psalm-suppress MissingClosureParamType */
         return new self(
             static function() use ($values, $size): \Generator {
                 $dropped = 0;
@@ -193,7 +190,6 @@ final class Lazy implements Implementation
     {
         $values = $this->values;
 
-        /** @psalm-suppress MissingClosureParamType */
         return new self(
             static function() use ($values, $predicate): \Generator {
                 foreach ($values() as $value) {
@@ -298,10 +294,7 @@ final class Lazy implements Implementation
     {
         $values = $this->values;
 
-        /**
-         * @psalm-suppress MissingClosureParamType
-         * @var Implementation<int>
-         */
+        /** @var Implementation<int> */
         return new self(
             static function() use ($values): \Generator {
                 $index = 0;
@@ -324,13 +317,10 @@ final class Lazy implements Implementation
     {
         $values = $this->values;
 
-        /** @psalm-suppress MissingClosureParamType */
         return new self(
             static function() use ($values, $function): \Generator {
                 foreach ($values() as $value) {
-                    $value = $function($value);
-
-                    yield $value;
+                    yield $function($value);
                 }
             },
         );
@@ -345,7 +335,6 @@ final class Lazy implements Implementation
     {
         $values = $this->values;
 
-        /** @psalm-suppress MissingClosureParamType */
         return new self(
             static function() use ($values, $size, $element): \Generator {
                 foreach ($values() as $value) {
@@ -379,7 +368,6 @@ final class Lazy implements Implementation
     {
         $values = $this->values;
 
-        /** @psalm-suppress MissingClosureParamType */
         return new self(
             static function() use ($values, $from, $until): \Generator {
                 $index = 0;
@@ -412,7 +400,6 @@ final class Lazy implements Implementation
     {
         $values = $this->values;
 
-        /** @psalm-suppress MissingClosureParamType */
         return new self(
             static function() use ($values, $size): \Generator {
                 $taken = 0;
@@ -448,7 +435,6 @@ final class Lazy implements Implementation
     {
         $values = $this->values;
 
-        /** @psalm-suppress MissingClosureParamType */
         return new self(
             static function() use ($values, $sequence): \Generator {
                 foreach ($values() as $value) {
@@ -485,7 +471,6 @@ final class Lazy implements Implementation
     {
         $values = $this->values;
 
-        /** @psalm-suppress MissingClosureParamType */
         return new self(
             static function() use ($values, $function): \Generator {
                 $values = \iterator_to_array($values());
@@ -529,7 +514,6 @@ final class Lazy implements Implementation
     {
         $values = $this->values;
 
-        /** @psalm-suppress MissingClosureParamType */
         return new self(
             static function() use ($values): \Generator {
                 $values = \iterator_to_array($values());
@@ -557,7 +541,6 @@ final class Lazy implements Implementation
         $mapper ??= static fn($v): \Generator => yield $v;
         $values = $this->values;
 
-        /** @psalm-suppress MissingClosureParamType */
         return Sequence::lazy(
             static function() use ($values, $mapper): \Generator {
                 foreach ($values() as $value) {
@@ -583,7 +566,6 @@ final class Lazy implements Implementation
         $mapper ??= static fn($v): \Generator => yield $v;
         $values = $this->values;
 
-        /** @psalm-suppress MissingClosureParamType */
         return Set::lazy(
             static function() use ($values, $mapper): \Generator {
                 foreach ($values() as $value) {
