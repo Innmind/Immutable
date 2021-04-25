@@ -219,15 +219,19 @@ final class DoubleIndex implements Implementation
     }
 
     /**
-     * @param callable(T, S): S $function
+     * @template B
      *
-     * @return self<T, S>
+     * @param callable(T, S): B $function
+     *
+     * @return self<T, B>
      */
     public function map(callable $function): self
     {
-        $map = $this->clear();
+        /** @var self<T, B> */
+        $map = new self;
 
         foreach ($this->pairs->iterator() as $pair) {
+            /** @psalm-suppress InvalidArgument */
             $map = ($map)(
                 $pair->key(),
                 $function($pair->key(), $pair->value()),

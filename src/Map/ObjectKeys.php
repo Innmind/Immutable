@@ -250,13 +250,15 @@ final class ObjectKeys implements Implementation
     }
 
     /**
-     * @param callable(T, S): S $function
+     * @template B
      *
-     * @return self<T, S>
+     * @param callable(T, S): B $function
+     *
+     * @return self<T, B>
      */
     public function map(callable $function): self
     {
-        $map = $this->clear();
+        $map = new self;
 
         foreach ($this->values as $k) {
             /** @var T */

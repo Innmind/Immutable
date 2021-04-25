@@ -190,16 +190,15 @@ final class Map implements \Countable
     /**
      * Apply the given function on all elements and return a new map
      *
-     * @param callable(T, S): S $function
+     * @template B
      *
-     * @return self<T, S>
+     * @param callable(T, S): B $function
+     *
+     * @return self<T, B>
      */
     public function map(callable $function): self
     {
-        $map = $this->clear();
-        $map->implementation = $this->implementation->map($function);
-
-        return $map;
+        return new self($this->implementation->map($function));
     }
 
     /**
