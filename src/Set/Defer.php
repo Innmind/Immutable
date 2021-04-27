@@ -24,7 +24,6 @@ final class Defer implements Implementation
      */
     public function __construct(Sequence\Implementation $values)
     {
-        /** @var Sequence\Implementation<T> */
         $this->values = $values->distinct();
     }
 

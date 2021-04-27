@@ -24,7 +24,6 @@ final class Lazy implements Implementation
      */
     public function __construct(Sequence\Implementation $values)
     {
-        /** @var Sequence\Implementation<T> */
         $this->values = $values->distinct();
     }
 
