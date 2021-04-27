@@ -359,6 +359,27 @@ final class Sequence implements \Countable
     }
 
     /**
+     * Append each sequence created by each value of the initial sequence
+     *
+     * @template S
+     *
+     * @param callable(T): self<S> $map
+     *
+     * @return self<S>
+     */
+    public function flatMap(callable $map): self
+    {
+        /**
+         * @psalm-suppress InvalidArgument
+         * @psalm-suppress MixedArgument
+         */
+        return $this->reduce(
+            self::of(),
+            static fn(self $carry, $value) => $carry->append($map($value)),
+        );
+    }
+
+    /**
      * Pad the sequence to a defined size with the given element
      *
      * @param T $element

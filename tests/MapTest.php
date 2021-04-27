@@ -269,6 +269,18 @@ class MapTest extends TestCase
         $this->assertSame([1, 4, 9, 25], unwrap($m2->values()));
     }
 
+    public function testFlatMap()
+    {
+        $map = Map::of()(0, 1)(2, 3)(4, 5);
+        $map2 = $map->flatMap(static fn($key, $value) => Map::of()($value, $key));
+
+        $this->assertNotSame($map, $map2);
+        $this->assertSame([0, 2, 4], unwrap($map->keys()));
+        $this->assertSame([1, 3, 5], unwrap($map->values()));
+        $this->assertSame([1, 3, 5], unwrap($map2->keys()));
+        $this->assertSame([0, 2, 4], unwrap($map2->values()));
+    }
+
     public function testRemove()
     {
         $m = Map::of()

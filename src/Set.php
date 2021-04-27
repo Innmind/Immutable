@@ -299,6 +299,27 @@ final class Set implements \Countable
     }
 
     /**
+     * Merge all sets created by each value from the original set
+     *
+     * @template S
+     *
+     * @param callable(T): self<S> $map
+     *
+     * @return self<S>
+     */
+    public function flatMap(callable $map): self
+    {
+        /**
+         * @psalm-suppress InvalidArgument
+         * @psalm-suppress MixedArgument
+         */
+        return $this->reduce(
+            self::of(),
+            static fn(self $carry, $value) => $carry->merge($map($value)),
+        );
+    }
+
+    /**
      * Return a sequence of 2 sets partitioned according to the given predicate
      *
      * @param callable(T): bool $predicate

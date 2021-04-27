@@ -202,6 +202,28 @@ final class Map implements \Countable
     }
 
     /**
+     * Merge all Maps created by by each value from the initial Map
+     *
+     * @template A
+     * @template B
+     *
+     * @param callable(T, S): self<A, B> $map
+     *
+     * @return self<A, B>
+     */
+    public function flatMap(callable $map): self
+    {
+        /**
+         * @psalm-suppress InvalidArgument
+         * @psalm-suppress MixedArgument
+         */
+        return $this->reduce(
+            self::of(),
+            static fn(self $carry, $key, $value) => $carry->merge($map($key, $value)),
+        );
+    }
+
+    /**
      * Remove the element with the given key
      *
      * @param T $key

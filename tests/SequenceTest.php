@@ -373,6 +373,16 @@ class SequenceTest extends TestCase
         $this->assertSame([1, 4, 9, 16], unwrap($b));
     }
 
+    public function testFlatMap()
+    {
+        $sequence = Sequence::of(1, 2, 3, 4);
+        $sequence2 = $sequence->flatMap(static fn($i) => Sequence::of($i, $i));
+
+        $this->assertNotSame($sequence, $sequence2);
+        $this->assertSame([1, 2, 3, 4], unwrap($sequence));
+        $this->assertSame([1, 1, 2, 2, 3, 3, 4, 4], unwrap($sequence2));
+    }
+
     public function testPad()
     {
         $a = Sequence::of()

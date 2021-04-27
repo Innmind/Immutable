@@ -278,6 +278,16 @@ class SetTest extends TestCase
         $this->assertSame([1, 4, 9, 16], unwrap($s2));
     }
 
+    public function testFlatMap()
+    {
+        $set = Set::of(1, 2, 3, 4);
+        $set2 = $set->flatMap(static fn($i) => Set::of($i, $i + 2));
+
+        $this->assertNotSame($set, $set2);
+        $this->assertSame([1, 2, 3, 4], unwrap($set));
+        $this->assertSame([1, 3, 2, 4, 5, 6], unwrap($set2));
+    }
+
     public function testPartition()
     {
         $s = Set::of()
