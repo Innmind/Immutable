@@ -28,6 +28,16 @@ final class Defer implements Implementation
     }
 
     /**
+     * @param T $element
+     *
+     * @return self<T>
+     */
+    public function __invoke($element): self
+    {
+        return new self(($this->values)($element));
+    }
+
+    /**
      * @template A
      *
      * @param \Generator<A> $generator
@@ -37,16 +47,6 @@ final class Defer implements Implementation
     public static function of(\Generator $generator): self
     {
         return new self(new Sequence\Defer($generator));
-    }
-
-    /**
-     * @param T $element
-     *
-     * @return self<T>
-     */
-    public function __invoke($element): self
-    {
-        return new self(($this->values)($element));
     }
 
     public function size(): int
@@ -191,7 +191,7 @@ final class Defer implements Implementation
          */
         return $map->reduce(
             Map::of(),
-            fn(Map $carry, $key, Sequence $values): Map => ($carry)(
+            static fn(Map $carry, $key, Sequence $values): Map => ($carry)(
                 $key,
                 $values->toSetOf('T'),
             ),

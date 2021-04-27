@@ -174,7 +174,7 @@ final class Primitive implements Implementation
          */
         return $map->reduce(
             Map::of(),
-            fn(Map $carry, $key, Sequence $values): Map => ($carry)(
+            static fn(Map $carry, $key, Sequence $values): Map => ($carry)(
                 $key,
                 $values->toSetOf('T'),
             ),
