@@ -20,7 +20,7 @@ final class Lazy implements Implementation
     private Sequence\Implementation $values;
 
     /**
-     * @param Sequence\Implementation<T> $generator
+     * @param Sequence\Implementation<T> $values
      */
     public function __construct(Sequence\Implementation $values)
     {
