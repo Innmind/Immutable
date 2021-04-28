@@ -125,9 +125,9 @@ class FunctionsTest extends TestCase
 
     public function testAccessFirstValueOfASet()
     {
-        $this->assertSame(null, first(Set::mixed(null, 1, '')));
+        $this->assertNull(first(Set::mixed(null, 1, '')));
         $this->assertSame('', first(Set::mixed('', 1, null)));
-        $this->assertSame(false, first(Set::mixed(false, 1, null)));
+        $this->assertFalse(first(Set::mixed(false, 1, null)));
         $this->assertSame(0, first(Set::mixed(0, 1, null)));
         $this->assertSame(42, first(Set::mixed(42, 1, null)));
     }
