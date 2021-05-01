@@ -513,6 +513,22 @@ final class Str
     }
 
     /**
+     * @param callable(string, string): string $map Second string is the encoding
+     */
+    public function map(callable $map): self
+    {
+        return new self($map($this->value, $this->encoding), $this->encoding);
+    }
+
+    /**
+     * @param callable(string, string): self $map Second string is the encoding
+     */
+    public function flatMap(callable $map): self
+    {
+        return $map($this->value, $this->encoding);
+    }
+
+    /**
      * Pad the string
      */
     private function pad(int $length, string $character, int $direction): self

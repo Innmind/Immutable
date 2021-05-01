@@ -819,4 +819,36 @@ class StrTest extends TestCase
         $this->assertSame('foo\#bar\.\*', $b->toString());
         $this->assertSame('f\o\o\#bar\.\*', $c->toString());
     }
+
+    public function testMap()
+    {
+        $a = S::of('foo');
+        $b = $a->map(function($string, $encoding) use ($a) {
+            $this->assertSame('foo', $string);
+            $this->assertSame($a->encoding()->toString(), $encoding);
+
+            return 'bar';
+        });
+
+        $this->assertNotSame($a, $b);
+        $this->assertSame('foo', $a->toString());
+        $this->assertSame('bar', $b->toString());
+    }
+
+    public function testFlatMap()
+    {
+        $expected = S::of('bar');
+        $a = S::of('foo');
+        $b = $a->flatMap(function($string, $encoding) use ($a, $expected) {
+            $this->assertSame('foo', $string);
+            $this->assertSame($a->encoding()->toString(), $encoding);
+
+            return $expected;
+        });
+
+        $this->assertNotSame($a, $b);
+        $this->assertSame($expected, $b);
+        $this->assertSame('foo', $a->toString());
+        $this->assertSame('bar', $b->toString());
+    }
 }
