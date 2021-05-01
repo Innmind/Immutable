@@ -183,19 +183,10 @@ final class Lazy implements Implementation
      */
     public function groupBy(callable $discriminator): Map
     {
-        $map = $this->values->groupBy($discriminator);
-
-        /**
-         * @psalm-suppress MissingParamType
-         * @var Map<D, Set<T>>
-         */
-        return $map->reduce(
-            Map::of(),
-            static fn(Map $carry, $key, Sequence $values): Map => ($carry)(
-                $key,
-                $values->toSetOf('T'),
-            ),
-        );
+        return $this
+            ->values
+            ->groupBy($discriminator)
+            ->map(static fn($_, $sequence) => Set::of(...$sequence->toList()));
     }
 
     /**
@@ -222,24 +213,10 @@ final class Lazy implements Implementation
      */
     public function partition(callable $predicate): Map
     {
-        $partitions = $this->values->partition($predicate);
-        /** @var Set<T> */
-        $truthy = $partitions
-            ->get(true)
-            ->toSetOf('T');
-        /** @var Set<T> */
-        $falsy = $partitions
-            ->get(false)
-            ->toSetOf('T');
-
-        /**
-         * @psalm-suppress InvalidScalarArgument
-         * @psalm-suppress InvalidArgument
-         * @var Map<bool, Set<T>>
-         */
-        return Map::of()
-            (true, $truthy)
-            (false, $falsy);
+        return $this
+            ->values
+            ->partition($predicate)
+            ->map(static fn($_, $sequence) => Set::of(...$sequence->toList()));
     }
 
     /**
