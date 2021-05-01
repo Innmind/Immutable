@@ -10,7 +10,7 @@ use Innmind\Immutable\{
     Sequence,
     Set,
     Pair,
-    Exception\ElementNotFound,
+    Maybe,
 };
 
 /**
@@ -87,19 +87,14 @@ final class DoubleIndex implements Implementation
     /**
      * @param T $key
      *
-     * @throws ElementNotFound
-     *
-     * @return S
+     * @return Maybe<S>
      */
-    public function get($key)
+    public function get($key): Maybe
     {
-        if (!$this->keys->contains($key)) {
-            throw new ElementNotFound($key);
-        }
-
-        return $this->values->get(
-            $this->keys->indexOf($key),
-        );
+        return $this
+            ->pairs
+            ->find(static fn($pair) => $pair->key() === $key)
+            ->map(static fn($pair) => $pair->value());
     }
 
     /**
@@ -133,7 +128,15 @@ final class DoubleIndex implements Implementation
         }
 
         foreach ($this->pairs->iterator() as $pair) {
-            if ($map->get($pair->key()) !== $pair->value()) {
+            $equals = $map
+                ->get($pair->key())
+                ->filter(static fn($value) => $value === $pair->value())
+                ->match(
+                    static fn() => true,
+                    static fn() => false,
+                );
+
+            if (!$equals) {
                 return false;
             }
         }
@@ -186,16 +189,11 @@ final class DoubleIndex implements Implementation
         foreach ($this->pairs->iterator() as $pair) {
             $key = $discriminator($pair->key(), $pair->value());
 
-            if ($groups->contains($key)) {
-                $group = $groups->get($key);
-                $group = ($group)($pair->key(), $pair->value());
-
-                $groups = ($groups)($key, $group);
-            } else {
-                $group = $this->clearMap()($pair->key(), $pair->value());
-
-                $groups = ($groups)($key, $group);
-            }
+            $group = $groups->get($key)->match(
+                static fn($group) => $group,
+                fn() => $this->clearMap(),
+            );
+            $groups = ($groups)($key, ($group)($pair->key(), $pair->value()));
         }
 
         /** @var Map<D, Map<T, S>> */

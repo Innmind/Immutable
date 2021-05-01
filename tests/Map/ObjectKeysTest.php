@@ -12,7 +12,6 @@ use Innmind\Immutable\{
     Str,
     Set,
     Sequence,
-    Exception\ElementNotFound,
 };
 use function Innmind\Immutable\unwrap;
 use PHPUnit\Framework\TestCase;
@@ -45,10 +44,10 @@ class ObjectKeysTest extends TestCase
             ($d = new \stdClass, 90)
             ($c, 1);
 
-        $this->assertSame(24, $m->get($a));
-        $this->assertSame(42, $m->get($b));
-        $this->assertSame(1, $m->get($c));
-        $this->assertSame(90, $m->get($d));
+        $this->assertSame(24, $this->get($m, $a));
+        $this->assertSame(42, $this->get($m, $b));
+        $this->assertSame(1, $this->get($m, $c));
+        $this->assertSame(90, $this->get($m, $d));
         $this->assertSame(4, $m->size());
     }
 
@@ -57,14 +56,12 @@ class ObjectKeysTest extends TestCase
         $m = new ObjectKeys;
         $m = ($m)($a = new \stdClass, 24);
 
-        $this->assertSame(24, $m->get($a));
+        $this->assertSame(24, $this->get($m, $a));
     }
 
-    public function testThrowWhenGettingUnknownKey()
+    public function testReturnNothingWhenGettingUnknownKey()
     {
-        $this->expectException(ElementNotFound::class);
-
-        (new ObjectKeys)->get(new \stdClass);
+        $this->assertNull($this->get(new ObjectKeys, new \stdClass));
     }
 
     public function testContains()
@@ -160,12 +157,12 @@ class ObjectKeysTest extends TestCase
         $this->assertInstanceOf(Map::class, $m2);
         $this->assertTrue($m2->contains(0));
         $this->assertTrue($m2->contains(1));
-        $this->assertSame(2, $m2->get(0)->size());
-        $this->assertSame(2, $m2->get(1)->size());
-        $this->assertSame(1, $m2->get(1)->get($a));
-        $this->assertSame(2, $m2->get(0)->get($b));
-        $this->assertSame(3, $m2->get(1)->get($c));
-        $this->assertSame(4, $m2->get(0)->get($d));
+        $this->assertSame(2, $this->get($m2, 0)->size());
+        $this->assertSame(2, $this->get($m2, 1)->size());
+        $this->assertSame(1, $this->get($this->get($m2, 1), $a));
+        $this->assertSame(2, $this->get($this->get($m2, 0), $b));
+        $this->assertSame(3, $this->get($this->get($m2, 1), $c));
+        $this->assertSame(4, $this->get($this->get($m2, 0), $d));
     }
     public function testKeys()
     {
@@ -299,19 +296,19 @@ class ObjectKeysTest extends TestCase
         );
         $this->assertSame(
             [$b, $d],
-            unwrap($p->get(true)->keys()),
+            unwrap($this->get($p, true)->keys()),
         );
         $this->assertSame(
             [2, 4],
-            unwrap($p->get(true)->values()),
+            unwrap($this->get($p, true)->values()),
         );
         $this->assertSame(
             [$a, $c, $e],
-            unwrap($p->get(false)->keys()),
+            unwrap($this->get($p, false)->keys()),
         );
         $this->assertSame(
             [1, 3, 5],
-            unwrap($p->get(false)->values()),
+            unwrap($this->get($p, false)->values()),
         );
     }
 
@@ -343,5 +340,13 @@ class ObjectKeysTest extends TestCase
 
         $this->assertInstanceOf(DoubleIndex::class, $map);
         $this->assertCount(1, $map);
+    }
+
+    private function get($map, $index)
+    {
+        return $map->get($index)->match(
+            static fn($value) => $value,
+            static fn() => null,
+        );
     }
 }

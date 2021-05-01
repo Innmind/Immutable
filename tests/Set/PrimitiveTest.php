@@ -129,8 +129,8 @@ class PrimitiveTest extends TestCase
         $this->assertSame([1, 2, 3, 4], \iterator_to_array($set->iterator()));
         $this->assertInstanceOf(Map::class, $groups);
         $this->assertCount(2, $groups);
-        $this->assertSame([2, 4], unwrap($groups->get(0)));
-        $this->assertSame([1, 3], unwrap($groups->get(1)));
+        $this->assertSame([2, 4], unwrap($this->get($groups, 0)));
+        $this->assertSame([1, 3], unwrap($this->get($groups, 1)));
     }
 
     public function testMap()
@@ -151,8 +151,8 @@ class PrimitiveTest extends TestCase
         $this->assertSame([1, 2, 3, 4], \iterator_to_array($set->iterator()));
         $this->assertInstanceOf(Map::class, $groups);
         $this->assertCount(2, $groups);
-        $this->assertSame([2, 4], unwrap($groups->get(true)));
-        $this->assertSame([1, 3], unwrap($groups->get(false)));
+        $this->assertSame([2, 4], unwrap($this->get($groups, true)));
+        $this->assertSame([1, 3], unwrap($this->get($groups, false)));
     }
 
     public function testSort()
@@ -231,6 +231,14 @@ class PrimitiveTest extends TestCase
                 static fn($i) => $i,
                 static fn() => null,
             ),
+        );
+    }
+
+    public function get($map, $index)
+    {
+        return $map->get($index)->match(
+            static fn($value) => $value,
+            static fn() => null,
         );
     }
 }

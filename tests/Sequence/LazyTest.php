@@ -70,20 +70,23 @@ class LazyTest extends TestCase
             yield 3;
         });
 
-        $this->assertSame(42, $sequence->get(1));
+        $this->assertSame(42, $this->get($sequence, 1));
     }
 
-    public function testThrowWhenIndexNotFound()
+    public function testReturnNothingWhenIndexNotFound()
     {
-        $this->expectException(OutOfBoundException::class);
-
         $sequence = new Lazy(static function() {
             if (false) {
                 yield 1;
             }
         });
 
-        $sequence->get(0);
+        $this->assertNull(
+            $sequence->get(0)->match(
+                static fn($value) => $value,
+                static fn() => null,
+            ),
+        );
     }
 
     public function testDiff()
@@ -246,34 +249,40 @@ class LazyTest extends TestCase
         $this->assertSame([1, 2, 3, 4], \iterator_to_array($sequence->iterator()));
         $this->assertInstanceOf(Map::class, $groups);
         $this->assertCount(2, $groups);
-        $this->assertSame([2, 4], unwrap($groups->get(0)));
-        $this->assertSame([1, 3], unwrap($groups->get(1)));
+        $this->assertSame([2, 4], unwrap($this->get($groups, 0)));
+        $this->assertSame([1, 3], unwrap($this->get($groups, 1)));
     }
 
-    public function testThrowWhenTryingToAccessFirstElementOnEmptySequence()
+    public function testReturnNothingWhenTryingToAccessFirstElementOnEmptySequence()
     {
-        $this->expectException(OutOfBoundException::class);
-
         $sequence = new Lazy(static function() {
             if (false) {
                 yield 1;
             }
         });
 
-        $sequence->first();
+        $this->assertNull(
+            $sequence->first()->match(
+                static fn($value) => $value,
+                static fn() => null,
+            ),
+        );
     }
 
-    public function testThrowWhenTryingToAccessLastElementOnEmptySequence()
+    public function testReturnNothingWhenTryingToAccessLastElementOnEmptySequence()
     {
-        $this->expectException(OutOfBoundException::class);
-
         $sequence = new Lazy(static function() {
             if (false) {
                 yield 1;
             }
         });
 
-        $sequence->last();
+        $this->assertNull(
+            $sequence->last()->match(
+                static fn($value) => $value,
+                static fn() => null,
+            ),
+        );
     }
 
     public function testFirst()
@@ -284,7 +293,13 @@ class LazyTest extends TestCase
             yield 4;
         });
 
-        $this->assertSame(2, $sequence->first());
+        $this->assertSame(
+            2,
+            $sequence->first()->match(
+                static fn($value) => $value,
+                static fn() => null,
+            ),
+        );
     }
 
     public function testLast()
@@ -295,7 +310,13 @@ class LazyTest extends TestCase
             yield 3;
         });
 
-        $this->assertSame(3, $sequence->last());
+        $this->assertSame(
+            3,
+            $sequence->last()->match(
+                static fn($value) => $value,
+                static fn() => null,
+            ),
+        );
     }
 
     public function testContains()
@@ -417,8 +438,8 @@ class LazyTest extends TestCase
         $this->assertSame([1, 2, 3, 4], \iterator_to_array($sequence->iterator()));
         $this->assertInstanceOf(Map::class, $partition);
         $this->assertCount(2, $partition);
-        $this->assertSame([2, 4], unwrap($partition->get(true)));
-        $this->assertSame([1, 3], unwrap($partition->get(false)));
+        $this->assertSame([2, 4], unwrap($this->get($partition, true)));
+        $this->assertSame([1, 3], unwrap($this->get($partition, false)));
     }
 
     public function testSlice()
@@ -453,8 +474,24 @@ class LazyTest extends TestCase
         $this->assertSame([2, 3, 4, 5], \iterator_to_array($sequence->iterator()));
         $this->assertInstanceOf(Sequence::class, $parts);
         $this->assertCount(2, $parts);
-        $this->assertSame([2, 3], unwrap($parts->first()));
-        $this->assertSame([4, 5], unwrap($parts->last()));
+        $this->assertSame(
+            [2, 3],
+            unwrap(
+                $parts->first()->match(
+                    static fn($value) => $value,
+                    static fn() => null,
+                ),
+            ),
+        );
+        $this->assertSame(
+            [4, 5],
+            unwrap(
+                $parts->last()->match(
+                    static fn($value) => $value,
+                    static fn() => null,
+                ),
+            ),
+        );
     }
 
     public function testTake()
@@ -702,6 +739,14 @@ class LazyTest extends TestCase
                 static fn($i) => $i,
                 static fn() => null,
             ),
+        );
+    }
+
+    public function get($map, $index)
+    {
+        return $map->get($index)->match(
+            static fn($value) => $value,
+            static fn() => null,
         );
     }
 }

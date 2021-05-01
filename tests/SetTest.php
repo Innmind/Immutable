@@ -256,8 +256,8 @@ class SetTest extends TestCase
         });
         $this->assertInstanceOf(Map::class, $m);
         $this->assertSame([1, 0], unwrap($m->keys()));
-        $this->assertSame([1, 3], unwrap($m->get(1)));
-        $this->assertSame([2, 4], unwrap($m->get(0)));
+        $this->assertSame([1, 3], unwrap($this->get($m, 1)));
+        $this->assertSame([2, 4], unwrap($this->get($m, 0)));
     }
 
     public function testMap()
@@ -301,10 +301,10 @@ class SetTest extends TestCase
         $this->assertNotSame($s, $s2);
         $this->assertInstanceOf(Map::class, $s2);
         $this->assertSame([1, 2, 3, 4], unwrap($s));
-        $this->assertInstanceOf(Set::class, $s2->get(true));
-        $this->assertInstanceOf(Set::class, $s2->get(false));
-        $this->assertSame([2, 4], unwrap($s2->get(true)));
-        $this->assertSame([1, 3], unwrap($s2->get(false)));
+        $this->assertInstanceOf(Set::class, $this->get($s2, true));
+        $this->assertInstanceOf(Set::class, $this->get($s2, false));
+        $this->assertSame([2, 4], unwrap($this->get($s2, true)));
+        $this->assertSame([1, 3], unwrap($this->get($s2, false)));
     }
 
     public function testSort()
@@ -436,5 +436,13 @@ class SetTest extends TestCase
 
         $this->assertTrue($set->any(static fn($i) => $i === 2));
         $this->assertFalse($set->any(static fn($i) => $i === 0));
+    }
+
+    public function get($map, $index)
+    {
+        return $map->get($index)->match(
+            static fn($value) => $value,
+            static fn() => null,
+        );
     }
 }

@@ -11,7 +11,6 @@ use Innmind\Immutable\{
     Set,
     Pair,
     Maybe,
-    Exception\ElementNotFound,
 };
 
 /**
@@ -83,21 +82,20 @@ final class ObjectKeys implements Implementation
     /**
      * @param T $key
      *
-     * @throws ElementNotFound
-     *
-     * @return S
+     * @return Maybe<S>
      */
-    public function get($key)
+    public function get($key): Maybe
     {
         if (!$this->contains($key)) {
-            throw new ElementNotFound($key);
+            /** @var Maybe<S> */
+            return Maybe::nothing();
         }
 
         /**
          * @psalm-suppress MixedArgumentTypeCoercion
-         * @var S
+         * @var Maybe<S>
          */
-        return $this->values->offsetGet($key);
+        return Maybe::just($this->values->offsetGet($key));
     }
 
     /**
@@ -129,7 +127,7 @@ final class ObjectKeys implements Implementation
      */
     public function equals(Implementation $map): bool
     {
-        if ($map->size() !== $this->size()) {
+        if (!$map->keys()->equals($this->keys())) {
             return false;
         }
 
@@ -138,12 +136,15 @@ final class ObjectKeys implements Implementation
             $key = $k;
             /** @var S $v */
             $v = $this->values[$k];
+            $equals = $map
+                ->get($key)
+                ->filter(static fn($value) => $value === $v)
+                ->match(
+                    static fn() => true,
+                    static fn() => false,
+                );
 
-            if (!$map->contains($key)) {
-                return false;
-            }
-
-            if ($map->get($key) !== $v) {
+            if (!$equals) {
                 return false;
             }
         }
@@ -209,16 +210,11 @@ final class ObjectKeys implements Implementation
 
             $discriminant = $discriminator($key, $v);
 
-            if ($groups->contains($discriminant)) {
-                $group = $groups->get($discriminant);
-                $group = ($group)($key, $v);
-
-                $groups = ($groups)($discriminant, $group);
-            } else {
-                $group = $this->clearMap()($key, $v);
-
-                $groups = ($groups)($discriminant, $group);
-            }
+            $group = $groups->get($discriminant)->match(
+                static fn($group) => $group,
+                fn() => $this->clearMap(),
+            );
+            $groups = ($groups)($discriminant, ($group)($key, $v));
         }
 
         /** @var Map<D, Map<T, S>> */

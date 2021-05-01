@@ -37,11 +37,9 @@ interface Implementation extends \Countable
     /**
      * Return the element at the given index
      *
-     * @throws OutOfBoundException
-     *
-     * @return T
+     * @return Maybe<T>
      */
-    public function get(int $index);
+    public function get(int $index): Maybe;
 
     /**
      * Return the diff between this sequence and another
@@ -110,16 +108,16 @@ interface Implementation extends \Countable
     /**
      * Return the first element
      *
-     * @return T
+     * @return Maybe<T>
      */
-    public function first();
+    public function first(): Maybe;
 
     /**
      * Return the last element
      *
-     * @return T
+     * @return Maybe<T>
      */
-    public function last();
+    public function last(): Maybe;
 
     /**
      * Check if the sequence contains the given element

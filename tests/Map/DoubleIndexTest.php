@@ -11,7 +11,6 @@ use Innmind\Immutable\{
     Str,
     Set,
     Sequence,
-    Exception\ElementNotFound,
 };
 use function Innmind\Immutable\unwrap;
 use PHPUnit\Framework\TestCase;
@@ -44,10 +43,10 @@ class DoubleIndexTest extends TestCase
             (89, 90)
             (65, 1);
 
-        $this->assertSame(24, $m->get(23));
-        $this->assertSame(42, $m->get(41));
-        $this->assertSame(1, $m->get(65));
-        $this->assertSame(90, $m->get(89));
+        $this->assertSame(24, $this->get($m, 23));
+        $this->assertSame(42, $this->get($m, 41));
+        $this->assertSame(1, $this->get($m, 65));
+        $this->assertSame(90, $this->get($m, 89));
         $this->assertSame(4, $m->size());
     }
 
@@ -56,14 +55,23 @@ class DoubleIndexTest extends TestCase
         $m = new DoubleIndex;
         $m = ($m)(23, 24);
 
-        $this->assertSame(24, $m->get(23));
+        $this->assertSame(
+            24,
+            $m->get(23)->match(
+                static fn($value) => $value,
+                static fn() => null,
+            ),
+        );
     }
 
-    public function testThrowWhenGettingUnknownKey()
+    public function testReturnNothingWhenGettingUnknownKey()
     {
-        $this->expectException(ElementNotFound::class);
-
-        (new DoubleIndex)->get(24);
+        $this->assertNull(
+            (new DoubleIndex)->get(24)->match(
+                static fn($value) => $value,
+                static fn() => null,
+            ),
+        );
     }
 
     public function testContains()
@@ -179,13 +187,13 @@ class DoubleIndexTest extends TestCase
         $this->assertTrue($m2->contains(0));
         $this->assertTrue($m2->contains(1));
         $this->assertTrue($m2->contains(2));
-        $this->assertSame(2, $m2->get(0)->size());
-        $this->assertSame(1, $m2->get(1)->size());
-        $this->assertSame(1, $m2->get(2)->size());
-        $this->assertSame(1, $m2->get(1)->get(0));
-        $this->assertSame(2, $m2->get(0)->get(1));
-        $this->assertSame(3, $m2->get(2)->get(2));
-        $this->assertSame(5, $m2->get(0)->get(4));
+        $this->assertSame(2, $this->get($m2, 0)->size());
+        $this->assertSame(1, $this->get($m2, 1)->size());
+        $this->assertSame(1, $this->get($m2, 2)->size());
+        $this->assertSame(1, $this->get($this->get($m2, 1), 0));
+        $this->assertSame(2, $this->get($this->get($m2, 0), 1));
+        $this->assertSame(3, $this->get($this->get($m2, 2), 2));
+        $this->assertSame(5, $this->get($this->get($m2, 0), 4));
     }
     public function testKeys()
     {
@@ -319,19 +327,19 @@ class DoubleIndexTest extends TestCase
         );
         $this->assertSame(
             [1, 4],
-            unwrap($p->get(true)->keys()),
+            unwrap($this->get($p, true)->keys()),
         );
         $this->assertSame(
             [2, 5],
-            unwrap($p->get(true)->values()),
+            unwrap($this->get($p, true)->values()),
         );
         $this->assertSame(
             [0, 2, 3],
-            unwrap($p->get(false)->keys()),
+            unwrap($this->get($p, false)->keys()),
         );
         $this->assertSame(
             [1, 3, 4],
-            unwrap($p->get(false)->values()),
+            unwrap($this->get($p, false)->values()),
         );
     }
 
@@ -355,5 +363,13 @@ class DoubleIndexTest extends TestCase
     {
         $this->assertTrue((new DoubleIndex)->empty());
         $this->assertFalse((new DoubleIndex)(1, 2)->empty());
+    }
+
+    private function get($map, $index)
+    {
+        return $map->get($index)->match(
+            static fn($value) => $value,
+            static fn() => null,
+        );
     }
 }

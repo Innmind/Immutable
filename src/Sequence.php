@@ -4,7 +4,6 @@ declare(strict_types = 1);
 namespace Innmind\Immutable;
 
 use Innmind\Immutable\Exception\{
-    LogicException,
     ElementNotFound,
     OutOfBoundException,
 };
@@ -171,13 +170,10 @@ final class Sequence implements \Countable
     /**
      * Return the element at the given index
      *
-     * @throws OutOfBoundException
-     *
-     * @return T
+     * @return Maybe<T>
      */
-    public function get(int $index)
+    public function get(int $index): Maybe
     {
-        /** @var T */
         return $this->implementation->get($index);
     }
 
@@ -292,22 +288,20 @@ final class Sequence implements \Countable
     /**
      * Return the first element
      *
-     * @return T
+     * @return Maybe<T>
      */
-    public function first()
+    public function first(): Maybe
     {
-        /** @var T */
         return $this->implementation->first();
     }
 
     /**
      * Return the last element
      *
-     * @return T
+     * @return Maybe<T>
      */
-    public function last()
+    public function last(): Maybe
     {
-        /** @var T */
         return $this->implementation->last();
     }
 

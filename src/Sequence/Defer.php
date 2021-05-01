@@ -72,23 +72,22 @@ final class Defer implements Implementation
     }
 
     /**
-     * @throws OutOfBoundException
-     *
-     * @return T
+     * @return Maybe<T>
      */
-    public function get(int $index)
+    public function get(int $index): Maybe
     {
         $iteration = 0;
 
         foreach ($this->values as $value) {
             if ($index === $iteration) {
-                return $value;
+                return Maybe::just($value);
             }
 
             ++$iteration;
         }
 
-        throw new OutOfBoundException;
+        /** @var Maybe<T> */
+        return Maybe::nothing();
     }
 
     /**
@@ -211,31 +210,32 @@ final class Defer implements Implementation
     }
 
     /**
-     * @return T
+     * @return Maybe<T>
      */
-    public function first()
+    public function first(): Maybe
     {
         foreach ($this->values as $value) {
-            return $value;
+            return Maybe::just($value);
         }
 
-        throw new OutOfBoundException;
+        /** @var Maybe<T> */
+        return Maybe::nothing();
     }
 
     /**
-     * @return T
+     * @return Maybe<T>
      */
-    public function last()
+    public function last(): Maybe
     {
         foreach ($this->values as $value) {
         }
 
         if (!isset($value)) {
-            throw new OutOfBoundException;
+            /** @var Maybe<T> */
+            return Maybe::nothing();
         }
 
-        /** @var T */
-        return $value;
+        return Maybe::just($value);
     }
 
     /**

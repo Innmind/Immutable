@@ -8,7 +8,7 @@ use Innmind\Immutable\{
     Sequence,
     Set,
     Pair,
-    Exception\ElementNotFound,
+    Maybe,
 };
 
 /**
@@ -60,13 +60,11 @@ final class Uninitialized implements Implementation
     /**
      * @param T $key
      *
-     * @throws ElementNotFound
-     *
-     * @return S
+     * @return Maybe<S>
      */
-    public function get($key)
+    public function get($key): Maybe
     {
-        throw new ElementNotFound($key);
+        return Maybe::nothing();
     }
 
     /**

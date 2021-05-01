@@ -3,12 +3,6 @@ declare(strict_types = 1);
 
 namespace Innmind\Immutable;
 
-use Innmind\Immutable\{
-    ValidateArgument\ClassType,
-    Exception\LogicException,
-    Exception\ElementNotFound,
-};
-
 /**
  * @template T
  * @template S
@@ -84,13 +78,10 @@ final class Map implements \Countable
      *
      * @param T $key
      *
-     * @throws ElementNotFound
-     *
-     * @return S
+     * @return Maybe<S>
      */
-    public function get($key)
+    public function get($key): Maybe
     {
-        /** @var S */
         return $this->implementation->get($key);
     }
 

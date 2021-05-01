@@ -9,7 +9,7 @@ use Innmind\Immutable\{
     Set,
     Sequence,
     Pair,
-    Exception\ElementNotFound,
+    Maybe,
 };
 
 /**
@@ -36,11 +36,9 @@ interface Implementation extends \Countable
      *
      * @param T $key
      *
-     * @throws ElementNotFound
-     *
-     * @return S
+     * @return Maybe<S>
      */
-    public function get($key);
+    public function get($key): Maybe;
 
     /**
      * Check if there is an element for the given key

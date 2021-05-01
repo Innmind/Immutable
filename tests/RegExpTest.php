@@ -50,6 +50,14 @@ class RegExpTest extends TestCase
         $map = $regexp->capture(Str::of('foo123bar'));
 
         $this->assertInstanceOf(Map::class, $map);
-        $this->assertSame('1', $map->get('i')->toString());
+        $this->assertSame('1', $this->get($map, 'i')->toString());
+    }
+
+    public function get($map, $index)
+    {
+        return $map->get($index)->match(
+            static fn($value) => $value,
+            static fn() => null,
+        );
     }
 }

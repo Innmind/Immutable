@@ -65,17 +65,16 @@ final class Primitive implements Implementation
     }
 
     /**
-     * @throws OutOfBoundException
-     *
-     * @return T
+     * @return Maybe<T>
      */
-    public function get(int $index)
+    public function get(int $index): Maybe
     {
         if (!$this->has($index)) {
-            throw new OutOfBoundException;
+            /** @var Maybe<T> */
+            return Maybe::nothing();
         }
 
-        return $this->values[$index];
+        return Maybe::just($this->values[$index]);
     }
 
     /**
@@ -181,14 +180,12 @@ final class Primitive implements Implementation
         foreach ($this->values as $value) {
             $key = $discriminator($value);
 
-            if ($groups->contains($key)) {
-                $group = $groups->get($key);
-                $group = ($group)($value);
-
-                $groups = ($groups)($key, $group);
-            } else {
-                $groups = ($groups)($key, Sequence::of($value));
-            }
+            /** @var Sequence<T> */
+            $group = $groups->get($key)->match(
+                static fn($group) => $group,
+                static fn() => Sequence::of(),
+            );
+            $groups = ($groups)($key, ($group)($value));
         }
 
         /** @var Map<D, Sequence<T>> */
@@ -196,17 +193,17 @@ final class Primitive implements Implementation
     }
 
     /**
-     * @return T
+     * @return Maybe<T>
      */
-    public function first()
+    public function first(): Maybe
     {
         return $this->get(0);
     }
 
     /**
-     * @return T
+     * @return Maybe<T>
      */
-    public function last()
+    public function last(): Maybe
     {
         return $this->get($this->size() - 1);
     }

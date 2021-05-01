@@ -42,14 +42,12 @@ class PrimitiveTest extends TestCase
 
     public function testGet()
     {
-        $this->assertSame(42, (new Primitive(1, 42, 3))->get(1));
+        $this->assertSame(42, $this->get(new Primitive(1, 42, 3), 1));
     }
 
-    public function testThrowWhenIndexNotFound()
+    public function testReturnNothingWhenIndexNotFound()
     {
-        $this->expectException(OutOfBoundException::class);
-
-        (new Primitive)->get(0);
+        $this->assertNull($this->get(new Primitive, 0));
     }
 
     public function testDiff()
@@ -141,32 +139,50 @@ class PrimitiveTest extends TestCase
         $this->assertSame([1, 2, 3, 4], \iterator_to_array($sequence->iterator()));
         $this->assertInstanceOf(Map::class, $groups);
         $this->assertCount(2, $groups);
-        $this->assertSame([2, 4], unwrap($groups->get(0)));
-        $this->assertSame([1, 3], unwrap($groups->get(1)));
+        $this->assertSame([2, 4], unwrap($this->get($groups, 0)));
+        $this->assertSame([1, 3], unwrap($this->get($groups, 1)));
     }
 
-    public function testThrowWhenTryingToAccessFirstElementOnEmptySequence()
+    public function testReturnNothingWhenTryingToAccessFirstElementOnEmptySequence()
     {
-        $this->expectException(OutOfBoundException::class);
-
-        (new Primitive)->first();
+        $this->assertNull(
+            (new Primitive)->first()->match(
+                static fn($value) => $value,
+                static fn() => null,
+            ),
+        );
     }
 
-    public function testThrowWhenTryingToAccessLastElementOnEmptySequence()
+    public function testReturnNothingWhenTryingToAccessLastElementOnEmptySequence()
     {
-        $this->expectException(OutOfBoundException::class);
-
-        (new Primitive)->last();
+        $this->assertNull(
+            (new Primitive)->last()->match(
+                static fn($value) => $value,
+                static fn() => null,
+            ),
+        );
     }
 
     public function testFirst()
     {
-        $this->assertSame(2, (new Primitive(2, 3, 4))->first());
+        $this->assertSame(
+            2,
+            (new Primitive(2, 3, 4))->first()->match(
+                static fn($value) => $value,
+                static fn() => null,
+            ),
+        );
     }
 
     public function testLast()
     {
-        $this->assertSame(4, (new Primitive(2, 3, 4))->last());
+        $this->assertSame(
+            4,
+            (new Primitive(2, 3, 4))->last()->match(
+                static fn($value) => $value,
+                static fn() => null,
+            ),
+        );
     }
 
     public function testContains()
@@ -243,8 +259,8 @@ class PrimitiveTest extends TestCase
         $this->assertSame([1, 2, 3, 4], \iterator_to_array($sequence->iterator()));
         $this->assertInstanceOf(Map::class, $partition);
         $this->assertCount(2, $partition);
-        $this->assertSame([2, 4], unwrap($partition->get(true)));
-        $this->assertSame([1, 3], unwrap($partition->get(false)));
+        $this->assertSame([2, 4], unwrap($this->get($partition, true)));
+        $this->assertSame([1, 3], unwrap($this->get($partition, false)));
     }
 
     public function testSlice()
@@ -265,8 +281,24 @@ class PrimitiveTest extends TestCase
         $this->assertSame([2, 3, 4, 5], \iterator_to_array($sequence->iterator()));
         $this->assertInstanceOf(Sequence::class, $parts);
         $this->assertCount(2, $parts);
-        $this->assertSame([2, 3], unwrap($parts->first()));
-        $this->assertSame([4, 5], unwrap($parts->last()));
+        $this->assertSame(
+            [2, 3],
+            unwrap(
+                $parts->first()->match(
+                    static fn($value) => $value,
+                    static fn() => null,
+                ),
+            ),
+        );
+        $this->assertSame(
+            [4, 5],
+            unwrap(
+                $parts->last()->match(
+                    static fn($value) => $value,
+                    static fn() => null,
+                ),
+            ),
+        );
     }
 
     public function testTake()
@@ -397,6 +429,14 @@ class PrimitiveTest extends TestCase
                 static fn($i) => $i,
                 static fn() => null,
             ),
+        );
+    }
+
+    public function get($map, $index)
+    {
+        return $map->get($index)->match(
+            static fn($value) => $value,
+            static fn() => null,
         );
     }
 }
