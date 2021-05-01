@@ -9,6 +9,7 @@ use Innmind\Immutable\{
     Set,
     Type,
     Str,
+    Maybe,
 };
 
 /**
@@ -281,7 +282,7 @@ final class Defer implements Implementation
         return $this->values->empty();
     }
 
-    public function find(callable $predicate)
+    public function find(callable $predicate): Maybe
     {
         return $this->values->find($predicate);
     }

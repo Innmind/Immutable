@@ -8,10 +8,9 @@ use Innmind\Immutable\{
     Sequence,
     Str,
     Set,
-    Type,
+    Maybe,
     Exception\OutOfBoundException,
     Exception\ElementNotFound,
-    Exception\NoElementMatchingPredicateFound,
 };
 
 /**
@@ -448,15 +447,16 @@ final class Primitive implements Implementation
         return Set::of(...$this->values);
     }
 
-    public function find(callable $predicate)
+    public function find(callable $predicate): Maybe
     {
         foreach ($this->values as $value) {
             if ($predicate($value) === true) {
-                return $value;
+                return Maybe::just($value);
             }
         }
 
-        throw new NoElementMatchingPredicateFound;
+        /** @var Maybe<T> */
+        return Maybe::nothing();
     }
 
     private function has(int $index): bool

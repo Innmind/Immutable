@@ -8,10 +8,9 @@ use Innmind\Immutable\{
     Sequence,
     Str,
     Set,
-    Type,
+    Maybe,
     Exception\ElementNotFound,
     Exception\OutOfBoundException,
-    Exception\NoElementMatchingPredicateFound,
 };
 
 /**
@@ -560,15 +559,16 @@ final class Lazy implements Implementation
         );
     }
 
-    public function find(callable $predicate)
+    public function find(callable $predicate): Maybe
     {
         foreach ($this->iterator() as $value) {
             if ($predicate($value) === true) {
-                return $value;
+                return Maybe::just($value);
             }
         }
 
-        throw new NoElementMatchingPredicateFound;
+        /** @var Maybe<T> */
+        return Maybe::nothing();
     }
 
     /**

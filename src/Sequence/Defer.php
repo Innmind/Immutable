@@ -8,11 +8,10 @@ use Innmind\Immutable\{
     Sequence,
     Str,
     Set,
+    Maybe,
     Accumulate,
-    Type,
     Exception\ElementNotFound,
     Exception\OutOfBoundException,
-    Exception\NoElementMatchingPredicateFound,
 };
 
 /**
@@ -541,15 +540,16 @@ final class Defer implements Implementation
         );
     }
 
-    public function find(callable $predicate)
+    public function find(callable $predicate): Maybe
     {
         foreach ($this->values as $value) {
             if ($predicate($value) === true) {
-                return $value;
+                return Maybe::just($value);
             }
         }
 
-        throw new NoElementMatchingPredicateFound;
+        /** @var Maybe<T> */
+        return Maybe::nothing();
     }
 
     /**

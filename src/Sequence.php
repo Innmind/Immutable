@@ -7,7 +7,6 @@ use Innmind\Immutable\Exception\{
     LogicException,
     ElementNotFound,
     OutOfBoundException,
-    NoElementMatchingPredicateFound,
 };
 
 /**
@@ -587,13 +586,10 @@ final class Sequence implements \Countable
     /**
      * @param callable(T): bool $predicate
      *
-     * @throws NoElementMatchingPredicateFound
-     *
-     * @return T
+     * @return Maybe<T>
      */
-    public function find(callable $predicate)
+    public function find(callable $predicate): Maybe
     {
-        /** @var T */
         return $this->implementation->find($predicate);
     }
 
@@ -617,12 +613,9 @@ final class Sequence implements \Countable
      */
     public function any(callable $predicate): bool
     {
-        try {
-            $this->find($predicate);
-
-            return true;
-        } catch (NoElementMatchingPredicateFound $e) {
-            return false;
-        }
+        return $this->find($predicate)->match(
+            static fn() => true,
+            static fn() => false,
+        );
     }
 }

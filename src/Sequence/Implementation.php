@@ -8,9 +8,9 @@ use Innmind\Immutable\{
     Sequence,
     Str,
     Set,
+    Maybe,
     Exception\ElementNotFound,
     Exception\OutOfBoundException,
-    Exception\NoElementMatchingPredicateFound,
 };
 
 /**
@@ -271,9 +271,7 @@ interface Implementation extends \Countable
     /**
      * @param callable(T): bool $predicate
      *
-     * @throws NoElementMatchingPredicateFound
-     *
-     * @return T
+     * @return Maybe<T>
      */
-    public function find(callable $predicate);
+    public function find(callable $predicate): Maybe;
 }

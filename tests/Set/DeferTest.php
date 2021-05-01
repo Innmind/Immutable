@@ -10,7 +10,6 @@ use Innmind\Immutable\{
     Map,
     Str,
     Sequence,
-    Exception\NoElementMatchingPredicateFound,
 };
 use function Innmind\Immutable\unwrap;
 use PHPUnit\Framework\TestCase;
@@ -356,15 +355,36 @@ class DeferTest extends TestCase
             yield 3;
         })());
 
-        $this->assertSame(1, $sequence->find(static fn($i) => $i === 1));
+        $this->assertSame(
+            1,
+            $sequence->find(static fn($i) => $i === 1)->match(
+                static fn($i) => $i,
+                static fn() => null,
+            ),
+        );
         $this->assertSame(1, $count);
-        $this->assertSame(2, $sequence->find(static fn($i) => $i === 2));
+        $this->assertSame(
+            2,
+            $sequence->find(static fn($i) => $i === 2)->match(
+                static fn($i) => $i,
+                static fn() => null,
+            ),
+        );
         $this->assertSame(2, $count);
-        $this->assertSame(3, $sequence->find(static fn($i) => $i === 3));
+        $this->assertSame(
+            3,
+            $sequence->find(static fn($i) => $i === 3)->match(
+                static fn($i) => $i,
+                static fn() => null,
+            ),
+        );
         $this->assertSame(3, $count);
 
-        $this->expectException(NoElementMatchingPredicateFound::class);
-
-        $sequence->find(static fn($i) => $i === 0);
+        $this->assertNull(
+            $sequence->find(static fn($i) => $i === 0)->match(
+                static fn($i) => $i,
+                static fn() => null,
+            ),
+        );
     }
 }

@@ -3,10 +3,7 @@ declare(strict_types = 1);
 
 namespace Innmind\Immutable;
 
-use Innmind\Immutable\Exception\{
-    EmptySet,
-    NoElementMatchingPredicateFound,
-};
+use Innmind\Immutable\Exception\EmptySet;
 
 /**
  * @template T
@@ -53,9 +50,14 @@ function join(string $separator, $structure): Str
  */
 function first(Set $set)
 {
-    try {
-        return $set->find(static fn(): bool => true);
-    } catch (NoElementMatchingPredicateFound $e) {
-        throw new EmptySet;
-    }
+    /**
+     * @psalm-suppress MissingClosureReturnType
+     * @var T
+     */
+    return $set->find(static fn(): bool => true)->match(
+        static fn($value) => $value,
+        static function() {
+            throw new EmptySet;
+        },
+    );
 }
