@@ -394,43 +394,6 @@ final class Set implements \Countable
     }
 
     /**
-     * @template ST
-     *
-     * @param null|callable(T): \Generator<ST> $mapper
-     *
-     * @return Sequence<ST>
-     */
-    public function toSequenceOf(string $type, callable $mapper = null): Sequence
-    {
-        return $this->implementation->toSequenceOf($type, $mapper);
-    }
-
-    /**
-     * @template ST
-     *
-     * @param null|callable(T): \Generator<ST> $mapper
-     *
-     * @return self<ST>
-     */
-    public function toSetOf(string $type, callable $mapper = null): self
-    {
-        return $this->implementation->toSetOf($type, $mapper);
-    }
-
-    /**
-     * @template MT
-     * @template MS
-     *
-     * @param callable(T): \Generator<MT, MS> $mapper
-     *
-     * @return Map<MT, MS>
-     */
-    public function toMapOf(string $key, string $value, callable $mapper): Map
-    {
-        return $this->implementation->toMapOf($key, $value, $mapper);
-    }
-
-    /**
      * @param callable(T): bool $predicate
      *
      * @throws NoElementMatchingPredicateFound

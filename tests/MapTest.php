@@ -397,36 +397,6 @@ class MapTest extends TestCase
         $this->assertSame([4], unwrap($m->values()));
     }
 
-    public function testToSetOf()
-    {
-        $map = Map::of()
-            (1, 2)
-            (3, 4);
-        $set = $map->toSetOf('int', static function($k, $v) {
-            yield $k;
-            yield $v;
-        });
-
-        $this->assertInstanceOf(Set::class, $set);
-        $this->assertSame(
-            [1, 2, 3, 4],
-            unwrap($set),
-        );
-    }
-
-    public function testToMapOf()
-    {
-        $map = Map::of()
-            (1, 2)
-            (3, 4);
-        $map = $map->toMapOf('string', 'int', static fn($i, $j) => yield (string) $j => $i);
-
-        $this->assertInstanceOf(Map::class, $map);
-        $this->assertCount(2, $map);
-        $this->assertSame(1, $map->get('2'));
-        $this->assertSame(3, $map->get('4'));
-    }
-
     public function testMatches()
     {
         $map = Map::of()

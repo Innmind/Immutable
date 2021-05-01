@@ -529,66 +529,35 @@ final class Lazy implements Implementation
     }
 
     /**
-     * @template ST
-     *
-     * @param null|callable(T): \Generator<ST> $mapper
-     *
-     * @return Sequence<ST>
+     * @return Sequence<T>
      */
-    public function toSequenceOf(string $type, callable $mapper = null): Sequence
+    public function toSequence(): Sequence
     {
-        /** @psalm-suppress MissingClosureParamType */
-        $mapper ??= static fn($v): \Generator => yield $v;
         $values = $this->values;
 
         return Sequence::lazy(
-            static function() use ($values, $mapper): \Generator {
+            static function() use ($values): \Generator {
                 foreach ($values() as $value) {
-                    /** @var ST $newValue */
-                    foreach ($mapper($value) as $newValue) {
-                        yield $newValue;
-                    }
+                    yield $value;
                 }
             },
         );
     }
 
     /**
-     * @template ST
-     *
-     * @param null|callable(T): \Generator<ST> $mapper
-     *
-     * @return Set<ST>
+     * @return Set<T>
      */
-    public function toSetOf(string $type, callable $mapper = null): Set
+    public function toSet(): Set
     {
-        /** @psalm-suppress MissingClosureParamType */
-        $mapper ??= static fn($v): \Generator => yield $v;
         $values = $this->values;
 
         return Set::lazy(
-            static function() use ($values, $mapper): \Generator {
+            static function() use ($values): \Generator {
                 foreach ($values() as $value) {
-                    /** @var ST $newValue */
-                    foreach ($mapper($value) as $newValue) {
-                        yield $newValue;
-                    }
+                    yield $value;
                 }
             },
         );
-    }
-
-    /**
-     * @template MT
-     * @template MS
-     *
-     * @param callable(T): \Generator<MT, MS> $mapper
-     *
-     * @return Map<MT, MS>
-     */
-    public function toMapOf(string $key, string $value, callable $mapper): Map
-    {
-        return $this->load()->toMapOf($key, $value, $mapper);
     }
 
     public function find(callable $predicate)

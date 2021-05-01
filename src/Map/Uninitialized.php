@@ -209,46 +209,6 @@ final class Uninitialized implements Implementation
     }
 
     /**
-     * @template ST
-     *
-     * @param callable(T, S): \Generator<ST> $mapper
-     *
-     * @return Sequence<ST>
-     */
-    public function toSequenceOf(string $type, callable $mapper): Sequence
-    {
-        /** @var Sequence<ST> */
-        return Sequence::of();
-    }
-
-    /**
-     * @template ST
-     *
-     * @param callable(T, S): \Generator<ST> $mapper
-     *
-     * @return Set<ST>
-     */
-    public function toSetOf(string $type, callable $mapper): Set
-    {
-        /** @var Set<ST> */
-        return Set::of();
-    }
-
-    /**
-     * @template MT
-     * @template MS
-     *
-     * @param null|callable(T, S): \Generator<MT, MS> $mapper
-     *
-     * @return Map<MT, MS>
-     */
-    public function toMapOf(string $key, string $value, callable $mapper = null): Map
-    {
-        /** @var Map<MT, MS> */
-        return Map::of();
-    }
-
-    /**
      * @return Map<T, S>
      */
     private function clearMap(): Map

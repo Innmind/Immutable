@@ -660,64 +660,6 @@ class DeferTest extends TestCase
         $this->assertTrue($bLoaded);
     }
 
-    public function testToSequenceOf()
-    {
-        $loaded = false;
-        $sequence = new Defer((static function() use (&$loaded) {
-            yield 1;
-            yield 2;
-            yield 3;
-            $loaded = true;
-        })());
-        $sequence = $sequence->toSequenceOf('string|int', static function($i) {
-            yield (string) $i;
-            yield $i;
-        });
-
-        $this->assertFalse($loaded);
-        $this->assertInstanceOf(Sequence::class, $sequence);
-        $this->assertSame(
-            ['1', 1, '2', 2, '3', 3],
-            unwrap($sequence),
-        );
-        $this->assertTrue($loaded);
-    }
-
-    public function testToSetOf()
-    {
-        $sequence = new Defer((static function() {
-            yield 1;
-            yield 2;
-            yield 3;
-        })());
-        $set = $sequence->toSetOf('string|int', static function($i) {
-            yield (string) $i;
-            yield $i;
-        });
-
-        $this->assertInstanceOf(Set::class, $set);
-        $this->assertSame(
-            ['1', 1, '2', 2, '3', 3],
-            unwrap($set),
-        );
-    }
-
-    public function testToMapOf()
-    {
-        $sequence = new Defer((static function() {
-            yield 1;
-            yield 2;
-            yield 3;
-        })());
-        $map = $sequence->toMapOf('string', 'int', static fn($i) => yield (string) $i => $i);
-
-        $this->assertInstanceOf(Map::class, $map);
-        $this->assertCount(3, $map);
-        $this->assertSame(1, $map->get('1'));
-        $this->assertSame(2, $map->get('2'));
-        $this->assertSame(3, $map->get('3'));
-    }
-
     public function testFind()
     {
         $count = 0;

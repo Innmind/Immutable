@@ -207,7 +207,7 @@ final class DoubleIndex implements Implementation
      */
     public function keys(): Set
     {
-        return $this->keys->toSetOf('T');
+        return $this->keys->toSet();
     }
 
     /**
@@ -215,7 +215,7 @@ final class DoubleIndex implements Implementation
      */
     public function values(): Sequence
     {
-        return $this->values->toSequenceOf('S');
+        return $this->values->toSequence();
     }
 
     /**
@@ -336,77 +336,6 @@ final class DoubleIndex implements Implementation
     public function empty(): bool
     {
         return $this->pairs->empty();
-    }
-
-    /**
-     * @template ST
-     *
-     * @param callable(T, S): \Generator<ST> $mapper
-     *
-     * @return Sequence<ST>
-     */
-    public function toSequenceOf(string $type, callable $mapper): Sequence
-    {
-        /** @var Sequence<ST> */
-        $sequence = Sequence::of();
-
-        foreach ($this->pairs->iterator() as $pair) {
-            foreach ($mapper($pair->key(), $pair->value()) as $newValue) {
-                $sequence = ($sequence)($newValue);
-            }
-        }
-
-        return $sequence;
-    }
-
-    /**
-     * @template ST
-     *
-     * @param callable(T, S): \Generator<ST> $mapper
-     *
-     * @return Set<ST>
-     */
-    public function toSetOf(string $type, callable $mapper): Set
-    {
-        /** @var Set<ST> */
-        $set = Set::of();
-
-        foreach ($this->pairs->iterator() as $pair) {
-            foreach ($mapper($pair->key(), $pair->value()) as $newValue) {
-                $set = ($set)($newValue);
-            }
-        }
-
-        return $set;
-    }
-
-    /**
-     * @template MT
-     * @template MS
-     *
-     * @param null|callable(T, S): \Generator<MT, MS> $mapper
-     *
-     * @return Map<MT, MS>
-     */
-    public function toMapOf(string $key, string $value, callable $mapper = null): Map
-    {
-        /** @psalm-suppress MissingClosureParamType */
-        $mapper ??= static fn($k, $v): \Generator => yield $k => $v;
-
-        /** @var Map<MT, MS> */
-        $map = Map::of();
-
-        foreach ($this->pairs->iterator() as $pair) {
-            /**
-             * @var MT $newKey
-             * @var MS $newValue
-             */
-            foreach ($mapper($pair->key(), $pair->value()) as $newKey => $newValue) {
-                $map = ($map)($newKey, $newValue);
-            }
-        }
-
-        return $map;
     }
 
     /**

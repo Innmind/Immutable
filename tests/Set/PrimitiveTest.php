@@ -201,48 +201,6 @@ class PrimitiveTest extends TestCase
         $this->assertFalse((new Primitive(1))->empty());
     }
 
-    public function testToSequenceOf()
-    {
-        $set = new Primitive(1, 2, 3);
-        $sequence = $set->toSequenceOf('string|int', static function($i) {
-            yield (string) $i;
-            yield $i;
-        });
-
-        $this->assertInstanceOf(Sequence::class, $sequence);
-        $this->assertSame(
-            ['1', 1, '2', 2, '3', 3],
-            unwrap($sequence),
-        );
-    }
-
-    public function testToSetOf()
-    {
-        $set = new Primitive(1, 2, 3);
-        $set = $set->toSetOf('string|int', static function($i) {
-            yield (string) $i;
-            yield $i;
-        });
-
-        $this->assertInstanceOf(Set::class, $set);
-        $this->assertSame(
-            ['1', 1, '2', 2, '3', 3],
-            unwrap($set),
-        );
-    }
-
-    public function testToMapOf()
-    {
-        $set = new Primitive(1, 2, 3);
-        $map = $set->toMapOf('string', 'int', static fn($i) => yield (string) $i => $i);
-
-        $this->assertInstanceOf(Map::class, $map);
-        $this->assertCount(3, $map);
-        $this->assertSame(1, $map->get('1'));
-        $this->assertSame(2, $map->get('2'));
-        $this->assertSame(3, $map->get('3'));
-    }
-
     public function testFind()
     {
         $sequence = new Primitive(1, 2, 3);

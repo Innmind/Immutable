@@ -344,68 +344,6 @@ class DeferTest extends TestCase
         $this->assertFalse($a->empty());
     }
 
-    public function testToSequenceOf()
-    {
-        $loaded = false;
-        $set = Defer::of((static function() use (&$loaded) {
-            yield 1;
-            yield 2;
-            yield 3;
-            $loaded = true;
-        })());
-        $sequence = $set->toSequenceOf('string|int', static function($i) {
-            yield (string) $i;
-            yield $i;
-        });
-
-        $this->assertFalse($loaded);
-        $this->assertInstanceOf(Sequence::class, $sequence);
-        $this->assertSame(
-            ['1', 1, '2', 2, '3', 3],
-            unwrap($sequence),
-        );
-        $this->assertTrue($loaded);
-    }
-
-    public function testToSetOf()
-    {
-        $loaded = false;
-        $set = Defer::of((static function() use (&$loaded) {
-            yield 1;
-            yield 2;
-            yield 3;
-            $loaded = true;
-        })());
-        $set = $set->toSetOf('string|int', static function($i) {
-            yield (string) $i;
-            yield $i;
-        });
-
-        $this->assertFalse($loaded);
-        $this->assertInstanceOf(Set::class, $set);
-        $this->assertSame(
-            ['1', 1, '2', 2, '3', 3],
-            unwrap($set),
-        );
-        $this->assertTrue($loaded);
-    }
-
-    public function testToMapOf()
-    {
-        $set = Defer::of((static function() {
-            yield 1;
-            yield 2;
-            yield 3;
-        })());
-        $map = $set->toMapOf('string', 'int', static fn($i) => yield (string) $i => $i);
-
-        $this->assertInstanceOf(Map::class, $map);
-        $this->assertCount(3, $map);
-        $this->assertSame(1, $map->get('1'));
-        $this->assertSame(2, $map->get('2'));
-        $this->assertSame(3, $map->get('3'));
-    }
-
     public function testFind()
     {
         $count = 0;

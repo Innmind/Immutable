@@ -389,56 +389,6 @@ class SetTest extends TestCase
         $this->assertFalse(Set::of(1)->empty());
     }
 
-    public function testToSequenceOf()
-    {
-        $set = Set::ints(1, 2, 3);
-        $sequence = $set->toSequenceOf('string|int', static function($i) {
-            yield (string) $i;
-            yield $i;
-        });
-
-        $this->assertInstanceOf(Sequence::class, $sequence);
-        $this->assertSame(
-            ['1', 1, '2', 2, '3', 3],
-            unwrap($sequence),
-        );
-        $this->assertSame(
-            [1, 2, 3],
-            unwrap($set->toSequenceOf('int')),
-        );
-    }
-
-    public function testToSetOf()
-    {
-        $initial = Set::ints(1, 2, 3);
-        $set = $initial->toSetOf('string|int', static function($i) {
-            yield (string) $i;
-            yield $i;
-        });
-
-        $this->assertInstanceOf(Set::class, $set);
-        $this->assertSame(
-            ['1', 1, '2', 2, '3', 3],
-            unwrap($set),
-        );
-        $this->assertSame(
-            [1, 2, 3],
-            unwrap($initial->toSetOf('int')),
-        );
-    }
-
-    public function testToMapOf()
-    {
-        $set = Set::ints(1, 2, 3);
-        $map = $set->toMapOf('string', 'int', static fn($i) => yield (string) $i => $i);
-
-        $this->assertInstanceOf(Map::class, $map);
-        $this->assertCount(3, $map);
-        $this->assertSame(1, $map->get('1'));
-        $this->assertSame(2, $map->get('2'));
-        $this->assertSame(3, $map->get('3'));
-    }
-
     public function testFind()
     {
         $sequence = Set::ints(1, 2, 3);

@@ -229,7 +229,7 @@ final class Lazy implements Implementation
         return $this
             ->values
             ->sort($function)
-            ->toSequenceOf('T');
+            ->toSequence();
     }
 
     /**
@@ -279,43 +279,6 @@ final class Lazy implements Implementation
     public function empty(): bool
     {
         return $this->values->empty();
-    }
-
-    /**
-     * @template ST
-     *
-     * @param null|callable(T): \Generator<ST> $mapper
-     *
-     * @return Sequence<ST>
-     */
-    public function toSequenceOf(string $type, callable $mapper = null): Sequence
-    {
-        return $this->values->toSequenceOf($type, $mapper);
-    }
-
-    /**
-     * @template ST
-     *
-     * @param null|callable(T): \Generator<ST> $mapper
-     *
-     * @return Set<ST>
-     */
-    public function toSetOf(string $type, callable $mapper = null): Set
-    {
-        return $this->values->toSetOf($type, $mapper);
-    }
-
-    /**
-     * @template MT
-     * @template MS
-     *
-     * @param callable(T): \Generator<MT, MS> $mapper
-     *
-     * @return Map<MT, MS>
-     */
-    public function toMapOf(string $key, string $value, callable $mapper): Map
-    {
-        return $this->values->toMapOf($key, $value, $mapper);
     }
 
     public function find(callable $predicate)

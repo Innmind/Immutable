@@ -334,8 +334,8 @@ final class Primitive implements Implementation
     {
         /** @var Sequence<Sequence<T>> */
         return Sequence::of(
-            $this->slice(0, $index)->toSequenceOf('T'),
-            $this->slice($index, $this->size())->toSequenceOf('T'),
+            $this->slice(0, $index)->toSequence(),
+            $this->slice($index, $this->size())->toSequence(),
         );
     }
 
@@ -433,75 +433,19 @@ final class Primitive implements Implementation
     }
 
     /**
-     * @template ST
-     *
-     * @param null|callable(T): \Generator<ST> $mapper
-     *
-     * @return Sequence<ST>
+     * @return Sequence<T>
      */
-    public function toSequenceOf(string $type, callable $mapper = null): Sequence
+    public function toSequence(): Sequence
     {
-        /** @psalm-suppress MissingClosureParamType */
-        $mapper ??= static fn($v): \Generator => yield $v;
-
-        /** @var Sequence<ST> */
-        $sequence = Sequence::of();
-
-        foreach ($this->values as $value) {
-            /** @var ST $newValue */
-            foreach ($mapper($value) as $newValue) {
-                $sequence = ($sequence)($newValue);
-            }
-        }
-
-        return $sequence;
+        return Sequence::of(...$this->values);
     }
 
     /**
-     * @template ST
-     *
-     * @param null|callable(T): \Generator<ST> $mapper
-     *
-     * @return Set<ST>
+     * @return Set<T>
      */
-    public function toSetOf(string $type, callable $mapper = null): Set
+    public function toSet(): Set
     {
-        /** @psalm-suppress MissingClosureParamType */
-        $mapper ??= static fn($v): \Generator => yield $v;
-
-        /** @var Set<ST> */
-        $set = Set::of();
-
-        foreach ($this->values as $value) {
-            /** @var ST $newValue */
-            foreach ($mapper($value) as $newValue) {
-                $set = ($set)($newValue);
-            }
-        }
-
-        return $set;
-    }
-
-    /**
-     * @template MT
-     * @template MS
-     *
-     * @param callable(T): \Generator<MT, MS> $mapper
-     *
-     * @return Map<MT, MS>
-     */
-    public function toMapOf(string $key, string $value, callable $mapper): Map
-    {
-        /** @var Map<MT, MS> */
-        $map = Map::of();
-
-        foreach ($this->values as $value) {
-            foreach ($mapper($value) as $newKey => $newValue) {
-                $map = ($map)($newKey, $newValue);
-            }
-        }
-
-        return $map;
+        return Set::of(...$this->values);
     }
 
     public function find(callable $predicate)

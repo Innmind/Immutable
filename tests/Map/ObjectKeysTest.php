@@ -337,47 +337,6 @@ class ObjectKeysTest extends TestCase
         $this->assertFalse((new ObjectKeys)(new \stdClass, 1)->empty());
     }
 
-    public function testToSequenceOf()
-    {
-        $map = (new ObjectKeys)
-            (new \stdClass, 2)
-            (new \stdClass, 4);
-        $sequence = $map->toSequenceOf('int', static fn($k, $v) => yield $v);
-
-        $this->assertInstanceOf(Sequence::class, $sequence);
-        $this->assertSame(
-            [2, 4],
-            unwrap($sequence),
-        );
-    }
-
-    public function testToSetOf()
-    {
-        $map = (new ObjectKeys)
-            (new \stdClass, 2)
-            (new \stdClass, 4);
-        $set = $map->toSetOf('int', static fn($k, $v) => yield $v);
-
-        $this->assertInstanceOf(Set::class, $set);
-        $this->assertSame(
-            [2, 4],
-            unwrap($set),
-        );
-    }
-
-    public function testToMapOf()
-    {
-        $map = (new ObjectKeys)
-            ($a = new \stdClass, 2)
-            ($b = new \stdClass, 4);
-        $map = $map->toMapOf('int', 'object', static fn($i, $j) => yield $j => $i);
-
-        $this->assertInstanceOf(Map::class, $map);
-        $this->assertCount(2, $map);
-        $this->assertSame($a, $map->get(2));
-        $this->assertSame($b, $map->get(4));
-    }
-
     public function testSwitchImplementationWhenAddingNonKeyObject()
     {
         $map = (new ObjectKeys)(1, 2);

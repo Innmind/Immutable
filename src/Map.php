@@ -285,43 +285,6 @@ final class Map implements \Countable
     }
 
     /**
-     * @template ST
-     *
-     * @param callable(T, S): \Generator<ST> $mapper
-     *
-     * @return Sequence<ST>
-     */
-    public function toSequenceOf(string $type, callable $mapper): Sequence
-    {
-        return $this->implementation->toSequenceOf($type, $mapper);
-    }
-
-    /**
-     * @template ST
-     *
-     * @param callable(T, S): \Generator<ST> $mapper
-     *
-     * @return Set<ST>
-     */
-    public function toSetOf(string $type, callable $mapper): Set
-    {
-        return $this->implementation->toSetOf($type, $mapper);
-    }
-
-    /**
-     * @template MT
-     * @template MS
-     *
-     * @param null|callable(T, S): \Generator<MT, MS> $mapper
-     *
-     * @return self<MT, MS>
-     */
-    public function toMapOf(string $key, string $value, callable $mapper = null): self
-    {
-        return $this->implementation->toMapOf($key, $value, $mapper);
-    }
-
-    /**
      * @param callable(T, S): bool $predicate
      */
     public function matches(callable $predicate): bool

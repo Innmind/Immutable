@@ -512,66 +512,33 @@ final class Defer implements Implementation
     }
 
     /**
-     * @template ST
-     *
-     * @param null|callable(T): \Generator<ST> $mapper
-     *
-     * @return Sequence<ST>
+     * @return Sequence<T>
      */
-    public function toSequenceOf(string $type, callable $mapper = null): Sequence
+    public function toSequence(): Sequence
     {
-        /** @psalm-suppress MissingClosureParamType */
-        $mapper ??= static fn($v): \Generator => yield $v;
-
         return Sequence::defer(
-            (static function(\Iterator $values, callable $mapper): \Generator {
+            (static function(\Iterator $values): \Generator {
                 /** @var T $value */
                 foreach ($values as $value) {
-                    /** @var ST $newValue */
-                    foreach ($mapper($value) as $newValue) {
-                        yield $newValue;
-                    }
+                    yield $value;
                 }
-            })($this->values, $mapper),
+            })($this->values),
         );
     }
 
     /**
-     * @template ST
-     *
-     * @param null|callable(T): \Generator<ST> $mapper
-     *
-     * @return Set<ST>
+     * @return Set<T>
      */
-    public function toSetOf(string $type, callable $mapper = null): Set
+    public function toSet(): Set
     {
-        /** @psalm-suppress MissingClosureParamType */
-        $mapper ??= static fn($v): \Generator => yield $v;
-
         return Set::defer(
-            (static function(\Iterator $values, callable $mapper): \Generator {
+            (static function(\Iterator $values): \Generator {
                 /** @var T $value */
                 foreach ($values as $value) {
-                    /** @var ST $newValue */
-                    foreach ($mapper($value) as $newValue) {
-                        yield $newValue;
-                    }
+                    yield $value;
                 }
-            })($this->values, $mapper),
+            })($this->values),
         );
-    }
-
-    /**
-     * @template MT
-     * @template MS
-     *
-     * @param callable(T): \Generator<MT, MS> $mapper
-     *
-     * @return Map<MT, MS>
-     */
-    public function toMapOf(string $key, string $value, callable $mapper): Map
-    {
-        return $this->load()->toMapOf($key, $value, $mapper);
     }
 
     public function find(callable $predicate)
