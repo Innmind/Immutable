@@ -112,7 +112,7 @@ final class Str
 
         $parts = $this
             ->split($search)
-            ->toSequenceOf('string', static fn($v) => yield $v->toString());
+            ->map(static fn($v) => $v->toString());
 
         return join($replacement, $parts);
     }
@@ -173,7 +173,7 @@ final class Str
         $parts = $this
             ->chunk()
             ->reverse()
-            ->toSequenceOf('string', static fn($v) => yield $v->toString());
+            ->map(static fn($v) => $v->toString());
 
         return join('', $parts)->toEncoding($this->encoding);
     }
@@ -408,10 +408,7 @@ final class Str
     {
         $words = $this
             ->pregSplit('/_| /')
-            ->map(static function(self $part) {
-                return $part->ucfirst();
-            })
-            ->toSequenceOf('string', static fn($v) => yield $v->toString());
+            ->map(static fn(self $part) => $part->ucfirst()->toString());
 
         return join('', $words)
             ->lcfirst()
