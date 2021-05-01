@@ -594,6 +594,14 @@ class SequenceTest extends TestCase
         $this->assertFalse(Sequence::of(1)->empty());
     }
 
+    public function testToList()
+    {
+        $this->assertSame(
+            [1, 2, 3],
+            Sequence::ints(1, 2, 3)->toList(),
+        );
+    }
+
     public function testToSequenceOf()
     {
         $initial = Sequence::ints(1, 2, 3);

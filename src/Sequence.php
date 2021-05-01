@@ -566,6 +566,26 @@ final class Sequence implements \Countable
     }
 
     /**
+     * @return list<T>
+     */
+    public function toList(): array
+    {
+        /**
+         * @psalm-suppress MixedAssignment
+         * @var list<T>
+         */
+        return $this->reduce(
+            [],
+            static function(array $carry, $value): array {
+                $carry[] = $value;
+
+                return $carry;
+            },
+        );
+    }
+
+    /**
+     * @deprecated
      * @template ST
      *
      * @param null|callable(T): \Generator<ST> $mapper
