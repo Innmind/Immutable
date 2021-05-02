@@ -9,7 +9,6 @@ use Innmind\Immutable\{
     Str,
     Set,
     Maybe,
-    Exception\OutOfBoundException,
 };
 
 /**
@@ -319,20 +318,6 @@ final class Primitive implements Implementation
         );
 
         return $self;
-    }
-
-    /**
-     * @throws OutOfBoundException
-     *
-     * @return Sequence<Sequence<T>>
-     */
-    public function splitAt(int $index): Sequence
-    {
-        /** @var Sequence<Sequence<T>> */
-        return Sequence::of(
-            $this->slice(0, $index)->toSequence(),
-            $this->slice($index, $this->size())->toSequence(),
-        );
     }
 
     /**

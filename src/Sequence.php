@@ -3,10 +3,6 @@ declare(strict_types = 1);
 
 namespace Innmind\Immutable;
 
-use Innmind\Immutable\Exception\{
-    OutOfBoundException,
-};
-
 /**
  * @template T
  */
@@ -409,18 +405,6 @@ final class Sequence implements \Countable
         $self->implementation = $this->implementation->slice($from, $until);
 
         return $self;
-    }
-
-    /**
-     * Split the sequence in a sequence of 2 sequences splitted at the given position
-     *
-     * @throws OutOfBoundException
-     *
-     * @return self<self<T>>
-     */
-    public function splitAt(int $position): self
-    {
-        return $this->implementation->splitAt($position);
     }
 
     /**

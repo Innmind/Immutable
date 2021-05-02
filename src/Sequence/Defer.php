@@ -10,7 +10,6 @@ use Innmind\Immutable\{
     Set,
     Maybe,
     Accumulate,
-    Exception\OutOfBoundException,
 };
 
 /**
@@ -363,16 +362,6 @@ final class Defer implements Implementation
                 }
             })($this->values, $from, $until),
         );
-    }
-
-    /**
-     * @throws OutOfBoundException
-     *
-     * @return Sequence<Sequence<T>>
-     */
-    public function splitAt(int $position): Sequence
-    {
-        return $this->load()->splitAt($position);
     }
 
     /**

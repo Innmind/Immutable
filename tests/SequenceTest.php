@@ -8,7 +8,6 @@ use Innmind\Immutable\{
     Str,
     Set,
     Map,
-    Exception\OutOfBoundException,
 };
 use function Innmind\Immutable\unwrap;
 use PHPUnit\Framework\TestCase;
@@ -445,38 +444,6 @@ class SequenceTest extends TestCase
         $this->assertNotSame($a, $b);
         $this->assertSame([1, 2, 3, 4], unwrap($a));
         $this->assertSame([2, 3], unwrap($b));
-    }
-
-    public function testSplitAt()
-    {
-        $a = Sequence::of()
-            ->add(1)
-            ->add(2)
-            ->add(3)
-            ->add(4);
-        $b = $a->splitAt(2);
-
-        $this->assertInstanceOf(Sequence::class, $b);
-        $this->assertNotSame($a, $b);
-        $this->assertSame([1, 2, 3, 4], unwrap($a));
-        $this->assertSame(
-            [1, 2],
-            unwrap(
-                $b->first()->match(
-                    static fn($value) => $value,
-                    static fn() => null,
-                ),
-            ),
-        );
-        $this->assertSame(
-            [3, 4],
-            unwrap(
-                $b->last()->match(
-                    static fn($value) => $value,
-                    static fn() => null,
-                ),
-            ),
-        );
     }
 
     public function testTake()

@@ -9,7 +9,6 @@ use Innmind\Immutable\{
     Str,
     Set,
     Maybe,
-    Exception\OutOfBoundException,
 };
 
 /**
@@ -379,16 +378,6 @@ final class Lazy implements Implementation
                 }
             },
         );
-    }
-
-    /**
-     * @throws OutOfBoundException
-     *
-     * @return Sequence<Sequence<T>>
-     */
-    public function splitAt(int $position): Sequence
-    {
-        return $this->load()->splitAt($position);
     }
 
     /**

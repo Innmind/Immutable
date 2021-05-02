@@ -9,7 +9,6 @@ use Innmind\Immutable\{
     Str,
     Set,
     Maybe,
-    Exception\OutOfBoundException,
 };
 
 /**
@@ -176,15 +175,6 @@ interface Implementation extends \Countable
      * @return self<T>
      */
     public function slice(int $from, int $until): self;
-
-    /**
-     * Split the sequence in a sequence of 2 sequences splitted at the given position
-     *
-     * @throws OutOfBoundException
-     *
-     * @return Sequence<Sequence<T>>
-     */
-    public function splitAt(int $position): Sequence;
 
     /**
      * Return a sequence with the n first elements

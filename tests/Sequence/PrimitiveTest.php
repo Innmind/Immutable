@@ -10,7 +10,6 @@ use Innmind\Immutable\{
     Sequence,
     Str,
     Set,
-    Exception\OutOfBoundException,
 };
 use function Innmind\Immutable\unwrap;
 use PHPUnit\Framework\TestCase;
@@ -285,34 +284,6 @@ class PrimitiveTest extends TestCase
         $this->assertSame([2, 3, 4, 5], \iterator_to_array($a->iterator()));
         $this->assertInstanceOf(Primitive::class, $b);
         $this->assertSame([3, 4], \iterator_to_array($b->iterator()));
-    }
-
-    public function testSplitAt()
-    {
-        $sequence = new Primitive(2, 3, 4, 5);
-        $parts = $sequence->splitAt(2);
-
-        $this->assertSame([2, 3, 4, 5], \iterator_to_array($sequence->iterator()));
-        $this->assertInstanceOf(Sequence::class, $parts);
-        $this->assertCount(2, $parts);
-        $this->assertSame(
-            [2, 3],
-            unwrap(
-                $parts->first()->match(
-                    static fn($value) => $value,
-                    static fn() => null,
-                ),
-            ),
-        );
-        $this->assertSame(
-            [4, 5],
-            unwrap(
-                $parts->last()->match(
-                    static fn($value) => $value,
-                    static fn() => null,
-                ),
-            ),
-        );
     }
 
     public function testTake()
