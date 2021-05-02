@@ -7,7 +7,7 @@ use Innmind\Immutable\{
     RegExp,
     Str,
     Map,
-    Exception\DomainException
+    Exception\LogicException
 };
 use PHPUnit\Framework\TestCase;
 
@@ -30,7 +30,7 @@ class RegExpTest extends TestCase
 
     public function testThrowWhenInvalidRegexp()
     {
-        $this->expectException(DomainException::class);
+        $this->expectException(LogicException::class);
 
         RegExp::of('/foo');
     }

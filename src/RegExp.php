@@ -4,7 +4,7 @@ declare(strict_types = 1);
 namespace Innmind\Immutable;
 
 use Innmind\Immutable\Exception\{
-    DomainException,
+    LogicException,
     InvalidRegex,
 };
 
@@ -15,7 +15,7 @@ final class RegExp
     private function __construct(string $pattern)
     {
         if (@\preg_match($pattern, '') === false) {
-            throw new DomainException($pattern, \preg_last_error());
+            throw new LogicException($pattern, \preg_last_error());
         }
 
         $this->pattern = $pattern;
