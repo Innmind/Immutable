@@ -305,6 +305,11 @@ final class DoubleIndex implements Implementation
         return $this->pairs->empty();
     }
 
+    public function find(callable $predicate): Maybe
+    {
+        return $this->pairs->find(static fn($pair) => $predicate($pair->key(), $pair->value()));
+    }
+
     /**
      * @return Map<T, S>
      */

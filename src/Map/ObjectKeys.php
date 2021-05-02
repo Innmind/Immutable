@@ -358,6 +358,23 @@ final class ObjectKeys implements Implementation
         return !$this->values->valid();
     }
 
+    public function find(callable $predicate): Maybe
+    {
+        foreach ($this->values as $k) {
+            /** @var T $key */
+            $key = $k;
+            /** @var S $v */
+            $v = $this->values[$k];
+
+            if ($predicate($key, $v)) {
+                return Maybe::just(new Pair($key, $v));
+            }
+        }
+
+        /** @var Maybe<Pair<T, S>> */
+        return Maybe::nothing();
+    }
+
     /**
      * @return Map<T, S>
      */

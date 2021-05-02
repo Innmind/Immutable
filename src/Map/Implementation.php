@@ -153,4 +153,11 @@ interface Implementation extends \Countable
     public function reduce($carry, callable $reducer);
 
     public function empty(): bool;
+
+    /**
+     * @param callable(T, S): bool $predicate
+     *
+     * @return Maybe<Pair<T, S>>
+     */
+    public function find(callable $predicate): Maybe;
 }

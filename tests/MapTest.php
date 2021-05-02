@@ -415,6 +415,22 @@ class MapTest extends TestCase
         $this->assertFalse($map->any(static fn($key, $value) => $value === 1));
     }
 
+    public function testFind()
+    {
+        $map = Map::of([1, 2], [3, 4], [5, 6]);
+
+        $this->assertSame(
+            4,
+            $map
+                ->find(static fn($k) => $k === 3)
+                ->map(static fn($pair) => $pair->value())
+                ->match(
+                    static fn($value) => $value,
+                    static fn() => null,
+                ),
+        );
+    }
+
     private function get($map, $index)
     {
         return $map->get($index)->match(

@@ -363,6 +363,22 @@ class DoubleIndexTest extends TestCase
         $this->assertFalse((new DoubleIndex)(1, 2)->empty());
     }
 
+    public function testFind()
+    {
+        $map = (new DoubleIndex)(1, 2)(3, 4)(5, 6);
+
+        $this->assertSame(
+            4,
+            $map
+                ->find(static fn($k) => $k === 3)
+                ->map(static fn($pair) => $pair->value())
+                ->match(
+                    static fn($value) => $value,
+                    static fn() => null,
+                ),
+        );
+    }
+
     private function get($map, $index)
     {
         return $map->get($index)->match(

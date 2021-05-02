@@ -341,6 +341,28 @@ class ObjectKeysTest extends TestCase
         $this->assertCount(1, $map);
     }
 
+    public function testFind()
+    {
+        $a = new \stdClass;
+        $b = new \stdClass;
+        $c = new \stdClass;
+        $map = (new ObjectKeys)
+            ($a, 2)
+            ($b, 4)
+            ($c, 6);
+
+        $this->assertSame(
+            4,
+            $map
+                ->find(static fn($k) => $k === $b)
+                ->map(static fn($pair) => $pair->value())
+                ->match(
+                    static fn($value) => $value,
+                    static fn() => null,
+                ),
+        );
+    }
+
     private function get($map, $index)
     {
         return $map->get($index)->match(

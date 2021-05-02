@@ -207,6 +207,12 @@ final class Uninitialized implements Implementation
         return true;
     }
 
+    public function find(callable $predicate): Maybe
+    {
+        /** @var Maybe<Pair<T, S>> */
+        return Maybe::nothing();
+    }
+
     /**
      * @return Map<T, S>
      */

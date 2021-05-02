@@ -285,16 +285,22 @@ final class Map implements \Countable
 
     /**
      * @param callable(T, S): bool $predicate
+     *
+     * @return Maybe<Pair<T, S>>
+     */
+    public function find(callable $predicate): Maybe
+    {
+        return $this->implementation->find($predicate);
+    }
+
+    /**
+     * @param callable(T, S): bool $predicate
      */
     public function matches(callable $predicate): bool
     {
-        /**
-         * @psalm-suppress MixedArgument
-         * @psalm-suppress MissingClosureParamType
-         */
-        return $this->reduce(
-            true,
-            static fn(bool $matches, $key, $value): bool => $matches && $predicate($key, $value),
+        return $this->find($predicate)->match(
+            static fn() => true,
+            static fn() => false,
         );
     }
 

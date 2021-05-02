@@ -326,6 +326,18 @@ final class Primitive implements Implementation
         return \is_null(\key($this->values));
     }
 
+    public function find(callable $predicate): Maybe
+    {
+        foreach ($this->values as $k => $v) {
+            if ($predicate($k, $v)) {
+                return Maybe::just(new Pair($k, $v));
+            }
+        }
+
+        /** @var Maybe<Pair<T, S>> */
+        return Maybe::nothing();
+    }
+
     /**
      * @return Map<T, S>
      */
