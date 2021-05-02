@@ -262,7 +262,7 @@ final class Str
      *
      * @throws InvalidRegex If the regex failed
      *
-     * @return Map<scalar, self>
+     * @return Map<int|string, self>
      */
     public function capture(string $regex): Map
     {

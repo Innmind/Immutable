@@ -43,7 +43,7 @@ final class RegExp
     /**
      * @throws InvalidRegex
      *
-     * @return Map<scalar, Str>
+     * @return Map<int|string, Str>
      */
     public function capture(Str $string): Map
     {
@@ -54,7 +54,7 @@ final class RegExp
             throw new InvalidRegex('', \preg_last_error());
         }
 
-        /** @var Map<scalar, Str> */
+        /** @var Map<int|string, Str> */
         $map = Map::of();
 
         foreach ($matches as $key => $match) {
