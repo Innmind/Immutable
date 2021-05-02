@@ -100,12 +100,10 @@ final class Primitive implements Implementation
             return $this;
         }
 
-        $index = $this->values->indexOf($element);
         $set = clone $this;
         $set->values = $this
             ->values
-            ->slice(0, $index)
-            ->append($this->values->slice($index + 1, $this->size()));
+            ->filter(static fn($value) => $value !== $element);
 
         return $set;
     }

@@ -19,17 +19,11 @@ use Innmind\Immutable\{
  */
 final class DoubleIndex implements Implementation
 {
-    /** @var Sequence\Implementation<T> */
-    private Sequence\Implementation $keys;
-    /** @var Sequence\Implementation<S> */
-    private Sequence\Implementation $values;
     /** @var Sequence\Implementation<Pair<T, S>> */
     private Sequence\Implementation $pairs;
 
     public function __construct()
     {
-        $this->keys = new Sequence\Primitive;
-        $this->values = new Sequence\Primitive;
         /** @var Sequence\Implementation<Pair<T, S>> */
         $this->pairs = new Sequence\Primitive;
     }
@@ -42,17 +36,8 @@ final class DoubleIndex implements Implementation
      */
     public function __invoke($key, $value): self
     {
-        $map = clone $this;
-
-        if ($this->keys->contains($key)) {
-            $index = $this->keys->indexOf($key);
-            $map->values = $this->values->take($index)($value)->append($this->values->drop($index + 1));
-            $map->pairs = $this->pairs->take($index)(new Pair($key, $value))->append($this->pairs->drop($index + 1));
-        } else {
-            $map->keys = ($this->keys)($key);
-            $map->values = ($this->values)($value);
-            $map->pairs = ($this->pairs)(new Pair($key, $value));
-        }
+        $map = $this->remove($key);
+        $map->pairs = ($map->pairs)(new Pair($key, $value));
 
         return $map;
     }
@@ -76,12 +61,12 @@ final class DoubleIndex implements Implementation
 
     public function size(): int
     {
-        return $this->keys->size();
+        return $this->pairs->size();
     }
 
     public function count(): int
     {
-        return $this->keys->count();
+        return $this->pairs->count();
     }
 
     /**
@@ -102,7 +87,13 @@ final class DoubleIndex implements Implementation
      */
     public function contains($key): bool
     {
-        return $this->keys->contains($key);
+        return $this
+            ->pairs
+            ->find(static fn($pair) => $pair->key() === $key)
+            ->match(
+                static fn() => true,
+                static fn() => false,
+            );
     }
 
     /**
@@ -111,8 +102,6 @@ final class DoubleIndex implements Implementation
     public function clear(): self
     {
         $map = clone $this;
-        $map->keys = $this->keys->clear();
-        $map->values = $this->values->clear();
         $map->pairs = $this->pairs->clear();
 
         return $map;
@@ -152,14 +141,9 @@ final class DoubleIndex implements Implementation
     public function filter(callable $predicate): self
     {
         $map = $this->clear();
-
-        foreach ($this->pairs->iterator() as $pair) {
-            if ($predicate($pair->key(), $pair->value()) === true) {
-                $map->keys = ($map->keys)($pair->key());
-                $map->values = ($map->values)($pair->value());
-                $map->pairs = ($map->pairs)($pair);
-            }
-        }
+        $map->pairs = $this
+            ->pairs
+            ->filter(static fn($pair) => $predicate($pair->key(), $pair->value()));
 
         return $map;
     }
@@ -205,7 +189,10 @@ final class DoubleIndex implements Implementation
      */
     public function keys(): Set
     {
-        return $this->keys->toSet();
+        return $this
+            ->pairs
+            ->map(static fn($pair) => $pair->key())
+            ->toSet();
     }
 
     /**
@@ -213,7 +200,10 @@ final class DoubleIndex implements Implementation
      */
     public function values(): Sequence
     {
-        return $this->values->toSequence();
+        return $this
+            ->pairs
+            ->map(static fn($pair) => $pair->value())
+            ->toSequence();
     }
 
     /**
@@ -246,24 +236,10 @@ final class DoubleIndex implements Implementation
      */
     public function remove($key): Implementation
     {
-        if (!$this->contains($key)) {
-            return $this;
-        }
-
-        $index = $this->keys->indexOf($key);
         $map = clone $this;
-        $map->keys = $this
-            ->keys
-            ->slice(0, $index)
-            ->append($this->keys->slice($index + 1, $this->keys->size()));
-        $map->values = $this
-            ->values
-            ->slice(0, $index)
-            ->append($this->values->slice($index + 1, $this->values->size()));
         $map->pairs = $this
             ->pairs
-            ->slice(0, $index)
-            ->append($this->pairs->slice($index + 1, $this->pairs->size()));
+            ->filter(static fn($pair) => $pair->key() !== $key);
 
         return $map;
     }

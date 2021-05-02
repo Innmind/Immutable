@@ -114,13 +114,10 @@ final class Defer implements Implementation
             return $this;
         }
 
-        $index = $this->values->indexOf($element);
-
         return new self(
             $this
                 ->values
-                ->slice(0, $index)
-                ->append($this->values->slice($index + 1, $this->size())),
+                ->filter(static fn($value) => $value !== $element),
         );
     }
 

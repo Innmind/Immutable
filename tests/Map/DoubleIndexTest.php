@@ -253,7 +253,6 @@ class DoubleIndexTest extends TestCase
             (4, 5);
 
         $m2 = $m->remove(12);
-        $this->assertSame($m, $m2);
         $this->assertSame([0, 1, 2, 3, 4], unwrap($m->keys()));
         $this->assertSame([1, 2, 3, 4, 5], unwrap($m->values()));
 
@@ -301,8 +300,8 @@ class DoubleIndexTest extends TestCase
         $this->assertSame([24, 42], unwrap($m->values()));
         $this->assertSame([$s3, $s2, $s4], unwrap($m2->keys()));
         $this->assertSame([24, 66, 42], unwrap($m2->values()));
-        $this->assertSame([$s, $s2, $s3, $s4], unwrap($m3->keys()));
-        $this->assertSame([24, 66, 24, 42], unwrap($m3->values()));
+        $this->assertSame([$s, $s3, $s2, $s4], unwrap($m3->keys()));
+        $this->assertSame([24, 24, 66, 42], unwrap($m3->values()));
         $this->assertFalse($m3->equals($m2->merge($m)));
     }
 
