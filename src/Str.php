@@ -116,25 +116,6 @@ final class Str
     }
 
     /**
-     * Returns the string following the given delimiter
-     *
-     * @throws SubstringException If the string is not found
-     */
-    public function str(string $delimiter): self
-    {
-        $sub = \mb_strstr($this->value, $delimiter, false, $this->encoding);
-
-        if ($sub === false) {
-            throw new SubstringException(\sprintf(
-                'Substring "%s" not found',
-                $delimiter,
-            ));
-        }
-
-        return new self($sub, $this->encoding);
-    }
-
-    /**
      * Return the string in upper case
      */
     public function toUpper(): self
@@ -198,25 +179,6 @@ final class Str
     public function uniPad(int $length, string $character = ' '): self
     {
         return $this->pad($length, $character, \STR_PAD_BOTH);
-    }
-
-    /**
-     * Find length of initial segment not matching mask
-     */
-    public function cspn(string $mask, int $start = 0, int $length = null): int
-    {
-        if ($length === null) {
-            $value = \strcspn($this->value, $mask, $start);
-        } else {
-            $value = \strcspn(
-                $this->value,
-                $mask,
-                $start,
-                $length,
-            );
-        }
-
-        return $value;
     }
 
     /**

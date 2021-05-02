@@ -313,34 +313,6 @@ class StrTest extends TestCase
         );
     }
 
-    public function testStr()
-    {
-        $str = S::of('name@example.com');
-
-        $str2 = $str->str('@');
-        $this->assertInstanceOf(S::class, $str2);
-        $this->assertNotSame($str, $str2);
-        $this->assertSame('@example.com', $str2->toString());
-        $this->assertSame('name@example.com', $str->toString());
-    }
-
-    public function testStrUtf8ManipulatedAsAscii()
-    {
-        $str = S::of('foo🙏bar');
-
-        $str2 = $str->toEncoding('ASCII')->str(\mb_substr('🙏', 0, 1, 'ASCII'));
-        $this->assertSame('foo🙏bar', $str->toString());
-        $this->assertSame('🙏bar', $str2->toString());
-    }
-
-    public function testThrowWhenStrDelimiterNotFound()
-    {
-        $this->expectException(SubstringException::class);
-        $this->expectExceptionMessage('Substring "foo" not found');
-
-        S::of('name@example.com')->str('foo');
-    }
-
     public function testToUpper()
     {
         $str = S::of('foo🙏');
@@ -426,23 +398,6 @@ class StrTest extends TestCase
         $this->assertNotSame($str, $str2);
         $this->assertSame('0foo00', $str2->toString());
         $this->assertSame('foo', $str->toString());
-    }
-
-    public function testCspn()
-    {
-        $str = S::of('abcdhelloabcd');
-
-        $this->assertSame(0, $str->cspn('abcd'));
-        $this->assertSame(5, $str->cspn('abcd', -9));
-        $this->assertSame(4, $str->cspn('abcd', -9, -5));
-
-        $str = S::of('foo🙏bar');
-
-        $this->assertSame(3, $str->cspn('🙏'));
-        $this->assertSame(0, $str->cspn('🙏', 4));
-        $this->assertSame(3, $str->cspn('🙏', 0, 4));
-        $this->assertSame(3, $str->cspn(\mb_substr('🙏', 0, 1, 'ASCII'), 0, 4));
-        $this->assertSame(3, $str->toEncoding('ASCII')->cspn(\mb_substr('🙏', 0, 1, 'ASCII'), 0, 4));
     }
 
     public function testRepeat()
