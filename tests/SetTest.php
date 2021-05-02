@@ -438,6 +438,14 @@ class SetTest extends TestCase
         $this->assertFalse($set->any(static fn($i) => $i === 0));
     }
 
+    public function testToList()
+    {
+        $this->assertSame(
+            [1, 2, 3],
+            Set::ints(1, 2, 3)->toList(),
+        );
+    }
+
     public function get($map, $index)
     {
         return $map->get($index)->match(
