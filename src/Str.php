@@ -362,7 +362,7 @@ final class Str
     }
 
     /**
-     * Return a CamelCase representation of the string
+     * Return a camelCase representation of the string
      */
     public function camelize(): self
     {
