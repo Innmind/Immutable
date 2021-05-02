@@ -61,7 +61,7 @@ jobs:
       - name: Install Dependencies
         run: composer install --no-progress
       - name: Psalm
-        run: vendor/bin/psalm --output-format=github --shepherd
+        run: vendor/bin/psalm --shepherd
   cs:
     runs-on: ubuntu-latest
     strategy:
