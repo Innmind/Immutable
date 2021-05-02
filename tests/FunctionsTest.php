@@ -3,16 +3,12 @@ declare(strict_types = 1);
 
 namespace Tests\Innmind\Immutable;
 
-use function Innmind\Immutable\{
-    join,
-    first,
-};
+use function Innmind\Immutable\join;
 use Innmind\Immutable\{
     Set,
     Sequence,
     Map,
     Str,
-    Exception\EmptySet,
 };
 use PHPUnit\Framework\TestCase;
 
@@ -32,21 +28,5 @@ class FunctionsTest extends TestCase
 
         $this->assertInstanceOf(Str::class, $str);
         $this->assertSame('1|2|3', $str->toString());
-    }
-
-    public function testThrowWhenTryingToAccessFirstValueOfAnEmptySet()
-    {
-        $this->expectException(EmptySet::class);
-
-        first(Set::of());
-    }
-
-    public function testAccessFirstValueOfASet()
-    {
-        $this->assertSame(null, first(Set::mixed(null, 1, '')));
-        $this->assertSame('', first(Set::mixed('', 1, null)));
-        $this->assertSame(false, first(Set::mixed(false, 1, null)));
-        $this->assertSame(0, first(Set::mixed(0, 1, null)));
-        $this->assertSame(42, first(Set::mixed(42, 1, null)));
     }
 }
