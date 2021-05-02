@@ -9,7 +9,6 @@ use Innmind\Immutable\{
     Set,
     Map,
     Exception\OutOfBoundException,
-    Exception\LogicException,
 };
 use function Innmind\Immutable\unwrap;
 use PHPUnit\Framework\TestCase;
@@ -339,8 +338,20 @@ class SequenceTest extends TestCase
             ->add(3)
             ->add(4);
 
-        $this->assertSame(0, $sequence->indexOf(1));
-        $this->assertSame(3, $sequence->indexOf(4));
+        $this->assertSame(
+            0,
+            $sequence->indexOf(1)->match(
+                static fn($value) => $value,
+                static fn() => null,
+            ),
+        );
+        $this->assertSame(
+            3,
+            $sequence->indexOf(4)->match(
+                static fn($value) => $value,
+                static fn() => null,
+            ),
+        );
     }
 
     public function testIndices()

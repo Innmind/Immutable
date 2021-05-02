@@ -9,7 +9,6 @@ use Innmind\Immutable\{
     Str,
     Set,
     Maybe,
-    Exception\ElementNotFound,
     Exception\OutOfBoundException,
 };
 
@@ -131,9 +130,9 @@ interface Implementation extends \Countable
      *
      * @param T $element
      *
-     * @throws ElementNotFound
+     * @return Maybe<int>
      */
-    public function indexOf($element): int;
+    public function indexOf($element): Maybe;
 
     /**
      * Return the list of indices

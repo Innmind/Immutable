@@ -10,7 +10,6 @@ use Innmind\Immutable\{
     Set,
     Maybe,
     Accumulate,
-    Exception\ElementNotFound,
     Exception\OutOfBoundException,
 };
 
@@ -255,21 +254,22 @@ final class Defer implements Implementation
     /**
      * @param T $element
      *
-     * @throws ElementNotFound
+     * @return Maybe<int>
      */
-    public function indexOf($element): int
+    public function indexOf($element): Maybe
     {
         $index = 0;
 
         foreach ($this->values as $value) {
             if ($value === $element) {
-                return $index;
+                return Maybe::just($index);
             }
 
             ++$index;
         }
 
-        throw new ElementNotFound($element);
+        /** @var Maybe<int> */
+        return Maybe::nothing();
     }
 
     /**

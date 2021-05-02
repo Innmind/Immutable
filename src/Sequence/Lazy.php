@@ -9,7 +9,6 @@ use Innmind\Immutable\{
     Str,
     Set,
     Maybe,
-    Exception\ElementNotFound,
     Exception\OutOfBoundException,
 };
 
@@ -266,21 +265,22 @@ final class Lazy implements Implementation
     /**
      * @param T $element
      *
-     * @throws ElementNotFound
+     * @return Maybe<int>
      */
-    public function indexOf($element): int
+    public function indexOf($element): Maybe
     {
         $index = 0;
 
         foreach ($this->iterator() as $value) {
             if ($value === $element) {
-                return $index;
+                return Maybe::just($index);
             }
 
             ++$index;
         }
 
-        throw new ElementNotFound($element);
+        /** @var Maybe<int> */
+        return Maybe::nothing();
     }
 
     /**

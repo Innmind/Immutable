@@ -11,7 +11,6 @@ use Innmind\Immutable\{
     Str,
     Set,
     Exception\OutOfBoundException,
-    Exception\ElementNotFound,
 };
 use function Innmind\Immutable\unwrap;
 use PHPUnit\Framework\TestCase;
@@ -197,15 +196,30 @@ class PrimitiveTest extends TestCase
     {
         $sequence = new Primitive(1, 2, 4);
 
-        $this->assertSame(1, $sequence->indexOf(2));
-        $this->assertSame(2, $sequence->indexOf(4));
+        $this->assertSame(
+            1,
+            $sequence->indexOf(2)->match(
+                static fn($value) => $value,
+                static fn() => null,
+            ),
+        );
+        $this->assertSame(
+            2,
+            $sequence->indexOf(4)->match(
+                static fn($value) => $value,
+                static fn() => null,
+            ),
+        );
     }
 
-    public function testThrowWhenTryingToAccessIndexOfUnknownValue()
+    public function testReturnNothingWhenTryingToAccessIndexOfUnknownValue()
     {
-        $this->expectException(ElementNotFound::class);
-
-        (new Primitive)->indexOf(1);
+        $this->assertNull(
+            (new Primitive)->indexOf(1)->match(
+                static fn($value) => $value,
+                static fn() => null,
+            ),
+        );
     }
 
     public function testIndices()

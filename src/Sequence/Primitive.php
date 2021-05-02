@@ -10,7 +10,6 @@ use Innmind\Immutable\{
     Set,
     Maybe,
     Exception\OutOfBoundException,
-    Exception\ElementNotFound,
 };
 
 /**
@@ -219,17 +218,18 @@ final class Primitive implements Implementation
     /**
      * @param T $element
      *
-     * @throws ElementNotFound
+     * @return Maybe<int>
      */
-    public function indexOf($element): int
+    public function indexOf($element): Maybe
     {
         $index = \array_search($element, $this->values, true);
 
         if ($index === false) {
-            throw new ElementNotFound($element);
+            /** @var Maybe<int> */
+            return Maybe::nothing();
         }
 
-        return $index;
+        return Maybe::just($index);
     }
 
     /**

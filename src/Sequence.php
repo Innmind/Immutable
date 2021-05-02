@@ -4,7 +4,6 @@ declare(strict_types = 1);
 namespace Innmind\Immutable;
 
 use Innmind\Immutable\Exception\{
-    ElementNotFound,
     OutOfBoundException,
 };
 
@@ -320,9 +319,9 @@ final class Sequence implements \Countable
      *
      * @param T $element
      *
-     * @throws ElementNotFound
+     * @return Maybe<int>
      */
-    public function indexOf($element): int
+    public function indexOf($element): Maybe
     {
         return $this->implementation->indexOf($element);
     }
