@@ -11,7 +11,6 @@ use Innmind\Immutable\{
     Set,
     Sequence,
 };
-use function Innmind\Immutable\unwrap;
 use PHPUnit\Framework\TestCase;
 
 class MapTest extends TestCase
@@ -228,7 +227,7 @@ class MapTest extends TestCase
 
         $k = $m->keys();
         $this->assertInstanceOf(Set::class, $k);
-        $this->assertSame([0, 1, 2, 4], unwrap($k));
+        $this->assertSame([0, 1, 2, 4], $k->toList());
         $this->assertTrue($k->equals($m->keys()));
     }
 
@@ -243,7 +242,7 @@ class MapTest extends TestCase
 
         $v = $m->values();
         $this->assertInstanceOf(Sequence::class, $v);
-        $this->assertSame([1, 2, 3, 5, 5], unwrap($v));
+        $this->assertSame([1, 2, 3, 5, 5], $v->toList());
         $this->assertTrue($v->equals($m->values()));
     }
 
@@ -260,10 +259,10 @@ class MapTest extends TestCase
         });
         $this->assertNotSame($m, $m2);
         $this->assertInstanceOf(Map::class, $m2);
-        $this->assertSame([0, 1, 2, 4], unwrap($m->keys()));
-        $this->assertSame([1, 2, 3, 5], unwrap($m->values()));
-        $this->assertSame([0, 1, 2, 4], unwrap($m2->keys()));
-        $this->assertSame([1, 4, 9, 25], unwrap($m2->values()));
+        $this->assertSame([0, 1, 2, 4], $m->keys()->toList());
+        $this->assertSame([1, 2, 3, 5], $m->values()->toList());
+        $this->assertSame([0, 1, 2, 4], $m2->keys()->toList());
+        $this->assertSame([1, 4, 9, 25], $m2->values()->toList());
     }
 
     public function testFlatMap()
@@ -272,10 +271,10 @@ class MapTest extends TestCase
         $map2 = $map->flatMap(static fn($key, $value) => Map::of()($value, $key));
 
         $this->assertNotSame($map, $map2);
-        $this->assertSame([0, 2, 4], unwrap($map->keys()));
-        $this->assertSame([1, 3, 5], unwrap($map->values()));
-        $this->assertSame([1, 3, 5], unwrap($map2->keys()));
-        $this->assertSame([0, 2, 4], unwrap($map2->values()));
+        $this->assertSame([0, 2, 4], $map->keys()->toList());
+        $this->assertSame([1, 3, 5], $map->values()->toList());
+        $this->assertSame([1, 3, 5], $map2->keys()->toList());
+        $this->assertSame([0, 2, 4], $map2->values()->toList());
     }
 
     public function testRemove()
@@ -289,32 +288,32 @@ class MapTest extends TestCase
 
         $m2 = $m->remove(12);
         $this->assertTrue($m->equals($m2));
-        $this->assertSame([0, 1, 2, 3, 4], unwrap($m->keys()));
-        $this->assertSame([1, 2, 3, 4, 5], unwrap($m->values()));
+        $this->assertSame([0, 1, 2, 3, 4], $m->keys()->toList());
+        $this->assertSame([1, 2, 3, 4, 5], $m->values()->toList());
 
         $m2 = $m->remove(3);
         $this->assertNotSame($m, $m2);
         $this->assertInstanceOf(Map::class, $m2);
-        $this->assertSame([0, 1, 2, 3, 4], unwrap($m->keys()));
-        $this->assertSame([1, 2, 3, 4, 5], unwrap($m->values()));
-        $this->assertSame([0, 1, 2, 4], unwrap($m2->keys()));
-        $this->assertSame([1, 2, 3, 5], unwrap($m2->values()));
+        $this->assertSame([0, 1, 2, 3, 4], $m->keys()->toList());
+        $this->assertSame([1, 2, 3, 4, 5], $m->values()->toList());
+        $this->assertSame([0, 1, 2, 4], $m2->keys()->toList());
+        $this->assertSame([1, 2, 3, 5], $m2->values()->toList());
 
         $m2 = $m->remove(4);
         $this->assertNotSame($m, $m2);
         $this->assertInstanceOf(Map::class, $m2);
-        $this->assertSame([0, 1, 2, 3, 4], unwrap($m->keys()));
-        $this->assertSame([1, 2, 3, 4, 5], unwrap($m->values()));
-        $this->assertSame([0, 1, 2, 3], unwrap($m2->keys()));
-        $this->assertSame([1, 2, 3, 4], unwrap($m2->values()));
+        $this->assertSame([0, 1, 2, 3, 4], $m->keys()->toList());
+        $this->assertSame([1, 2, 3, 4, 5], $m->values()->toList());
+        $this->assertSame([0, 1, 2, 3], $m2->keys()->toList());
+        $this->assertSame([1, 2, 3, 4], $m2->values()->toList());
 
         $m2 = $m->remove(0);
         $this->assertNotSame($m, $m2);
         $this->assertInstanceOf(Map::class, $m2);
-        $this->assertSame([0, 1, 2, 3, 4], unwrap($m->keys()));
-        $this->assertSame([1, 2, 3, 4, 5], unwrap($m->values()));
-        $this->assertSame([1, 2, 3, 4], unwrap($m2->keys()));
-        $this->assertSame([2, 3, 4, 5], unwrap($m2->values()));
+        $this->assertSame([0, 1, 2, 3, 4], $m->keys()->toList());
+        $this->assertSame([1, 2, 3, 4, 5], $m->values()->toList());
+        $this->assertSame([1, 2, 3, 4], $m2->keys()->toList());
+        $this->assertSame([2, 3, 4, 5], $m2->values()->toList());
     }
 
     public function testMerge()
@@ -332,12 +331,12 @@ class MapTest extends TestCase
         $this->assertNotSame($m2, $m3);
         $this->assertInstanceOf(Map::class, $m3);
         $this->assertSame(4, $m3->size());
-        $this->assertSame([$s, $s2], unwrap($m->keys()));
-        $this->assertSame([24, 42], unwrap($m->values()));
-        $this->assertSame([$s3, $s2, $s4], unwrap($m2->keys()));
-        $this->assertSame([24, 66, 42], unwrap($m2->values()));
-        $this->assertSame([$s, $s2, $s3, $s4], unwrap($m3->keys()));
-        $this->assertSame([24, 66, 24, 42], unwrap($m3->values()));
+        $this->assertSame([$s, $s2], $m->keys()->toList());
+        $this->assertSame([24, 42], $m->values()->toList());
+        $this->assertSame([$s3, $s2, $s4], $m2->keys()->toList());
+        $this->assertSame([24, 66, 42], $m2->values()->toList());
+        $this->assertSame([$s, $s2, $s3, $s4], $m3->keys()->toList());
+        $this->assertSame([24, 66, 24, 42], $m3->values()->toList());
         $this->assertFalse($m3->equals($m2->merge($m)));
     }
 
@@ -358,23 +357,23 @@ class MapTest extends TestCase
         $this->assertNotSame($p, $m);
         $this->assertSame(
             [true, false],
-            unwrap($p->keys())
+            $p->keys()->toList(),
         );
         $this->assertSame(
             [1, 4],
-            unwrap($this->get($p, true)->keys())
+            $this->get($p, true)->keys()->toList(),
         );
         $this->assertSame(
             [2, 5],
-            unwrap($this->get($p, true)->values())
+            $this->get($p, true)->values()->toList(),
         );
         $this->assertSame(
             [0, 2, 3],
-            unwrap($this->get($p, false)->keys())
+            $this->get($p, false)->keys()->toList(),
         );
         $this->assertSame(
             [1, 3, 4],
-            unwrap($this->get($p, false)->values())
+            $this->get($p, false)->values()->toList(),
         );
     }
 
@@ -390,8 +389,8 @@ class MapTest extends TestCase
         );
 
         $this->assertSame(2.625, $v);
-        $this->assertSame([4], unwrap($m->keys()));
-        $this->assertSame([4], unwrap($m->values()));
+        $this->assertSame([4], $m->keys()->toList());
+        $this->assertSame([4], $m->values()->toList());
     }
 
     public function testMatches()

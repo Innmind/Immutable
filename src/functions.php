@@ -6,37 +6,13 @@ namespace Innmind\Immutable;
 use Innmind\Immutable\Exception\EmptySet;
 
 /**
- * @template T
- *
- * @param Set<T>|Sequence<T> $structure
- *
- * @return list<T>
- */
-function unwrap($structure): array
-{
-    /**
-     * @psalm-suppress MixedAssignment
-     *
-     * @var list<T>
-     */
-    return $structure->reduce(
-        [],
-        static function(array $carry, $t): array {
-            $carry[] = $t;
-
-            return $carry;
-        },
-    );
-}
-
-/**
  * Concatenate all elements with the given separator
  *
  * @param Set<string>|Sequence<string> $structure
  */
 function join(string $separator, $structure): Str
 {
-    return Str::of(\implode($separator, unwrap($structure)));
+    return Str::of(\implode($separator, $structure->toList()));
 }
 
 /**

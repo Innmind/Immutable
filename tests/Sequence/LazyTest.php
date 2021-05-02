@@ -11,7 +11,6 @@ use Innmind\Immutable\{
     Str,
     Set,
 };
-use function Innmind\Immutable\unwrap;
 use PHPUnit\Framework\TestCase;
 
 class LazyTest extends TestCase
@@ -247,8 +246,8 @@ class LazyTest extends TestCase
         $this->assertSame([1, 2, 3, 4], \iterator_to_array($sequence->iterator()));
         $this->assertInstanceOf(Map::class, $groups);
         $this->assertCount(2, $groups);
-        $this->assertSame([2, 4], unwrap($this->get($groups, 0)));
-        $this->assertSame([1, 3], unwrap($this->get($groups, 1)));
+        $this->assertSame([2, 4], $this->get($groups, 0)->toList());
+        $this->assertSame([1, 3], $this->get($groups, 1)->toList());
     }
 
     public function testReturnNothingWhenTryingToAccessFirstElementOnEmptySequence()
@@ -451,8 +450,8 @@ class LazyTest extends TestCase
         $this->assertSame([1, 2, 3, 4], \iterator_to_array($sequence->iterator()));
         $this->assertInstanceOf(Map::class, $partition);
         $this->assertCount(2, $partition);
-        $this->assertSame([2, 4], unwrap($this->get($partition, true)));
-        $this->assertSame([1, 3], unwrap($this->get($partition, false)));
+        $this->assertSame([2, 4], $this->get($partition, true)->toList());
+        $this->assertSame([1, 3], $this->get($partition, false)->toList());
     }
 
     public function testSlice()

@@ -11,7 +11,6 @@ use Innmind\Immutable\{
     Str,
     Sequence,
 };
-use function Innmind\Immutable\unwrap;
 use PHPUnit\Framework\TestCase;
 
 class PrimitiveTest extends TestCase
@@ -129,8 +128,8 @@ class PrimitiveTest extends TestCase
         $this->assertSame([1, 2, 3, 4], \iterator_to_array($set->iterator()));
         $this->assertInstanceOf(Map::class, $groups);
         $this->assertCount(2, $groups);
-        $this->assertSame([2, 4], unwrap($this->get($groups, 0)));
-        $this->assertSame([1, 3], unwrap($this->get($groups, 1)));
+        $this->assertSame([2, 4], $this->get($groups, 0)->toList());
+        $this->assertSame([1, 3], $this->get($groups, 1)->toList());
     }
 
     public function testMap()
@@ -151,8 +150,8 @@ class PrimitiveTest extends TestCase
         $this->assertSame([1, 2, 3, 4], \iterator_to_array($set->iterator()));
         $this->assertInstanceOf(Map::class, $groups);
         $this->assertCount(2, $groups);
-        $this->assertSame([2, 4], unwrap($this->get($groups, true)));
-        $this->assertSame([1, 3], unwrap($this->get($groups, false)));
+        $this->assertSame([2, 4], $this->get($groups, true)->toList());
+        $this->assertSame([1, 3], $this->get($groups, false)->toList());
     }
 
     public function testSort()
@@ -162,7 +161,7 @@ class PrimitiveTest extends TestCase
 
         $this->assertSame([1, 4, 3, 2], \iterator_to_array($set->iterator()));
         $this->assertInstanceOf(Sequence::class, $sorted);
-        $this->assertSame([1, 2, 3, 4], unwrap($sorted));
+        $this->assertSame([1, 2, 3, 4], $sorted->toList());
     }
 
     public function testMerge()

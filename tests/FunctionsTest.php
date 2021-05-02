@@ -4,7 +4,6 @@ declare(strict_types = 1);
 namespace Tests\Innmind\Immutable;
 
 use function Innmind\Immutable\{
-    unwrap,
     join,
     first,
 };
@@ -19,22 +18,6 @@ use PHPUnit\Framework\TestCase;
 
 class FunctionsTest extends TestCase
 {
-    public function testUnwrapSet()
-    {
-        $this->assertSame(
-            [1, 2, 3],
-            unwrap(Set::ints(1, 2, 3)),
-        );
-    }
-
-    public function testUnwrapSequence()
-    {
-        $this->assertSame(
-            [1, 2, 3],
-            unwrap(Sequence::ints(1, 2, 3)),
-        );
-    }
-
     public function testJoinSet()
     {
         $str = join('|', Set::of('1', '2', '3'));

@@ -9,7 +9,6 @@ use Innmind\Immutable\{
     Set,
     Map,
 };
-use function Innmind\Immutable\unwrap;
 use PHPUnit\Framework\TestCase;
 
 class SequenceTest extends TestCase
@@ -19,7 +18,7 @@ class SequenceTest extends TestCase
         $sequence = Sequence::of();
 
         $this->assertInstanceOf(\Countable::class, $sequence);
-        $this->assertSame([], unwrap($sequence));
+        $this->assertSame([], $sequence->toList());
     }
 
     public function testOf()
@@ -46,7 +45,7 @@ class SequenceTest extends TestCase
 
         $this->assertInstanceOf(Sequence::class, $sequence);
         $this->assertFalse($loaded);
-        $this->assertSame([1, 2, 3], unwrap($sequence));
+        $this->assertSame([1, 2, 3], $sequence->toList());
         $this->assertTrue($loaded);
     }
 
@@ -62,7 +61,7 @@ class SequenceTest extends TestCase
 
         $this->assertInstanceOf(Sequence::class, $sequence);
         $this->assertFalse($loaded);
-        $this->assertSame([1, 2, 3], unwrap($sequence));
+        $this->assertSame([1, 2, 3], $sequence->toList());
         $this->assertTrue($loaded);
     }
 
@@ -71,7 +70,7 @@ class SequenceTest extends TestCase
         $sequence = Sequence::mixed(1, '2', 3);
 
         $this->assertInstanceOf(Sequence::class, $sequence);
-        $this->assertSame([1, '2', 3], unwrap($sequence));
+        $this->assertSame([1, '2', 3], $sequence->toList());
     }
 
     public function testInts()
@@ -79,7 +78,7 @@ class SequenceTest extends TestCase
         $sequence = Sequence::ints(1, 2, 3);
 
         $this->assertInstanceOf(Sequence::class, $sequence);
-        $this->assertSame([1, 2, 3], unwrap($sequence));
+        $this->assertSame([1, 2, 3], $sequence->toList());
     }
 
     public function testFloats()
@@ -87,7 +86,7 @@ class SequenceTest extends TestCase
         $sequence = Sequence::floats(1, 2, 3.2);
 
         $this->assertInstanceOf(Sequence::class, $sequence);
-        $this->assertSame([1.0, 2.0, 3.2], unwrap($sequence));
+        $this->assertSame([1.0, 2.0, 3.2], $sequence->toList());
     }
 
     public function testStrings()
@@ -95,7 +94,7 @@ class SequenceTest extends TestCase
         $sequence = Sequence::strings('1', '2', '3');
 
         $this->assertInstanceOf(Sequence::class, $sequence);
-        $this->assertSame(['1', '2', '3'], unwrap($sequence));
+        $this->assertSame(['1', '2', '3'], $sequence->toList());
     }
 
     public function testObjects()
@@ -106,7 +105,7 @@ class SequenceTest extends TestCase
         $sequence = Sequence::objects($a, $b, $c);
 
         $this->assertInstanceOf(Sequence::class, $sequence);
-        $this->assertSame([$a, $b, $c], unwrap($sequence));
+        $this->assertSame([$a, $b, $c], $sequence->toList());
     }
 
     public function testSize()
@@ -158,9 +157,9 @@ class SequenceTest extends TestCase
         $this->assertInstanceOf(Sequence::class, $c);
         $this->assertNotSame($c, $a);
         $this->assertNotSame($c, $b);
-        $this->assertSame([1, 2, 3], unwrap($a));
-        $this->assertSame([3, 4, 5], unwrap($b));
-        $this->assertSame([1, 2], unwrap($c));
+        $this->assertSame([1, 2, 3], $a->toList());
+        $this->assertSame([3, 4, 5], $b->toList());
+        $this->assertSame([1, 2], $c->toList());
     }
 
     public function testDistinct()
@@ -173,8 +172,8 @@ class SequenceTest extends TestCase
 
         $this->assertInstanceOf(Sequence::class, $b);
         $this->assertNotSame($a, $b);
-        $this->assertSame([1, 1, 1], unwrap($a));
-        $this->assertSame([1], unwrap($b));
+        $this->assertSame([1, 1, 1], $a->toList());
+        $this->assertSame([1], $b->toList());
     }
 
     public function testDrop()
@@ -187,8 +186,8 @@ class SequenceTest extends TestCase
 
         $this->assertInstanceOf(Sequence::class, $b);
         $this->assertNotSame($a, $b);
-        $this->assertSame([1, 3, 5], unwrap($a));
-        $this->assertSame([5], unwrap($b));
+        $this->assertSame([1, 3, 5], $a->toList());
+        $this->assertSame([5], $b->toList());
     }
 
     public function testDropEnd()
@@ -201,8 +200,8 @@ class SequenceTest extends TestCase
 
         $this->assertInstanceOf(Sequence::class, $b);
         $this->assertNotSame($a, $b);
-        $this->assertSame([1, 3, 5], unwrap($a));
-        $this->assertSame([1], unwrap($b));
+        $this->assertSame([1, 3, 5], $a->toList());
+        $this->assertSame([1], $b->toList());
     }
 
     public function testEquals()
@@ -237,8 +236,8 @@ class SequenceTest extends TestCase
 
         $this->assertInstanceOf(Sequence::class, $b);
         $this->assertNotSame($a, $b);
-        $this->assertSame([1, 2, 3, 4], unwrap($a));
-        $this->assertSame([2, 4], unwrap($b));
+        $this->assertSame([1, 2, 3, 4], $a->toList());
+        $this->assertSame([2, 4], $b->toList());
     }
 
     public function testForeach()
@@ -269,9 +268,9 @@ class SequenceTest extends TestCase
 
         $this->assertInstanceOf(Map::class, $map);
         $this->assertCount(3, $map);
-        $this->assertSame([3], unwrap($this->get($map, 0)));
-        $this->assertSame([1, 4], unwrap($this->get($map, 1)));
-        $this->assertSame([2], unwrap($this->get($map, 2)));
+        $this->assertSame([3], $this->get($map, 0)->toList());
+        $this->assertSame([1, 4], $this->get($map, 1)->toList());
+        $this->assertSame([2], $this->get($map, 2)->toList());
     }
 
     public function testGroupEmptySequence()
@@ -363,7 +362,7 @@ class SequenceTest extends TestCase
         $indices = $sequence->indices();
 
         $this->assertInstanceOf(Sequence::class, $indices);
-        $this->assertSame([0, 1, 2, 3], unwrap($indices));
+        $this->assertSame([0, 1, 2, 3], $indices->toList());
     }
 
     public function testEmptyIndices()
@@ -372,7 +371,7 @@ class SequenceTest extends TestCase
         $indices = $sequence->indices();
 
         $this->assertInstanceOf(Sequence::class, $indices);
-        $this->assertSame([], unwrap($indices));
+        $this->assertSame([], $indices->toList());
     }
 
     public function testMap()
@@ -388,8 +387,8 @@ class SequenceTest extends TestCase
 
         $this->assertInstanceOf(Sequence::class, $b);
         $this->assertNotSame($a, $b);
-        $this->assertSame([1, 2, 3, 4], unwrap($a));
-        $this->assertSame([1, 4, 9, 16], unwrap($b));
+        $this->assertSame([1, 2, 3, 4], $a->toList());
+        $this->assertSame([1, 4, 9, 16], $b->toList());
     }
 
     public function testFlatMap()
@@ -398,8 +397,8 @@ class SequenceTest extends TestCase
         $sequence2 = $sequence->flatMap(static fn($i) => Sequence::of($i, $i));
 
         $this->assertNotSame($sequence, $sequence2);
-        $this->assertSame([1, 2, 3, 4], unwrap($sequence));
-        $this->assertSame([1, 1, 2, 2, 3, 3, 4, 4], unwrap($sequence2));
+        $this->assertSame([1, 2, 3, 4], $sequence->toList());
+        $this->assertSame([1, 1, 2, 2, 3, 3, 4, 4], $sequence2->toList());
     }
 
     public function testPad()
@@ -411,8 +410,8 @@ class SequenceTest extends TestCase
 
         $this->assertInstanceOf(Sequence::class, $b);
         $this->assertNotSame($a, $b);
-        $this->assertSame([1, 2], unwrap($a));
-        $this->assertSame([1, 2, 0, 0], unwrap($b));
+        $this->assertSame([1, 2], $a->toList());
+        $this->assertSame([1, 2, 0, 0], $b->toList());
     }
 
     public function testPartition()
@@ -427,8 +426,8 @@ class SequenceTest extends TestCase
             });
 
         $this->assertInstanceOf(Map::class, $map);
-        $this->assertSame([2, 4], unwrap($this->get($map, true)));
-        $this->assertSame([1, 3], unwrap($this->get($map, false)));
+        $this->assertSame([2, 4], $this->get($map, true)->toList());
+        $this->assertSame([1, 3], $this->get($map, false)->toList());
     }
 
     public function testSlice()
@@ -442,8 +441,8 @@ class SequenceTest extends TestCase
 
         $this->assertInstanceOf(Sequence::class, $b);
         $this->assertNotSame($a, $b);
-        $this->assertSame([1, 2, 3, 4], unwrap($a));
-        $this->assertSame([2, 3], unwrap($b));
+        $this->assertSame([1, 2, 3, 4], $a->toList());
+        $this->assertSame([2, 3], $b->toList());
     }
 
     public function testTake()
@@ -457,8 +456,8 @@ class SequenceTest extends TestCase
 
         $this->assertInstanceOf(Sequence::class, $b);
         $this->assertNotSame($a, $b);
-        $this->assertSame([1, 2, 3, 4], unwrap($a));
-        $this->assertSame([1, 2], unwrap($b));
+        $this->assertSame([1, 2, 3, 4], $a->toList());
+        $this->assertSame([1, 2], $b->toList());
     }
 
     public function testTakeEnd()
@@ -472,8 +471,8 @@ class SequenceTest extends TestCase
 
         $this->assertInstanceOf(Sequence::class, $b);
         $this->assertNotSame($a, $b);
-        $this->assertSame([1, 2, 3, 4], unwrap($a));
-        $this->assertSame([3, 4], unwrap($b));
+        $this->assertSame([1, 2, 3, 4], $a->toList());
+        $this->assertSame([3, 4], $b->toList());
     }
 
     public function testAppend()
@@ -489,9 +488,9 @@ class SequenceTest extends TestCase
         $this->assertInstanceOf(Sequence::class, $c);
         $this->assertNotSame($c, $a);
         $this->assertNotSame($c, $b);
-        $this->assertSame([1, 2], unwrap($a));
-        $this->assertSame([3, 4], unwrap($b));
-        $this->assertSame([3, 4, 1, 2], unwrap($c));
+        $this->assertSame([1, 2], $a->toList());
+        $this->assertSame([3, 4], $b->toList());
+        $this->assertSame([3, 4, 1, 2], $c->toList());
     }
 
     public function testIntersect()
@@ -507,9 +506,9 @@ class SequenceTest extends TestCase
         $this->assertInstanceOf(Sequence::class, $c);
         $this->assertNotSame($c, $a);
         $this->assertNotSame($c, $b);
-        $this->assertSame([1, 2], unwrap($a));
-        $this->assertSame([2, 3], unwrap($b));
-        $this->assertSame([2], unwrap($c));
+        $this->assertSame([1, 2], $a->toList());
+        $this->assertSame([2, 3], $b->toList());
+        $this->assertSame([2], $c->toList());
     }
 
     public function testAdd()
@@ -519,12 +518,12 @@ class SequenceTest extends TestCase
 
         $this->assertInstanceOf(Sequence::class, $b);
         $this->assertNotSame($a, $b);
-        $this->assertSame([], unwrap($a));
-        $this->assertSame([1], unwrap($b));
+        $this->assertSame([], $a->toList());
+        $this->assertSame([1], $b->toList());
 
         $this->assertSame(
             [1, 2, 3],
-            unwrap(Sequence::ints(1)(2)(3)),
+            Sequence::ints(1)(2)(3)->toList(),
         );
     }
 
@@ -542,8 +541,8 @@ class SequenceTest extends TestCase
 
         $this->assertInstanceOf(Sequence::class, $b);
         $this->assertNotSame($a, $b);
-        $this->assertSame([1, 2, 3, 3, 4], unwrap($a));
-        $this->assertSame([4, 3, 3, 2, 1], unwrap($b));
+        $this->assertSame([1, 2, 3, 3, 4], $a->toList());
+        $this->assertSame([4, 3, 3, 2, 1], $b->toList());
     }
 
     public function testReduce()
@@ -572,8 +571,8 @@ class SequenceTest extends TestCase
         $sequence2 = $sequence->clear();
 
         $this->assertNotSame($sequence, $sequence2);
-        $this->assertSame([1, 2, 3], unwrap($sequence));
-        $this->assertSame([], unwrap($sequence2));
+        $this->assertSame([1, 2, 3], $sequence->toList());
+        $this->assertSame([], $sequence2->toList());
     }
 
     public function testReverse()
@@ -587,8 +586,8 @@ class SequenceTest extends TestCase
 
         $this->assertInstanceOf(Sequence::class, $reverse);
         $this->assertNotSame($sequence, $reverse);
-        $this->assertSame([1, 3, 4, 2], unwrap($sequence));
-        $this->assertSame([2, 4, 3, 1], unwrap($reverse));
+        $this->assertSame([1, 3, 4, 2], $sequence->toList());
+        $this->assertSame([2, 4, 3, 1], $reverse->toList());
     }
 
     public function testEmpty()
