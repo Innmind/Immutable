@@ -499,14 +499,6 @@ class StrTest extends TestCase
         $this->assertTrue(S::of('foo🙏bar')->toEncoding('ASCII')->matches('/🙏/'));
     }
 
-    public function testThrowWhenMatchInvalidRegex()
-    {
-        $this->expectException(InvalidRegex::class);
-        $this->expectExceptionMessage('Backtrack limit error');
-
-        S::of(\str_repeat('x', 1000000))->matches('/x+x+y/');
-    }
-
     public function testCapture()
     {
         $str = S::of('http://www.php.net/index.html');
@@ -535,14 +527,6 @@ class StrTest extends TestCase
         $this->assertSame('0.7', $this->get($matches, 5)->toString());
         $this->assertSame('0.7', $this->get($matches, 'quality')->toString());
         $this->assertSame('.7', $this->get($matches, 6)->toString());
-    }
-
-    public function testThrowWhenGettingMatchesInvalidRegex()
-    {
-        $this->expectException(InvalidRegex::class);
-        $this->expectExceptionMessage('Backtrack limit error');
-
-        S::of(\str_repeat('x', 1000000))->capture('/x+x+y/');
     }
 
     public function testPregReplace()
