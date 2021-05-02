@@ -5,7 +5,7 @@ namespace Innmind\Immutable;
 
 use Innmind\Immutable\Exception\{
     DomainException,
-    RegexException,
+    InvalidRegex,
 };
 
 final class RegExp
@@ -27,21 +27,21 @@ final class RegExp
     }
 
     /**
-     * @throws RegexException
+     * @throws InvalidRegex
      */
     public function matches(Str $string): bool
     {
         $value = \preg_match($this->pattern, $string->toString());
 
         if ($value === false) {
-            throw new RegexException('', \preg_last_error());
+            throw new InvalidRegex('', \preg_last_error());
         }
 
         return (bool) $value;
     }
 
     /**
-     * @throws RegexException
+     * @throws InvalidRegex
      *
      * @return Map<scalar, Str>
      */
@@ -51,7 +51,7 @@ final class RegExp
         $value = \preg_match($this->pattern, $string->toString(), $matches);
 
         if ($value === false) {
-            throw new RegexException('', \preg_last_error());
+            throw new InvalidRegex('', \preg_last_error());
         }
 
         /** @var Map<scalar, Str> */

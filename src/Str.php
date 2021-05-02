@@ -4,7 +4,7 @@ declare(strict_types = 1);
 namespace Innmind\Immutable;
 
 use Innmind\Immutable\{
-    Exception\RegexException,
+    Exception\InvalidRegex,
     Exception\SubstringException,
     Exception\LogicException,
 };
@@ -254,7 +254,7 @@ final class Str
     /**
      * Check if the string match the given regular expression
      *
-     * @throws RegexException If the regex failed
+     * @throws InvalidRegex If the regex failed
      */
     public function matches(string $regex): bool
     {
@@ -264,7 +264,7 @@ final class Str
     /**
      * Return a collection of the elements matching the regex
      *
-     * @throws RegexException If the regex failed
+     * @throws InvalidRegex If the regex failed
      *
      * @return Map<scalar, self>
      */
@@ -276,7 +276,7 @@ final class Str
     /**
      * Replace part of the string by using a regular expression
      *
-     * @throws RegexException If the regex failed
+     * @throws InvalidRegex If the regex failed
      */
     public function pregReplace(
         string $regex,
@@ -291,7 +291,7 @@ final class Str
         );
 
         if ($value === null) {
-            throw new RegexException('', \preg_last_error());
+            throw new InvalidRegex('', \preg_last_error());
         }
 
         return new self($value, $this->encoding);

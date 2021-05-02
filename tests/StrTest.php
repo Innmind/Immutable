@@ -10,7 +10,7 @@ use Innmind\Immutable\{
     Sequence,
     Map,
     Exception\SubstringException,
-    Exception\RegexException
+    Exception\InvalidRegex,
 };
 use PHPUnit\Framework\{
     TestCase,
@@ -507,7 +507,7 @@ class StrTest extends TestCase
 
     public function testThrowWhenMatchInvalidRegex()
     {
-        $this->expectException(RegexException::class);
+        $this->expectException(InvalidRegex::class);
         $this->expectExceptionMessage('Backtrack limit error');
 
         S::of(\str_repeat('x', 1000000))->matches('/x+x+y/');
@@ -545,7 +545,7 @@ class StrTest extends TestCase
 
     public function testThrowWhenGettingMatchesInvalidRegex()
     {
-        $this->expectException(RegexException::class);
+        $this->expectException(InvalidRegex::class);
         $this->expectExceptionMessage('Backtrack limit error');
 
         S::of(\str_repeat('x', 1000000))->capture('/x+x+y/');

@@ -3,7 +3,7 @@ declare(strict_types = 1);
 
 namespace Innmind\Immutable\Exception;
 
-class RegexException extends \Exception implements Exception
+class InvalidRegex extends LogicException
 {
     const INTERNAL_ERROR = 1;
     const BACKTRACK_LIMIT_ERROR = 2;
