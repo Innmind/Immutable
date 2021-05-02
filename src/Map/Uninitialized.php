@@ -184,9 +184,10 @@ final class Uninitialized implements Implementation
          * @psalm-suppress InvalidArgument
          * @var Map<bool, Map<T, S>>
          */
-        return Map::of()
-            (true, $this->clearMap())
-            (false, $this->clearMap());
+        return Map::of(
+            [true, $this->clearMap()],
+            [false, $this->clearMap()],
+        );
     }
 
     /**

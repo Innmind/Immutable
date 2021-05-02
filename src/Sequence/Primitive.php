@@ -295,14 +295,7 @@ final class Primitive implements Implementation
         $true = Sequence::of(...$truthy);
         $false = Sequence::of(...$falsy);
 
-        /**
-         * @psalm-suppress InvalidScalarArgument
-         * @psalm-suppress InvalidArgument
-         * @var Map<bool, Sequence<T>>
-         */
-        return Map::of()
-            (true, $true)
-            (false, $false);
+        return Map::of([true, $true], [false, $false]);
     }
 
     /**

@@ -281,14 +281,7 @@ final class DoubleIndex implements Implementation
             }
         }
 
-        /**
-         * @psalm-suppress InvalidScalarArgument
-         * @psalm-suppress InvalidArgument
-         * @var Map<bool, Map<T, S>>
-         */
-        return Map::of()
-            (true, $truthy)
-            (false, $falsy);
+        return Map::of([true, $truthy], [false, $falsy]);
     }
 
     /**

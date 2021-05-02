@@ -43,11 +43,19 @@ final class Map implements \Countable
      * @template U
      * @template V
      *
+     * @param list<array{0: U, 1: V}> $pairs
+     *
      * @return self<U, V>
      */
-    public static function of(): self
+    public static function of(array ...$pairs): self
     {
-        return new self(new Map\Uninitialized);
+        $self = new self(new Map\Uninitialized);
+
+        foreach ($pairs as [$key, $value]) {
+            $self = ($self)($key, $value);
+        }
+
+        return $self;
     }
 
     public function size(): int
