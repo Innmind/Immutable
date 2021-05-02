@@ -6,6 +6,7 @@ namespace Innmind\Immutable;
 /**
  * @template T
  * @template S
+ * @psalm-immutable
  */
 final class Map implements \Countable
 {
@@ -42,6 +43,7 @@ final class Map implements \Countable
     /**
      * @template U
      * @template V
+     * @psalm-pure
      *
      * @param list<array{0: U, 1: V}> $pairs
      *
@@ -65,7 +67,7 @@ final class Map implements \Countable
 
     public function count(): int
     {
-        return $this->implementation->count();
+        return $this->size();
     }
 
     /**
@@ -135,10 +137,7 @@ final class Map implements \Countable
      */
     public function filter(callable $predicate): self
     {
-        $map = $this->clear();
-        $map->implementation = $this->implementation->filter($predicate);
-
-        return $map;
+        return new self($this->implementation->filter($predicate));
     }
 
     /**
@@ -146,9 +145,9 @@ final class Map implements \Countable
      *
      * @param callable(T, S): void $function
      */
-    public function foreach(callable $function): void
+    public function foreach(callable $function): SideEffect
     {
-        $this->implementation->foreach($function);
+        return $this->implementation->foreach($function);
     }
 
     /**

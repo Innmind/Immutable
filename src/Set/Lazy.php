@@ -9,10 +9,12 @@ use Innmind\Immutable\{
     Set,
     Str,
     Maybe,
+    SideEffect,
 };
 
 /**
  * @template T
+ * @psalm-immutable
  */
 final class Lazy implements Implementation
 {
@@ -39,6 +41,7 @@ final class Lazy implements Implementation
 
     /**
      * @template A
+     * @psalm-pure
      *
      * @param callable(): \Generator<A> $generator
      *
@@ -166,9 +169,9 @@ final class Lazy implements Implementation
     /**
      * @param callable(T): void $function
      */
-    public function foreach(callable $function): void
+    public function foreach(callable $function): SideEffect
     {
-        $this->values->foreach($function);
+        return $this->values->foreach($function);
     }
 
     /**
@@ -270,7 +273,7 @@ final class Lazy implements Implementation
      */
     public function clear(): Implementation
     {
-        return new Primitive;
+        return Primitive::of();
     }
 
     public function empty(): bool

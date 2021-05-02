@@ -9,10 +9,12 @@ use Innmind\Immutable\{
     Str,
     Set,
     Maybe,
+    SideEffect,
 };
 
 /**
  * @template T
+ * @psalm-immutable
  */
 interface Implementation extends \Countable
 {
@@ -90,7 +92,7 @@ interface Implementation extends \Countable
      *
      * @param callable(T): void $function
      */
-    public function foreach(callable $function): void;
+    public function foreach(callable $function): SideEffect;
 
     /**
      * Return a new map of pairs grouped by keys determined with the given

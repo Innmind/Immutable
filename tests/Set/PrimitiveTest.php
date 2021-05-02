@@ -10,6 +10,7 @@ use Innmind\Immutable\{
     Map,
     Str,
     Sequence,
+    SideEffect,
 };
 use PHPUnit\Framework\TestCase;
 
@@ -19,25 +20,25 @@ class PrimitiveTest extends TestCase
     {
         $this->assertInstanceOf(
             Implementation::class,
-            new Primitive,
+            Primitive::of(),
         );
     }
 
     public function testSize()
     {
-        $this->assertSame(2, (new Primitive(1, 2))->size());
-        $this->assertSame(2, (new Primitive(1, 2))->count());
+        $this->assertSame(2, (Primitive::of(1, 2))->size());
+        $this->assertSame(2, (Primitive::of(1, 2))->count());
     }
 
     public function testIterator()
     {
-        $this->assertSame([1, 2], \iterator_to_array((new Primitive(1, 2))->iterator()));
+        $this->assertSame([1, 2], \iterator_to_array((Primitive::of(1, 2))->iterator()));
     }
 
     public function testIntersect()
     {
-        $a = new Primitive(1, 2);
-        $b = new Primitive(2, 3);
+        $a = Primitive::of(1, 2);
+        $b = Primitive::of(2, 3);
         $c = $a->intersect($b);
 
         $this->assertSame([1, 2], \iterator_to_array($a->iterator()));
@@ -48,7 +49,7 @@ class PrimitiveTest extends TestCase
 
     public function testAdd()
     {
-        $a = new Primitive(1);
+        $a = Primitive::of(1);
         $b = ($a)(2);
 
         $this->assertSame([1], \iterator_to_array($a->iterator()));
@@ -59,7 +60,7 @@ class PrimitiveTest extends TestCase
 
     public function testContains()
     {
-        $set = new Primitive(1);
+        $set = Primitive::of(1);
 
         $this->assertTrue($set->contains(1));
         $this->assertFalse($set->contains(2));
@@ -67,7 +68,7 @@ class PrimitiveTest extends TestCase
 
     public function testRemove()
     {
-        $a = new Primitive(1, 2, 3, 4);
+        $a = Primitive::of(1, 2, 3, 4);
         $b = $a->remove(3);
 
         $this->assertSame([1, 2, 3, 4], \iterator_to_array($a->iterator()));
@@ -78,8 +79,8 @@ class PrimitiveTest extends TestCase
 
     public function testDiff()
     {
-        $a = new Primitive(1, 2, 3);
-        $b = new Primitive(2, 4);
+        $a = Primitive::of(1, 2, 3);
+        $b = Primitive::of(2, 4);
         $c = $a->diff($b);
 
         $this->assertSame([1, 2, 3], \iterator_to_array($a->iterator()));
@@ -90,14 +91,14 @@ class PrimitiveTest extends TestCase
 
     public function testEquals()
     {
-        $this->assertTrue((new Primitive(1, 2))->equals(new Primitive(1, 2)));
-        $this->assertFalse((new Primitive(1, 2))->equals(new Primitive(1)));
-        $this->assertFalse((new Primitive(1, 2))->equals(new Primitive(1, 2, 3)));
+        $this->assertTrue((Primitive::of(1, 2))->equals(Primitive::of(1, 2)));
+        $this->assertFalse((Primitive::of(1, 2))->equals(Primitive::of(1)));
+        $this->assertFalse((Primitive::of(1, 2))->equals(Primitive::of(1, 2, 3)));
     }
 
     public function testFilter()
     {
-        $a = new Primitive(1, 2, 3, 4);
+        $a = Primitive::of(1, 2, 3, 4);
         $b = $a->filter(static fn($i) => $i % 2 === 0);
 
         $this->assertSame([1, 2, 3, 4], \iterator_to_array($a->iterator()));
@@ -107,14 +108,17 @@ class PrimitiveTest extends TestCase
 
     public function testForeach()
     {
-        $set = new Primitive(1, 2, 3, 4);
+        $set = Primitive::of(1, 2, 3, 4);
         $calls = 0;
         $sum = 0;
 
-        $this->assertNull($set->foreach(static function($i) use (&$calls, &$sum) {
-            ++$calls;
-            $sum += $i;
-        }));
+        $this->assertInstanceOf(
+            SideEffect::class,
+            $set->foreach(static function($i) use (&$calls, &$sum) {
+                ++$calls;
+                $sum += $i;
+            }),
+        );
 
         $this->assertSame(4, $calls);
         $this->assertSame(10, $sum);
@@ -122,7 +126,7 @@ class PrimitiveTest extends TestCase
 
     public function testGroupBy()
     {
-        $set = new Primitive(1, 2, 3, 4);
+        $set = Primitive::of(1, 2, 3, 4);
         $groups = $set->groupBy(static fn($i) => $i % 2);
 
         $this->assertSame([1, 2, 3, 4], \iterator_to_array($set->iterator()));
@@ -134,7 +138,7 @@ class PrimitiveTest extends TestCase
 
     public function testMap()
     {
-        $a = new Primitive(1, 2, 3);
+        $a = Primitive::of(1, 2, 3);
         $b = $a->map(static fn($i) => $i * 2);
 
         $this->assertSame([1, 2, 3], \iterator_to_array($a->iterator()));
@@ -144,7 +148,7 @@ class PrimitiveTest extends TestCase
 
     public function testPartition()
     {
-        $set = new Primitive(1, 2, 3, 4);
+        $set = Primitive::of(1, 2, 3, 4);
         $groups = $set->partition(static fn($i) => $i % 2 === 0);
 
         $this->assertSame([1, 2, 3, 4], \iterator_to_array($set->iterator()));
@@ -156,7 +160,7 @@ class PrimitiveTest extends TestCase
 
     public function testSort()
     {
-        $set = new Primitive(1, 4, 3, 2);
+        $set = Primitive::of(1, 4, 3, 2);
         $sorted = $set->sort(static fn($a, $b) => $a > $b ? 1 : -1);
 
         $this->assertSame([1, 4, 3, 2], \iterator_to_array($set->iterator()));
@@ -166,8 +170,8 @@ class PrimitiveTest extends TestCase
 
     public function testMerge()
     {
-        $a = new Primitive(1, 2);
-        $b = new Primitive(2, 3);
+        $a = Primitive::of(1, 2);
+        $b = Primitive::of(2, 3);
         $c = $a->merge($b);
 
         $this->assertSame([1, 2], \iterator_to_array($a->iterator()));
@@ -178,14 +182,14 @@ class PrimitiveTest extends TestCase
 
     public function testReduce()
     {
-        $set = new Primitive(1, 2, 3, 4);
+        $set = Primitive::of(1, 2, 3, 4);
 
         $this->assertSame(10, $set->reduce(0, static fn($sum, $i) => $sum + $i));
     }
 
     public function testClear()
     {
-        $a = new Primitive(1);
+        $a = Primitive::of(1);
         $b = $a->clear();
 
         $this->assertSame([1], \iterator_to_array($a->iterator()));
@@ -195,13 +199,13 @@ class PrimitiveTest extends TestCase
 
     public function testEmpty()
     {
-        $this->assertTrue((new Primitive)->empty());
-        $this->assertFalse((new Primitive(1))->empty());
+        $this->assertTrue((Primitive::of())->empty());
+        $this->assertFalse((Primitive::of(1))->empty());
     }
 
     public function testFind()
     {
-        $sequence = new Primitive(1, 2, 3);
+        $sequence = Primitive::of(1, 2, 3);
 
         $this->assertSame(
             1,

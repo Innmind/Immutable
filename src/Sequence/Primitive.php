@@ -9,23 +9,22 @@ use Innmind\Immutable\{
     Str,
     Set,
     Maybe,
+    SideEffect,
 };
 
 /**
  * @template T
+ * @psalm-immutable
  */
 final class Primitive implements Implementation
 {
     /** @var list<T> */
     private array $values;
-    private ?int $size = null;
 
     /**
-     * @no-named-arguments
-     *
-     * @param T $values
+     * @param list<T> $values
      */
-    public function __construct(...$values)
+    public function __construct(array $values = [])
     {
         $this->values = $values;
     }
@@ -37,16 +36,15 @@ final class Primitive implements Implementation
      */
     public function __invoke($element): self
     {
-        $self = clone $this;
-        $self->values[] = $element;
-        $self->size = $this->size() + 1;
+        $values = $this->values;
+        $values[] = $element;
 
-        return $self;
+        return new self($values);
     }
 
     public function size(): int
     {
-        return $this->size ?? $this->size = \count($this->values);
+        return \count($this->values);
     }
 
     public function count(): int
@@ -111,10 +109,7 @@ final class Primitive implements Implementation
      */
     public function drop(int $size): self
     {
-        $self = $this->clear();
-        $self->values = \array_slice($this->values, $size);
-
-        return $self;
+        return new self(\array_slice($this->values, $size));
     }
 
     /**
@@ -122,10 +117,7 @@ final class Primitive implements Implementation
      */
     public function dropEnd(int $size): self
     {
-        $self = $this->clear();
-        $self->values = \array_slice($this->values, 0, $this->size() - $size);
-
-        return $self;
+        return new self(\array_slice($this->values, 0, $this->size() - $size));
     }
 
     /**
@@ -133,6 +125,7 @@ final class Primitive implements Implementation
      */
     public function equals(Implementation $sequence): bool
     {
+        /** @psalm-suppress ImpureFunctionCall */
         return $this->values === \iterator_to_array($sequence->iterator());
     }
 
@@ -143,23 +136,23 @@ final class Primitive implements Implementation
      */
     public function filter(callable $predicate): self
     {
-        $self = $this->clear();
-        $self->values = \array_values(\array_filter(
+        /** @psalm-suppress ImpureFunctionCall */
+        return new self(\array_values(\array_filter(
             $this->values,
             $predicate,
-        ));
-
-        return $self;
+        )));
     }
 
     /**
      * @param callable(T): void $function
      */
-    public function foreach(callable $function): void
+    public function foreach(callable $function): SideEffect
     {
         foreach ($this->values as $value) {
             $function($value);
         }
+
+        return new SideEffect;
     }
 
     /**
@@ -242,7 +235,7 @@ final class Primitive implements Implementation
         }
 
         /** @var self<int> */
-        return new self(...\range(0, $this->size() - 1));
+        return new self(\range(0, $this->size() - 1));
     }
 
     /**
@@ -254,7 +247,8 @@ final class Primitive implements Implementation
      */
     public function map(callable $function): self
     {
-        return new self(...\array_map($function, $this->values));
+        /** @psalm-suppress ImpureFunctionCall */
+        return new self(\array_map($function, $this->values));
     }
 
     /**
@@ -264,10 +258,7 @@ final class Primitive implements Implementation
      */
     public function pad(int $size, $element): self
     {
-        $self = $this->clear();
-        $self->values = \array_pad($this->values, $size, $element);
-
-        return $self;
+        return new self(\array_pad($this->values, $size, $element));
     }
 
     /**
@@ -301,14 +292,11 @@ final class Primitive implements Implementation
      */
     public function slice(int $from, int $until): self
     {
-        $self = $this->clear();
-        $self->values = \array_slice(
+        return new self(\array_slice(
             $this->values,
             $from,
             $until - $from,
-        );
-
-        return $self;
+        ));
     }
 
     /**
@@ -334,10 +322,11 @@ final class Primitive implements Implementation
      */
     public function append(Implementation $sequence): self
     {
-        $self = $this->clear();
-        $self->values = \array_merge($this->values, \iterator_to_array($sequence->iterator()));
-
-        return $self;
+        /** @psalm-suppress ImpureFunctionCall */
+        return new self(\array_merge(
+            $this->values,
+            \iterator_to_array($sequence->iterator()),
+        ));
     }
 
     /**
@@ -361,6 +350,7 @@ final class Primitive implements Implementation
     public function sort(callable $function): self
     {
         $self = clone $this;
+        /** @psalm-suppress ImpureFunctionCall */
         \usort($self->values, $function);
 
         return $self;
@@ -375,7 +365,10 @@ final class Primitive implements Implementation
      */
     public function reduce($carry, callable $reducer)
     {
-        /** @var R */
+        /**
+         * @psalm-suppress ImpureFunctionCall
+         * @var R
+         */
         return \array_reduce($this->values, $reducer, $carry);
     }
 
@@ -392,10 +385,7 @@ final class Primitive implements Implementation
      */
     public function reverse(): self
     {
-        $self = clone $this;
-        $self->values = \array_reverse($this->values);
-
-        return $self;
+        return new self(\array_reverse($this->values));
     }
 
     public function empty(): bool

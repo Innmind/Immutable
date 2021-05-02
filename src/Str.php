@@ -5,6 +5,9 @@ namespace Innmind\Immutable;
 
 use Innmind\Immutable\Exception\InvalidRegex;
 
+/**
+ * @psalm-immutable
+ */
 final class Str
 {
     private string $value;
@@ -13,10 +16,16 @@ final class Str
     private function __construct(string $value, string $encoding = null)
     {
         $this->value = $value;
-        /** @var string */
+        /**
+         * @psalm-suppress ImpureFunctionCall
+         * @var string
+         */
         $this->encoding = $encoding ?? \mb_internal_encoding();
     }
 
+    /**
+     * @psalm-pure
+     */
     public static function of(string $value, string $encoding = null): self
     {
         return new self($value, $encoding);
@@ -287,6 +296,7 @@ final class Str
         );
 
         if ($value === null) {
+            /** @psalm-suppress ImpureFunctionCall */
             throw new InvalidRegex('', \preg_last_error());
         }
 

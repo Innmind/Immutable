@@ -10,10 +10,12 @@ use Innmind\Immutable\{
     Set,
     Maybe,
     Accumulate,
+    SideEffect,
 };
 
 /**
  * @template T
+ * @psalm-immutable
  */
 final class Defer implements Implementation
 {
@@ -57,7 +59,7 @@ final class Defer implements Implementation
 
     public function count(): int
     {
-        return $this->load()->count();
+        return $this->size();
     }
 
     /**
@@ -185,11 +187,13 @@ final class Defer implements Implementation
     /**
      * @param callable(T): void $function
      */
-    public function foreach(callable $function): void
+    public function foreach(callable $function): SideEffect
     {
         foreach ($this->values as $value) {
             $function($value);
         }
+
+        return new SideEffect;
     }
 
     /**
@@ -489,8 +493,10 @@ final class Defer implements Implementation
 
     public function empty(): bool
     {
+        /** @psalm-suppress ImpureMethodCall */
         $this->values->rewind();
 
+        /** @psalm-suppress ImpureMethodCall */
         return !$this->values->valid();
     }
 
@@ -541,6 +547,7 @@ final class Defer implements Implementation
      */
     private function load(): Implementation
     {
-        return new Primitive(...\iterator_to_array($this->values));
+        /** @psalm-suppress ImpureFunctionCall */
+        return new Primitive(\array_values(\iterator_to_array($this->values)));
     }
 }

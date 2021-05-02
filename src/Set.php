@@ -5,6 +5,7 @@ namespace Innmind\Immutable;
 
 /**
  * @template T
+ * @psalm-immutable
  */
 final class Set implements \Countable
 {
@@ -39,6 +40,7 @@ final class Set implements \Countable
     /**
      * @template V
      * @no-named-arguments
+     * @psalm-pure
      *
      * @param V $values
      *
@@ -46,7 +48,7 @@ final class Set implements \Countable
      */
     public static function of(...$values): self
     {
-        return new self(new Set\Primitive(...$values));
+        return new self(Set\Primitive::of(...$values));
     }
 
     /**
@@ -56,6 +58,7 @@ final class Set implements \Countable
      * Use this mode when the amount of data may not fit in memory
      *
      * @template V
+     * @psalm-pure
      *
      * @param \Generator<V> $generator
      *
@@ -75,6 +78,7 @@ final class Set implements \Countable
      * as parsing a file or calling an API
      *
      * @template V
+     * @psalm-pure
      *
      * @param callable(): \Generator<V> $generator
      *
@@ -87,6 +91,7 @@ final class Set implements \Countable
 
     /**
      * @no-named-arguments
+     * @psalm-pure
      *
      * @param mixed $values
      *
@@ -94,57 +99,61 @@ final class Set implements \Countable
      */
     public static function mixed(...$values): self
     {
-        return new self(new Set\Primitive(...$values));
+        return new self(Set\Primitive::of(...$values));
     }
 
     /**
      * @no-named-arguments
+     * @psalm-pure
      *
      * @return self<int>
      */
     public static function ints(int ...$values): self
     {
         /** @var self<int> */
-        $self = new self(new Set\Primitive(...$values));
+        $self = new self(Set\Primitive::of(...$values));
 
         return $self;
     }
 
     /**
      * @no-named-arguments
+     * @psalm-pure
      *
      * @return self<float>
      */
     public static function floats(float ...$values): self
     {
         /** @var self<float> */
-        $self = new self(new Set\Primitive(...$values));
+        $self = new self(Set\Primitive::of(...$values));
 
         return $self;
     }
 
     /**
      * @no-named-arguments
+     * @psalm-pure
      *
      * @return self<string>
      */
     public static function strings(string ...$values): self
     {
         /** @var self<string> */
-        $self = new self(new Set\Primitive(...$values));
+        $self = new self(Set\Primitive::of(...$values));
 
         return $self;
     }
 
     /**
      * @no-named-arguments
+     * @psalm-pure
      *
      * @return self<object>
      */
     public static function objects(object ...$values): self
     {
         /** @var self<object> */
-        $self = new self(new Set\Primitive(...$values));
+        $self = new self(Set\Primitive::of(...$values));
 
         return $self;
     }
@@ -260,9 +269,9 @@ final class Set implements \Countable
      *
      * @param callable(T): void $function
      */
-    public function foreach(callable $function): void
+    public function foreach(callable $function): SideEffect
     {
-        $this->implementation->foreach($function);
+        return $this->implementation->foreach($function);
     }
 
     /**

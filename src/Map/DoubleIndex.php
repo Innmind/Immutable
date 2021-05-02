@@ -10,21 +10,26 @@ use Innmind\Immutable\{
     Set,
     Pair,
     Maybe,
+    SideEffect,
 };
 
 /**
  * @template T
  * @template S
+ * @psalm-immutable
  */
 final class DoubleIndex implements Implementation
 {
     /** @var Sequence\Implementation<Pair<T, S>> */
     private Sequence\Implementation $pairs;
 
-    public function __construct()
+    /**
+     * @param Sequence\Implementation<Pair<T, S>> $pairs
+     */
+    public function __construct(Sequence\Implementation $pairs = null)
     {
         /** @var Sequence\Implementation<Pair<T, S>> */
-        $this->pairs = new Sequence\Primitive;
+        $this->pairs = $pairs ?? new Sequence\Primitive;
     }
 
     /**
@@ -36,14 +41,14 @@ final class DoubleIndex implements Implementation
     public function __invoke($key, $value): self
     {
         $map = $this->remove($key);
-        $map->pairs = ($map->pairs)(new Pair($key, $value));
 
-        return $map;
+        return new self(($map->pairs)(new Pair($key, $value)));
     }
 
     /**
      * @template A
      * @template B
+     * @psalm-pure
      *
      * @param A $key
      * @param B $value
@@ -52,10 +57,8 @@ final class DoubleIndex implements Implementation
      */
     public static function of($key, $value): self
     {
-        /** @var self<A, B> */
-        $self = new self;
-
-        return ($self)($key, $value);
+        /** @psalm-suppress MixedArgumentTypeCoercion */
+        return new self(new Sequence\Primitive([new Pair($key, $value)]));
     }
 
     public function size(): int
@@ -65,7 +68,7 @@ final class DoubleIndex implements Implementation
 
     public function count(): int
     {
-        return $this->pairs->count();
+        return $this->size();
     }
 
     /**
@@ -139,22 +142,21 @@ final class DoubleIndex implements Implementation
      */
     public function filter(callable $predicate): self
     {
-        $map = $this->clear();
-        $map->pairs = $this
-            ->pairs
-            ->filter(static fn($pair) => $predicate($pair->key(), $pair->value()));
-
-        return $map;
+        return new self(
+            $this->pairs->filter(static fn($pair) => $predicate($pair->key(), $pair->value())),
+        );
     }
 
     /**
      * @param callable(T, S): void $function
      */
-    public function foreach(callable $function): void
+    public function foreach(callable $function): SideEffect
     {
         foreach ($this->pairs->iterator() as $pair) {
             $function($pair->key(), $pair->value());
         }
+
+        return new SideEffect;
     }
 
     /**
@@ -233,7 +235,7 @@ final class DoubleIndex implements Implementation
      *
      * @return self<T, S>
      */
-    public function remove($key): Implementation
+    public function remove($key): self
     {
         $map = clone $this;
         $map->pairs = $this

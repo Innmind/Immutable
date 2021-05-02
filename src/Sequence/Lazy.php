@@ -9,16 +9,17 @@ use Innmind\Immutable\{
     Str,
     Set,
     Maybe,
+    SideEffect,
 };
 
 /**
  * @template T
+ * @psalm-immutable
  */
 final class Lazy implements Implementation
 {
     /** @var \Closure(): \Generator<int, T> */
     private \Closure $values;
-    private ?int $size = null;
 
     public function __construct(callable $generator)
     {
@@ -53,17 +54,13 @@ final class Lazy implements Implementation
 
     public function size(): int
     {
-        if (\is_int($this->size)) {
-            return $this->size;
-        }
-
         $size = 0;
 
         foreach ($this->iterator() as $_) {
             ++$size;
         }
 
-        return $this->size = $size;
+        return $size;
     }
 
     public function count(): int
@@ -199,11 +196,13 @@ final class Lazy implements Implementation
     /**
      * @param callable(T): void $function
      */
-    public function foreach(callable $function): void
+    public function foreach(callable $function): SideEffect
     {
         foreach ($this->iterator() as $value) {
             $function($value);
         }
+
+        return new SideEffect;
     }
 
     /**
@@ -510,6 +509,7 @@ final class Lazy implements Implementation
 
     public function empty(): bool
     {
+        /** @psalm-suppress ImpureMethodCall */
         return !$this->iterator()->valid();
     }
 
@@ -562,6 +562,7 @@ final class Lazy implements Implementation
      */
     private function load(): Implementation
     {
-        return new Primitive(...\iterator_to_array($this->iterator()));
+        /** @psalm-suppress ImpureFunctionCall */
+        return new Primitive(\array_values(\iterator_to_array($this->iterator())));
     }
 }

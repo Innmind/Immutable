@@ -5,6 +5,7 @@ namespace Innmind\Immutable;
 
 /**
  * @template T
+ * @psalm-immutable
  */
 final class Sequence implements \Countable
 {
@@ -42,6 +43,7 @@ final class Sequence implements \Countable
     /**
      * @template V
      * @no-named-arguments
+     * @psalm-pure
      *
      * @param V $values
      *
@@ -49,7 +51,7 @@ final class Sequence implements \Countable
      */
     public static function of(...$values): self
     {
-        return new self(new Sequence\Primitive(...$values));
+        return new self(new Sequence\Primitive($values));
     }
 
     /**
@@ -59,6 +61,7 @@ final class Sequence implements \Countable
      * Use this mode when the amount of data may not fit in memory
      *
      * @template V
+     * @psalm-pure
      *
      * @param \Generator<V> $generator
      *
@@ -78,6 +81,7 @@ final class Sequence implements \Countable
      * as parsing a file or calling an API
      *
      * @template V
+     * @psalm-pure
      *
      * @param callable(): \Generator<V> $generator
      *
@@ -90,6 +94,7 @@ final class Sequence implements \Countable
 
     /**
      * @no-named-arguments
+     * @psalm-pure
      *
      * @param mixed $values
      *
@@ -97,57 +102,61 @@ final class Sequence implements \Countable
      */
     public static function mixed(...$values): self
     {
-        return new self(new Sequence\Primitive(...$values));
+        return new self(new Sequence\Primitive($values));
     }
 
     /**
      * @no-named-arguments
+     * @psalm-pure
      *
      * @return self<int>
      */
     public static function ints(int ...$values): self
     {
         /** @var self<int> */
-        $self = new self(new Sequence\Primitive(...$values));
+        $self = new self(new Sequence\Primitive($values));
 
         return $self;
     }
 
     /**
      * @no-named-arguments
+     * @psalm-pure
      *
      * @return self<float>
      */
     public static function floats(float ...$values): self
     {
         /** @var self<float> */
-        $self = new self(new Sequence\Primitive(...$values));
+        $self = new self(new Sequence\Primitive($values));
 
         return $self;
     }
 
     /**
      * @no-named-arguments
+     * @psalm-pure
      *
      * @return self<string>
      */
     public static function strings(string ...$values): self
     {
         /** @var self<string> */
-        $self = new self(new Sequence\Primitive(...$values));
+        $self = new self(new Sequence\Primitive($values));
 
         return $self;
     }
 
     /**
      * @no-named-arguments
+     * @psalm-pure
      *
      * @return self<object>
      */
     public static function objects(object ...$values): self
     {
         /** @var self<object> */
-        $self = new self(new Sequence\Primitive(...$values));
+        $self = new self(new Sequence\Primitive($values));
 
         return $self;
     }
@@ -260,9 +269,9 @@ final class Sequence implements \Countable
      *
      * @param callable(T): void $function
      */
-    public function foreach(callable $function): void
+    public function foreach(callable $function): SideEffect
     {
-        $this->implementation->foreach($function);
+        return $this->implementation->foreach($function);
     }
 
     /**

@@ -8,6 +8,7 @@ namespace Innmind\Immutable;
  *
  * @template T
  * @template S
+ * @psalm-immutable
  */
 final class Pair
 {

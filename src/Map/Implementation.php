@@ -10,12 +10,14 @@ use Innmind\Immutable\{
     Sequence,
     Pair,
     Maybe,
+    SideEffect,
 };
 
 /**
  * @template T
  * @template S
  * @internal Dot not code against this interface
+ * @psalm-immutable
  */
 interface Implementation extends \Countable
 {
@@ -75,7 +77,7 @@ interface Implementation extends \Countable
      *
      * @param callable(T, S): void $function
      */
-    public function foreach(callable $function): void;
+    public function foreach(callable $function): SideEffect;
 
     /**
      * Return a new map of pairs' sequences grouped by keys determined with the given

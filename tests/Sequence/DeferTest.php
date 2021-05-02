@@ -10,6 +10,7 @@ use Innmind\Immutable\{
     Sequence,
     Str,
     Set,
+    SideEffect,
 };
 use PHPUnit\Framework\TestCase;
 
@@ -204,10 +205,13 @@ class DeferTest extends TestCase
         $calls = 0;
         $sum = 0;
 
-        $this->assertNull($sequence->foreach(static function($i) use (&$calls, &$sum) {
-            ++$calls;
-            $sum += $i;
-        }));
+        $this->assertInstanceOf(
+            SideEffect::class,
+            $sequence->foreach(static function($i) use (&$calls, &$sum) {
+                ++$calls;
+                $sum += $i;
+            }),
+        );
         $this->assertSame(4, $calls);
         $this->assertSame(10, $sum);
     }

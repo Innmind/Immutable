@@ -10,20 +10,25 @@ use Innmind\Immutable\{
     Set,
     Pair,
     Maybe,
+    SideEffect,
 };
 
 /**
  * @template T
  * @template S
+ * @psalm-immutable
  */
 final class Primitive implements Implementation
 {
     /** @var array<T, S> */
-    private array $values = [];
-    private ?int $size = null;
+    private array $values;
 
-    public function __construct()
+    /**
+     * @param array<T, S> $values
+     */
+    public function __construct(array $values = [])
     {
+        $this->values = $values;
     }
 
     /**
@@ -42,11 +47,10 @@ final class Primitive implements Implementation
             return (new DoubleIndex)->merge($this)($key, $value);
         }
 
-        $map = clone $this;
-        $map->size = null;
-        $map->values[$key] = $value;
+        $values = $this->values;
+        $values[$key] = $value;
 
-        return $map;
+        return new self($values);
     }
 
     /**
@@ -80,7 +84,7 @@ final class Primitive implements Implementation
     public function size(): int
     {
         /** @psalm-suppress MixedArgumentTypeCoercion */
-        return $this->size ?? $this->size = \count($this->values);
+        return \count($this->values);
     }
 
     public function count(): int
@@ -116,11 +120,7 @@ final class Primitive implements Implementation
      */
     public function clear(): self
     {
-        $map = clone $this;
-        $map->size = null;
-        $map->values = [];
-
-        return $map;
+        return new self;
     }
 
     /**
@@ -156,25 +156,28 @@ final class Primitive implements Implementation
      */
     public function filter(callable $predicate): self
     {
-        $map = $this->clear();
+        /** @var array<T, S> */
+        $values = [];
 
         foreach ($this->values as $k => $v) {
             if ($predicate($k, $v) === true) {
-                $map->values[$k] = $v;
+                $values[$k] = $v;
             }
         }
 
-        return $map;
+        return new self($values);
     }
 
     /**
      * @param callable(T, S): void $function
      */
-    public function foreach(callable $function): void
+    public function foreach(callable $function): SideEffect
     {
         foreach ($this->values as $k => $v) {
             $function($k, $v);
         }
+
+        return new SideEffect;
     }
 
     /**
@@ -234,14 +237,14 @@ final class Primitive implements Implementation
      */
     public function map(callable $function): self
     {
-        /** @var self<T, B> */
-        $map = new self;
+        /** @var array<T, B> */
+        $values = [];
 
         foreach ($this->values as $k => $v) {
-            $map->values[$k] = $function($k, $v);
+            $values[$k] = $function($k, $v);
         }
 
-        return $map;
+        return new self($values);
     }
 
     /**
@@ -255,12 +258,11 @@ final class Primitive implements Implementation
             return $this;
         }
 
-        $map = clone $this;
-        $map->size = null;
+        $values = $this->values;
         /** @psalm-suppress MixedArrayTypeCoercion */
-        unset($map->values[$key]);
+        unset($values[$key]);
 
-        return $map;
+        return new self($values);
     }
 
     /**

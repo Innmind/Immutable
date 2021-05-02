@@ -9,10 +9,12 @@ use Innmind\Immutable\{
     Set,
     Str,
     Maybe,
+    SideEffect,
 };
 
 /**
  * @template T
+ * @psalm-immutable
  */
 final class Primitive implements Implementation
 {
@@ -20,14 +22,11 @@ final class Primitive implements Implementation
     private Sequence\Implementation $values;
 
     /**
-     * @no-named-arguments
-     *
-     * @param T $values
+     * @param Sequence\Implementation<T> $values
      */
-    public function __construct(...$values)
+    public function __construct(Sequence\Implementation $values)
     {
-        /** @var Sequence\Implementation<T> */
-        $this->values = (new Sequence\Primitive(...$values))->distinct();
+        $this->values = $values;
     }
 
     /**
@@ -41,10 +40,22 @@ final class Primitive implements Implementation
             return $this;
         }
 
-        $set = clone $this;
-        $set->values = ($this->values)($element);
+        return new self(($this->values)($element));
+    }
 
-        return $set;
+    /**
+     * @no-named-arguments
+     * @psalm-pure
+     *
+     * @template A
+     *
+     * @param A $values
+     *
+     * @return self<A>
+     */
+    public static function of(...$values): self
+    {
+        return new self((new Sequence\Primitive($values))->distinct());
     }
 
     public function size(): int
@@ -72,12 +83,10 @@ final class Primitive implements Implementation
      */
     public function intersect(Implementation $set): self
     {
-        $self = $this->clear();
-        $self->values = $this->values->intersect(
-            new Sequence\Primitive(...$set->iterator()),
-        );
-
-        return $self;
+        /** @psalm-suppress ImpureFunctionCall */
+        return new self($this->values->intersect(
+            new Sequence\Primitive(\array_values(\iterator_to_array($set->iterator()))),
+        ));
     }
 
     /**
@@ -99,12 +108,9 @@ final class Primitive implements Implementation
             return $this;
         }
 
-        $set = clone $this;
-        $set->values = $this
-            ->values
-            ->filter(static fn($value) => $value !== $element);
-
-        return $set;
+        return new self(
+            $this->values->filter(static fn($value) => $value !== $element),
+        );
     }
 
     /**
@@ -114,12 +120,10 @@ final class Primitive implements Implementation
      */
     public function diff(Implementation $set): self
     {
-        $self = clone $this;
-        $self->values = $this->values->diff(
-            new Sequence\Primitive(...$set->iterator()),
-        );
-
-        return $self;
+        /** @psalm-suppress ImpureFunctionCall */
+        return new self($this->values->diff(
+            new Sequence\Primitive(\array_values(\iterator_to_array($set->iterator()))),
+        ));
     }
 
     /**
@@ -141,18 +145,15 @@ final class Primitive implements Implementation
      */
     public function filter(callable $predicate): self
     {
-        $set = clone $this;
-        $set->values = $this->values->filter($predicate);
-
-        return $set;
+        return new self($this->values->filter($predicate));
     }
 
     /**
      * @param callable(T): void $function
      */
-    public function foreach(callable $function): void
+    public function foreach(callable $function): SideEffect
     {
-        $this->values->foreach($function);
+        return $this->values->foreach($function);
     }
 
     /**
@@ -184,7 +185,7 @@ final class Primitive implements Implementation
          * @psalm-suppress InvalidArgument
          */
         return $this->reduce(
-            new self,
+            self::of(),
             static fn(self $carry, $value): self => ($carry)($function($value)),
         );
     }
@@ -246,7 +247,7 @@ final class Primitive implements Implementation
      */
     public function clear(): self
     {
-        return new self;
+        return self::of();
     }
 
     public function empty(): bool

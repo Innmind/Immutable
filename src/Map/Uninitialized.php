@@ -9,11 +9,13 @@ use Innmind\Immutable\{
     Set,
     Pair,
     Maybe,
+    SideEffect,
 };
 
 /**
  * @template T
  * @template S
+ * @psalm-immutable
  */
 final class Uninitialized implements Implementation
 {
@@ -31,6 +33,7 @@ final class Uninitialized implements Implementation
     /**
      * @template A
      * @template B
+     * @psalm-pure
      *
      * @param A $key
      * @param B $value
@@ -104,9 +107,9 @@ final class Uninitialized implements Implementation
     /**
      * @param callable(T, S): void $function
      */
-    public function foreach(callable $function): void
+    public function foreach(callable $function): SideEffect
     {
-        // noop
+        return new SideEffect;
     }
 
     /**
