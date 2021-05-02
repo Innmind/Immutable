@@ -5,7 +5,6 @@ namespace Tests\Innmind\Immutable;
 
 use Innmind\Immutable\{
     Map,
-    SizeableInterface,
     Pair,
     Str,
     Set,

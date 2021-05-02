@@ -5,17 +5,11 @@ namespace Tests\Innmind\Immutable;
 
 use Innmind\Immutable\{
     Str as S,
-    PrimitiveInterface,
-    StringableInterface,
     Sequence,
     Map,
-    Exception\SubstringException,
     Exception\InvalidRegex,
 };
-use PHPUnit\Framework\{
-    TestCase,
-    ExpectationFailedException,
-};
+use PHPUnit\Framework\TestCase;
 
 class StrTest extends TestCase
 {

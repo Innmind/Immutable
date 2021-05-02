@@ -3,11 +3,7 @@ declare(strict_types = 1);
 
 namespace Innmind\Immutable;
 
-use Innmind\Immutable\{
-    Exception\InvalidRegex,
-    Exception\SubstringException,
-    Exception\LogicException,
-};
+use Innmind\Immutable\Exception\InvalidRegex;
 
 final class Str
 {

@@ -5,7 +5,6 @@ namespace Innmind\Immutable\Map;
 
 use Innmind\Immutable\{
     Map,
-    Type,
     Str,
     Sequence,
     Set,
