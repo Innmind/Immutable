@@ -229,21 +229,47 @@ class StrTest extends TestCase
     {
         $str = S::of('foo');
 
-        $this->assertSame(1, $str->position('o'));
-        $this->assertSame(2, $str->position('o', 2));
+        $this->assertSame(
+            1,
+            $str->position('o')->match(
+                static fn($value) => $value,
+                static fn() => null,
+            ),
+        );
+        $this->assertSame(
+            2,
+            $str->position('o', 2)->match(
+                static fn($value) => $value,
+                static fn() => null,
+            ),
+        );
 
         $emoji = S::of('foo🙏bar');
 
-        $this->assertSame(4, $emoji->position('bar'));
-        $this->assertSame(7, $emoji->toEncoding('ASCII')->position('bar'));
+        $this->assertSame(
+            4,
+            $emoji->position('bar')->match(
+                static fn($value) => $value,
+                static fn() => null,
+            ),
+        );
+        $this->assertSame(
+            7,
+            $emoji->toEncoding('ASCII')->position('bar')->match(
+                static fn($value) => $value,
+                static fn() => null,
+            ),
+        );
     }
 
-    public function testThrowWhenPositionNotFound()
+    public function testReturnNothingWhenPositionNotFound()
     {
-        $this->expectException(SubstringException::class);
-        $this->expectExceptionMessage('Substring "o" not found');
-
-        S::of('bar')->position('o');
+        $this->assertNull(
+            S::of('bar')->position('o')->match(
+                static fn($value) => $value,
+                static fn() => null,
+            ),
+        );
     }
 
     public function testReplace()

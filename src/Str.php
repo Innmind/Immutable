@@ -85,20 +85,18 @@ final class Str
     /**
      * Returns the position of the first occurence of the string
      *
-     * @throws SubstringException If the string is not found
+     * @return Maybe<int>
      */
-    public function position(string $needle, int $offset = 0): int
+    public function position(string $needle, int $offset = 0): Maybe
     {
         $position = \mb_strpos($this->value, $needle, $offset, $this->encoding);
 
         if ($position === false) {
-            throw new SubstringException(\sprintf(
-                'Substring "%s" not found',
-                $needle,
-            ));
+            /** @var Maybe<int> */
+            return Maybe::nothing();
         }
 
-        return $position;
+        return Maybe::just($position);
     }
 
     /**
