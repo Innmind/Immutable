@@ -309,10 +309,7 @@ final class Map implements \Countable
      */
     public function any(callable $predicate): bool
     {
-        /**
-         * @psalm-suppress MixedArgument
-         * @psalm-suppress MissingClosureParamType
-         */
+        /** @psalm-suppress MixedArgument */
         return $this->reduce(
             false,
             static fn(bool $any, $key, $value): bool => $any || $predicate($key, $value),

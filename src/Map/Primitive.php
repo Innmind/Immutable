@@ -270,7 +270,6 @@ final class Primitive implements Implementation
      */
     public function merge(Implementation $map): Implementation
     {
-        /** @psalm-suppress MixedArgument For some reason it no longer recognize templates for $key and $value */
         return $map->reduce(
             $this,
             static fn(Implementation $carry, $key, $value): Implementation => ($carry)($key, $value),

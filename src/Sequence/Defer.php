@@ -38,9 +38,8 @@ final class Defer implements Implementation
      */
     public function __invoke($element): Implementation
     {
-        /** @psalm-suppress MissingClosureParamType */
         return new self(
-            (static function(\Iterator $values, $element): \Generator {
+            (static function(\Iterator $values, mixed $element): \Generator {
                 /** @var T $value */
                 foreach ($values as $value) {
                     yield $value;
@@ -95,8 +94,7 @@ final class Defer implements Implementation
      */
     public function diff(Implementation $sequence): Implementation
     {
-        /** @psalm-suppress MissingClosureParamType */
-        return $this->filter(static function($value) use ($sequence): bool {
+        return $this->filter(static function(mixed $value) use ($sequence): bool {
             /** @var T $value */
             return !$sequence->contains($value);
         });
@@ -129,9 +127,8 @@ final class Defer implements Implementation
      */
     public function drop(int $size): Implementation
     {
-        /** @psalm-suppress MissingClosureParamType */
         return new self(
-            (static function(\Iterator $values, $toDrop): \Generator {
+            (static function(\Iterator $values, int $toDrop): \Generator {
                 $dropped = 0;
 
                 /** @var T $value */
@@ -316,9 +313,8 @@ final class Defer implements Implementation
      */
     public function pad(int $size, $element): Implementation
     {
-        /** @psalm-suppress MissingClosureParamType */
         return new self(
-            (static function(\Iterator $values, int $toPad, $element): \Generator {
+            (static function(\Iterator $values, int $toPad, mixed $element): \Generator {
                 /** @var T $value */
                 foreach ($values as $value) {
                     yield $value;
@@ -424,8 +420,7 @@ final class Defer implements Implementation
      */
     public function intersect(Implementation $sequence): Implementation
     {
-        /** @psalm-suppress MissingClosureParamType */
-        return $this->filter(static function($value) use ($sequence): bool {
+        return $this->filter(static function(mixed $value) use ($sequence): bool {
             /** @var T $value */
             return $sequence->contains($value);
         });

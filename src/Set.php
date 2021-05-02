@@ -404,10 +404,7 @@ final class Set implements \Countable
      */
     public function matches(callable $predicate): bool
     {
-        /**
-         * @psalm-suppress MixedArgument
-         * @psalm-suppress MissingClosureParamType
-         */
+        /** @psalm-suppress MixedArgument */
         return $this->reduce(
             true,
             static fn(bool $matches, $value): bool => $matches && $predicate($value),

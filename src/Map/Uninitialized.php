@@ -179,11 +179,6 @@ final class Uninitialized implements Implementation
      */
     public function partition(callable $predicate): Map
     {
-        /**
-         * @psalm-suppress InvalidScalarArgument
-         * @psalm-suppress InvalidArgument
-         * @var Map<bool, Map<T, S>>
-         */
         return Map::of(
             [true, $this->clearMap()],
             [false, $this->clearMap()],

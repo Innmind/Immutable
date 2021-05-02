@@ -180,7 +180,6 @@ final class Primitive implements Implementation
     public function map(callable $function): self
     {
         /**
-         * @psalm-suppress MissingClosureParamType
          * @psalm-suppress MixedArgument
          * @psalm-suppress InvalidArgument
          */

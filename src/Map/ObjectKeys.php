@@ -39,7 +39,6 @@ final class ObjectKeys implements Implementation
 
         $map = clone $this;
         $map->values = clone $this->values;
-        /** @psalm-suppress MixedArgumentTypeCoercion */
         $map->values[$key] = $value;
 
         return $map;
@@ -225,7 +224,6 @@ final class ObjectKeys implements Implementation
      */
     public function keys(): Set
     {
-        /** @psalm-suppress MissingClosureParamType */
         return $this->reduce(
             Set::of(),
             static fn(Set $keys, $key): Set => ($keys)($key),
@@ -237,7 +235,6 @@ final class ObjectKeys implements Implementation
      */
     public function values(): Sequence
     {
-        /** @psalm-suppress MissingClosureParamType */
         return $this->reduce(
             Sequence::of(),
             static fn(Sequence $values, $_, $value): Sequence => ($values)($value),
@@ -294,7 +291,6 @@ final class ObjectKeys implements Implementation
      */
     public function merge(Implementation $map): Implementation
     {
-        /** @psalm-suppress MixedArgument For some reason it no longer recognize templates for $key and $value */
         return $map->reduce(
             $this,
             static fn(Implementation $carry, $key, $value): Implementation => ($carry)($key, $value),
