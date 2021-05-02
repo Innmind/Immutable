@@ -17,6 +17,7 @@ final class Pair
     private $value;
 
     /**
+     * @internal You should never have to manually create this object
      * @param T $key
      * @param S $value
      */
