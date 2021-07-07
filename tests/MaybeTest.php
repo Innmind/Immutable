@@ -259,6 +259,159 @@ class MaybeTest extends TestCase
             });
     }
 
+    public function testAllMapKeepValuesOrder()
+    {
+        $this
+            ->forAll(Set\Sequence::of(
+                $this->value(),
+                Set\Integers::between(1, 5),
+            ))
+            ->then(function($expected) {
+                $maybes = \array_map(
+                    static fn($value) => Maybe::just($value),
+                    $expected,
+                );
+
+                $comprehension = Maybe::all(...$maybes);
+
+                $this->assertInstanceOf(Maybe\Comprehension::class, $comprehension);
+                $maybe = $comprehension->map(function(...$args) use ($expected) {
+                    $this->assertSame($expected, $args);
+
+                    return $args[0];
+                });
+                $this->assertInstanceOf(Maybe::class, $maybe);
+            });
+    }
+
+    public function testAllFlatMapKeepValuesOrder()
+    {
+        $this
+            ->forAll(Set\Sequence::of(
+                $this->value(),
+                Set\Integers::between(1, 5),
+            ))
+            ->then(function($expected) {
+                $maybes = \array_map(
+                    static fn($value) => Maybe::just($value),
+                    $expected,
+                );
+
+                $comprehension = Maybe::all(...$maybes);
+
+                $this->assertInstanceOf(Maybe\Comprehension::class, $comprehension);
+                $maybe = $comprehension->flatMap(function(...$args) use ($expected) {
+                    $this->assertSame($expected, $args);
+
+                    return Maybe::just($args[0]);
+                });
+                $this->assertInstanceOf(Maybe::class, $maybe);
+            });
+    }
+
+    public function testAllMapResult()
+    {
+        $this
+            ->forAll(
+                Set\Sequence::of(
+                    Set\Decorate::immutable(
+                        static fn($value) => Maybe::just($value),
+                        $this->value(),
+                    ),
+                    Set\Integers::between(1, 5),
+                ),
+                $this->value(),
+            )
+            ->then(function($maybes, $expected) {
+                $comprehension = Maybe::all(...$maybes);
+
+                $this->assertInstanceOf(Maybe\Comprehension::class, $comprehension);
+                $maybe = $comprehension->map(static fn(...$args) => $expected);
+                $this->assertSame($expected, $maybe->match(
+                    static fn($value) => $value,
+                    static fn() => null,
+                ));
+            });
+    }
+
+    public function testAllFlatMapResult()
+    {
+        $this
+            ->forAll(
+                Set\Sequence::of(
+                    Set\Decorate::immutable(
+                        static fn($value) => Maybe::just($value),
+                        $this->value(),
+                    ),
+                    Set\Integers::between(1, 5),
+                ),
+                new Set\Either(
+                    Set\Elements::of(Maybe::nothing()),
+                    Set\Decorate::immutable(
+                        static fn($value) => Maybe::just($value),
+                        $this->value(),
+                    ),
+                ),
+            )
+            ->then(function($maybes, $expected) {
+                $comprehension = Maybe::all(...$maybes);
+
+                $this->assertInstanceOf(Maybe\Comprehension::class, $comprehension);
+                $maybe = $comprehension->flatMap(static fn(...$args) => $expected);
+                $this->assertSame($expected, $maybe);
+            });
+    }
+
+    public function testAllMapNotCalledWhenOneNothingIsPresent()
+    {
+        $this
+            ->forAll(Set\Sequence::of(
+                Set\Decorate::immutable(
+                    static fn($value) => Maybe::just($value),
+                    $this->value(),
+                ),
+                Set\Integers::between(1, 5),
+            ))
+            ->then(function($maybes) {
+                $maybes[] = Maybe::nothing();
+                $comprehension = Maybe::all(...$maybes);
+
+                $this->assertInstanceOf(Maybe\Comprehension::class, $comprehension);
+                $called = false;
+                $comprehension->map(static function(...$args) use (&$called) {
+                    $called = true;
+
+                    return $args[0];
+                });
+                $this->assertFalse($called);
+            });
+    }
+
+    public function testAllFlatMapNotCalledWhenOneNothingIsPresent()
+    {
+        $this
+            ->forAll(Set\Sequence::of(
+                Set\Decorate::immutable(
+                    static fn($value) => Maybe::just($value),
+                    $this->value(),
+                ),
+                Set\Integers::between(1, 5),
+            ))
+            ->then(function($maybes) {
+                $maybes[] = Maybe::nothing();
+                $comprehension = Maybe::all(...$maybes);
+
+                $this->assertInstanceOf(Maybe\Comprehension::class, $comprehension);
+                $called = false;
+                $comprehension->flatMap(static function(...$args) use (&$called) {
+                    $called = true;
+
+                    return Maybe::just($args[0]);
+                });
+                $this->assertFalse($called);
+            });
+    }
+
     private function value(): Set
     {
         return Set\AnyType::any()->filter(static fn($value) => $value !== null);
