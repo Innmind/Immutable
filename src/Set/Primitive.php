@@ -168,7 +168,7 @@ final class Primitive implements Implementation
         return $this
             ->values
             ->groupBy($discriminator)
-            ->map(static fn($_, $sequence) => Set::of(...$sequence->toList()));
+            ->map(static fn(mixed $_, $sequence) => Set::of(...$sequence->toList()));
     }
 
     /**
