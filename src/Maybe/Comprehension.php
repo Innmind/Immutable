@@ -5,6 +5,9 @@ namespace Innmind\Immutable\Maybe;
 
 use Innmind\Immutable\Maybe;
 
+/**
+ * @psalm-immutable
+ */
 final class Comprehension
 {
     private Maybe $first;
@@ -22,6 +25,7 @@ final class Comprehension
 
     /**
      * @internal
+     * @psalm-pure
      * @no-named-arguments
      */
     public static function of(Maybe $first, Maybe ...$rest): self
