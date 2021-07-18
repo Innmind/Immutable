@@ -18,8 +18,6 @@ class MapTest extends TestCase
         $this->assertInstanceOf(
             Set::class,
             Map::of(
-                'string',
-                'string',
                 Set\Chars::any(),
                 Set\Chars::any()
             )
@@ -29,8 +27,6 @@ class MapTest extends TestCase
     public function testGeneratesAtMost100ValuesByDefault()
     {
         $maps = Map::of(
-            'string',
-            'int',
             Set\Chars::any(),
             Set\Integers::any()
         );
@@ -43,16 +39,12 @@ class MapTest extends TestCase
         foreach ($maps->values(new RandomInt) as $map) {
             $this->assertInstanceOf(Set\Value::class, $map);
             $this->assertInstanceOf(Structure::class, $map->unwrap());
-            $this->assertSame('string', (string) $map->unwrap()->keyType());
-            $this->assertSame('int', (string) $map->unwrap()->valueType());
         }
     }
 
     public function testGeneratesMapsOfDifferentSizes()
     {
         $maps = Map::of(
-            'string',
-            'string',
             Set\Chars::any(),
             Set\Chars::any(),
             Set\Integers::between(0, 50)
@@ -69,8 +61,6 @@ class MapTest extends TestCase
     public function testTake()
     {
         $maps1 = Map::of(
-            'string',
-            'string',
             Set\Chars::any(),
             Set\Chars::any()
         );
@@ -88,8 +78,6 @@ class MapTest extends TestCase
     public function testFilter()
     {
         $maps = Map::of(
-            'string',
-            'string',
             Set\Chars::any(),
             Set\Chars::any(),
         );
@@ -119,8 +107,6 @@ class MapTest extends TestCase
     public function testFlagStructureAsMutableWhenUnderlyingKeysAreMutable()
     {
         $maps = Map::of(
-            'object',
-            'string',
             Set\Decorate::mutable(
                 static fn() => new \stdClass,
                 Set\Chars::any(),
@@ -138,8 +124,6 @@ class MapTest extends TestCase
     public function testFlagStructureAsMutableWhenUnderlyingValuesAreMutable()
     {
         $maps = Map::of(
-            'string',
-            'object',
             Set\Chars::any(),
             Set\Decorate::mutable(
                 static fn() => new \stdClass,
@@ -156,8 +140,6 @@ class MapTest extends TestCase
     public function testNonEmptyMapCanBeShrunk()
     {
         $maps = Map::of(
-            'string',
-            'string',
             Set\Chars::any(),
             Set\Chars::any(),
             Set\Integers::between(1, 100),
@@ -171,8 +153,6 @@ class MapTest extends TestCase
     public function testEmptyMapCanNotBeShrunk()
     {
         $maps = Map::of(
-            'string',
-            'string',
             Set\Chars::any(),
             Set\Chars::any(),
             Set\Integers::below(1),
@@ -191,8 +171,6 @@ class MapTest extends TestCase
     public function testNonEmptyMapAreShrunkWithDifferentStrategies()
     {
         $maps = Map::of(
-            'string',
-            'string',
             Set\Chars::any(),
             Set\Chars::any(),
             Set\Integers::between(3, 100),
@@ -212,8 +190,6 @@ class MapTest extends TestCase
     public function testShrunkMapsDoContainsLessThanTheInitialValue()
     {
         $maps = Map::of(
-            'string',
-            'string',
             Set\Chars::any(),
             Set\Chars::any(),
             Set\Integers::between(2, 100),
@@ -237,8 +213,6 @@ class MapTest extends TestCase
     public function testShrinkingStrategyAReduceTheMapFasterThanStrategyB()
     {
         $maps = Map::of(
-            'string',
-            'string',
             Set\Chars::any(),
             Set\Chars::any(),
             Set\Integers::between(3, 100),
@@ -261,8 +235,6 @@ class MapTest extends TestCase
     public function testShrunkValuesConserveMutabilityProperty()
     {
         $maps = Map::of(
-            'string',
-            'string',
             Set\Chars::any(),
             Set\Chars::any(),
             Set\Integers::between(1, 100),
@@ -276,8 +248,6 @@ class MapTest extends TestCase
         }
 
         $maps = Map::of(
-            'string',
-            'object',
             Set\Chars::any(),
             Set\Decorate::mutable(
                 static fn() => new \stdClass,

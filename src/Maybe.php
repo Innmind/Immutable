@@ -65,6 +65,17 @@ final class Maybe
     }
 
     /**
+     * The comprehension is called only when all values exist
+     *
+     * @psalm-pure
+     * @no-named-arguments
+     */
+    public static function all(self $first, self ...$rest): Maybe\Comprehension
+    {
+        return Maybe\Comprehension::of($first, ...$rest);
+    }
+
+    /**
      * @template V
      *
      * @param callable(T): V $map

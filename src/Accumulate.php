@@ -10,6 +10,7 @@ namespace Innmind\Immutable;
  * @template T
  * @template S
  * @internal Do not use this in your code
+ * @psalm-immutable Not really immutable but to simplify declaring immutability of other structures
  */
 final class Accumulate implements \Iterator
 {
@@ -33,6 +34,7 @@ final class Accumulate implements \Iterator
      */
     public function current()
     {
+        /** @psalm-suppress UnusedMethodCall */
         $this->pop();
 
         return \current($this->values);
@@ -43,6 +45,7 @@ final class Accumulate implements \Iterator
      */
     public function key()
     {
+        /** @psalm-suppress UnusedMethodCall */
         $this->pop();
 
         return \current($this->keys);
@@ -54,6 +57,7 @@ final class Accumulate implements \Iterator
         \next($this->values);
 
         if ($this->reachedCacheEnd()) {
+            /** @psalm-suppress ImpureMethodCall */
             $this->generator->next();
         }
     }
@@ -66,11 +70,13 @@ final class Accumulate implements \Iterator
 
     public function valid(): bool
     {
+        /** @psalm-suppress ImpureMethodCall */
         $valid = !$this->reachedCacheEnd() || $this->generator->valid();
 
         if (!$valid) {
             // once the "true" end has been reached we automatically rewind this
             // iterator so it is always in a clean state
+            /** @psalm-suppress UnusedMethodCall */
             $this->rewind();
         }
 
@@ -85,7 +91,15 @@ final class Accumulate implements \Iterator
     private function pop(): void
     {
         if ($this->reachedCacheEnd()) {
+            /**
+             * @psalm-suppress InaccessibleProperty
+             * @psalm-suppress ImpureMethodCall
+             */
             $this->keys[] = $this->generator->key();
+            /**
+             * @psalm-suppress InaccessibleProperty
+             * @psalm-suppress ImpureMethodCall
+             */
             $this->values[] = $this->generator->current();
         }
     }

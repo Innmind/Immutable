@@ -15,10 +15,10 @@ final class Sequence
      *
      * @return Set<Structure<I>>
      */
-    public static function of(string $type, Set $set, Set\Integers $sizes = null): Set
+    public static function of(Set $set, Set\Integers $sizes = null): Set
     {
         return Set\Decorate::immutable(
-            static fn(array $values): Structure => Structure::of($type, ...$values),
+            static fn(array $values): Structure => Structure::of(...$values),
             Set\Sequence::of(
                 $set,
                 $sizes,

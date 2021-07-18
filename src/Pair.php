@@ -8,6 +8,7 @@ namespace Innmind\Immutable;
  *
  * @template T
  * @template S
+ * @psalm-immutable
  */
 final class Pair
 {
@@ -17,6 +18,7 @@ final class Pair
     private $value;
 
     /**
+     * @internal You should never have to manually create this object
      * @param T $key
      * @param S $value
      */

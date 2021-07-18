@@ -3,12 +3,11 @@ declare(strict_types = 1);
 
 namespace Innmind\Immutable;
 
-use Innmind\Immutable\{
-    Exception\RegexException,
-    Exception\SubstringException,
-    Exception\LogicException,
-};
+use Innmind\Immutable\Exception\InvalidRegex;
 
+/**
+ * @psalm-immutable
+ */
 final class Str
 {
     private string $value;
@@ -17,10 +16,16 @@ final class Str
     private function __construct(string $value, string $encoding = null)
     {
         $this->value = $value;
-        /** @var string */
+        /**
+         * @psalm-suppress ImpureFunctionCall
+         * @var string
+         */
         $this->encoding = $encoding ?? \mb_internal_encoding();
     }
 
+    /**
+     * @psalm-pure
+     */
     public static function of(string $value, string $encoding = null): self
     {
         return new self($value, $encoding);
@@ -54,7 +59,7 @@ final class Str
 
         $parts = \explode($delimiter, $this->value);
         /** @var Sequence<self> */
-        $sequence = Sequence::of(self::class);
+        $sequence = Sequence::of();
 
         foreach ($parts as $part) {
             $sequence = ($sequence)(new self($part, $this->encoding));
@@ -71,7 +76,7 @@ final class Str
     public function chunk(int $size = 1): Sequence
     {
         /** @var Sequence<self> */
-        $sequence = Sequence::of(self::class);
+        $sequence = Sequence::of();
         /** @var list<string> */
         $parts = \mb_str_split($this->value, $size, $this->encoding);
 
@@ -85,20 +90,18 @@ final class Str
     /**
      * Returns the position of the first occurence of the string
      *
-     * @throws SubstringException If the string is not found
+     * @return Maybe<int>
      */
-    public function position(string $needle, int $offset = 0): int
+    public function position(string $needle, int $offset = 0): Maybe
     {
         $position = \mb_strpos($this->value, $needle, $offset, $this->encoding);
 
         if ($position === false) {
-            throw new SubstringException(\sprintf(
-                'Substring "%s" not found',
-                $needle,
-            ));
+            /** @var Maybe<int> */
+            return Maybe::nothing();
         }
 
-        return $position;
+        return Maybe::just($position);
     }
 
     /**
@@ -112,28 +115,9 @@ final class Str
 
         $parts = $this
             ->split($search)
-            ->toSequenceOf('string', static fn($v) => yield $v->toString());
+            ->map(static fn($v) => $v->toString());
 
         return join($replacement, $parts);
-    }
-
-    /**
-     * Returns the string following the given delimiter
-     *
-     * @throws SubstringException If the string is not found
-     */
-    public function str(string $delimiter): self
-    {
-        $sub = \mb_strstr($this->value, $delimiter, false, $this->encoding);
-
-        if ($sub === false) {
-            throw new SubstringException(\sprintf(
-                'Substring "%s" not found',
-                $delimiter,
-            ));
-        }
-
-        return new self($sub, $this->encoding);
     }
 
     /**
@@ -173,7 +157,7 @@ final class Str
         $parts = $this
             ->chunk()
             ->reverse()
-            ->toSequenceOf('string', static fn($v) => yield $v->toString());
+            ->map(static fn($v) => $v->toString());
 
         return join('', $parts)->toEncoding($this->encoding);
     }
@@ -203,46 +187,11 @@ final class Str
     }
 
     /**
-     * Find length of initial segment not matching mask
-     */
-    public function cspn(string $mask, int $start = 0, int $length = null): int
-    {
-        if ($length === null) {
-            $value = \strcspn($this->value, $mask, $start);
-        } else {
-            $value = \strcspn(
-                $this->value,
-                $mask,
-                $start,
-                $length,
-            );
-        }
-
-        return $value;
-    }
-
-    /**
      * Repeat the string n times
      */
     public function repeat(int $repeat): self
     {
         return new self(\str_repeat($this->value, $repeat), $this->encoding);
-    }
-
-    /**
-     * Shuffle the string
-     */
-    public function shuffle(): self
-    {
-        /** @psalm-suppress InvalidArgument */
-        $parts = unwrap(
-            $this
-                ->chunk()
-                ->toSequenceOf('string', static fn($v) => yield $v->toString()),
-        );
-        \shuffle($parts);
-
-        return new self(\implode('', $parts), $this->encoding);
     }
 
     public function stripSlashes(): self
@@ -280,7 +229,7 @@ final class Str
         /** @var list<string> */
         $words = \str_word_count($this->value, 2, $charlist);
         /** @var Map<int, self> */
-        $map = Map::of('int', self::class);
+        $map = Map::of();
 
         foreach ($words as $position => $word) {
             $map = ($map)($position, new self($word, $this->encoding));
@@ -298,7 +247,7 @@ final class Str
     {
         $strings = \preg_split($regex, $this->value, $limit);
         /** @var Sequence<self> */
-        $sequence = Sequence::of(self::class);
+        $sequence = Sequence::of();
 
         foreach ($strings as $string) {
             $sequence = ($sequence)(new self($string, $this->encoding));
@@ -310,7 +259,7 @@ final class Str
     /**
      * Check if the string match the given regular expression
      *
-     * @throws RegexException If the regex failed
+     * @throws InvalidRegex If the regex failed
      */
     public function matches(string $regex): bool
     {
@@ -320,9 +269,9 @@ final class Str
     /**
      * Return a collection of the elements matching the regex
      *
-     * @throws RegexException If the regex failed
+     * @throws InvalidRegex If the regex failed
      *
-     * @return Map<scalar, self>
+     * @return Map<int|string, self>
      */
     public function capture(string $regex): Map
     {
@@ -332,7 +281,7 @@ final class Str
     /**
      * Replace part of the string by using a regular expression
      *
-     * @throws RegexException If the regex failed
+     * @throws InvalidRegex If the regex failed
      */
     public function pregReplace(
         string $regex,
@@ -347,7 +296,8 @@ final class Str
         );
 
         if ($value === null) {
-            throw new RegexException('', \preg_last_error());
+            /** @psalm-suppress ImpureFunctionCall */
+            throw new InvalidRegex('', \preg_last_error());
         }
 
         return new self($value, $this->encoding);
@@ -418,16 +368,13 @@ final class Str
     }
 
     /**
-     * Return a CamelCase representation of the string
+     * Return a camelCase representation of the string
      */
     public function camelize(): self
     {
         $words = $this
             ->pregSplit('/_| /')
-            ->map(static function(self $part) {
-                return $part->ucfirst();
-            })
-            ->toSequenceOf('string', static fn($v) => yield $v->toString());
+            ->map(static fn(self $part) => $part->ucfirst()->toString());
 
         return join('', $words)
             ->lcfirst()
@@ -529,6 +476,22 @@ final class Str
     public function pregQuote(string $delimiter = ''): self
     {
         return new self(\preg_quote($this->value, $delimiter), $this->encoding);
+    }
+
+    /**
+     * @param callable(string, string): string $map Second string is the encoding
+     */
+    public function map(callable $map): self
+    {
+        return new self($map($this->value, $this->encoding), $this->encoding);
+    }
+
+    /**
+     * @param callable(string, string): self $map Second string is the encoding
+     */
+    public function flatMap(callable $map): self
+    {
+        return $map($this->value, $this->encoding);
     }
 
     /**

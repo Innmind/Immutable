@@ -17,13 +17,13 @@ class SetTest extends TestCase
     {
         $this->assertInstanceOf(
             DataSet::class,
-            Set::of('string', new DataSet\Chars)
+            Set::of(new DataSet\Chars)
         );
     }
 
     public function testGeneratesAtMost100ValuesByDefault()
     {
-        $sets = Set::of('string', new DataSet\Chars);
+        $sets = Set::of(new DataSet\Chars);
 
         $this->assertInstanceOf(\Generator::class, $sets->values(new RandomInt));
         $count = \count(\iterator_to_array($sets->values(new RandomInt)));
@@ -33,14 +33,12 @@ class SetTest extends TestCase
         foreach ($sets->values(new RandomInt) as $set) {
             $this->assertInstanceOf(DataSet\Value::class, $set);
             $this->assertInstanceOf(Structure::class, $set->unwrap());
-            $this->assertSame('string', (string) $set->unwrap()->type());
         }
     }
 
     public function testGeneratesSequencesOfDifferentSizes()
     {
         $sets = Set::of(
-            'string',
             new DataSet\Chars,
             DataSet\Integers::between(0, 50)
         );
@@ -55,7 +53,7 @@ class SetTest extends TestCase
 
     public function testTake()
     {
-        $sets1 = Set::of('string', new DataSet\Chars);
+        $sets1 = Set::of(new DataSet\Chars);
         $sets2 = $sets1->take(50);
 
         $this->assertNotSame($sets1, $sets2);
@@ -69,7 +67,7 @@ class SetTest extends TestCase
 
     public function testFilter()
     {
-        $sets = Set::of('string', DataSet\Chars::any());
+        $sets = Set::of(DataSet\Chars::any());
         $sets2 = $sets->filter(static fn($set) => $set->size() % 2 === 0);
 
         $this->assertInstanceOf(DataSet::class, $sets2);
@@ -96,7 +94,6 @@ class SetTest extends TestCase
     public function testFlagStructureAsMutableWhenUnderlyingSetValuesAreMutable()
     {
         $sets = Set::of(
-            'object',
             DataSet\Decorate::mutable(
                 static fn() => new \stdClass,
                 new DataSet\Chars,
@@ -112,7 +109,7 @@ class SetTest extends TestCase
 
     public function testNonEmptySetCanBeShrunk()
     {
-        $sets = Set::of('string', DataSet\Chars::any(), DataSet\Integers::between(1, 100));
+        $sets = Set::of(DataSet\Chars::any(), DataSet\Integers::between(1, 100));
 
         foreach ($sets->values(new RandomInt) as $value) {
             $this->assertTrue($value->shrinkable());
@@ -121,7 +118,7 @@ class SetTest extends TestCase
 
     public function testEmptySetCanNotBeShrunk()
     {
-        $sets = Set::of('string', DataSet\Chars::any(), DataSet\Integers::below(1));
+        $sets = Set::of(DataSet\Chars::any(), DataSet\Integers::below(1));
 
         foreach ($sets->values(new RandomInt) as $value) {
             if (!$value->unwrap()->empty()) {
@@ -135,7 +132,7 @@ class SetTest extends TestCase
 
     public function testNonEmptySetAreShrunkWithDifferentStrategies()
     {
-        $sets = Set::of('string', DataSet\Chars::any(), DataSet\Integers::between(3, 100));
+        $sets = Set::of(DataSet\Chars::any(), DataSet\Integers::between(3, 100));
 
         foreach ($sets->values(new RandomInt) as $value) {
             if ($value->unwrap()->size() < 6) {
@@ -153,7 +150,7 @@ class SetTest extends TestCase
 
     public function testShrunkSetsDoContainsLessThanTheInitialValue()
     {
-        $sets = Set::of('string', DataSet\Chars::any(), DataSet\Integers::between(2, 100));
+        $sets = Set::of(DataSet\Chars::any(), DataSet\Integers::between(2, 100));
 
         foreach ($sets->values(new RandomInt) as $value) {
             if ($value->unwrap()->size() < 4) {
@@ -172,7 +169,7 @@ class SetTest extends TestCase
 
     public function testShrinkingStrategyAReduceTheSetFasterThanStrategyB()
     {
-        $sets = Set::of('string', DataSet\Chars::any(), DataSet\Integers::between(3, 100));
+        $sets = Set::of(DataSet\Chars::any(), DataSet\Integers::between(3, 100));
 
         foreach ($sets->values(new RandomInt) as $value) {
             if ($value->unwrap()->size() < 6) {
@@ -190,7 +187,7 @@ class SetTest extends TestCase
 
     public function testShrunkValuesConserveMutabilityProperty()
     {
-        $sets = Set::of('string', DataSet\Chars::any(), DataSet\Integers::between(1, 100));
+        $sets = Set::of(DataSet\Chars::any(), DataSet\Integers::between(1, 100));
 
         foreach ($sets->values(new RandomInt) as $value) {
             $dichotomy = $value->shrink();
@@ -200,7 +197,6 @@ class SetTest extends TestCase
         }
 
         $sets = Set::of(
-            'object',
             DataSet\Decorate::mutable(
                 static fn() => new \stdClass,
                 new DataSet\Chars,

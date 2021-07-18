@@ -5,76 +5,86 @@ namespace Innmind\Immutable\Map;
 
 use Innmind\Immutable\{
     Map,
-    Type,
     Str,
     Sequence,
     Set,
     Pair,
-    ValidateArgument,
-    Exception\LogicException,
-    Exception\ElementNotFound,
-    Exception\CannotGroupEmptyStructure,
+    Maybe,
+    SideEffect,
 };
 
 /**
  * @template T
  * @template S
+ * @psalm-immutable
  */
 final class Primitive implements Implementation
 {
-    private string $keyType;
-    private string $valueType;
-    private ValidateArgument $validateKey;
-    private ValidateArgument $validateValue;
     /** @var array<T, S> */
-    private array $values = [];
-    private ?int $size = null;
+    private array $values;
 
-    public function __construct(string $keyType, string $valueType)
+    /**
+     * @param array<T, S> $values
+     */
+    public function __construct(array $values = [])
     {
-        $this->validateKey = Type::of($keyType);
-
-        if (!\in_array($keyType, ['int', 'integer', 'string'], true)) {
-            throw new LogicException;
-        }
-
-        $this->validateValue = Type::of($valueType);
-        $this->keyType = $keyType;
-        $this->valueType = $valueType;
+        $this->values = $values;
     }
 
     /**
      * @param T $key
      * @param S $value
      *
-     * @return self<T, S>
+     * @return Implementation<T, S>
      */
-    public function __invoke($key, $value): self
+    public function __invoke($key, $value): Implementation
     {
-        ($this->validateKey)($key, 1);
-        ($this->validateValue)($value, 2);
+        /** @psalm-suppress DocblockTypeContradiction */
+        if (\is_string($key) && \is_numeric($key)) {
+            // numeric-string keys are casted to ints by php, so when iterating
+            // over the array afterward the type is not conserved so we switch
+            // the implementation to DoubleIndex so keep the type
+            return (new DoubleIndex)->merge($this)($key, $value);
+        }
 
-        $map = clone $this;
-        $map->size = null;
-        $map->values[$key] = $value;
+        $values = $this->values;
+        $values[$key] = $value;
 
-        return $map;
+        return new self($values);
     }
 
-    public function keyType(): string
+    /**
+     * @template A
+     * @template B
+     *
+     * @param A $key
+     * @param B $value
+     *
+     * @return Maybe<Implementation<A, B>>
+     */
+    public static function of($key, $value): Maybe
     {
-        return $this->keyType;
-    }
+        /** @psalm-suppress DocblockTypeContradiction */
+        if (\is_string($key) && \is_numeric($key)) {
+            /** @var Maybe<Implementation<A, B>> */
+            return Maybe::nothing();
+        }
 
-    public function valueType(): string
-    {
-        return $this->valueType;
+        if (\is_string($key) || \is_int($key)) {
+            /** @var self<A, B> */
+            $self = new self;
+
+            return Maybe::just(($self)($key, $value));
+        }
+
+        /** @var Maybe<Implementation<A, B>> */
+        return Maybe::nothing();
     }
 
     public function size(): int
     {
         /** @psalm-suppress MixedArgumentTypeCoercion */
-        return $this->size ?? $this->size = \count($this->values);
+        return \count($this->values);
     }
 
     public function count(): int
@@ -85,17 +95,15 @@ final class Primitive implements Implementation
     /**
      * @param T $key
      *
-     * @throws ElementNotFound
-     *
-     * @return S
+     * @return Maybe<S>
      */
-    public function get($key)
+    public function get($key): Maybe
     {
         if (!$this->contains($key)) {
-            throw new ElementNotFound($key);
+            return Maybe::nothing();
         }
 
-        return $this->values[$key];
+        return Maybe::just($this->values[$key]);
     }
 
     /**
@@ -112,11 +120,7 @@ final class Primitive implements Implementation
      */
     public function clear(): self
     {
-        $map = clone $this;
-        $map->size = null;
-        $map->values = [];
-
-        return $map;
+        return new self;
     }
 
     /**
@@ -124,16 +128,20 @@ final class Primitive implements Implementation
      */
     public function equals(Implementation $map): bool
     {
-        if ($map->size() !== $this->size()) {
+        if (!$map->keys()->equals($this->keys())) {
             return false;
         }
 
         foreach ($this->values as $k => $v) {
-            if (!$map->contains($k)) {
-                return false;
-            }
+            $equals = $map
+                ->get($k)
+                ->filter(static fn($value) => $value === $v)
+                ->match(
+                    static fn() => true,
+                    static fn() => false,
+                );
 
-            if ($map->get($k) !== $v) {
+            if (!$equals) {
                 return false;
             }
         }
@@ -148,65 +156,50 @@ final class Primitive implements Implementation
      */
     public function filter(callable $predicate): self
     {
-        $map = $this->clear();
+        /** @var array<T, S> */
+        $values = [];
 
         foreach ($this->values as $k => $v) {
-            if ($predicate($this->normalizeKey($k), $v) === true) {
-                $map->values[$k] = $v;
+            if ($predicate($k, $v) === true) {
+                $values[$k] = $v;
             }
         }
 
-        return $map;
+        return new self($values);
     }
 
     /**
      * @param callable(T, S): void $function
      */
-    public function foreach(callable $function): void
+    public function foreach(callable $function): SideEffect
     {
         foreach ($this->values as $k => $v) {
-            $function($this->normalizeKey($k), $v);
+            $function($k, $v);
         }
+
+        return new SideEffect;
     }
 
     /**
      * @template D
-     * @param callable(T, S): D $discriminator
      *
-     * @throws CannotGroupEmptyStructure
+     * @param callable(T, S): D $discriminator
      *
      * @return Map<D, Map<T, S>>
      */
     public function groupBy(callable $discriminator): Map
     {
-        if ($this->empty()) {
-            throw new CannotGroupEmptyStructure;
-        }
+        /** @var Map<D, Map<T, S>> */
+        $groups = Map::of();
 
-        $groups = null;
-
-        foreach ($this->values as $k => $value) {
-            $key = $this->normalizeKey($k);
+        foreach ($this->values as $key => $value) {
             $discriminant = $discriminator($key, $value);
 
-            if ($groups === null) {
-                /** @var Map<D, Map<T, S>> */
-                $groups = Map::of(
-                    Type::determine($discriminant),
-                    Map::class,
-                );
-            }
-
-            if ($groups->contains($discriminant)) {
-                $group = $groups->get($discriminant);
-                $group = ($group)($key, $value);
-
-                $groups = ($groups)($discriminant, $group);
-            } else {
-                $group = $this->clearMap()($key, $value);
-
-                $groups = ($groups)($discriminant, $group);
-            }
+            $group = $groups->get($discriminant)->match(
+                static fn($group) => $group,
+                fn() => $this->clearMap(),
+            );
+            $groups = ($groups)($discriminant, ($group)($key, $value));
         }
 
         /** @var Map<D, Map<T, S>> */
@@ -221,13 +214,7 @@ final class Primitive implements Implementation
         /** @psalm-suppress MixedArgumentTypeCoercion */
         $keys = \array_keys($this->values);
 
-        return Set::of(
-            $this->keyType,
-            ...\array_map(
-                fn($key) => $this->normalizeKey($key),
-                $keys,
-            ),
-        );
+        return Set::of(...$keys);
     }
 
     /**
@@ -238,39 +225,26 @@ final class Primitive implements Implementation
         /** @psalm-suppress MixedArgumentTypeCoercion */
         $values = \array_values($this->values);
 
-        return Sequence::of($this->valueType, ...$values);
+        return Sequence::of(...$values);
     }
 
     /**
-     * @param callable(T, S): (S|Pair<T, S>) $function
+     * @template B
      *
-     * @return self<T, S>
+     * @param callable(T, S): B $function
+     *
+     * @return self<T, B>
      */
     public function map(callable $function): self
     {
-        $map = $this->clear();
+        /** @var array<T, B> */
+        $values = [];
 
         foreach ($this->values as $k => $v) {
-            $return = $function($this->normalizeKey($k), $v);
-
-            if ($return instanceof Pair) {
-                ($this->validateKey)($return->key(), 1);
-
-                /** @var T */
-                $key = $return->key();
-                /** @var S */
-                $value = $return->value();
-            } else {
-                $key = $k;
-                $value = $return;
-            }
-
-            ($this->validateValue)($value, 2);
-
-            $map->values[$key] = $value;
+            $values[$k] = $function($k, $v);
         }
 
-        return $map;
+        return new self($values);
     }
 
     /**
@@ -284,25 +258,23 @@ final class Primitive implements Implementation
             return $this;
         }
 
-        $map = clone $this;
-        $map->size = null;
+        $values = $this->values;
         /** @psalm-suppress MixedArrayTypeCoercion */
-        unset($map->values[$key]);
+        unset($values[$key]);
 
-        return $map;
+        return new self($values);
     }
 
     /**
      * @param Implementation<T, S> $map
      *
-     * @return self<T, S>
+     * @return Implementation<T, S>
      */
-    public function merge(Implementation $map): self
+    public function merge(Implementation $map): Implementation
     {
-        /** @psalm-suppress MixedArgument For some reason it no longer recognize templates for $key and $value */
         return $map->reduce(
             $this,
-            static fn(self $carry, $key, $value): self => ($carry)($key, $value),
+            static fn(Implementation $carry, $key, $value): Implementation => ($carry)($key, $value),
         );
     }
 
@@ -317,7 +289,7 @@ final class Primitive implements Implementation
         $falsy = $this->clearMap();
 
         foreach ($this->values as $k => $v) {
-            $return = $predicate($this->normalizeKey($k), $v);
+            $return = $predicate($k, $v);
 
             if ($return === true) {
                 $truthy = ($truthy)($k, $v);
@@ -326,14 +298,7 @@ final class Primitive implements Implementation
             }
         }
 
-        /**
-         * @psalm-suppress InvalidScalarArgument
-         * @psalm-suppress InvalidArgument
-         * @var Map<bool, Map<T, S>>
-         */
-        return Map::of('bool', Map::class)
-            (true, $truthy)
-            (false, $falsy);
+        return Map::of([true, $truthy], [false, $falsy]);
     }
 
     /**
@@ -346,7 +311,7 @@ final class Primitive implements Implementation
     public function reduce($carry, callable $reducer)
     {
         foreach ($this->values as $k => $v) {
-            $carry = $reducer($carry, $this->normalizeKey($k), $v);
+            $carry = $reducer($carry, $k, $v);
         }
 
         return $carry;
@@ -361,91 +326,16 @@ final class Primitive implements Implementation
         return \is_null(\key($this->values));
     }
 
-    /**
-     * @template ST
-     *
-     * @param callable(T, S): \Generator<ST> $mapper
-     *
-     * @return Sequence<ST>
-     */
-    public function toSequenceOf(string $type, callable $mapper): Sequence
+    public function find(callable $predicate): Maybe
     {
-        /** @var Sequence<ST> */
-        $sequence = Sequence::of($type);
-
-        foreach ($this->values as $key => $value) {
-            foreach ($mapper($key, $value) as $newValue) {
-                $sequence = ($sequence)($newValue);
+        foreach ($this->values as $k => $v) {
+            if ($predicate($k, $v)) {
+                return Maybe::just(new Pair($k, $v));
             }
         }
 
-        return $sequence;
-    }
-
-    /**
-     * @template ST
-     *
-     * @param callable(T, S): \Generator<ST> $mapper
-     *
-     * @return Set<ST>
-     */
-    public function toSetOf(string $type, callable $mapper): Set
-    {
-        /** @var Set<ST> */
-        $set = Set::of($type);
-
-        foreach ($this->values as $key => $value) {
-            foreach ($mapper($key, $value) as $newValue) {
-                $set = ($set)($newValue);
-            }
-        }
-
-        return $set;
-    }
-
-    /**
-     * @template MT
-     * @template MS
-     *
-     * @param null|callable(T, S): \Generator<MT, MS> $mapper
-     *
-     * @return Map<MT, MS>
-     */
-    public function toMapOf(string $key, string $value, callable $mapper = null): Map
-    {
-        /** @psalm-suppress MissingClosureParamType */
-        $mapper ??= static fn($k, $v): \Generator => yield $k => $v;
-
-        /** @var Map<MT, MS> */
-        $map = Map::of($key, $value);
-
-        foreach ($this->values as $key => $value) {
-            /**
-             * @var MT $newKey
-             * @var MS $newValue
-             */
-            foreach ($mapper($key, $value) as $newKey => $newValue) {
-                $map = ($map)($newKey, $newValue);
-            }
-        }
-
-        return $map;
-    }
-
-    /**
-     * @param mixed $value
-     *
-     * @return T
-     */
-    private function normalizeKey($value)
-    {
-        if ($this->keyType === 'string' && !\is_null($value)) {
-            /** @var T */
-            return (string) $value;
-        }
-
-        /** @var T */
-        return $value;
+        /** @var Maybe<Pair<T, S>> */
+        return Maybe::nothing();
     }
 
     /**
@@ -453,6 +343,6 @@ final class Primitive implements Implementation
      */
     private function clearMap(): Map
     {
-        return Map::of($this->keyType, $this->valueType);
+        return Map::of();
     }
 }
