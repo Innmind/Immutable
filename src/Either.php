@@ -68,11 +68,12 @@ final class Either
     }
 
     /**
+     * @template A
      * @template B
      *
-     * @param callable(R): Either<L, B> $map
+     * @param callable(R): Either<A, B> $map
      *
-     * @return Either<L, B>
+     * @return Either<L|A, B>
      */
     public function flatMap(callable $map): self
     {
