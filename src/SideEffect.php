@@ -11,10 +11,4 @@ namespace Innmind\Immutable;
  */
 final class SideEffect
 {
-    /**
-     * @internal
-     */
-    public function __construct()
-    {
-    }
 }
