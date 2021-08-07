@@ -212,7 +212,7 @@ final class Str
      */
     public function wordCount(string $charlist = ''): int
     {
-        return (int) \str_word_count(
+        return \str_word_count(
             $this->value,
             0,
             $charlist,
