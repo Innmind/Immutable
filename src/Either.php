@@ -106,9 +106,12 @@ final class Either
     }
 
     /**
-     * @param callable(): Either<L, R> $otherwise
+     * @template A
+     * @template B
      *
-     * @return Either<L, R>
+     * @param callable(L): Either<A, B> $otherwise
+     *
+     * @return Either<A, R|B>
      */
     public function otherwise(callable $otherwise): self
     {

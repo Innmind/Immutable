@@ -55,7 +55,7 @@ final class Left implements Implementation
 
     public function otherwise(callable $otherwise): Either
     {
-        return $otherwise();
+        return $otherwise($this->value);
     }
 
     public function filter(callable $predicate, callable $otherwise): self
