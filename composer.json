@@ -36,7 +36,8 @@
         "innmind/coding-standard": "^1.0"
     },
     "conflict": {
-        "innmind/black-box": "<4.4|~5.0"
+        "innmind/black-box": "<4.4|~5.0",
+        "vimeo/psalm": "4.9.3"
     },
     "suggest": {
         "innmind/black-box": "For property based testing"
