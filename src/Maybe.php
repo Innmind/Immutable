@@ -113,9 +113,11 @@ final class Maybe
     }
 
     /**
-     * @param callable(): Maybe<T> $otherwise
+     * @template V
      *
-     * @return Maybe<T>
+     * @param callable(): Maybe<V> $otherwise
+     *
+     * @return Maybe<T|V>
      */
     public function otherwise(callable $otherwise): self
     {
