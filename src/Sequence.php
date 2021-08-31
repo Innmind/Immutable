@@ -96,11 +96,9 @@ final class Sequence implements \Countable
      * @no-named-arguments
      * @psalm-pure
      *
-     * @param mixed $values
-     *
      * @return self<mixed>
      */
-    public static function mixed(...$values): self
+    public static function mixed(mixed ...$values): self
     {
         return new self(new Sequence\Primitive($values));
     }

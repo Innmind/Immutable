@@ -93,11 +93,9 @@ final class Set implements \Countable
      * @no-named-arguments
      * @psalm-pure
      *
-     * @param mixed $values
-     *
      * @return self<mixed>
      */
-    public static function mixed(...$values): self
+    public static function mixed(mixed ...$values): self
     {
         return new self(Set\Primitive::of(...$values));
     }
