@@ -48,7 +48,7 @@ final class Left implements Implementation
         return new self($map($this->value));
     }
 
-    public function match(callable $left, callable $right)
+    public function match(callable $right, callable $left)
     {
         return $left($this->value);
     }

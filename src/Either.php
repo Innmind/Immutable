@@ -95,14 +95,14 @@ final class Either
     /**
      * @template T
      *
-     * @param callable(L): T $left
      * @param callable(R): T $right
+     * @param callable(L): T $left
      *
      * @return T
      */
-    public function match(callable $left, callable $right)
+    public function match(callable $right, callable $left)
     {
-        return $this->either->match($left, $right);
+        return $this->either->match($right, $left);
     }
 
     /**
