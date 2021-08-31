@@ -7,6 +7,7 @@ use Innmind\Immutable\{
     Str as S,
     Sequence,
     Map,
+    Set,
     Exception\InvalidRegex,
 };
 use PHPUnit\Framework\TestCase;
@@ -809,6 +810,22 @@ class StrTest extends TestCase
         $this->assertSame($expected, $b);
         $this->assertSame('foo', $a->toString());
         $this->assertSame('bar', $b->toString());
+    }
+
+    public function testJoinSet()
+    {
+        $str = S::of('|')->join(Set::of('1', '2', '3'));
+
+        $this->assertInstanceOf(S::class, $str);
+        $this->assertSame('1|2|3', $str->toString());
+    }
+
+    public function testJoinSequence()
+    {
+        $str = S::of('|')->join(Sequence::of('1', '2', '3'));
+
+        $this->assertInstanceOf(S::class, $str);
+        $this->assertSame('1|2|3', $str->toString());
     }
 
     public function get($map, $index)

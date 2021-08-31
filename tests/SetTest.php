@@ -446,22 +446,6 @@ class SetTest extends TestCase
         );
     }
 
-    public function testJoinSet()
-    {
-        $str = Str::join('|', Set::of('1', '2', '3'));
-
-        $this->assertInstanceOf(Str::class, $str);
-        $this->assertSame('1|2|3', $str->toString());
-    }
-
-    public function testJoinSequence()
-    {
-        $str = Str::join('|', Sequence::of('1', '2', '3'));
-
-        $this->assertInstanceOf(Str::class, $str);
-        $this->assertSame('1|2|3', $str->toString());
-    }
-
     public function get($map, $index)
     {
         return $map->get($index)->match(
