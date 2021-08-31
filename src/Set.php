@@ -22,7 +22,7 @@ final class Set implements \Countable
      *
      * Example:
      * <code>
-     * Set::of('int')(1)(3)
+     * Set::of()(1)(3)
      * </code>
      *
      * @param T $element

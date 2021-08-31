@@ -25,7 +25,7 @@ final class Sequence implements \Countable
      *
      * Example:
      * <code>
-     * Sequence::of('int')(1)(3)
+     * Sequence::of()(1)(3)
      * </code>
      *
      * @param T $element

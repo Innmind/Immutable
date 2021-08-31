@@ -22,7 +22,7 @@ final class Map implements \Countable
      *
      * Example:
      * <code>
-     * Map::of('int', 'int')
+     * Map::of()
      *     (1, 2)
      *     (3, 4)
      * </code>
@@ -106,7 +106,7 @@ final class Map implements \Countable
     }
 
     /**
-     * Return an empty map given the same given type
+     * Return an empty map of the same type
      *
      * @return self<T, S>
      */
@@ -200,7 +200,7 @@ final class Map implements \Countable
     }
 
     /**
-     * Merge all Maps created by by each value from the initial Map
+     * Merge all Maps created by each value from the initial Map
      *
      * @template A
      * @template B
