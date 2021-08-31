@@ -31,10 +31,7 @@ final class Set implements \Countable
      */
     public function __invoke($element): self
     {
-        $self = clone $this;
-        $self->implementation = ($this->implementation)($element);
-
-        return $self;
+        return new self(($this->implementation)($element));
     }
 
     /**
@@ -175,12 +172,9 @@ final class Set implements \Countable
      */
     public function intersect(self $set): self
     {
-        $newSet = clone $this;
-        $newSet->implementation = $this->implementation->intersect(
+        return new self($this->implementation->intersect(
             $set->implementation,
-        );
-
-        return $newSet;
+        ));
     }
 
     /**
@@ -214,10 +208,7 @@ final class Set implements \Countable
      */
     public function remove($element): self
     {
-        $self = clone $this;
-        $self->implementation = $this->implementation->remove($element);
-
-        return $self;
+        return new self($this->implementation->remove($element));
     }
 
     /**
@@ -229,12 +220,9 @@ final class Set implements \Countable
      */
     public function diff(self $set): self
     {
-        $self = clone $this;
-        $self->implementation = $this->implementation->diff(
+        return new self($this->implementation->diff(
             $set->implementation,
-        );
-
-        return $self;
+        ));
     }
 
     /**
@@ -256,10 +244,7 @@ final class Set implements \Countable
      */
     public function filter(callable $predicate): self
     {
-        $set = clone $this;
-        $set->implementation = $this->implementation->filter($predicate);
-
-        return $set;
+        return new self($this->implementation->filter($predicate));
     }
 
     /**
@@ -355,12 +340,9 @@ final class Set implements \Countable
      */
     public function merge(self $set): self
     {
-        $self = clone $this;
-        $self->implementation = $this->implementation->merge(
+        return new self($this->implementation->merge(
             $set->implementation,
-        );
-
-        return $self;
+        ));
     }
 
     /**
@@ -385,10 +367,7 @@ final class Set implements \Countable
      */
     public function clear(): self
     {
-        $self = clone $this;
-        $self->implementation = $this->implementation->clear();
-
-        return $self;
+        return new self($this->implementation->clear());
     }
 
     public function empty(): bool

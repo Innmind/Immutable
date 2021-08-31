@@ -34,10 +34,7 @@ final class Map implements \Countable
      */
     public function __invoke($key, $value): self
     {
-        $map = clone $this;
-        $map->implementation = ($this->implementation)($key, $value);
-
-        return $map;
+        return new self(($this->implementation)($key, $value));
     }
 
     /**
@@ -112,10 +109,7 @@ final class Map implements \Countable
      */
     public function clear(): self
     {
-        $map = clone $this;
-        $map->implementation = $this->implementation->clear();
-
-        return $map;
+        return new self($this->implementation->clear());
     }
 
     /**
@@ -230,10 +224,7 @@ final class Map implements \Countable
      */
     public function remove($key): self
     {
-        $map = clone $this;
-        $map->implementation = $this->implementation->remove($key);
-
-        return $map;
+        return new self($this->implementation->remove($key));
     }
 
     /**
@@ -245,10 +236,7 @@ final class Map implements \Countable
      */
     public function merge(self $map): self
     {
-        $self = clone $this;
-        $self->implementation = $this->implementation->merge($map->implementation);
-
-        return $self;
+        return new self($this->implementation->merge($map->implementation));
     }
 
     /**

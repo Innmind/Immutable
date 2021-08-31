@@ -73,7 +73,7 @@ final class RegExp
                 Str::of(
                     (string) $match,
                     $string->encoding()->toString(),
-                )
+                ),
             );
         }
 

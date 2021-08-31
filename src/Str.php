@@ -298,7 +298,7 @@ final class Str
     public function pregReplace(
         string $regex,
         string $replacement,
-        int $limit = -1
+        int $limit = -1,
     ): self {
         $value = \preg_replace(
             $regex,

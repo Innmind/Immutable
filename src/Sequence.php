@@ -34,10 +34,7 @@ final class Sequence implements \Countable
      */
     public function __invoke($element): self
     {
-        $self = clone $this;
-        $self->implementation = ($this->implementation)($element);
-
-        return $self;
+        return new self(($this->implementation)($element));
     }
 
     /**
@@ -188,12 +185,9 @@ final class Sequence implements \Countable
      */
     public function diff(self $sequence): self
     {
-        $self = clone $this;
-        $self->implementation = $this->implementation->diff(
+        return new self($this->implementation->diff(
             $sequence->implementation,
-        );
-
-        return $self;
+        ));
     }
 
     /**
@@ -203,10 +197,7 @@ final class Sequence implements \Countable
      */
     public function distinct(): self
     {
-        $self = clone $this;
-        $self->implementation = $this->implementation->distinct();
-
-        return $self;
+        return new self($this->implementation->distinct());
     }
 
     /**
@@ -216,10 +207,7 @@ final class Sequence implements \Countable
      */
     public function drop(int $size): self
     {
-        $self = clone $this;
-        $self->implementation = $this->implementation->drop($size);
-
-        return $self;
+        return new self($this->implementation->drop($size));
     }
 
     /**
@@ -229,10 +217,7 @@ final class Sequence implements \Countable
      */
     public function dropEnd(int $size): self
     {
-        $self = clone $this;
-        $self->implementation = $this->implementation->dropEnd($size);
-
-        return $self;
+        return new self($this->implementation->dropEnd($size));
     }
 
     /**
@@ -256,10 +241,7 @@ final class Sequence implements \Countable
      */
     public function filter(callable $predicate): self
     {
-        $self = clone $this;
-        $self->implementation = $this->implementation->filter($predicate);
-
-        return $self;
+        return new self($this->implementation->filter($predicate));
     }
 
     /**
@@ -383,10 +365,7 @@ final class Sequence implements \Countable
      */
     public function pad(int $size, $element): self
     {
-        $self = clone $this;
-        $self->implementation = $this->implementation->pad($size, $element);
-
-        return $self;
+        return new self($this->implementation->pad($size, $element));
     }
 
     /**
@@ -408,10 +387,7 @@ final class Sequence implements \Countable
      */
     public function slice(int $from, int $until): self
     {
-        $self = clone $this;
-        $self->implementation = $this->implementation->slice($from, $until);
-
-        return $self;
+        return new self($this->implementation->slice($from, $until));
     }
 
     /**
@@ -421,10 +397,7 @@ final class Sequence implements \Countable
      */
     public function take(int $size): self
     {
-        $self = clone $this;
-        $self->implementation = $this->implementation->take($size);
-
-        return $self;
+        return new self($this->implementation->take($size));
     }
 
     /**
@@ -434,10 +407,7 @@ final class Sequence implements \Countable
      */
     public function takeEnd(int $size): self
     {
-        $self = clone $this;
-        $self->implementation = $this->implementation->takeEnd($size);
-
-        return $self;
+        return new self($this->implementation->takeEnd($size));
     }
 
     /**
@@ -449,12 +419,9 @@ final class Sequence implements \Countable
      */
     public function append(self $sequence): self
     {
-        $self = clone $this;
-        $self->implementation = $this->implementation->append(
+        return new self($this->implementation->append(
             $sequence->implementation,
-        );
-
-        return $self;
+        ));
     }
 
     /**
@@ -467,12 +434,9 @@ final class Sequence implements \Countable
      */
     public function intersect(self $sequence): self
     {
-        $self = clone $this;
-        $self->implementation = $this->implementation->intersect(
+        return new self($this->implementation->intersect(
             $sequence->implementation,
-        );
-
-        return $self;
+        ));
     }
 
     /**
@@ -496,10 +460,7 @@ final class Sequence implements \Countable
      */
     public function sort(callable $function): self
     {
-        $self = clone $this;
-        $self->implementation = $this->implementation->sort($function);
-
-        return $self;
+        return new self($this->implementation->sort($function));
     }
 
     /**
@@ -524,10 +485,7 @@ final class Sequence implements \Countable
      */
     public function clear(): self
     {
-        $self = clone $this;
-        $self->implementation = new Sequence\Primitive;
-
-        return $self;
+        return new self(new Sequence\Primitive);
     }
 
     /**
@@ -537,10 +495,7 @@ final class Sequence implements \Countable
      */
     public function reverse(): self
     {
-        $self = clone $this;
-        $self->implementation = $this->implementation->reverse();
-
-        return $self;
+        return new self($this->implementation->reverse());
     }
 
     public function empty(): bool

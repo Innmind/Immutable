@@ -108,9 +108,9 @@ final class Primitive implements Implementation
             return $this;
         }
 
-        return new self(
-            $this->values->filter(static fn($value) => $value !== $element),
-        );
+        return new self($this->values->filter(
+            static fn($value) => $value !== $element,
+        ));
     }
 
     /**

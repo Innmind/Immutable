@@ -103,10 +103,7 @@ final class DoubleIndex implements Implementation
      */
     public function clear(): self
     {
-        $map = clone $this;
-        $map->pairs = $this->pairs->clear();
-
-        return $map;
+        return new self($this->pairs->clear());
     }
 
     /**
@@ -142,9 +139,9 @@ final class DoubleIndex implements Implementation
      */
     public function filter(callable $predicate): self
     {
-        return new self(
-            $this->pairs->filter(static fn($pair) => $predicate($pair->key(), $pair->value())),
-        );
+        return new self($this->pairs->filter(
+            static fn($pair) => $predicate($pair->key(), $pair->value()),
+        ));
     }
 
     /**
@@ -216,18 +213,10 @@ final class DoubleIndex implements Implementation
      */
     public function map(callable $function): self
     {
-        /** @var self<T, B> */
-        $map = new self;
-
-        foreach ($this->pairs->iterator() as $pair) {
-            /** @psalm-suppress InvalidArgument */
-            $map = ($map)(
-                $pair->key(),
-                $function($pair->key(), $pair->value()),
-            );
-        }
-
-        return $map;
+        return new self($this->pairs->map(static fn($pair) => new Pair(
+            $pair->key(),
+            $function($pair->key(), $pair->value()),
+        )));
     }
 
     /**
@@ -237,12 +226,9 @@ final class DoubleIndex implements Implementation
      */
     public function remove($key): self
     {
-        $map = clone $this;
-        $map->pairs = $this
-            ->pairs
-            ->filter(static fn($pair) => $pair->key() !== $key);
-
-        return $map;
+        return new self($this->pairs->filter(
+            static fn($pair) => $pair->key() !== $key
+        ));
     }
 
     /**
