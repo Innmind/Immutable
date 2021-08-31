@@ -21,8 +21,7 @@
         "psr-4": {
             "Innmind\\Immutable\\": "src/",
             "Fixtures\\Innmind\\Immutable\\": "fixtures/"
-        },
-        "files": ["src/functions.php"]
+        }
     },
     "autoload-dev": {
         "psr-4": {

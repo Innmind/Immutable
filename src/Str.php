@@ -31,6 +31,18 @@ final class Str
         return new self($value, $encoding);
     }
 
+    /**
+     * Concatenate all elements with the given separator
+     *
+     * @psalm-pure
+     *
+     * @param Set<string>|Sequence<string> $structure
+     */
+    public static function join(string $separator, Set|Sequence $structure): self
+    {
+        return new self(\implode($separator, $structure->toList()));
+    }
+
     public function toString(): string
     {
         return $this->value;
@@ -117,7 +129,7 @@ final class Str
             ->split($search)
             ->map(static fn($v) => $v->toString());
 
-        return join($replacement, $parts);
+        return self::join($replacement, $parts);
     }
 
     /**
@@ -159,7 +171,7 @@ final class Str
             ->reverse()
             ->map(static fn($v) => $v->toString());
 
-        return join('', $parts)->toEncoding($this->encoding);
+        return self::join('', $parts)->toEncoding($this->encoding);
     }
 
     /**
@@ -376,7 +388,7 @@ final class Str
             ->pregSplit('/_| /')
             ->map(static fn(self $part) => $part->ucfirst()->toString());
 
-        return join('', $words)
+        return self::join('', $words)
             ->lcfirst()
             ->toEncoding($this->encoding);
     }
