@@ -297,9 +297,10 @@ final class Map implements \Countable
      */
     public function matches(callable $predicate): bool
     {
-        return $this->find($predicate)->match(
-            static fn() => true,
-            static fn() => false,
+        /** @psalm-suppress MixedArgument */
+        return $this->reduce(
+            true,
+            static fn(bool $matches, $key, $value): bool => $matches && $predicate($key, $value),
         );
     }
 
@@ -308,10 +309,9 @@ final class Map implements \Countable
      */
     public function any(callable $predicate): bool
     {
-        /** @psalm-suppress MixedArgument */
-        return $this->reduce(
-            false,
-            static fn(bool $any, $key, $value): bool => $any || $predicate($key, $value),
+        return $this->find($predicate)->match(
+            static fn() => true,
+            static fn() => false,
         );
     }
 }

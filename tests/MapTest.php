@@ -400,6 +400,9 @@ class MapTest extends TestCase
 
         $this->assertTrue($map->matches(static fn($key, $value) => $value % 2 === 0));
         $this->assertFalse($map->matches(static fn($key, $value) => $key % 2 === 0));
+        $this->assertFalse(Map::of([1, 2], [3, 3])->matches(
+            static fn($key, $value) => $value % 2 === 0,
+        ));
     }
 
     public function testAny()
