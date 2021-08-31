@@ -62,10 +62,12 @@ interface Implementation
     public function otherwise(callable $otherwise): Either;
 
     /**
-     * @param callable(R): bool $predicate
-     * @param callable(): L $otherwise
+     * @template A
      *
-     * @return self<L, R>
+     * @param callable(R): bool $predicate
+     * @param callable(): A $otherwise
+     *
+     * @return self<L|A, R>
      */
     public function filter(callable $predicate, callable $otherwise): self;
 }
