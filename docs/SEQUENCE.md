@@ -254,6 +254,16 @@ $squares = $ints->map(fn($i) => $i**2);
 $squares->equals(Sequence::ints(1, 4, 9)); // true
 ```
 
+## `->flatMap()`
+
+This is similar to `->map()` except that instead of returning a new value it returns a new sequence for each value, and each new sequence is appended together.
+
+```php
+$ints = Sequence::ints(1, 2, 3);
+$squares = $ints->flatMap(fn($i) => Sequence::of($i, $i**2));
+$squares->equals(Sequence::ints(1, 1, 2, 4, 3, 9)); // true
+```
+
 ## `->pad()`
 
 Add the same element to a new sequence in order that its size is at least the given one.
