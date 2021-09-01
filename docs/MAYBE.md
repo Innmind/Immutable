@@ -17,8 +17,6 @@ function env(string $name): Maybe {
 }
 ```
 
-**Important**: this structure is immutable and is only typed with [Psalm](http://psalm.dev) to keep the interface simple and jump between types more easily. So make sure to use Psalm in your code so you know if you use the structure correctly.
-
 ## `::just()`
 
 This named constructor tells that there **is** a value that can be used.
