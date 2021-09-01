@@ -36,7 +36,7 @@ final class Str
      *
      * @param Set<string>|Sequence<string> $structure
      */
-    public function join(Set|Sequence $structure): self // todo make non static
+    public function join(Set|Sequence $structure): self
     {
         return new self(
             \implode($this->value, $structure->toList()),
