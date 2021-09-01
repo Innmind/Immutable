@@ -34,8 +34,6 @@ function accessResource(User $user): Either {
 
 **Note**: `ServerRequest`, `User`, `Resource` and `Error` are imaginary classes.
 
-**Important**: this structure is immutable and is only typed with [Psalm](http://psalm.dev) to keep the interface simple and jump between types more easily. So make sure to use Psalm in your code so you know if you use the structure correctly.
-
 ## `::left()`
 
 This builds an `Either` instance with the given value in the left hand side.
