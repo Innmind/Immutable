@@ -167,7 +167,7 @@ $values = Map::of([24, 1], [42, 2])->values();
 $values->equals(Sequence::of(1, 2)); // true
 ```
 
-**Note**: it returns a `Sequence` because it can contains duplicates, the order is not guaranteed as a map is not ordered.
+**Note**: it returns a `Sequence` because it can contain duplicates, the order is not guaranteed as a map is not ordered.
 
 ## `->map()`
 
