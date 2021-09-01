@@ -245,6 +245,20 @@ class DeferTest extends TestCase
         $this->assertTrue($loaded);
     }
 
+    public function testMapDoesntIntroduceDuplicates()
+    {
+        $set = Defer::of((static function() {
+            yield 1;
+            yield 2;
+            yield 3;
+        })());
+
+        $this->assertSame(
+            [1],
+            \iterator_to_array($set->map(static fn() => 1)->iterator()),
+        );
+    }
+
     public function testPartition()
     {
         $set = Defer::of((static function() {

@@ -196,12 +196,7 @@ final class Defer implements Implementation
      */
     public function map(callable $function): self
     {
-        return new self(
-            $this
-                ->values
-                ->map($function)
-                ->distinct(),
-        );
+        return new self($this->values->map($function));
     }
 
     /**
