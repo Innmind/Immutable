@@ -388,6 +388,10 @@ Sequence::ints()->empty(); // true
 Sequence::ints(1)->empty(); // false
 ```
 
+## `->toList()`
+
+It returns a new `array` containing all the elements of the sequence.
+
 ## `->find()`
 
 Returns a [`Maybe`](maybe.md) object containing the first element that matches the predicate.
