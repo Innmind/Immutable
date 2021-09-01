@@ -654,6 +654,83 @@ class SequenceTest extends TestCase
         $this->assertFalse($sequence->any(static fn($i) => $i === 0));
     }
 
+    public function testPossibilityToCleanupResourcesWhenGeneratorStoppedBeforeEnd()
+    {
+        $cleanupCalled = false;
+        $endReached = false;
+        $started = 0;
+        $sequence = Sequence::lazy(static function($registerCleanup) use (&$cleanupCalled, &$endReached, &$started) {
+            ++$started;
+            $file = \fopen(__FILE__, 'r');
+            $registerCleanup(static function() use ($file, &$cleanupCalled) {
+                \fclose($file);
+                $cleanupCalled = true;
+            });
+
+            while (!\feof($file)) {
+                $line = \fgets($file);
+
+                yield $line;
+            }
+
+            $endReached = true;
+            \fclose($file);
+        });
+
+        $line = $sequence
+            ->map(static fn($line) => \trim($line))
+            ->filter(static fn($line) => $line !== '')
+            ->find(static fn($line) => \substr($line, -2) === '()')
+            ->match(
+                static fn($line) => $line,
+                static fn() => null,
+            );
+
+        $this->assertSame('public function testInterface()', $line);
+        $this->assertSame(1, $started);
+        $this->assertTrue($cleanupCalled);
+        $this->assertFalse($endReached);
+    }
+
+    public function testCleanupIsNotCalledWhenReachingTheEndOfTheGenerator()
+    {
+        $cleanupCalled = false;
+        $endReached = false;
+        $started = 0;
+        $sequence = Sequence::lazy(static function($registerCleanup) use (&$cleanupCalled, &$endReached, &$started) {
+            ++$started;
+            $file = \fopen(__FILE__, 'r');
+            $registerCleanup(static function() use ($file, &$cleanupCalled) {
+                \fclose($file);
+                $cleanupCalled = true;
+            });
+
+            while (!\feof($file)) {
+                $line = \fgets($file);
+
+                yield $line;
+            }
+
+            $endReached = true;
+            \fclose($file);
+        });
+
+        $line = $sequence
+            ->filter(static fn($line) => \is_string($line))
+            ->map(static fn($line) => \trim($line))
+            ->filter(static fn($line) => $line !== '')
+            ->find(static fn($line) => $line === 'unknown')
+            ->match(
+                static fn($line) => $line,
+                static fn() => null,
+            );
+
+        $this->assertNull($line);
+        $this->assertSame(1, $started);
+        $this->assertFalse($cleanupCalled);
+        $this->assertTrue($endReached);
+    }
+
     public function get($map, $index)
     {
         return $map->get($index)->match(

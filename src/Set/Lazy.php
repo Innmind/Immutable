@@ -15,6 +15,7 @@ use Innmind\Immutable\{
 /**
  * @template T
  * @psalm-immutable
+ * @psalm-type RegisterCleanup = callable(callable(): void): void
  */
 final class Lazy implements Implementation
 {
@@ -43,7 +44,7 @@ final class Lazy implements Implementation
      * @template A
      * @psalm-pure
      *
-     * @param callable(): \Generator<A> $generator
+     * @param callable(RegisterCleanup): \Generator<A> $generator
      *
      * @return self<A>
      */

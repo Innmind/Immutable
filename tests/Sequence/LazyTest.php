@@ -725,6 +725,108 @@ class LazyTest extends TestCase
         );
     }
 
+    public function testCallCleanupWhenGettingIndexBeforeTheEndOfGenerator()
+    {
+        $cleanupCalled = false;
+        $sequence = new Lazy(static function($registerCleanup) use (&$cleanupCalled) {
+            $registerCleanup(static function() use (&$cleanupCalled) {
+                $cleanupCalled = true;
+            });
+            yield 2;
+            yield 3;
+            yield 4;
+            yield 5;
+        });
+        $this->assertFalse($cleanupCalled);
+        $value = $sequence->get(1)->match(
+            static fn($value) => $value,
+            static fn() => null,
+        );
+
+        $this->assertSame(3, $value);
+        $this->assertTrue($cleanupCalled);
+    }
+
+    public function testCallCleanupWhenElementBeingLookedForIsFoundBeforeTheEndOfGenerator()
+    {
+        $cleanupCalled = false;
+        $sequence = new Lazy(static function($registerCleanup) use (&$cleanupCalled) {
+            $registerCleanup(static function() use (&$cleanupCalled) {
+                $cleanupCalled = true;
+            });
+            yield 2;
+            yield 3;
+            yield 4;
+            yield 5;
+        });
+
+        $this->assertFalse($cleanupCalled);
+        $this->assertTrue($sequence->contains(3));
+        $this->assertTrue($cleanupCalled);
+    }
+
+    public function testCallCleanupWhenIndexOfElementBeingLookedForIsFoundBeforeTheEndOfGenerator()
+    {
+        $cleanupCalled = false;
+        $sequence = new Lazy(static function($registerCleanup) use (&$cleanupCalled) {
+            $registerCleanup(static function() use (&$cleanupCalled) {
+                $cleanupCalled = true;
+            });
+            yield 2;
+            yield 3;
+            yield 4;
+            yield 5;
+        });
+
+        $this->assertFalse($cleanupCalled);
+        $index = $sequence->indexOf(3)->match(
+            static fn($index) => $index,
+            static fn() => null,
+        );
+        $this->assertSame(1, $index);
+        $this->assertTrue($cleanupCalled);
+    }
+
+    public function testCallCleanupWhenTakingLessElementsThanContainedInTheGenerator()
+    {
+        $cleanupCalled = false;
+        $sequence = new Lazy(static function($registerCleanup) use (&$cleanupCalled) {
+            $registerCleanup(static function() use (&$cleanupCalled) {
+                $cleanupCalled = true;
+            });
+            yield 2;
+            yield 3;
+            yield 4;
+            yield 5;
+        });
+
+        $this->assertFalse($cleanupCalled);
+        $this->assertSame([2, 3], \iterator_to_array($sequence->take(2)->iterator()));
+        $this->assertTrue($cleanupCalled);
+    }
+
+    public function testCallCleanupWhenFindingElementBeforeTheEndOfGenerator()
+    {
+        $cleanupCalled = false;
+        $sequence = new Lazy(static function($registerCleanup) use (&$cleanupCalled) {
+            $registerCleanup(static function() use (&$cleanupCalled) {
+                $cleanupCalled = true;
+            });
+            yield 2;
+            yield 3;
+            yield 4;
+            yield 5;
+        });
+        $this->assertFalse($cleanupCalled);
+        $value = $sequence->find(static fn($value) => $value === 3)->match(
+            static fn($value) => $value,
+            static fn() => null,
+        );
+
+        $this->assertSame(3, $value);
+        $this->assertTrue($cleanupCalled);
+    }
+
     public function get($map, $index)
     {
         return $map->get($index)->match(
