@@ -191,6 +191,37 @@ $incremented->equals(
 );
 ```
 
+## `->flatMap()`
+
+This is similar to `->map()` but instead of returning a new value it returns a new `Map` for each value, all maps are merged to form only one `Map`.
+
+This is usefull to generate multiple pairs for each initial pair or to modify the keys.
+
+```php
+$urls = Map::of(
+    ['example.com', 1],
+    ['github.com', 1],
+    ['news.ycombinator.com', 1],
+    ['reddit.com', 1],
+);
+$withScheme = $map->map(fn($key, $value) => Map::of(
+    ["http://$key", $value],
+    ["https://$key", $value],
+));
+$withScheme->equals(
+    Map::of(
+        ['http://example.com', 1],
+        ['https://example.com', 1],
+        ['http://github.com', 1],
+        ['https://github.com', 1],
+        ['http://news.ycombinator.com', 1],
+        ['https://news.ycombinator.com', 1],
+        ['http://reddit.com', 1],
+        ['https://reddit.com', 1],
+    ),
+);
+```
+
 ## `->remove()`
 
 Remove the pair from the map with the given key.
