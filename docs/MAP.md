@@ -290,6 +290,18 @@ Map::of()->empty(); // true
 Map::of([1, 2])->empty(); // false
 ```
 
+## `->find()`
+
+This will return the first pair that matches the given predicate (remember that the map is not ordered).
+
+```php
+use Innmind\Immutable\Pair;
+
+Map::of([1, 2], [3, 4], [5, 6], [7, 8])->find(
+    fn($key, $value) => ($key + $value) > 10,
+); // Maybe::just(new Pair(5, 6))
+```
+
 ## `->matches()`
 
 Check if all the pairs of the map matches the given predicate.
