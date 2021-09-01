@@ -166,4 +166,9 @@ interface Implementation extends \Countable
      * @return Maybe<T>
      */
     public function find(callable $predicate): Maybe;
+
+    /**
+     * @return Sequence\Implementation<T>
+     */
+    public function sequence(): Sequence\Implementation;
 }

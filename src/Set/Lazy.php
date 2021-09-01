@@ -83,18 +83,7 @@ final class Lazy implements Implementation
             return $this;
         }
 
-        return new self(
-            $this->values->intersect(
-                new Sequence\Defer(
-                    (static function(\Iterator $values): \Generator {
-                        /** @var T $value */
-                        foreach ($values as $value) {
-                            yield $value;
-                        }
-                    })($set->iterator()),
-                ),
-            ),
-        );
+        return new self($this->values->intersect($set->sequence()));
     }
 
     /**
@@ -128,18 +117,7 @@ final class Lazy implements Implementation
      */
     public function diff(Implementation $set): self
     {
-        return new self(
-            $this->values->diff(
-                new Sequence\Defer(
-                    (static function(\Iterator $values): \Generator {
-                        /** @var T $value */
-                        foreach ($values as $value) {
-                            yield $value;
-                        }
-                    })($set->iterator()),
-                ),
-            ),
-        );
+        return new self($this->values->diff($set->sequence()));
     }
 
     /**
@@ -232,21 +210,7 @@ final class Lazy implements Implementation
      */
     public function merge(Implementation $set): self
     {
-        return new self(
-            new Sequence\Defer(
-                (static function(\Iterator $self, \Iterator $set): \Generator {
-                    /** @var T $value */
-                    foreach ($self as $value) {
-                        yield $value;
-                    }
-
-                    /** @var T $value */
-                    foreach ($set as $value) {
-                        yield $value;
-                    }
-                })($this->values->iterator(), $set->iterator()),
-            ),
-        );
+        return new self($this->values->append($set->sequence()));
     }
 
     /**
@@ -277,5 +241,13 @@ final class Lazy implements Implementation
     public function find(callable $predicate): Maybe
     {
         return $this->values->find($predicate);
+    }
+
+    /**
+     * @return Sequence\Implementation<T>
+     */
+    public function sequence(): Sequence\Implementation
+    {
+        return $this->values;
     }
 }

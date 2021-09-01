@@ -83,10 +83,7 @@ final class Primitive implements Implementation
      */
     public function intersect(Implementation $set): self
     {
-        /** @psalm-suppress ImpureFunctionCall */
-        return new self($this->values->intersect(
-            new Sequence\Primitive(\array_values(\iterator_to_array($set->iterator()))),
-        ));
+        return new self($this->values->intersect($set->sequence()));
     }
 
     /**
@@ -120,10 +117,7 @@ final class Primitive implements Implementation
      */
     public function diff(Implementation $set): self
     {
-        /** @psalm-suppress ImpureFunctionCall */
-        return new self($this->values->diff(
-            new Sequence\Primitive(\array_values(\iterator_to_array($set->iterator()))),
-        ));
+        return new self($this->values->diff($set->sequence()));
     }
 
     /**
@@ -180,14 +174,7 @@ final class Primitive implements Implementation
      */
     public function map(callable $function): self
     {
-        /**
-         * @psalm-suppress MixedArgument
-         * @psalm-suppress InvalidArgument
-         */
-        return $this->reduce(
-            self::of(),
-            static fn(self $carry, $value): self => ($carry)($function($value)),
-        );
+        return new self($this->values->map($function)->distinct());
     }
 
     /**
@@ -223,11 +210,7 @@ final class Primitive implements Implementation
      */
     public function merge(Implementation $set): self
     {
-        /** @psalm-suppress MixedArgument For some reason it no longer recognize the template for $value */
-        return $set->reduce(
-            $this,
-            static fn(self $carry, $value): self => ($carry)($value),
-        );
+        return new self($this->values->append($set->sequence())->distinct());
     }
 
     /**
@@ -258,5 +241,13 @@ final class Primitive implements Implementation
     public function find(callable $predicate): Maybe
     {
         return $this->values->find($predicate);
+    }
+
+    /**
+     * @return Sequence\Implementation<T>
+     */
+    public function sequence(): Sequence\Implementation
+    {
+        return $this->values;
     }
 }
