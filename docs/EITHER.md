@@ -76,8 +76,6 @@ $either = identify($serverRequest);
 $resource = $either->flatMap(fn(User $user): Either => accessResource($user));
 ```
 
-**Important**: the left type of an `Either` returned by the `->flatMap` cannot change as the next call on `$resource` you wouldn't know if it's the old left type or the new one.
-
 ## `->match()`
 
 This is the only way to extract the wrapped value.
@@ -94,11 +92,9 @@ $response = identify($serverRequest)
 
 **Note**: `Response` is an imaginary class.
 
-Both functions used with `->match()` **must** have the same return type. Otherwise you would have to check the type of the returned value to know what to do next, this would break the logic of this approach that frees you from writing any `if` statement.
-
 ## `->otherwise()`
 
-This is like `->flatMap()` but is called when the instance contains a left value. The callable must return an `Either` with the same types as the previous one.
+This is like `->flatMap()` but is called when the instance contains a left value. The callable must return a new `Either` object.
 
 ```php
 /**
