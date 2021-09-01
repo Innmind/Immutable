@@ -83,8 +83,6 @@ $logger = $dsn->match(
 );
 ```
 
-Both functions used with `->match()` **must** have the same return type. Otherwise you would have to check the type of the returned value to know what to do next, this would break the logic of this approach that frees you from writing any `if` statement.
-
 ## `->otherwise()`
 
 This is like `->flatMap()` but is called when there is no value wrapped. The other difference from `->flatMap()` is that you must return the same wrapped value type.
