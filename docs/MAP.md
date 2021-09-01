@@ -1,6 +1,6 @@
 # `Map`
 
-A map is an unordered list of pair of elements, think of it like an associative array or a `array<T, S>` in the [Psalm](http://psalm.dev) nomenclature. But with the added benefit that the keys can be of any type, even objects!
+A map is an unordered list of pair of elements, think of it like an associative array or an `array<T, S>` in the [Psalm](http://psalm.dev) nomenclature. But with the added benefit that the keys can be of any type, even objects!
 
 ## `::of()`
 
