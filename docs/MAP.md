@@ -2,8 +2,6 @@
 
 A map is an unordered list of pair of elements, think of it like an associative array or a `array<T, S>` in the [Psalm](http://psalm.dev) nomenclature. But with the added benefit that the keys can be of any type, even objects!
 
-A map is always typed in order to be sure it only contains elements of the type you specified. If you try to add an element of a different type it will throw an error.
-
 ## `::of()`
 
 ```php
