@@ -70,7 +70,7 @@ $map->contains(2); // false
 
 ## `->clear()`
 
-Return an empty new map of the same type.
+Return an empty new map of the same type. Useful to avoid to respecify the templates types of the map in a new docblock annotation.
 
 ```php
 $map = Map::of([1, 2], [3, 4]);
@@ -108,7 +108,7 @@ $sideEffect = Map::of(['hello', 'world'])->foreach(function(string $key, string 
 });
 ```
 
-## `->groupBy()`
+In itself the `SideEffect` object has no use except to avoid psalm complaining that the `foreach` method is not used.
 
 ## `->groupBy()`
 
