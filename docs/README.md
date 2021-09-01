@@ -21,3 +21,5 @@ This library provides the 7 following structures:
 - [`Either`](EITHER.md)
 
 See the documentation for each structure to understand how to use them.
+
+All structures are typed with [`vimeo/psalm`](https://psalm.dev), you must use it in order to verify that you use this library correctly.
