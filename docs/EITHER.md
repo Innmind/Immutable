@@ -85,8 +85,8 @@ This is the only way to extract the wrapped value.
 $response = identify($serverRequest)
     ->flatMap(fn(User $user): Either => accessResource($user))
     ->match(
-        fn(Error $error) => new Response(400, $error->message()), // here the error can be from identify or from accessResource
         fn(Resource $resource) => new Response(200, $resource->toString()),
+        fn(Error $error) => new Response(400, $error->message()), // here the error can be from identify or from accessResource
     );
 ```
 
@@ -124,8 +124,8 @@ identify($request)
         fn() => new Error('User is not allowed'),
     )
     ->match(
-        fn(Error $error) => print($error->message()), // can be "User not found" or "User is not allowed"
         fn(User $user) => doSomething($user), // here we know the user is allowed
+        fn(Error $error) => print($error->message()), // can be "User not found" or "User is not allowed"
     );
 ```
 
