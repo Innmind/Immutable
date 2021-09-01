@@ -68,7 +68,7 @@ class StrTest extends TestCase
         $this->assertInstanceOf(Sequence::class, $sequence);
         $this->assertCount(3, $sequence);
 
-        foreach ($sequence as $part) {
+        foreach ($sequence->toList() as $part) {
             $this->assertInstanceOf(S::class, $part);
         }
 
@@ -90,7 +90,7 @@ class StrTest extends TestCase
         $this->assertInstanceOf(Sequence::class, $sequence);
         $this->assertCount(3, $sequence);
 
-        foreach ($sequence as $part) {
+        foreach ($sequence->toList() as $part) {
             $this->assertInstanceOf(S::class, $part);
         }
 
@@ -103,7 +103,7 @@ class StrTest extends TestCase
         $this->assertInstanceOf(Sequence::class, $sequence);
         $this->assertCount(3, $sequence);
 
-        foreach ($sequence as $part) {
+        foreach ($sequence->toList() as $part) {
             $this->assertInstanceOf(S::class, $part);
         }
 
