@@ -11,7 +11,7 @@ use Innmind\Immutable\Map;
 $map = Map::of('object', 'int');
 ```
 
-The first type is for the keys and the second one for the values. This order is the same for all the methods below where you specified both types.
+The first type is for the keys and the second one for the values. This order is the same for all the methods below.
 
 ## `->__invoke()`
 
