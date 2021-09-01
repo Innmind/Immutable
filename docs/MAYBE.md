@@ -35,6 +35,19 @@ $maybe = \is_null($value) ? Maybe::nothing() : Maybe::just($value);
 $maybe = Maybe::of($value);
 ```
 
+## `::all()`
+
+This is a shortcut to make sure all the wrappers contain a value to easily combine them. If any of the arguments doesn't contain a value then the call to `->map()` or `->flatMap()` will return a `Maybe::nothing()`.
+
+```php
+$kernel = Maybe::all(env('ENV'), env('DEBUG'))
+    ->map(static fn(string $env, string $debug) => new Kernel($env, $debug))
+    ->match(
+        static fn(Kernel $kernel) => $kernel,
+        static fn() => throw new \Exception('ENV or DEBUG environment variable is missing (or both)'),
+    );
+```
+
 ## `->map()`
 
 This function allows you to transform the value into another value that will be wrapped in a `Maybe` object.
