@@ -15,35 +15,6 @@ $map = Map::of('object', 'int');
 
 The first type is for the keys and the second one for the values. This order is the same for all the methods below where you specified both types.
 
-## `->isOfType()`
-
-This method is here to help you know the map is of a certain type:
-
-```php
-$map = Map::of('object', 'int');
-$map->isOfType('stdClass', 'int'); // false
-$map->isOfType('object', 'float'); // false
-$map->isOfType('object', 'int'); // true
-```
-
-## `->keyType()`
-
-This returns the keys type you specified at initialisation.
-
-```php
-$map = Map::of('stdClass', 'int');
-$map->keyType(); // 'stdClass'
-```
-
-## `->valueType()`
-
-This returns the values type you specified at initialisation.
-
-```php
-$map = Map::of('stdClass', 'int');
-$map->valueType(); // 'int'
-```
-
 ## `->__invoke()`
 
 Augment the map with a new pair of elements. If the key already exist it will replace the value.
@@ -137,32 +108,6 @@ Use this method to call a function for each pair of the map. Since this method d
 Map::of('string', 'string')('hello', 'world')->foreach(function(string $key, string $value): void {
     echo "$key $value";
 });
-```
-
-## `->group()`
-
-This will create multiples maps with elements regrouped under the same key computed by the given function.
-
-```php
-$urls = Map::of('string', 'int')
-    ('http://example.com', 1)
-    ('http://example.com/foo', 1)
-    ('https://example.com', 2)
-    ('ftp://example.com', 4);
-/** @var Map<string, Map<string, string>> */
-$map = $urls->group(
-    'string',
-    fn(string $url, int $whatever): string => \parse_url($url)['scheme'],
-);
-$map->get('http')->equals(
-    Map::of('string', 'int')('http://example.com', 1)('http://example.com/foo', 1),
-); // true
-$map->get('https')->equals(
-    Map::of('string', 'int')('https://example.com', 2),
-); // true
-$map->get('ftp')->equals(
-    Map::of('string', 'int')('ftp://example.com', 4),
-); // true
 ```
 
 ## `->groupBy()`
@@ -293,55 +238,6 @@ Tells whether there is at least one pair or not.
 ```php
 Map::of('int', 'int')->empty(); // true
 Map::of('int', 'int')(1, 2)->empty(); // false
-```
-
-## `->toSequenceOf()`
-
-Create a new sequence with the value computed from the pairs.
-
-```php
-$sequence = Map::of('int', 'int')(1, 2)(3, 4)->toSequenceOf(
-    'int',
-    function(int $key, int $value) {
-        yield $key;
-        yield $value;
-    },
-);
-$sequence->equals(Sequence::of('int|string', 1, 2, 3, 4)); // true
-```
-
-## `->toSetOf()`
-
-Similar to `->toSequenceOf()` but it returns a [`Set`](SET.md) instead.
-
-```php
-$set = Map::of('int', 'int')(1, 2)(3, 4)->toSetOf(
-    'int',
-    function(int $key, int $value) {
-        yield $key;
-        yield $value;
-    },
-);
-$set->equals(Set::of('int|string', 1, '1', 2, '2', 3, '3')); // true
-```
-
-## `->toMapOf()`
-
-Similar to `->toSequenceOf()` but it returns a `Map` instead.
-
-```php
-$map = Map::of('int', 'int')(1, 2)(3, 4)->toMapOf(
-    'string',
-    'int',
-    function(int $key, int $value) {
-        yield (string) $key => $int;
-    },
-);
-$map->equals(
-    Map::of('string', 'int')
-        ('1', 2)
-        ('3', 4)
-); // true
 ```
 
 ## `->matches()`
