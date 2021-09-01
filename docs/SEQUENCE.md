@@ -307,31 +307,6 @@ $sequence = Sequence::ints(4, 3, 2, 1);
 $sequence->slice(1, 4)->equals(Sequence::ints(3, 2)); // true
 ```
 
-## `->splitAt()`
-
-Create a new sequence of 2 sequences split at the given index.
-
-```php
-$sequence = Sequence::ints(4, 3, 1, 0);
-/** @var Sequence<Sequence<int>> */
-$splits = $sequence->splitAt(2);
-$splits->size(); // 2
-$splits
-    ->get(0)
-    ->match(
-        static fn($split) => $split,
-        static fn() => Sequence::ints(),
-    )
-    ->equals(Sequence::ints(4, 3)); // true
-$splits
-    ->get(1)
-    ->match(
-        static fn($split) => $split,
-        static fn() => Sequence::ints(),
-    )
-    ->equals(Sequence::ints(1, 0)); // true
-```
-
 ## `->take()`
 
 Create a new sequence with only the given number of elements from the start of the sequence.
