@@ -347,14 +347,10 @@ final class Sequence implements \Countable
      */
     public function flatMap(callable $map): self
     {
-        /**
-         * @psalm-suppress InvalidArgument
-         * @psalm-suppress MixedArgument
-         */
-        return $this->reduce(
-            self::of(),
-            static fn(self $carry, $value) => $carry->append($map($value)),
-        );
+        /** @var callable(self<S>): Sequence\Implementation<S> */
+        $exfiltrate = static fn(self $sequence): Sequence\Implementation => $sequence->implementation;
+
+        return $this->implementation->flatMap($map, $exfiltrate);
     }
 
     /**

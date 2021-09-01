@@ -401,6 +401,42 @@ class SequenceTest extends TestCase
         $this->assertSame([1, 1, 2, 2, 3, 3, 4, 4], $sequence2->toList());
     }
 
+    public function testLazyFlatMap()
+    {
+        $loaded = false;
+        $a = Sequence::lazy(static function() use (&$loaded) {
+            yield 1;
+            yield 2;
+            yield 3;
+            yield 4;
+            $loaded = true;
+        });
+        $b = $a->flatMap(static fn($i) => Sequence::of($i, $i*2));
+
+        $this->assertFalse($loaded);
+        $this->assertSame([1, 2, 2, 4, 3, 6, 4, 8], $b->toList());
+        $this->assertTrue($loaded);
+        $this->assertSame([1, 2, 3, 4], $a->toList());
+    }
+
+    public function testDeferFlatMap()
+    {
+        $loaded = false;
+        $a = Sequence::defer((static function() use (&$loaded) {
+            yield 1;
+            yield 2;
+            yield 3;
+            yield 4;
+            $loaded = true;
+        })());
+        $b = $a->flatMap(static fn($i) => Sequence::of($i, $i*2));
+
+        $this->assertFalse($loaded);
+        $this->assertSame([1, 2, 2, 4, 3, 6, 4, 8], $b->toList());
+        $this->assertTrue($loaded);
+        $this->assertSame([1, 2, 3, 4], $a->toList());
+    }
+
     public function testPad()
     {
         $a = Sequence::of()

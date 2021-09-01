@@ -311,6 +311,32 @@ final class Defer implements Implementation
     }
 
     /**
+     * @template S
+     *
+     * @param callable(T): Sequence<S> $map
+     * @param callable(Sequence<S>): Implementation<S> $exfiltrate
+     *
+     * @return Sequence<S>
+     */
+    public function flatMap(callable $map, callable $exfiltrate): Sequence
+    {
+        return Sequence::defer(
+            (static function(\Iterator $values, callable $map, callable $exfiltrate): \Generator {
+                /** @var T $value */
+                foreach ($values as $value) {
+                    /**
+                     * @var callable(T): Sequence<S> $map
+                     * @var callable(Sequence<S>): Implementation<S> $exfiltrate
+                     */
+                    foreach ($exfiltrate($map($value))->iterator() as $inner) {
+                        yield $inner;
+                    }
+                }
+            })($this->values, $map, $exfiltrate),
+        );
+    }
+
+    /**
      * @param T $element
      *
      * @return Implementation<T>
