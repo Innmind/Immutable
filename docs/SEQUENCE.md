@@ -2,8 +2,6 @@
 
 A sequence is an ordered list of elements, think of it like an array such as `[1, 'a', new stdClass]` or a `list<T>` in the [Psalm](http://psalm.dev) nomenclature.
 
-A sequence is always typed in order to be sure it only contains elements of the type you specified. If you try to add an element of a different type it will throw an error.
-
 ## `::of()`
 
 The `of` static method allows you to create a new sequence of the given [type](types.html):
