@@ -85,7 +85,7 @@ $logger = $dsn->match(
 
 ## `->otherwise()`
 
-This is like `->flatMap()` but is called when there is no value wrapped. The other difference from `->flatMap()` is that you must return the same wrapped value type.
+This is like `->flatMap()` but is called when there is no value wrapped.
 
 This is useful to create a chain of alternative strategies.
 
