@@ -8,7 +8,7 @@ This is the named cosntructor for this class.
 
 ```php
 RegExp::of('/foo/') instanceof RegExp; // true
-RegExp::of('foo'); // throws Innmind\Immutable\Exception\DomainException
+RegExp::of('foo'); // throws Innmind\Immutable\Exception\LogicException
 ```
 
 ## `->matches()`
