@@ -49,10 +49,6 @@ return static function(Config $config): Config
                 ),
             )->alwaysOpen(),
             Entry::markdown(
-                'Types',
-                Path::of('TYPES.md'),
-            ),
-            Entry::markdown(
                 'Blackbox',
                 Path::of('BLACKBOX.md'),
             ),

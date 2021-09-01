@@ -21,5 +21,3 @@ This library provides the 7 following structures:
 - [`Either`](EITHER.md)
 
 See the documentation for each structure to understand how to use them.
-
-`Sequence`, `Set` and `Map` will ask to provide the types of the elements they contains, you can see [here](TYPES.md) which types you can use.

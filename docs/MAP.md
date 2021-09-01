@@ -6,8 +6,6 @@ A map is always typed in order to be sure it only contains elements of the type 
 
 ## `::of()`
 
-The `of` static method allows you to create a new map of the given [types](TYPES.md):
-
 ```php
 use Innmind\Immutable\Map;
 
