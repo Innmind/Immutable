@@ -51,13 +51,11 @@ Use this method to split a string into a [`Sequence`](sequence.md) of smaller st
 
 ```php
 Str::of('foo')->split()->equals(Sequence::of(
-    Str::class,
     Str::of('f'),
     Str::of('o'),
     Str::of('o'),
 ));
 Str::of('foo|bar')->split('|')->equals(Sequence::of(
-    Str::class,
     Str::of('foo'),
     Str::of('bar'),
 ));
@@ -81,8 +79,8 @@ Str::of('foobar')->chunk(2)->equals(Sequence::of(
 Returns the position of the searched string in the original string.
 
 ```php
-Str::of('foobar')->position('ob'); // 2
-Str::of('foobar')->position('unknown'); // throws Innmind\Immutable\Exception\SubstringException
+Str::of('foobar')->position('ob'); // Maybe::just(2)
+Str::of('foobar')->position('unknown'); // Maybe::nothing()
 ```
 
 ## `->replace()`
@@ -91,15 +89,6 @@ Replace the searched string by its replacement.
 
 ```php
 Str::of('foobar')->replace('ob', 'bo')->equals(Str::of('foboar')); // true
-```
-
-## `->str()`
-
-Returns the string following the given delimiter.
-
-```php
-Str::of('foobar')->str('b')->equals(Str::of('bar')); // true
-Str::of('foobar')->str('unknown'); // throws Innmind\Immutable\Exception\SubstringException
 ```
 
 ## `->toUpper()`
@@ -167,7 +156,7 @@ Str::of('Alien')->leftPad(10, '_')->equals(Str::of('_____Alien'));
 Str::of('Alien')->leftPad(3, '_')->equals(Str::of('Alien'));
 ```
 
-## `->rightPad()`
+## `->uniPad()`
 
 Add the given string to both sides of the string in order of the new string to be at least of the given size.
 
@@ -188,6 +177,10 @@ Str::of('foo')->repeat(3)->equals(Str::of('foofoofoo'));
 
 Same behaviour as the native `stripslashes` function.
 
+## `->stripCSlashes()`
+
+Same behaviour as the native `stripcslashes` function.
+
 ## `->wordCount()`
 
 Counts the number in the string.
@@ -202,9 +195,10 @@ The list of words with their position.
 
 ```php
 Str::of('foo bar')->words()->equals(
-    Map::of('int', Str::class)
-        (0, Str::of('foo'))
-        (4, Str::of('bar')),
+    Map::of(
+        [0, Str::of('foo')],
+        [4, Str::of('bar')],
+    ),
 );
 ```
 
@@ -215,7 +209,6 @@ Split the string using a regular expression.
 ```php
 Str::of('hypertext language, programming')->pregSplit('/[\s,]+/')->equals(
     Sequence::of(
-        Str::class,
         Str::of('hypertext'),
         Str::of('language'),
         Str::of('programming'),
@@ -238,10 +231,11 @@ Return a map of the elements matching the regular expression.
 
 ```php
 Str::of('http://www.php.net/index.html')->capture('@^(?:http://)?(?P<host>[^/]+)@i')->equals(
-    Map::of('scalar', Str::class)
-        (0, Str::of('http://www.php.net'))
-        (1, Str::of('www.php.net'))
-        ('host', Str::of('www.php.net')),
+    Map::of(
+        [0, Str::of('http://www.php.net')],
+        [1, Str::of('www.php.net')],
+        ['host', Str::of('www.php.net')],
+    ),
 );
 ```
 
@@ -319,8 +313,6 @@ Return a CamelCase representation of the string.
 ```php
 Str::of('foo bar_baz')->camelize()->equals(Str::of('fooBarBaz'));
 ```
-
-**Note**: this function doesn't provide a true CamelCase as the first letter is lower cased. This will stay this way until the next major release to prevent breaking existing code relying on this bug.
 
 ## `->append()`
 
