@@ -204,6 +204,16 @@ $squares = $ints->map(fn($i) => $i**2);
 $squares->equals(Set::ints(1, 4, 9)); // true
 ```
 
+## `->flatMap()`
+
+This is similar to `->map()` except that instead of returning a new value it returns a new set for each value, and each new set is merged together.
+
+```php
+$ints = Set::ints(1, 2, 3);
+$squares = $ints->flatMap(fn($i) => Set::of($i, $i**2));
+$squares->equals(Set::ints(1, 2, 4, 3, 9)); // true
+```
+
 ## `->partition()`
 
 This method is similar to `->groupBy()` method but the map keys are always booleans. The difference is that here the 2 keys are always present whereas with `->groupBy()` it will depend on the original set.
@@ -273,6 +283,10 @@ Tells whether there is at least one element or not.
 Set::ints()->empty(); // true
 Set::ints(1)->empty(); // false
 ```
+
+## `->toList()`
+
+It returns a new `array` containing all the elements of the set.
 
 ## `->find()`
 
