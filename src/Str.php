@@ -84,6 +84,8 @@ final class Str
     /**
      * Returns a collection of the string splitted by the given chunk size
      *
+     * @param positive-int $size
+     *
      * @return Sequence<self>
      */
     public function chunk(int $size = 1): Sequence
@@ -177,6 +179,8 @@ final class Str
 
     /**
      * Pad to the right
+     *
+     * @param positive-int $length
      */
     public function rightPad(int $length, string $character = ' '): self
     {
@@ -185,6 +189,8 @@ final class Str
 
     /**
      * Pad to the left
+     *
+     * @param positive-int $length
      */
     public function leftPad(int $length, string $character = ' '): self
     {
@@ -193,6 +199,8 @@ final class Str
 
     /**
      * Pad both sides
+     *
+     * @param positive-int $length
      */
     public function uniPad(int $length, string $character = ' '): self
     {
@@ -201,6 +209,8 @@ final class Str
 
     /**
      * Repeat the string n times
+     *
+     * @param positive-int $repeat
      */
     public function repeat(int $repeat): self
     {
@@ -330,21 +340,33 @@ final class Str
         return new self($sub, $this->encoding);
     }
 
+    /**
+     * @param positive-int $size
+     */
     public function take(int $size): self
     {
         return $this->substring(0, $size);
     }
 
+    /**
+     * @param positive-int $size
+     */
     public function takeEnd(int $size): self
     {
         return $this->substring(-$size);
     }
 
+    /**
+     * @param positive-int $size
+     */
     public function drop(int $size): self
     {
         return $this->substring($size);
     }
 
+    /**
+     * @param positive-int $size
+     */
     public function dropEnd(int $size): self
     {
         return $this->substring(0, $this->length() - $size);
@@ -480,7 +502,10 @@ final class Str
             return true;
         }
 
-        return $this->takeEnd(self::of($value, $this->encoding)->length())->toString() === $value;
+        /** @var positive-int */
+        $length = self::of($value, $this->encoding)->length();
+
+        return $this->takeEnd($length)->toString() === $value;
     }
 
     /**

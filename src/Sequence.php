@@ -204,6 +204,8 @@ final class Sequence implements \Countable
     /**
      * Remove the n first elements
      *
+     * @param positive-int $size
+     *
      * @return self<T>
      */
     public function drop(int $size): self
@@ -213,6 +215,8 @@ final class Sequence implements \Countable
 
     /**
      * Remove the n last elements
+     *
+     * @param positive-int $size
      *
      * @return self<T>
      */
@@ -390,6 +394,8 @@ final class Sequence implements \Countable
     /**
      * Return a sequence with the n first elements
      *
+     * @param positive-int $size
+     *
      * @return self<T>
      */
     public function take(int $size): self
@@ -399,6 +405,8 @@ final class Sequence implements \Countable
 
     /**
      * Return a sequence with the n last elements
+     *
+     * @param positive-int $size
      *
      * @return self<T>
      */
