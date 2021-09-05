@@ -31,7 +31,7 @@ Str::of('whataver')->toString(); // 'whatever'
 
 ## `->encoding()`
 
-This will return the encoding use to manipulate the string.
+This will return the encoding used to manipulate the string.
 
 ```php
 Str::of('', 'UTF-8')->encoding()->equals(Str::of('UTF-8')); // true
