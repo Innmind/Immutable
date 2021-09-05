@@ -8,39 +8,27 @@ use Innmind\Immutable\{
     Sequence,
     Str,
     Set,
-    ValidateArgument,
-    Type,
-    Exception\LogicException,
-    Exception\CannotGroupEmptyStructure,
-    Exception\ElementNotFound,
-    Exception\OutOfBoundException,
-    Exception\NoElementMatchingPredicateFound,
+    Maybe,
+    SideEffect,
 };
 
 /**
  * @template T
+ * @psalm-immutable
+ * @psalm-type RegisterCleanup = callable(callable(): void): void
  */
 final class Lazy implements Implementation
 {
-    private string $type;
-    /** @var \Closure(): \Generator<T> */
+    /** @var \Closure(RegisterCleanup): \Generator<int, T> */
     private \Closure $values;
-    private ValidateArgument $validate;
-    private ?int $size = null;
 
-    public function __construct(string $type, callable $generator)
+    /**
+     * @param callable(RegisterCleanup): \Generator<T> $generator
+     */
+    public function __construct(callable $generator)
     {
-        $this->type = $type;
-        $validate = Type::of($type);
-        /** @var \Closure(): \Generator<T> */
-        $this->values = \Closure::fromCallable(static function() use ($generator, $validate): \Generator {
-            /** @var T $value */
-            foreach ($generator() as $value) {
-                $validate($value, 1);
-                yield $value;
-            }
-        });
-        $this->validate = $validate;
+        /** @var \Closure(RegisterCleanup): \Generator<int, T> */
+        $this->values = \Closure::fromCallable($generator);
     }
 
     /**
@@ -52,11 +40,10 @@ final class Lazy implements Implementation
     {
         $values = $this->values;
 
-        /** @psalm-suppress MissingClosureParamType */
         return new self(
-            $this->type,
-            static function() use ($values, $element): \Generator {
-                foreach ($values() as $value) {
+            static function(callable $registerCleanup) use ($values, $element): \Generator {
+                /** @var RegisterCleanup $registerCleanup */
+                foreach ($values($registerCleanup) as $value) {
                     yield $value;
                 }
 
@@ -65,24 +52,15 @@ final class Lazy implements Implementation
         );
     }
 
-    public function type(): string
-    {
-        return $this->type;
-    }
-
     public function size(): int
     {
-        if (\is_int($this->size)) {
-            return $this->size;
-        }
-
         $size = 0;
 
         foreach ($this->iterator() as $_) {
             ++$size;
         }
 
-        return $this->size = $size;
+        return $size;
     }
 
     public function count(): int
@@ -91,31 +69,41 @@ final class Lazy implements Implementation
     }
 
     /**
-     * @return \Iterator<T>
+     * @return \Iterator<int, T>
      */
     public function iterator(): \Iterator
     {
-        return ($this->values)();
+        // when accessing the iterator from the outside we cannot know when it
+        // will be stop being iterated over so we can't have a way to notify the
+        // generator to cleanup its ressources, so we pass an empty function
+        // that does nothing
+        return ($this->values)(self::bypassCleanup());
     }
 
     /**
-     * @throws OutOfBoundException
-     *
-     * @return T
+     * @return Maybe<T>
      */
-    public function get(int $index)
+    public function get(int $index): Maybe
     {
         $iteration = 0;
+        $cleanup = self::noCleanup();
+        $generator = ($this->values)(static function(callable $userDefinedCleanup) use (&$cleanup) {
+            $cleanup = $userDefinedCleanup;
+        });
 
-        foreach ($this->iterator() as $value) {
+        foreach ($generator as $value) {
             if ($index === $iteration) {
-                return $value;
+                /** @psalm-suppress MixedFunctionCall Due to the reference in the closure above */
+                $cleanup();
+
+                return Maybe::just($value);
             }
 
             ++$iteration;
         }
 
-        throw new OutOfBoundException;
+        /** @var Maybe<T> */
+        return Maybe::nothing();
     }
 
     /**
@@ -125,8 +113,7 @@ final class Lazy implements Implementation
      */
     public function diff(Implementation $sequence): Implementation
     {
-        /** @psalm-suppress MissingClosureParamType */
-        return $this->filter(static function($value) use ($sequence): bool {
+        return $this->filter(static function(mixed $value) use ($sequence): bool {
             /** @var T $value */
             return !$sequence->contains($value);
         });
@@ -139,14 +126,13 @@ final class Lazy implements Implementation
     {
         $values = $this->values;
 
-        /** @psalm-suppress MissingClosureParamType */
         return new self(
-            $this->type,
-            static function() use ($values): \Generator {
+            static function(callable $registerCleanup) use ($values): \Generator {
                 /** @var list<T> */
                 $uniques = [];
 
-                foreach ($values() as $value) {
+                /** @var RegisterCleanup $registerCleanup */
+                foreach ($values($registerCleanup) as $value) {
                     if (!\in_array($value, $uniques, true)) {
                         $uniques[] = $value;
 
@@ -164,13 +150,12 @@ final class Lazy implements Implementation
     {
         $values = $this->values;
 
-        /** @psalm-suppress MissingClosureParamType */
         return new self(
-            $this->type,
-            static function() use ($values, $size): \Generator {
+            static function(callable $registerCleanup) use ($values, $size): \Generator {
+                /** @var RegisterCleanup $registerCleanup */
                 $dropped = 0;
 
-                foreach ($values() as $value) {
+                foreach ($values($registerCleanup) as $value) {
                     if ($dropped < $size) {
                         ++$dropped;
 
@@ -210,11 +195,10 @@ final class Lazy implements Implementation
     {
         $values = $this->values;
 
-        /** @psalm-suppress MissingClosureParamType */
         return new self(
-            $this->type,
-            static function() use ($values, $predicate): \Generator {
-                foreach ($values() as $value) {
+            static function(callable $registerCleanup) use ($values, $predicate): \Generator {
+                /** @var RegisterCleanup $registerCleanup */
+                foreach ($values($registerCleanup) as $value) {
                     if ($predicate($value)) {
                         yield $value;
                     }
@@ -226,18 +210,18 @@ final class Lazy implements Implementation
     /**
      * @param callable(T): void $function
      */
-    public function foreach(callable $function): void
+    public function foreach(callable $function): SideEffect
     {
         foreach ($this->iterator() as $value) {
             $function($value);
         }
+
+        return new SideEffect;
     }
 
     /**
      * @template D
      * @param callable(T): D $discriminator
-     *
-     * @throws CannotGroupEmptyStructure
      *
      * @return Map<D, Sequence<T>>
      */
@@ -248,31 +232,27 @@ final class Lazy implements Implementation
     }
 
     /**
-     * @return T
+     * @return Maybe<T>
      */
-    public function first()
+    public function first(): Maybe
     {
-        foreach ($this->iterator() as $value) {
-            return $value;
-        }
-
-        throw new OutOfBoundException;
+        return $this->get(0);
     }
 
     /**
-     * @return T
+     * @return Maybe<T>
      */
-    public function last()
+    public function last(): Maybe
     {
         foreach ($this->iterator() as $value) {
         }
 
         if (!isset($value)) {
-            throw new OutOfBoundException;
+            /** @var Maybe<T> */
+            return Maybe::nothing();
         }
 
-        /** @var T */
-        return $value;
+        return Maybe::just($value);
     }
 
     /**
@@ -280,8 +260,16 @@ final class Lazy implements Implementation
      */
     public function contains($element): bool
     {
-        foreach ($this->iterator() as $value) {
+        $cleanup = self::noCleanup();
+        $generator = ($this->values)(static function(callable $userDefinedCleanup) use (&$cleanup) {
+            $cleanup = $userDefinedCleanup;
+        });
+
+        foreach ($generator as $value) {
             if ($value === $element) {
+                /** @psalm-suppress MixedFunctionCall Due to the reference in the closure above */
+                $cleanup();
+
                 return true;
             }
         }
@@ -292,21 +280,29 @@ final class Lazy implements Implementation
     /**
      * @param T $element
      *
-     * @throws ElementNotFound
+     * @return Maybe<int>
      */
-    public function indexOf($element): int
+    public function indexOf($element): Maybe
     {
         $index = 0;
+        $cleanup = self::noCleanup();
+        $generator = ($this->values)(static function(callable $userDefinedCleanup) use (&$cleanup) {
+            $cleanup = $userDefinedCleanup;
+        });
 
-        foreach ($this->iterator() as $value) {
+        foreach ($generator as $value) {
             if ($value === $element) {
-                return $index;
+                /** @psalm-suppress MixedFunctionCall Due to the reference in the closure above */
+                $cleanup();
+
+                return Maybe::just($index);
             }
 
             ++$index;
         }
 
-        throw new ElementNotFound($element);
+        /** @var Maybe<int> */
+        return Maybe::nothing();
     }
 
     /**
@@ -318,16 +314,13 @@ final class Lazy implements Implementation
     {
         $values = $this->values;
 
-        /**
-         * @psalm-suppress MissingClosureParamType
-         * @var Implementation<int>
-         */
+        /** @var Implementation<int> */
         return new self(
-            'int',
-            static function() use ($values): \Generator {
+            static function(callable $registerCleanup) use ($values): \Generator {
+                /** @var RegisterCleanup $registerCleanup */
                 $index = 0;
 
-                foreach ($values() as $_) {
+                foreach ($values($registerCleanup) as $_) {
                     yield $index++;
                 }
             },
@@ -335,26 +328,51 @@ final class Lazy implements Implementation
     }
 
     /**
-     * @param callable(T): T $function
+     * @template S
      *
-     * @return Implementation<T>
+     * @param callable(T): S $function
+     *
+     * @return Implementation<S>
      */
     public function map(callable $function): Implementation
     {
         $values = $this->values;
-        $validate = $this->validate;
 
-        /** @psalm-suppress MissingClosureParamType */
         return new self(
-            $this->type,
-            static function() use ($values, $function, $validate): \Generator {
-                foreach ($values() as $value) {
-                    $value = $function($value);
-                    $validate($value, 1);
-
-                    yield $value;
+            static function(callable $registerCleanup) use ($values, $function): \Generator {
+                /** @var RegisterCleanup $registerCleanup */
+                foreach ($values($registerCleanup) as $value) {
+                    yield $function($value);
                 }
             },
+        );
+    }
+
+    /**
+     * @template S
+     *
+     * @param callable(T): Sequence<S> $map
+     * @param callable(Sequence<S>): Implementation<S> $exfiltrate
+     *
+     * @return Sequence<S>
+     */
+    public function flatMap(callable $map, callable $exfiltrate): Sequence
+    {
+        $values = $this->values;
+
+        return Sequence::lazy(
+            static function(callable $registerCleanup) use ($values, $map, $exfiltrate): \Generator {
+                foreach ($values($registerCleanup) as $value) {
+                    $generator = self::open(
+                        $exfiltrate($map($value)),
+                        $registerCleanup,
+                    );
+
+                    foreach ($generator as $inner) {
+                        yield $inner;
+                    }
+                }
+            }
         );
     }
 
@@ -367,11 +385,10 @@ final class Lazy implements Implementation
     {
         $values = $this->values;
 
-        /** @psalm-suppress MissingClosureParamType */
         return new self(
-            $this->type,
-            static function() use ($values, $size, $element): \Generator {
-                foreach ($values() as $value) {
+            static function(callable $registerCleanup) use ($values, $size, $element): \Generator {
+                /** @var RegisterCleanup $registerCleanup */
+                foreach ($values($registerCleanup) as $value) {
                     yield $value;
                     --$size;
                 }
@@ -402,13 +419,12 @@ final class Lazy implements Implementation
     {
         $values = $this->values;
 
-        /** @psalm-suppress MissingClosureParamType */
         return new self(
-            $this->type,
-            static function() use ($values, $from, $until): \Generator {
+            static function(callable $registerCleanup) use ($values, $from, $until): \Generator {
                 $index = 0;
 
-                foreach ($values() as $value) {
+                /** @var RegisterCleanup $registerCleanup */
+                foreach ($values($registerCleanup) as $value) {
                     if ($index >= $from && $index < $until) {
                         yield $value;
                     }
@@ -420,30 +436,32 @@ final class Lazy implements Implementation
     }
 
     /**
-     * @throws OutOfBoundException
-     *
-     * @return Sequence<Sequence<T>>
-     */
-    public function splitAt(int $position): Sequence
-    {
-        return $this->load()->splitAt($position);
-    }
-
-    /**
      * @return Implementation<T>
      */
     public function take(int $size): Implementation
     {
         $values = $this->values;
 
-        /** @psalm-suppress MissingClosureParamType */
         return new self(
-            $this->type,
-            static function() use ($values, $size): \Generator {
+            static function(callable $registerCleanup) use ($values, $size): \Generator {
                 $taken = 0;
+                // We intercept the registering of the cleanup function here
+                // because this generator can be stopped when we reach the number
+                // of elements to take so we have to cleanup here. In this case
+                // the parent sequence may not need to cleanup as it could
+                // iterate over the whole generator but this inner one still
+                // needs to free resources correctly
+                $cleanup = self::noCleanup();
+                $middleware = static function(callable $userDefinedCleanup) use (&$cleanup, $registerCleanup): void {
+                    $cleanup = $userDefinedCleanup;
+                    $registerCleanup($userDefinedCleanup);
+                };
 
-                foreach ($values() as $value) {
+                foreach ($values($middleware) as $value) {
                     if ($taken >= $size) {
+                        /** @psalm-suppress MixedFunctionCall Due to the reference in the closure above */
+                        $cleanup();
+
                         return;
                     }
 
@@ -473,15 +491,14 @@ final class Lazy implements Implementation
     {
         $values = $this->values;
 
-        /** @psalm-suppress MissingClosureParamType */
         return new self(
-            $this->type,
-            static function() use ($values, $sequence): \Generator {
-                foreach ($values() as $value) {
+            static function(callable $registerCleanup) use ($values, $sequence): \Generator {
+                /** @var RegisterCleanup $registerCleanup */
+                foreach ($values($registerCleanup) as $value) {
                     yield $value;
                 }
 
-                foreach ($sequence->iterator() as $value) {
+                foreach (self::open($sequence, $registerCleanup) as $value) {
                     yield $value;
                 }
             },
@@ -495,8 +512,7 @@ final class Lazy implements Implementation
      */
     public function intersect(Implementation $sequence): Implementation
     {
-        /** @psalm-suppress MissingClosureParamType */
-        return $this->filter(static function($value) use ($sequence): bool {
+        return $this->filter(static function(mixed $value) use ($sequence): bool {
             /** @var T $value */
             return $sequence->contains($value);
         });
@@ -511,11 +527,11 @@ final class Lazy implements Implementation
     {
         $values = $this->values;
 
-        /** @psalm-suppress MissingClosureParamType */
         return new self(
-            $this->type,
             static function() use ($values, $function): \Generator {
-                $values = \iterator_to_array($values());
+                // bypass the registering of cleanup function as we iterate over
+                // the whole generator
+                $values = \iterator_to_array($values(self::bypassCleanup()));
                 \usort($values, $function);
 
                 foreach ($values as $value) {
@@ -546,7 +562,7 @@ final class Lazy implements Implementation
      */
     public function clear(): Implementation
     {
-        return new Primitive($this->type);
+        return new Primitive;
     }
 
     /**
@@ -556,11 +572,11 @@ final class Lazy implements Implementation
     {
         $values = $this->values;
 
-        /** @psalm-suppress MissingClosureParamType */
         return new self(
-            $this->type,
             static function() use ($values): \Generator {
-                $values = \iterator_to_array($values());
+                // bypass the registering of cleanup function as we iterate over
+                // the whole generator
+                $values = \iterator_to_array($values(self::bypassCleanup()));
 
                 yield from \array_reverse($values);
             },
@@ -569,85 +585,60 @@ final class Lazy implements Implementation
 
     public function empty(): bool
     {
+        /** @psalm-suppress ImpureMethodCall */
         return !$this->iterator()->valid();
     }
 
     /**
-     * @template ST
-     *
-     * @param null|callable(T): \Generator<ST> $mapper
-     *
-     * @return Sequence<ST>
+     * @return Sequence<T>
      */
-    public function toSequenceOf(string $type, callable $mapper = null): Sequence
+    public function toSequence(): Sequence
     {
-        /** @psalm-suppress MissingClosureParamType */
-        $mapper ??= static fn($v): \Generator => yield $v;
         $values = $this->values;
 
-        /** @psalm-suppress MissingClosureParamType */
         return Sequence::lazy(
-            $type,
-            static function() use ($values, $mapper): \Generator {
-                foreach ($values() as $value) {
-                    /** @var ST $newValue */
-                    foreach ($mapper($value) as $newValue) {
-                        yield $newValue;
-                    }
+            static function(callable $registerCleanup) use ($values): \Generator {
+                foreach ($values($registerCleanup) as $value) {
+                    yield $value;
                 }
             },
         );
     }
 
     /**
-     * @template ST
-     *
-     * @param null|callable(T): \Generator<ST> $mapper
-     *
-     * @return Set<ST>
+     * @return Set<T>
      */
-    public function toSetOf(string $type, callable $mapper = null): Set
+    public function toSet(): Set
     {
-        /** @psalm-suppress MissingClosureParamType */
-        $mapper ??= static fn($v): \Generator => yield $v;
         $values = $this->values;
 
-        /** @psalm-suppress MissingClosureParamType */
         return Set::lazy(
-            $type,
-            static function() use ($values, $mapper): \Generator {
-                foreach ($values() as $value) {
-                    /** @var ST $newValue */
-                    foreach ($mapper($value) as $newValue) {
-                        yield $newValue;
-                    }
+            static function(callable $registerCleanup) use ($values): \Generator {
+                foreach ($values($registerCleanup) as $value) {
+                    yield $value;
                 }
             },
         );
     }
 
-    /**
-     * @template MT
-     * @template MS
-     *
-     * @param callable(T): \Generator<MT, MS> $mapper
-     *
-     * @return Map<MT, MS>
-     */
-    public function toMapOf(string $key, string $value, callable $mapper): Map
+    public function find(callable $predicate): Maybe
     {
-        return $this->load()->toMapOf($key, $value, $mapper);
-    }
+        $cleanup = self::noCleanup();
+        $generator = ($this->values)(static function(callable $userDefinedCleanup) use (&$cleanup) {
+            $cleanup = $userDefinedCleanup;
+        });
 
-    public function find(callable $predicate)
-    {
-        foreach ($this->iterator() as $value) {
+        foreach ($generator as $value) {
             if ($predicate($value) === true) {
-                return $value;
+                /** @psalm-suppress MixedFunctionCall Due to the reference in the closure above */
+                $cleanup();
+
+                return Maybe::just($value);
             }
         }
 
-        throw new NoElementMatchingPredicateFound;
+        /** @var Maybe<T> */
+        return Maybe::nothing();
     }
 
     /**
@@ -655,9 +646,47 @@ final class Lazy implements Implementation
      */
     private function load(): Implementation
     {
-        return new Primitive(
-            $this->type,
-            ...\iterator_to_array($this->iterator()),
-        );
+        /** @psalm-suppress ImpureFunctionCall */
+        return new Primitive(\array_values(\iterator_to_array($this->iterator())));
+    }
+
+    /**
+     * @param RegisterCleanup $registerCleanup
+     *
+     * @return \Iterator<int, T>
+     */
+    private static function open(
+        Implementation $sequence,
+        callable $registerCleanup,
+    ): \Iterator {
+        if ($sequence instanceof self) {
+            return ($sequence->values)($registerCleanup);
+        }
+
+        return $sequence->iterator();
+    }
+
+    /**
+     * @psalm-pure
+     *
+     * @return callable(): void
+     */
+    private static function noCleanup(): callable
+    {
+        return static function(): void {
+            // nothing to do
+        };
+    }
+
+    /**
+     * @psalm-pure
+     *
+     * @return RegisterCleanup
+     */
+    private static function bypassCleanup(): callable
+    {
+        return static function(): void {
+            // nothing to do
+        };
     }
 }

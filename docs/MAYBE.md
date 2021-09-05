@@ -17,8 +17,6 @@ function env(string $name): Maybe {
 }
 ```
 
-**Important**: this structure is immutable and is only typed with [Psalm](http://psalm.dev) to keep the interface simple and jump between types more easily. So make sure to use Psalm in your code so you know if you use the structure correctly.
-
 ## `::just()`
 
 This named constructor tells that there **is** a value that can be used.
@@ -35,6 +33,19 @@ This is a shortcut so you don't have to write the `if (is_null)` yourself.
 $maybe = \is_null($value) ? Maybe::nothing() : Maybe::just($value);
 // is equivalent to
 $maybe = Maybe::of($value);
+```
+
+## `::all()`
+
+This is a shortcut to make sure all the wrappers contain a value to easily combine them. If any of the arguments doesn't contain a value then the call to `->map()` or `->flatMap()` will return a `Maybe::nothing()`.
+
+```php
+$kernel = Maybe::all(env('ENV'), env('DEBUG'))
+    ->map(static fn(string $env, string $debug) => new Kernel($env, $debug))
+    ->match(
+        static fn(Kernel $kernel) => $kernel,
+        static fn() => throw new \Exception('ENV or DEBUG environment variable is missing (or both)'),
+    );
 ```
 
 ## `->map()`
@@ -85,11 +96,9 @@ $logger = $dsn->match(
 );
 ```
 
-Both functions used with `->match()` **must** have the same return type. Otherwise you would have to check the type of the returned value to know what to do next, this would break the logic of this approach that frees you from writing any `if` statement.
-
 ## `->otherwise()`
 
-This is like `->flatMap()` but is called when there is no value wrapped. The other difference from `->flatMap()` is that you must return the same wrapped value type.
+This is like `->flatMap()` but is called when there is no value wrapped.
 
 This is useful to create a chain of alternative strategies.
 

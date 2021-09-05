@@ -2,7 +2,7 @@
 
 This package provides additional sets for [`innmind/black-box`](https://packagist.org/packages/innmind/black-box) so you can more easily generate: `Map`s, `Set`s and `Sequence`s.
 
-For the 3 `::of()` method you can as last parameter an instance of `Innmind\BlackBox\Set\Intergers` to specify the range of elements to generate. By default it's between `0` and `100`, depending on the values you generate you may to lower the upper bound to reduce the memory footprint and speed up your tests.
+For the 3 `::of()` method you can pass as last parameter an instance of `Innmind\BlackBox\Set\Intergers` to specify the range of elements to generate. By default it's between `0` and `100`, depending on the values you generate you may to lower the upper bound to reduce the memory footprint and speed up your tests.
 
 ## `Map`
 
@@ -10,10 +10,8 @@ For the 3 `::of()` method you can as last parameter an instance of `Innmind\Blac
 use Fixtures\Innmind\Immutable\Map;
 use Innmind\BlackBox\Set;
 
-/** @var Innmind\Immutable\Map<int, string> */
+/** @var Set<Innmind\Immutable\Map<int, string>> */
 $set = Map::of(
-    'int',
-    'string',
     Set\Integers::any(),
     Set\Strings::any(),
 );
@@ -23,12 +21,11 @@ $set = Map::of(
 
 ```php
 use Fixtures\Innmind\Immutable\Set;
-use Innmind\BlackBox\Set;
+use Innmind\BlackBox\Set as BSet;
 
-/** @var Innmind\Immutable\Set<string> */
+/** @var BSet<Innmind\Immutable\Set<string>> */
 $set = Set::of(
-    'string',
-    Set\Strings::any(),
+    BSet\Strings::any(),
 );
 ```
 
@@ -38,9 +35,8 @@ $set = Set::of(
 use Fixtures\Innmind\Immutable\Sequence;
 use Innmind\BlackBox\Sequence;
 
-/** @var Innmind\Immutable\Sequence<string> */
+/** @var Set<Innmind\Immutable\Sequence<string>> */
 $set = Sequence::of(
-    'string',
     Sequence\Strings::any(),
 );
 ```

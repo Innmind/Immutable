@@ -5,75 +5,75 @@ namespace Innmind\Immutable\Map;
 
 use Innmind\Immutable\{
     Map,
-    Type,
     Str,
     Sequence,
     Set,
     Pair,
-    ValidateArgument,
-    ValidateArgument\ClassType,
-    Exception\LogicException,
-    Exception\ElementNotFound,
-    Exception\CannotGroupEmptyStructure,
+    Maybe,
+    SideEffect,
 };
 
 /**
  * @template T
  * @template S
+ * @psalm-immutable
  */
 final class ObjectKeys implements Implementation
 {
-    private string $keyType;
-    private string $valueType;
-    private ValidateArgument $validateKey;
-    private ValidateArgument $validateValue;
     private \SplObjectStorage $values;
 
-    public function __construct(string $keyType, string $valueType)
+    public function __construct(\SplObjectStorage $values = null)
     {
-        $this->validateKey = Type::of($keyType);
-
-        if (!$this->validateKey instanceof ClassType && $keyType !== 'object') {
-            throw new LogicException;
-        }
-
-        $this->validateValue = Type::of($valueType);
-        $this->keyType = $keyType;
-        $this->valueType = $valueType;
-        $this->values = new \SplObjectStorage;
+        $this->values = $values ?? new \SplObjectStorage;
     }
 
     /**
      * @param T $key
      * @param S $value
      *
-     * @return self<T, S>
+     * @return Implementation<T, S>
      */
     public function __invoke($key, $value): Implementation
     {
-        ($this->validateKey)($key, 1);
-        ($this->validateValue)($value, 2);
+        if (!\is_object($key)) {
+            return (new DoubleIndex)->merge($this)($key, $value);
+        }
 
-        $map = clone $this;
-        $map->values = clone $this->values;
-        /** @psalm-suppress MixedArgumentTypeCoercion */
-        $map->values[$key] = $value;
+        /** @var \SplObjectStorage<object, mixed> */
+        $values = clone $this->values;
+        /** @psalm-suppress ImpureMethodCall */
+        $values[$key] = $value;
 
-        return $map;
+        return new self($values);
     }
 
-    public function keyType(): string
+    /**
+     * @template A
+     * @template B
+     * @psalm-pure
+     *
+     * @param A $key
+     * @param B $value
+     *
+     * @return Maybe<Implementation<A, B>>
+     */
+    public static function of($key, $value): Maybe
     {
-        return $this->keyType;
-    }
+        if (\is_object($key)) {
+            /** @var self<A, B> */
+            $self = new self;
 
-    public function valueType(): string
-    {
-        return $this->valueType;
+            /** @var Maybe<Implementation<A, B>> */
+            return Maybe::just(($self)($key, $value));
+        }
+
+        /** @var Maybe<Implementation<A, B>> */
+        return Maybe::nothing();
     }
 
     public function size(): int
     {
+        /** @psalm-suppress ImpureMethodCall */
         return $this->values->count();
     }
 
@@ -85,21 +85,21 @@ final class ObjectKeys implements Implementation
     /**
      * @param T $key
      *
-     * @throws ElementNotFound
-     *
-     * @return S
+     * @return Maybe<S>
      */
-    public function get($key)
+    public function get($key): Maybe
     {
         if (!$this->contains($key)) {
-            throw new ElementNotFound($key);
+            /** @var Maybe<S> */
+            return Maybe::nothing();
         }
 
         /**
          * @psalm-suppress MixedArgumentTypeCoercion
-         * @var S
+         * @psalm-suppress ImpureMethodCall
+         * @var Maybe<S>
          */
-        return $this->values->offsetGet($key);
+        return Maybe::just($this->values->offsetGet($key));
     }
 
     /**
@@ -111,7 +111,10 @@ final class ObjectKeys implements Implementation
             return false;
         }
 
-        /** @psalm-suppress MixedArgumentTypeCoercion */
+        /**
+         * @psalm-suppress MixedArgumentTypeCoercion
+         * @psalm-suppress ImpureMethodCall
+         */
         return $this->values->offsetExists($key);
     }
 
@@ -120,10 +123,7 @@ final class ObjectKeys implements Implementation
      */
     public function clear(): self
     {
-        $map = clone $this;
-        $map->values = new \SplObjectStorage;
-
-        return $map;
+        return new self;
     }
 
     /**
@@ -131,21 +131,25 @@ final class ObjectKeys implements Implementation
      */
     public function equals(Implementation $map): bool
     {
-        if ($map->size() !== $this->size()) {
+        if (!$map->keys()->equals($this->keys())) {
             return false;
         }
 
+        /** @psalm-suppress ImpureMethodCall */
         foreach ($this->values as $k) {
             /** @var T $key */
             $key = $k;
             /** @var S $v */
             $v = $this->values[$k];
+            $equals = $map
+                ->get($key)
+                ->filter(static fn($value) => $value === $v)
+                ->match(
+                    static fn() => true,
+                    static fn() => false,
+                );
 
-            if (!$map->contains($key)) {
-                return false;
-            }
-
-            if ($map->get($key) !== $v) {
+            if (!$equals) {
                 return false;
             }
         }
@@ -160,8 +164,10 @@ final class ObjectKeys implements Implementation
      */
     public function filter(callable $predicate): self
     {
-        $map = $this->clear();
+        /** @var \SplObjectStorage<object, mixed> */
+        $values = new \SplObjectStorage;
 
+        /** @psalm-suppress ImpureMethodCall */
         foreach ($this->values as $k) {
             /** @var T $key */
             $key = $k;
@@ -169,70 +175,63 @@ final class ObjectKeys implements Implementation
             $v = $this->values[$k];
 
             if ($predicate($key, $v) === true) {
-                $map->values[$k] = $v;
+                $values[$k] = $v;
             }
         }
 
-        return $map;
+        return new self($values);
     }
 
     /**
      * @param callable(T, S): void $function
      */
-    public function foreach(callable $function): void
+    public function foreach(callable $function): SideEffect
     {
+        /** @psalm-suppress ImpureMethodCall */
         foreach ($this->values as $k) {
             /** @var T $key */
             $key = $k;
-            /** @var S $v */
+            /**
+             * @psalm-suppress ImpureMethodCall
+             * @var S $v
+             */
             $v = $this->values[$k];
 
             $function($key, $v);
         }
+
+        return new SideEffect;
     }
 
     /**
      * @template D
-     * @param callable(T, S): D $discriminator
      *
-     * @throws CannotGroupEmptyStructure
+     * @param callable(T, S): D $discriminator
      *
      * @return Map<D, Map<T, S>>
      */
     public function groupBy(callable $discriminator): Map
     {
-        if ($this->empty()) {
-            throw new CannotGroupEmptyStructure;
-        }
+        /** @var Map<D, Map<T, S>> */
+        $groups = Map::of();
 
-        $groups = null;
-
+        /** @psalm-suppress ImpureMethodCall */
         foreach ($this->values as $k) {
             /** @var T $key */
             $key = $k;
-            /** @var S $v */
+            /**
+             * @psalm-suppress ImpureMethodCall
+             * @var S
+             */
             $v = $this->values[$k];
 
             $discriminant = $discriminator($key, $v);
 
-            if ($groups === null) {
-                /** @var Map<D, Map<T, S>> */
-                $groups = Map::of(
-                    Type::determine($discriminant),
-                    Map::class,
-                );
-            }
-
-            if ($groups->contains($discriminant)) {
-                $group = $groups->get($discriminant);
-                $group = ($group)($key, $v);
-
-                $groups = ($groups)($discriminant, $group);
-            } else {
-                $group = $this->clearMap()($key, $v);
-
-                $groups = ($groups)($discriminant, $group);
-            }
+            $group = $groups->get($discriminant)->match(
+                static fn($group) => $group,
+                fn() => $this->clearMap(),
+            );
+            $groups = ($groups)($discriminant, ($group)($key, $v));
         }
 
         /** @var Map<D, Map<T, S>> */
@@ -244,9 +243,8 @@ final class ObjectKeys implements Implementation
      */
     public function keys(): Set
     {
-        /** @psalm-suppress MissingClosureParamType */
         return $this->reduce(
-            Set::of($this->keyType),
+            Set::of(),
             static fn(Set $keys, $key): Set => ($keys)($key),
         );
     }
@@ -256,48 +254,39 @@ final class ObjectKeys implements Implementation
      */
     public function values(): Sequence
     {
-        /** @psalm-suppress MissingClosureParamType */
         return $this->reduce(
-            Sequence::of($this->valueType),
+            Sequence::of(),
             static fn(Sequence $values, $_, $value): Sequence => ($values)($value),
         );
     }
 
     /**
-     * @param callable(T, S): (S|Pair<T, S>) $function
+     * @template B
      *
-     * @return self<T, S>
+     * @param callable(T, S): B $function
+     *
+     * @return self<T, B>
      */
     public function map(callable $function): self
     {
-        $map = $this->clear();
+        /** @var \SplObjectStorage<object, mixed> */
+        $values = new \SplObjectStorage;
 
+        /** @psalm-suppress ImpureMethodCall */
         foreach ($this->values as $k) {
             /** @var T */
             $key = $k;
-            /** @var S */
+            /**
+             * @psalm-suppress ImpureMethodCall
+             * @var S
+             */
             $v = $this->values[$k];
 
-            $return = $function($key, $v);
-
-            if ($return instanceof Pair) {
-                ($this->validateKey)($return->key(), 1);
-
-                /** @var object */
-                $key = $return->key();
-                /** @var S */
-                $value = $return->value();
-            } else {
-                $key = $k;
-                $value = $return;
-            }
-
-            ($this->validateValue)($value, 2);
-
-            $map->values[$key] = $value;
+            /** @psalm-suppress ImpureMethodCall */
+            $values[$k] = $function($key, $v);
         }
 
-        return $map;
+        return new self($values);
     }
 
     /**
@@ -311,26 +300,29 @@ final class ObjectKeys implements Implementation
             return $this;
         }
 
-        $map = clone $this;
-        $map->values = clone $this->values;
-        /** @psalm-suppress MixedArgumentTypeCoercion */
-        $map->values->detach($key);
-        $map->values->rewind();
+        /** @var \SplObjectStorage<object, mixed> */
+        $values = clone $this->values;
+        /**
+         * @psalm-suppress MixedArgumentTypeCoercion
+         * @psalm-suppress ImpureMethodCall
+         */
+        $values->detach($key);
+        /** @psalm-suppress ImpureMethodCall */
+        $values->rewind();
 
-        return $map;
+        return new self($values);
     }
 
     /**
      * @param Implementation<T, S> $map
      *
-     * @return self<T, S>
+     * @return Implementation<T, S>
      */
-    public function merge(Implementation $map): self
+    public function merge(Implementation $map): Implementation
     {
-        /** @psalm-suppress MixedArgument For some reason it no longer recognize templates for $key and $value */
         return $map->reduce(
             $this,
-            static fn(self $carry, $key, $value): self => ($carry)($key, $value),
+            static fn(Implementation $carry, $key, $value): Implementation => ($carry)($key, $value),
         );
     }
 
@@ -344,10 +336,14 @@ final class ObjectKeys implements Implementation
         $truthy = $this->clearMap();
         $falsy = $this->clearMap();
 
+        /** @psalm-suppress ImpureMethodCall */
         foreach ($this->values as $k) {
             /** @var T $key */
             $key = $k;
-            /** @var S $v */
+            /**
+             * @psalm-suppress ImpureMethodCall
+             * @var S $v
+             */
             $v = $this->values[$k];
 
             $return = $predicate($key, $v);
@@ -359,14 +355,7 @@ final class ObjectKeys implements Implementation
             }
         }
 
-        /**
-         * @psalm-suppress InvalidScalarArgument
-         * @psalm-suppress InvalidArgument
-         * @var Map<bool, Map<T, S>>
-         */
-        return Map::of('bool', Map::class)
-            (true, $truthy)
-            (false, $falsy);
+        return Map::of([true, $truthy], [false, $falsy]);
     }
 
     /**
@@ -378,10 +367,14 @@ final class ObjectKeys implements Implementation
      */
     public function reduce($carry, callable $reducer)
     {
+        /** @psalm-suppress ImpureMethodCall */
         foreach ($this->values as $k) {
             /** @var T $key */
             $key = $k;
-            /** @var S $v */
+            /**
+             * @psalm-suppress ImpureMethodCall
+             * @var S $v
+             */
             $v = $this->values[$k];
 
             $carry = $reducer($carry, $key, $v);
@@ -392,95 +385,32 @@ final class ObjectKeys implements Implementation
 
     public function empty(): bool
     {
+        /** @psalm-suppress ImpureMethodCall */
         $this->values->rewind();
 
+        /** @psalm-suppress ImpureMethodCall */
         return !$this->values->valid();
     }
 
-    /**
-     * @template ST
-     *
-     * @param callable(T, S): \Generator<ST> $mapper
-     *
-     * @return Sequence<ST>
-     */
-    public function toSequenceOf(string $type, callable $mapper): Sequence
+    public function find(callable $predicate): Maybe
     {
-        /** @var Sequence<ST> */
-        $sequence = Sequence::of($type);
-
+        /** @psalm-suppress ImpureMethodCall */
         foreach ($this->values as $k) {
             /** @var T $key */
             $key = $k;
-            /** @var S $v */
-            $v = $this->values[$k];
-
-            foreach ($mapper($key, $v) as $newValue) {
-                $sequence = ($sequence)($newValue);
-            }
-        }
-
-        return $sequence;
-    }
-
-    /**
-     * @template ST
-     *
-     * @param callable(T, S): \Generator<ST> $mapper
-     *
-     * @return Set<ST>
-     */
-    public function toSetOf(string $type, callable $mapper): Set
-    {
-        /** @var Set<ST> */
-        $set = Set::of($type);
-
-        foreach ($this->values as $k) {
-            /** @var T $key */
-            $key = $k;
-            /** @var S $v */
-            $v = $this->values[$k];
-
-            foreach ($mapper($key, $v) as $newValue) {
-                $set = ($set)($newValue);
-            }
-        }
-
-        return $set;
-    }
-
-    /**
-     * @template MT
-     * @template MS
-     *
-     * @param null|callable(T, S): \Generator<MT, MS> $mapper
-     *
-     * @return Map<MT, MS>
-     */
-    public function toMapOf(string $key, string $value, callable $mapper = null): Map
-    {
-        /** @psalm-suppress MissingClosureParamType */
-        $mapper ??= static fn($k, $v): \Generator => yield $k => $v;
-
-        /** @var Map<MT, MS> */
-        $map = Map::of($key, $value);
-
-        foreach ($this->values as $k) {
-            /** @var T $key */
-            $key = $k;
-            /** @var S $v */
-            $v = $this->values[$k];
-
             /**
-             * @var MT $newKey
-             * @var MS $newValue
+             * @psalm-suppress ImpureMethodCall
+             * @var S $v
              */
-            foreach ($mapper($key, $v) as $newKey => $newValue) {
-                $map = ($map)($newKey, $newValue);
+            $v = $this->values[$k];
+
+            if ($predicate($key, $v)) {
+                return Maybe::just(new Pair($key, $v));
             }
         }
 
-        return $map;
+        /** @var Maybe<Pair<T, S>> */
+        return Maybe::nothing();
     }
 
     /**
@@ -488,6 +418,6 @@ final class ObjectKeys implements Implementation
      */
     private function clearMap(): Map
     {
-        return Map::of($this->keyType, $this->valueType);
+        return Map::of();
     }
 }

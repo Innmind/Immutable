@@ -8,15 +8,13 @@ use Innmind\Immutable\{
     Sequence,
     Str,
     Set,
-    Exception\LogicException,
-    Exception\CannotGroupEmptyStructure,
-    Exception\ElementNotFound,
-    Exception\OutOfBoundException,
-    Exception\NoElementMatchingPredicateFound,
+    Maybe,
+    SideEffect,
 };
 
 /**
  * @template T
+ * @psalm-immutable
  */
 interface Implementation extends \Countable
 {
@@ -29,26 +27,19 @@ interface Implementation extends \Countable
      */
     public function __invoke($element): self;
 
-    /**
-     * Type of the elements
-     */
-    public function type(): string;
-
     public function size(): int;
 
     /**
-     * @return \Iterator<T>
+     * @return \Iterator<int, T>
      */
     public function iterator(): \Iterator;
 
     /**
      * Return the element at the given index
      *
-     * @throws OutOfBoundException
-     *
-     * @return T
+     * @return Maybe<T>
      */
-    public function get(int $index);
+    public function get(int $index): Maybe;
 
     /**
      * Return the diff between this sequence and another
@@ -101,7 +92,7 @@ interface Implementation extends \Countable
      *
      * @param callable(T): void $function
      */
-    public function foreach(callable $function): void;
+    public function foreach(callable $function): SideEffect;
 
     /**
      * Return a new map of pairs grouped by keys determined with the given
@@ -110,8 +101,6 @@ interface Implementation extends \Countable
      * @template D
      * @param callable(T): D $discriminator
      *
-     * @throws CannotGroupEmptyStructure
-     *
      * @return Map<D, Sequence<T>>
      */
     public function groupBy(callable $discriminator): Map;
@@ -119,16 +108,16 @@ interface Implementation extends \Countable
     /**
      * Return the first element
      *
-     * @return T
+     * @return Maybe<T>
      */
-    public function first();
+    public function first(): Maybe;
 
     /**
      * Return the last element
      *
-     * @return T
+     * @return Maybe<T>
      */
-    public function last();
+    public function last(): Maybe;
 
     /**
      * Check if the sequence contains the given element
@@ -142,9 +131,9 @@ interface Implementation extends \Countable
      *
      * @param T $element
      *
-     * @throws ElementNotFound
+     * @return Maybe<int>
      */
-    public function indexOf($element): int;
+    public function indexOf($element): Maybe;
 
     /**
      * Return the list of indices
@@ -156,11 +145,23 @@ interface Implementation extends \Countable
     /**
      * Return a new sequence by applying the given function to all elements
      *
-     * @param callable(T): T $function
+     * @template S
      *
-     * @return self<T>
+     * @param callable(T): S $function
+     *
+     * @return self<S>
      */
     public function map(callable $function): self;
+
+    /**
+     * @template S
+     *
+     * @param callable(T): Sequence<S> $map
+     * @param callable(Sequence<S>): self<S> $exfiltrate
+     *
+     * @return Sequence<S>
+     */
+    public function flatMap(callable $map, callable $exfiltrate): Sequence;
 
     /**
      * Pad the sequence to a defined size with the given element
@@ -186,15 +187,6 @@ interface Implementation extends \Countable
      * @return self<T>
      */
     public function slice(int $from, int $until): self;
-
-    /**
-     * Split the sequence in a sequence of 2 sequences splitted at the given position
-     *
-     * @throws OutOfBoundException
-     *
-     * @return Sequence<Sequence<T>>
-     */
-    public function splitAt(int $position): Sequence;
 
     /**
      * Return a sequence with the n first elements
@@ -266,39 +258,19 @@ interface Implementation extends \Countable
     public function empty(): bool;
 
     /**
-     * @template ST
-     *
-     * @param null|callable(T): \Generator<ST> $mapper
-     *
-     * @return Sequence<ST>
+     * @return Sequence<T>
      */
-    public function toSequenceOf(string $type, callable $mapper = null): Sequence;
+    public function toSequence(): Sequence;
 
     /**
-     * @template ST
-     *
-     * @param null|callable(T): \Generator<ST> $mapper
-     *
-     * @return Set<ST>
+     * @return Set<T>
      */
-    public function toSetOf(string $type, callable $mapper = null): Set;
-
-    /**
-     * @template MT
-     * @template MS
-     *
-     * @param callable(T): \Generator<MT, MS> $mapper
-     *
-     * @return Map<MT, MS>
-     */
-    public function toMapOf(string $key, string $value, callable $mapper): Map;
+    public function toSet(): Set;
 
     /**
      * @param callable(T): bool $predicate
      *
-     * @throws NoElementMatchingPredicateFound
-     *
-     * @return T
+     * @return Maybe<T>
      */
-    public function find(callable $predicate);
+    public function find(callable $predicate): Maybe;
 }

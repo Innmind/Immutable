@@ -22,4 +22,4 @@ This library provides the 7 following structures:
 
 See the documentation for each structure to understand how to use them.
 
-`Sequence`, `Set` and `Map` will ask to provide the types of the elements they contains, you can see [here](TYPES.md) which types you can use.
+All structures are typed with [`vimeo/psalm`](https://psalm.dev), you must use it in order to verify that you use this library correctly.

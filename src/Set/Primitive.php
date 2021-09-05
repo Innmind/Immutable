@@ -7,31 +7,26 @@ use Innmind\Immutable\{
     Map,
     Sequence,
     Set,
-    Type,
-    ValidateArgument,
     Str,
-    Exception\CannotGroupEmptyStructure,
+    Maybe,
+    SideEffect,
 };
 
 /**
  * @template T
+ * @psalm-immutable
  */
 final class Primitive implements Implementation
 {
-    private string $type;
-    private ValidateArgument $validate;
     /** @var Sequence\Implementation<T> */
     private Sequence\Implementation $values;
 
     /**
-     * @param T $values
+     * @param Sequence\Implementation<T> $values
      */
-    public function __construct(string $type, ...$values)
+    public function __construct(Sequence\Implementation $values)
     {
-        $this->type = $type;
-        $this->validate = Type::of($type);
-        /** @var Sequence\Implementation<T> */
-        $this->values = (new Sequence\Primitive($type, ...$values))->distinct();
+        $this->values = $values;
     }
 
     /**
@@ -45,15 +40,22 @@ final class Primitive implements Implementation
             return $this;
         }
 
-        $set = clone $this;
-        $set->values = ($this->values)($element);
-
-        return $set;
+        return new self(($this->values)($element));
     }
 
-    public function type(): string
+    /**
+     * @no-named-arguments
+     * @psalm-pure
+     *
+     * @template A
+     *
+     * @param A $values
+     *
+     * @return self<A>
+     */
+    public static function of(...$values): self
     {
-        return $this->type;
+        return new self((new Sequence\Primitive($values))->distinct());
     }
 
     public function size(): int
@@ -67,7 +69,7 @@ final class Primitive implements Implementation
     }
 
     /**
-     * @return \Iterator<T>
+     * @return \Iterator<int, T>
      */
     public function iterator(): \Iterator
     {
@@ -81,13 +83,7 @@ final class Primitive implements Implementation
      */
     public function intersect(Implementation $set): self
     {
-        $self = $this->clear();
-        /** @psalm-suppress InvalidArgument */
-        $self->values = $this->values->intersect(
-            new Sequence\Primitive($this->type, ...$set->iterator()),
-        );
-
-        return $self;
+        return new self($this->values->intersect($set->sequence()));
     }
 
     /**
@@ -109,14 +105,9 @@ final class Primitive implements Implementation
             return $this;
         }
 
-        $index = $this->values->indexOf($element);
-        $set = clone $this;
-        $set->values = $this
-            ->values
-            ->slice(0, $index)
-            ->append($this->values->slice($index + 1, $this->size()));
-
-        return $set;
+        return new self($this->values->filter(
+            static fn($value) => $value !== $element,
+        ));
     }
 
     /**
@@ -126,13 +117,7 @@ final class Primitive implements Implementation
      */
     public function diff(Implementation $set): self
     {
-        $self = clone $this;
-        /** @psalm-suppress InvalidArgument */
-        $self->values = $this->values->diff(
-            new Sequence\Primitive($this->type, ...$set->iterator()),
-        );
-
-        return $self;
+        return new self($this->values->diff($set->sequence()));
     }
 
     /**
@@ -154,71 +139,42 @@ final class Primitive implements Implementation
      */
     public function filter(callable $predicate): self
     {
-        $set = clone $this;
-        $set->values = $this->values->filter($predicate);
-
-        return $set;
+        return new self($this->values->filter($predicate));
     }
 
     /**
      * @param callable(T): void $function
      */
-    public function foreach(callable $function): void
+    public function foreach(callable $function): SideEffect
     {
-        $this->values->foreach($function);
+        return $this->values->foreach($function);
     }
 
     /**
      * @template D
-     * @param callable(T): D $discriminator
      *
-     * @throws CannotGroupEmptyStructure
+     * @param callable(T): D $discriminator
      *
      * @return Map<D, Set<T>>
      */
     public function groupBy(callable $discriminator): Map
     {
-        $map = $this->values->groupBy($discriminator);
-
-        /**
-         * @psalm-suppress MissingParamType
-         * @var Map<D, Set<T>>
-         */
-        return $map->reduce(
-            Map::of($map->keyType(), Set::class),
-            fn(Map $carry, $key, Sequence $values): Map => ($carry)(
-                $key,
-                $values->toSetOf($this->type),
-            ),
-        );
+        return $this
+            ->values
+            ->groupBy($discriminator)
+            ->map(static fn(mixed $_, $sequence) => Set::of(...$sequence->toList()));
     }
 
     /**
-     * @param callable(T): T $function
+     * @template S
      *
-     * @return self<T>
+     * @param callable(T): S $function
+     *
+     * @return self<S>
      */
     public function map(callable $function): self
     {
-        $validate = $this->validate;
-
-        /**
-         * @psalm-suppress MissingClosureParamType
-         * @psalm-suppress MissingClosureReturnType
-         */
-        $function = static function($value) use ($validate, $function) {
-            /** @var T $value */
-            $returned = $function($value);
-            ($validate)($returned, 1);
-
-            return $returned;
-        };
-
-        /** @psalm-suppress MissingClosureParamType */
-        return $this->reduce(
-            $this->clear(),
-            static fn(self $carry, $value): self => ($carry)($function($value)),
-        );
+        return new self($this->values->map($function)->distinct());
     }
 
     /**
@@ -228,24 +184,10 @@ final class Primitive implements Implementation
      */
     public function partition(callable $predicate): Map
     {
-        $partitions = $this->values->partition($predicate);
-        /** @var Set<T> */
-        $truthy = $partitions
-            ->get(true)
-            ->toSetOf($this->type);
-        /** @var Set<T> */
-        $falsy = $partitions
-            ->get(false)
-            ->toSetOf($this->type);
-
-        /**
-         * @psalm-suppress InvalidScalarArgument
-         * @psalm-suppress InvalidArgument
-         * @var Map<bool, Set<T>>
-         */
-        return Map::of('bool', Set::class)
-            (true, $truthy)
-            (false, $falsy);
+        return $this
+            ->values
+            ->partition($predicate)
+            ->map(static fn($_, $sequence) => Set::of(...$sequence->toList()));
     }
 
     /**
@@ -258,7 +200,7 @@ final class Primitive implements Implementation
         return $this
             ->values
             ->sort($function)
-            ->toSequenceOf($this->type);
+            ->toSequence();
     }
 
     /**
@@ -268,11 +210,7 @@ final class Primitive implements Implementation
      */
     public function merge(Implementation $set): self
     {
-        /** @psalm-suppress MixedArgument For some reason it no longer recognize the template for $value */
-        return $set->reduce(
-            $this,
-            static fn(self $carry, $value): self => ($carry)($value),
-        );
+        return new self($this->values->append($set->sequence())->distinct());
     }
 
     /**
@@ -292,7 +230,7 @@ final class Primitive implements Implementation
      */
     public function clear(): self
     {
-        return new self($this->type);
+        return self::of();
     }
 
     public function empty(): bool
@@ -300,45 +238,16 @@ final class Primitive implements Implementation
         return $this->values->empty();
     }
 
-    /**
-     * @template ST
-     *
-     * @param null|callable(T): \Generator<ST> $mapper
-     *
-     * @return Sequence<ST>
-     */
-    public function toSequenceOf(string $type, callable $mapper = null): Sequence
-    {
-        return $this->values->toSequenceOf($type, $mapper);
-    }
-
-    /**
-     * @template ST
-     *
-     * @param null|callable(T): \Generator<ST> $mapper
-     *
-     * @return Set<ST>
-     */
-    public function toSetOf(string $type, callable $mapper = null): Set
-    {
-        return $this->values->toSetOf($type, $mapper);
-    }
-
-    /**
-     * @template MT
-     * @template MS
-     *
-     * @param callable(T): \Generator<MT, MS> $mapper
-     *
-     * @return Map<MT, MS>
-     */
-    public function toMapOf(string $key, string $value, callable $mapper): Map
-    {
-        return $this->values->toMapOf($key, $value, $mapper);
-    }
-
-    public function find(callable $predicate)
+    public function find(callable $predicate): Maybe
     {
         return $this->values->find($predicate);
+    }
+
+    /**
+     * @return Sequence\Implementation<T>
+     */
+    public function sequence(): Sequence\Implementation
+    {
+        return $this->values;
     }
 }

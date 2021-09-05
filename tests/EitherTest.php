@@ -27,12 +27,12 @@ class EitherTest extends TestCase
                 $this->assertSame(
                     $left,
                     $either->match(
+                        static fn($value) => $right,
                         function($value) use ($left) {
                             $this->assertSame($left, $value);
 
                             return $value;
                         },
-                        static fn($value) => $right,
                     ),
                 );
             });
@@ -51,12 +51,12 @@ class EitherTest extends TestCase
                 $this->assertSame(
                     $right,
                     $either->match(
-                        static fn($value) => $value,
                         function($value) use ($right) {
                             $this->assertSame($right, $value);
 
                             return $value;
                         },
+                        static fn($value) => $value,
                     ),
                 );
             });
@@ -193,8 +193,8 @@ class EitherTest extends TestCase
                 $this->assertSame(
                     $right,
                     $either->match(
-                        static fn() => $left,
                         static fn($value) => $value,
+                        static fn() => $left,
                     ),
                 );
             });
@@ -219,8 +219,8 @@ class EitherTest extends TestCase
                 $this->assertSame(
                     $left,
                     $either->match(
-                        static fn($value) => $value,
                         static fn() => $right,
+                        static fn($value) => $value,
                     ),
                 );
             });
@@ -248,8 +248,8 @@ class EitherTest extends TestCase
                 $this->assertSame(
                     $right,
                     $either->match(
-                        static fn() => $left,
                         static fn($value) => $value,
+                        static fn() => $left,
                     ),
                 );
             });
@@ -277,8 +277,8 @@ class EitherTest extends TestCase
                 $this->assertSame(
                     $otherwise,
                     $either->match(
-                        static fn($value) => $value,
                         static fn($value) => $unwanted,
+                        static fn($value) => $value,
                     ),
                 );
             });

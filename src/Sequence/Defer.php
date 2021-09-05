@@ -8,38 +8,29 @@ use Innmind\Immutable\{
     Sequence,
     Str,
     Set,
+    Maybe,
     Accumulate,
-    ValidateArgument,
-    Type,
-    Exception\LogicException,
-    Exception\CannotGroupEmptyStructure,
-    Exception\ElementNotFound,
-    Exception\OutOfBoundException,
-    Exception\NoElementMatchingPredicateFound,
+    SideEffect,
 };
 
 /**
  * @template T
+ * @psalm-immutable
  */
 final class Defer implements Implementation
 {
-    private string $type;
-    /** @var \Iterator<T> */
+    /** @var \Iterator<int, T> */
     private \Iterator $values;
-    private ValidateArgument $validate;
 
-    public function __construct(string $type, \Generator $generator)
+    public function __construct(\Generator $generator)
     {
-        $this->type = $type;
-        $validate = Type::of($type);
-        $this->values = new Accumulate((static function(\Generator $generator, ValidateArgument $validate): \Generator {
+        /** @var \Iterator<int, T> */
+        $this->values = new Accumulate((static function(\Generator $generator): \Generator {
             /** @var T $value */
             foreach ($generator as $value) {
-                $validate($value, 1);
                 yield $value;
             }
-        })($generator, $validate));
-        $this->validate = $validate;
+        })($generator));
     }
 
     /**
@@ -49,10 +40,8 @@ final class Defer implements Implementation
      */
     public function __invoke($element): Implementation
     {
-        /** @psalm-suppress MissingClosureParamType */
         return new self(
-            $this->type,
-            (static function($values, $element): \Generator {
+            (static function(\Iterator $values, mixed $element): \Generator {
                 /** @var T $value */
                 foreach ($values as $value) {
                     yield $value;
@@ -63,11 +52,6 @@ final class Defer implements Implementation
         );
     }
 
-    public function type(): string
-    {
-        return $this->type;
-    }
-
     public function size(): int
     {
         return $this->load()->size();
@@ -75,11 +59,11 @@ final class Defer implements Implementation
 
     public function count(): int
     {
-        return $this->load()->count();
+        return $this->size();
     }
 
     /**
-     * @return \Iterator<T>
+     * @return \Iterator<int, T>
      */
     public function iterator(): \Iterator
     {
@@ -87,23 +71,22 @@ final class Defer implements Implementation
     }
 
     /**
-     * @throws OutOfBoundException
-     *
-     * @return T
+     * @return Maybe<T>
      */
-    public function get(int $index)
+    public function get(int $index): Maybe
     {
         $iteration = 0;
 
         foreach ($this->values as $value) {
             if ($index === $iteration) {
-                return $value;
+                return Maybe::just($value);
             }
 
             ++$iteration;
         }
 
-        throw new OutOfBoundException;
+        /** @var Maybe<T> */
+        return Maybe::nothing();
     }
 
     /**
@@ -113,8 +96,7 @@ final class Defer implements Implementation
      */
     public function diff(Implementation $sequence): Implementation
     {
-        /** @psalm-suppress MissingClosureParamType */
-        return $this->filter(static function($value) use ($sequence): bool {
+        return $this->filter(static function(mixed $value) use ($sequence): bool {
             /** @var T $value */
             return !$sequence->contains($value);
         });
@@ -125,10 +107,8 @@ final class Defer implements Implementation
      */
     public function distinct(): Implementation
     {
-        /** @psalm-suppress MissingClosureParamType */
         return new self(
-            $this->type,
-            (static function($values): \Generator {
+            (static function(\Iterator $values): \Generator {
                 /** @var list<T> */
                 $uniques = [];
 
@@ -149,10 +129,8 @@ final class Defer implements Implementation
      */
     public function drop(int $size): Implementation
     {
-        /** @psalm-suppress MissingClosureParamType */
         return new self(
-            $this->type,
-            (static function($values, $toDrop): \Generator {
+            (static function(\Iterator $values, int $toDrop): \Generator {
                 $dropped = 0;
 
                 /** @var T $value */
@@ -194,10 +172,8 @@ final class Defer implements Implementation
      */
     public function filter(callable $predicate): Implementation
     {
-        /** @psalm-suppress MissingClosureParamType */
         return new self(
-            $this->type,
-            (static function($values, callable $predicate): \Generator {
+            (static function(\Iterator $values, callable $predicate): \Generator {
                 /** @var T $value */
                 foreach ($values as $value) {
                     if ($predicate($value)) {
@@ -211,18 +187,18 @@ final class Defer implements Implementation
     /**
      * @param callable(T): void $function
      */
-    public function foreach(callable $function): void
+    public function foreach(callable $function): SideEffect
     {
         foreach ($this->values as $value) {
             $function($value);
         }
+
+        return new SideEffect;
     }
 
     /**
      * @template D
      * @param callable(T): D $discriminator
-     *
-     * @throws CannotGroupEmptyStructure
      *
      * @return Map<D, Sequence<T>>
      */
@@ -233,31 +209,32 @@ final class Defer implements Implementation
     }
 
     /**
-     * @return T
+     * @return Maybe<T>
      */
-    public function first()
+    public function first(): Maybe
     {
         foreach ($this->values as $value) {
-            return $value;
+            return Maybe::just($value);
         }
 
-        throw new OutOfBoundException;
+        /** @var Maybe<T> */
+        return Maybe::nothing();
     }
 
     /**
-     * @return T
+     * @return Maybe<T>
      */
-    public function last()
+    public function last(): Maybe
     {
         foreach ($this->values as $value) {
         }
 
         if (!isset($value)) {
-            throw new OutOfBoundException;
+            /** @var Maybe<T> */
+            return Maybe::nothing();
         }
 
-        /** @var T */
-        return $value;
+        return Maybe::just($value);
     }
 
     /**
@@ -277,21 +254,22 @@ final class Defer implements Implementation
     /**
      * @param T $element
      *
-     * @throws ElementNotFound
+     * @return Maybe<int>
      */
-    public function indexOf($element): int
+    public function indexOf($element): Maybe
     {
         $index = 0;
 
         foreach ($this->values as $value) {
             if ($value === $element) {
-                return $index;
+                return Maybe::just($index);
             }
 
             ++$index;
         }
 
-        throw new ElementNotFound($element);
+        /** @var Maybe<int> */
+        return Maybe::nothing();
     }
 
     /**
@@ -301,13 +279,9 @@ final class Defer implements Implementation
      */
     public function indices(): Implementation
     {
-        /**
-         * @psalm-suppress MissingClosureParamType
-         * @var Implementation<int>
-         */
+        /** @var Implementation<int> */
         return new self(
-            'int',
-            (static function($values): \Generator {
+            (static function(\Iterator $values): \Generator {
                 $index = 0;
 
                 foreach ($values as $_) {
@@ -318,25 +292,47 @@ final class Defer implements Implementation
     }
 
     /**
-     * @param callable(T): T $function
+     * @template S
      *
-     * @return Implementation<T>
+     * @param callable(T): S $function
+     *
+     * @return Implementation<S>
      */
     public function map(callable $function): Implementation
     {
-        /** @psalm-suppress MissingClosureParamType */
         return new self(
-            $this->type,
-            (static function($values, callable $map, ValidateArgument $validate): \Generator {
+            (static function(\Iterator $values, callable $map): \Generator {
                 /** @var T $value */
                 foreach ($values as $value) {
-                    /** @var T */
-                    $value = $map($value);
-                    $validate($value, 1);
-
-                    yield $value;
+                    yield $map($value);
                 }
-            })($this->values, $function, $this->validate),
+            })($this->values, $function),
+        );
+    }
+
+    /**
+     * @template S
+     *
+     * @param callable(T): Sequence<S> $map
+     * @param callable(Sequence<S>): Implementation<S> $exfiltrate
+     *
+     * @return Sequence<S>
+     */
+    public function flatMap(callable $map, callable $exfiltrate): Sequence
+    {
+        return Sequence::defer(
+            (static function(\Iterator $values, callable $map, callable $exfiltrate): \Generator {
+                /** @var T $value */
+                foreach ($values as $value) {
+                    /**
+                     * @var callable(T): Sequence<S> $map
+                     * @var callable(Sequence<S>): Implementation<S> $exfiltrate
+                     */
+                    foreach ($exfiltrate($map($value))->iterator() as $inner) {
+                        yield $inner;
+                    }
+                }
+            })($this->values, $map, $exfiltrate),
         );
     }
 
@@ -347,10 +343,8 @@ final class Defer implements Implementation
      */
     public function pad(int $size, $element): Implementation
     {
-        /** @psalm-suppress MissingClosureParamType */
         return new self(
-            $this->type,
-            (static function($values, int $toPad, $element): \Generator {
+            (static function(\Iterator $values, int $toPad, mixed $element): \Generator {
                 /** @var T $value */
                 foreach ($values as $value) {
                     yield $value;
@@ -381,10 +375,8 @@ final class Defer implements Implementation
      */
     public function slice(int $from, int $until): Implementation
     {
-        /** @psalm-suppress MissingClosureParamType */
         return new self(
-            $this->type,
-            (static function($values, int $from, int $until): \Generator {
+            (static function(\Iterator $values, int $from, int $until): \Generator {
                 $index = 0;
                 /** @var T $value */
                 foreach ($values as $value) {
@@ -399,24 +391,12 @@ final class Defer implements Implementation
     }
 
     /**
-     * @throws OutOfBoundException
-     *
-     * @return Sequence<Sequence<T>>
-     */
-    public function splitAt(int $position): Sequence
-    {
-        return $this->load()->splitAt($position);
-    }
-
-    /**
      * @return Implementation<T>
      */
     public function take(int $size): Implementation
     {
-        /** @psalm-suppress MissingClosureParamType */
         return new self(
-            $this->type,
-            (static function($values, int $size): \Generator {
+            (static function(\Iterator $values, int $size): \Generator {
                 $taken = 0;
                 /** @var T $value */
                 foreach ($values as $value) {
@@ -448,10 +428,8 @@ final class Defer implements Implementation
      */
     public function append(Implementation $sequence): Implementation
     {
-        /** @psalm-suppress MissingClosureParamType */
         return new self(
-            $this->type,
-            (static function($values, Implementation $sequence): \Generator {
+            (static function(\Iterator $values, Implementation $sequence): \Generator {
                 /** @var T $value */
                 foreach ($values as $value) {
                     yield $value;
@@ -472,8 +450,7 @@ final class Defer implements Implementation
      */
     public function intersect(Implementation $sequence): Implementation
     {
-        /** @psalm-suppress MissingClosureParamType */
-        return $this->filter(static function($value) use ($sequence): bool {
+        return $this->filter(static function(mixed $value) use ($sequence): bool {
             /** @var T $value */
             return $sequence->contains($value);
         });
@@ -486,9 +463,7 @@ final class Defer implements Implementation
      */
     public function sort(callable $function): Implementation
     {
-        /** @psalm-suppress MissingClosureParamType */
         return new self(
-            $this->type,
             (static function(\Iterator $values, callable $function): \Generator {
                 /** @var callable(T, T): int $sorter */
                 $sorter = $function;
@@ -525,7 +500,7 @@ final class Defer implements Implementation
      */
     public function clear(): Implementation
     {
-        return new Primitive($this->type);
+        return new Primitive;
     }
 
     /**
@@ -533,9 +508,7 @@ final class Defer implements Implementation
      */
     public function reverse(): Implementation
     {
-        /** @psalm-suppress MissingClosureParamType */
         return new self(
-            $this->type,
             (static function(\Iterator $values): \Generator {
                 $values = \iterator_to_array($values);
 
@@ -546,87 +519,53 @@ final class Defer implements Implementation
 
     public function empty(): bool
     {
+        /** @psalm-suppress ImpureMethodCall */
         $this->values->rewind();
 
+        /** @psalm-suppress ImpureMethodCall */
         return !$this->values->valid();
     }
 
     /**
-     * @template ST
-     *
-     * @param null|callable(T): \Generator<ST> $mapper
-     *
-     * @return Sequence<ST>
+     * @return Sequence<T>
      */
-    public function toSequenceOf(string $type, callable $mapper = null): Sequence
+    public function toSequence(): Sequence
     {
-        /** @psalm-suppress MissingClosureParamType */
-        $mapper ??= static fn($v): \Generator => yield $v;
-
-        /** @psalm-suppress MissingClosureParamType */
         return Sequence::defer(
-            $type,
-            (static function($values, callable $mapper): \Generator {
+            (static function(\Iterator $values): \Generator {
                 /** @var T $value */
                 foreach ($values as $value) {
-                    /** @var ST $newValue */
-                    foreach ($mapper($value) as $newValue) {
-                        yield $newValue;
-                    }
+                    yield $value;
                 }
-            })($this->values, $mapper),
+            })($this->values),
         );
     }
 
     /**
-     * @template ST
-     *
-     * @param null|callable(T): \Generator<ST> $mapper
-     *
-     * @return Set<ST>
+     * @return Set<T>
      */
-    public function toSetOf(string $type, callable $mapper = null): Set
+    public function toSet(): Set
     {
-        /** @psalm-suppress MissingClosureParamType */
-        $mapper ??= static fn($v): \Generator => yield $v;
-
-        /** @psalm-suppress MissingClosureParamType */
         return Set::defer(
-            $type,
-            (static function($values, callable $mapper): \Generator {
+            (static function(\Iterator $values): \Generator {
                 /** @var T $value */
                 foreach ($values as $value) {
-                    /** @var ST $newValue */
-                    foreach ($mapper($value) as $newValue) {
-                        yield $newValue;
-                    }
+                    yield $value;
                 }
-            })($this->values, $mapper),
+            })($this->values),
         );
     }
 
-    /**
-     * @template MT
-     * @template MS
-     *
-     * @param callable(T): \Generator<MT, MS> $mapper
-     *
-     * @return Map<MT, MS>
-     */
-    public function toMapOf(string $key, string $value, callable $mapper): Map
-    {
-        return $this->load()->toMapOf($key, $value, $mapper);
-    }
-
-    public function find(callable $predicate)
+    public function find(callable $predicate): Maybe
     {
         foreach ($this->values as $value) {
             if ($predicate($value) === true) {
-                return $value;
+                return Maybe::just($value);
             }
         }
 
-        throw new NoElementMatchingPredicateFound;
+        /** @var Maybe<T> */
+        return Maybe::nothing();
     }
 
     /**
@@ -634,9 +573,7 @@ final class Defer implements Implementation
      */
     private function load(): Implementation
     {
-        return new Primitive(
-            $this->type,
-            ...\iterator_to_array($this->values),
-        );
+        /** @psalm-suppress ImpureFunctionCall */
+        return new Primitive(\array_values(\iterator_to_array($this->values)));
     }
 }

@@ -48,7 +48,7 @@ final class Right implements Implementation
         return $this;
     }
 
-    public function match(callable $left, callable $right)
+    public function match(callable $right, callable $left)
     {
         return $right($this->value);
     }
