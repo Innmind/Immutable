@@ -48,6 +48,17 @@ return static function(Config $config): Config
                     Path::of('EITHER.md'),
                 ),
             )->alwaysOpen(),
+            Entry::section(
+                'Use cases',
+                Entry::markdown(
+                    'How to read a file',
+                    Path::of('LAZY_FILE.md'),
+                ),
+                Entry::markdown(
+                    'Parsing strings',
+                    Path::of('PARSING.md'),
+                ),
+            )->alwaysOpen(),
             Entry::markdown(
                 'Blackbox',
                 Path::of('BLACKBOX.md'),
