@@ -374,3 +374,35 @@ Check if the current string ends with the given string.
 Str::of('foobar')->endsWith('bar'); // true
 Str::of('foobar')->endsWith('foo'); // false
 ```
+
+## `->join()`
+
+This method will create a new `Str` object with all the values from the set/sequence separated by the vlue of the original string.
+
+```php
+Str::of('|')
+    ->join(Sequence::of('foo', 'bar', 'baz'))
+    ->equals(Str::of('foo|bar|baz')); // true
+```
+
+## `->map()`
+
+This function will create a new `Str` object with the value modified by the given function.
+
+```php
+$str = Str::of('foo|bar|baz')->map(
+    fn(string $value, string $encoding): string => \implode(',', \explode('|', $string)),
+);
+$str->equals(Str::of('foo,bar,baz')); // true
+```
+
+## `->flatMap()`
+
+This is similar to `->map()` but instead of the function returning a value it must return a new `Str` object.
+
+```php
+$str = Str::of('foo|bar|baz')->flatMap(
+    fn(string $value, string $encoding): Str => Str::of(',')->join(Sequence::of(...\explode('|', $string))),
+);
+$str->equals(Str::of('foo,bar,baz')); // true
+```
