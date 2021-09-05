@@ -47,7 +47,7 @@ Str::of('👋')->toEncoding('UTF-8');
 
 ## `->split()`
 
-Use this method to split a string into a [`Sequence`](sequence.html) of smaller strings.
+Use this method to split a string into a [`Sequence`](sequence.md) of smaller strings.
 
 ```php
 Str::of('foo')->split()->equals(Sequence::of(
@@ -65,7 +65,7 @@ Str::of('foo|bar')->split('|')->equals(Sequence::of(
 
 ## `->chunk()`
 
-This will create a [`Sequence`](sequence.html) of strings of the given size.
+This will create a [`Sequence`](sequence.md) of strings of the given size.
 
 ```php
 Str::of('foobar')->chunk(2)->equals(Sequence::of(
