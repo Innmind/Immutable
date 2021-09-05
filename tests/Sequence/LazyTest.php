@@ -10,12 +10,8 @@ use Innmind\Immutable\{
     Sequence,
     Str,
     Set,
-    Exception\OutOfBoundException,
-    Exception\CannotGroupEmptyStructure,
-    Exception\ElementNotFound,
-    Exception\NoElementMatchingPredicateFound,
+    SideEffect,
 };
-use function Innmind\Immutable\unwrap;
 use PHPUnit\Framework\TestCase;
 
 class LazyTest extends TestCase
@@ -24,14 +20,14 @@ class LazyTest extends TestCase
     {
         $this->assertInstanceOf(
             Implementation::class,
-            new Lazy('mixed', static fn() => yield),
+            new Lazy(static fn() => yield),
         );
     }
 
     public function testGeneratorNotLoadedAtInstanciation()
     {
         $loaded = false;
-        $sequence = new Lazy('int', static function() use (&$loaded) {
+        $sequence = new Lazy(static function() use (&$loaded) {
             yield 1;
             $loaded = true;
         });
@@ -39,25 +35,9 @@ class LazyTest extends TestCase
         $this->assertFalse($loaded);
     }
 
-    public function testThrowWhenYieldingInvalidType()
-    {
-        $this->expectException(\TypeError::class);
-        $this->expectExceptionMessage('Argument 1 must be of type int, string given');
-
-        $sequence = new Lazy('int', static function() {
-            yield '1';
-        });
-        \iterator_to_array($sequence->iterator());
-    }
-
-    public function testType()
-    {
-        $this->assertSame('int', (new Lazy('int', static fn() => yield))->type());
-    }
-
     public function testSize()
     {
-        $sequence = new Lazy('int', static function() {
+        $sequence = new Lazy(static function() {
             yield 1;
             yield 1;
         });
@@ -68,7 +48,7 @@ class LazyTest extends TestCase
 
     public function testIterator()
     {
-        $sequence = new Lazy('int', static function() {
+        $sequence = new Lazy(static function() {
             yield 1;
             yield 2;
             yield 3;
@@ -82,38 +62,41 @@ class LazyTest extends TestCase
 
     public function testGet()
     {
-        $sequence = new Lazy('int', static function() {
+        $sequence = new Lazy(static function() {
             yield 1;
             yield 42;
             yield 3;
         });
 
-        $this->assertSame(42, $sequence->get(1));
+        $this->assertSame(42, $this->get($sequence, 1));
     }
 
-    public function testThrowWhenIndexNotFound()
+    public function testReturnNothingWhenIndexNotFound()
     {
-        $this->expectException(OutOfBoundException::class);
-
-        $sequence = new Lazy('int', static function() {
+        $sequence = new Lazy(static function() {
             if (false) {
                 yield 1;
             }
         });
 
-        $sequence->get(0);
+        $this->assertNull(
+            $sequence->get(0)->match(
+                static fn($value) => $value,
+                static fn() => null,
+            ),
+        );
     }
 
     public function testDiff()
     {
         $aLoaded = false;
         $bLoaded = false;
-        $a = new Lazy('int', static function() use (&$aLoaded) {
+        $a = new Lazy(static function() use (&$aLoaded) {
             yield 1;
             yield 2;
             $aLoaded = true;
         });
-        $b = new Lazy('int', static function() use (&$bLoaded) {
+        $b = new Lazy(static function() use (&$bLoaded) {
             yield 2;
             yield 3;
             $bLoaded = true;
@@ -133,7 +116,7 @@ class LazyTest extends TestCase
     public function testDistinct()
     {
         $loaded = false;
-        $a = new Lazy('int', static function() use (&$loaded) {
+        $a = new Lazy(static function() use (&$loaded) {
             yield 1;
             yield 2;
             yield 1;
@@ -151,7 +134,7 @@ class LazyTest extends TestCase
     public function testDrop()
     {
         $loaded = false;
-        $a = new Lazy('int', static function() use (&$loaded) {
+        $a = new Lazy(static function() use (&$loaded) {
             yield 1;
             yield 2;
             yield 3;
@@ -169,7 +152,7 @@ class LazyTest extends TestCase
 
     public function testDropEnd()
     {
-        $a = new Lazy('int', static function() {
+        $a = new Lazy(static function() {
             yield 1;
             yield 2;
             yield 3;
@@ -184,11 +167,11 @@ class LazyTest extends TestCase
 
     public function testEquals()
     {
-        $a = new Lazy('int', static function() {
+        $a = new Lazy(static function() {
             yield 1;
             yield 2;
         });
-        $b = new Lazy('int', static function() {
+        $b = new Lazy(static function() {
             yield 1;
             yield 2;
             yield 3;
@@ -201,7 +184,7 @@ class LazyTest extends TestCase
     public function testFilter()
     {
         $loaded = false;
-        $a = new Lazy('int', static function() use (&$loaded) {
+        $a = new Lazy(static function() use (&$loaded) {
             yield 1;
             yield 2;
             yield 3;
@@ -219,7 +202,7 @@ class LazyTest extends TestCase
 
     public function testForeach()
     {
-        $sequence = new Lazy('int', static function() {
+        $sequence = new Lazy(static function() {
             yield 1;
             yield 2;
             yield 3;
@@ -228,30 +211,35 @@ class LazyTest extends TestCase
         $calls = 0;
         $sum = 0;
 
-        $this->assertNull($sequence->foreach(static function($i) use (&$calls, &$sum) {
-            ++$calls;
-            $sum += $i;
-        }));
+        $this->assertInstanceOf(
+            SideEffect::class,
+            $sequence->foreach(static function($i) use (&$calls, &$sum) {
+                ++$calls;
+                $sum += $i;
+            }),
+        );
         $this->assertSame(4, $calls);
         $this->assertSame(10, $sum);
     }
 
-    public function testThrowWhenTryingToGroupEmptySequence()
+    public function testGroupEmptySequence()
     {
-        $this->expectException(CannotGroupEmptyStructure::class);
-
-        $sequence = new Lazy('int', static function() {
+        $sequence = new Lazy(static function() {
             if (false) {
                 yield 1;
             }
         });
 
-        $sequence->groupBy(static fn($i) => $i);
+        $this->assertTrue(
+            $sequence
+                ->groupBy(static fn($i) => $i)
+                ->equals(Map::of()),
+        );
     }
 
     public function testGroupBy()
     {
-        $sequence = new Lazy('int', static function() {
+        $sequence = new Lazy(static function() {
             yield 1;
             yield 2;
             yield 3;
@@ -261,65 +249,80 @@ class LazyTest extends TestCase
 
         $this->assertSame([1, 2, 3, 4], \iterator_to_array($sequence->iterator()));
         $this->assertInstanceOf(Map::class, $groups);
-        $this->assertTrue($groups->isOfType('int', Sequence::class));
         $this->assertCount(2, $groups);
-        $this->assertTrue($groups->get(0)->isOfType('int'));
-        $this->assertTrue($groups->get(1)->isOfType('int'));
-        $this->assertSame([2, 4], unwrap($groups->get(0)));
-        $this->assertSame([1, 3], unwrap($groups->get(1)));
+        $this->assertSame([2, 4], $this->get($groups, 0)->toList());
+        $this->assertSame([1, 3], $this->get($groups, 1)->toList());
     }
 
-    public function testThrowWhenTryingToAccessFirstElementOnEmptySequence()
+    public function testReturnNothingWhenTryingToAccessFirstElementOnEmptySequence()
     {
-        $this->expectException(OutOfBoundException::class);
-
-        $sequence = new Lazy('int', static function() {
+        $sequence = new Lazy(static function() {
             if (false) {
                 yield 1;
             }
         });
 
-        $sequence->first();
+        $this->assertNull(
+            $sequence->first()->match(
+                static fn($value) => $value,
+                static fn() => null,
+            ),
+        );
     }
 
-    public function testThrowWhenTryingToAccessLastElementOnEmptySequence()
+    public function testReturnNothingWhenTryingToAccessLastElementOnEmptySequence()
     {
-        $this->expectException(OutOfBoundException::class);
-
-        $sequence = new Lazy('int', static function() {
+        $sequence = new Lazy(static function() {
             if (false) {
                 yield 1;
             }
         });
 
-        $sequence->last();
+        $this->assertNull(
+            $sequence->last()->match(
+                static fn($value) => $value,
+                static fn() => null,
+            ),
+        );
     }
 
     public function testFirst()
     {
-        $sequence = new Lazy('int', static function() {
+        $sequence = new Lazy(static function() {
             yield 2;
             yield 3;
             yield 4;
         });
 
-        $this->assertSame(2, $sequence->first());
+        $this->assertSame(
+            2,
+            $sequence->first()->match(
+                static fn($value) => $value,
+                static fn() => null,
+            ),
+        );
     }
 
     public function testLast()
     {
-        $sequence = new Lazy('int', static function() {
+        $sequence = new Lazy(static function() {
             yield 1;
             yield 2;
             yield 3;
         });
 
-        $this->assertSame(3, $sequence->last());
+        $this->assertSame(
+            3,
+            $sequence->last()->match(
+                static fn($value) => $value,
+                static fn() => null,
+            ),
+        );
     }
 
     public function testContains()
     {
-        $sequence = new Lazy('int', static function() {
+        $sequence = new Lazy(static function() {
             yield 1;
             yield 2;
             yield 3;
@@ -331,33 +334,48 @@ class LazyTest extends TestCase
 
     public function testIndexOf()
     {
-        $sequence = new Lazy('int', static function() {
+        $sequence = new Lazy(static function() {
             yield 1;
             yield 2;
             yield 4;
         });
 
-        $this->assertSame(1, $sequence->indexOf(2));
-        $this->assertSame(2, $sequence->indexOf(4));
+        $this->assertSame(
+            1,
+            $sequence->indexOf(2)->match(
+                static fn($value) => $value,
+                static fn() => null,
+            ),
+        );
+        $this->assertSame(
+            2,
+            $sequence->indexOf(4)->match(
+                static fn($value) => $value,
+                static fn() => null,
+            ),
+        );
     }
 
-    public function testThrowWhenTryingToAccessIndexOfUnknownValue()
+    public function testReturnNothingWhenTryingToAccessIndexOfUnknownValue()
     {
-        $this->expectException(ElementNotFound::class);
-
-        $sequence = new Lazy('int', static function() {
+        $sequence = new Lazy(static function() {
             if (false) {
                 yield 1;
             }
         });
 
-        $sequence->indexOf(1);
+        $this->assertNull(
+            $sequence->indexOf(1)->match(
+                static fn($value) => $value,
+                static fn() => null,
+            ),
+        );
     }
 
     public function testIndices()
     {
         $loaded = false;
-        $a = new Lazy('string', static function() use (&$loaded) {
+        $a = new Lazy(static function() use (&$loaded) {
             yield '1';
             yield '2';
             $loaded = true;
@@ -367,14 +385,13 @@ class LazyTest extends TestCase
         $this->assertFalse($loaded);
         $this->assertSame(['1', '2'], \iterator_to_array($a->iterator()));
         $this->assertInstanceOf(Lazy::class, $b);
-        $this->assertSame('int', $b->type());
         $this->assertSame([0, 1], \iterator_to_array($b->iterator()));
         $this->assertTrue($loaded);
     }
 
     public function testIndicesOnEmptySequence()
     {
-        $a = new Lazy('string', static function() {
+        $a = new Lazy(static function() {
             if (false) {
                 yield 1;
             }
@@ -383,14 +400,13 @@ class LazyTest extends TestCase
 
         $this->assertSame([], \iterator_to_array($a->iterator()));
         $this->assertInstanceOf(Lazy::class, $b);
-        $this->assertSame('int', $b->type());
         $this->assertSame([], \iterator_to_array($b->iterator()));
     }
 
     public function testMap()
     {
         $loaded = false;
-        $a = new Lazy('int', static function() use (&$loaded) {
+        $a = new Lazy(static function() use (&$loaded) {
             yield 1;
             yield 2;
             yield 3;
@@ -405,24 +421,10 @@ class LazyTest extends TestCase
         $this->assertTrue($loaded);
     }
 
-    public function testThrowWhenTryingToModifyTheTypeWhenMapping()
-    {
-        $this->expectException(\TypeError::class);
-        $this->expectExceptionMessage('Argument 1 must be of type int, string given');
-
-        $sequence = new Lazy('int', static function() {
-            yield 1;
-            yield 2;
-            yield 3;
-        });
-
-        \iterator_to_array($sequence->map(static fn($i) => (string) $i)->iterator());
-    }
-
     public function testPad()
     {
         $loaded = false;
-        $a = new Lazy('int', static function() use (&$loaded) {
+        $a = new Lazy(static function() use (&$loaded) {
             yield 1;
             yield 2;
             $loaded = true;
@@ -441,7 +443,7 @@ class LazyTest extends TestCase
 
     public function testPartition()
     {
-        $sequence = new Lazy('int', static function() {
+        $sequence = new Lazy(static function() {
             yield 1;
             yield 2;
             yield 3;
@@ -451,18 +453,15 @@ class LazyTest extends TestCase
 
         $this->assertSame([1, 2, 3, 4], \iterator_to_array($sequence->iterator()));
         $this->assertInstanceOf(Map::class, $partition);
-        $this->assertTrue($partition->isOfType('bool', Sequence::class));
         $this->assertCount(2, $partition);
-        $this->assertTrue($partition->get(true)->isOfType('int'));
-        $this->assertTrue($partition->get(false)->isOfType('int'));
-        $this->assertSame([2, 4], unwrap($partition->get(true)));
-        $this->assertSame([1, 3], unwrap($partition->get(false)));
+        $this->assertSame([2, 4], $this->get($partition, true)->toList());
+        $this->assertSame([1, 3], $this->get($partition, false)->toList());
     }
 
     public function testSlice()
     {
         $loaded = false;
-        $a = new Lazy('int', static function() use (&$loaded) {
+        $a = new Lazy(static function() use (&$loaded) {
             yield 2;
             yield 3;
             yield 4;
@@ -478,30 +477,10 @@ class LazyTest extends TestCase
         $this->assertTrue($loaded);
     }
 
-    public function testSplitAt()
-    {
-        $sequence = new Lazy('int', static function() {
-            yield 2;
-            yield 3;
-            yield 4;
-            yield 5;
-        });
-        $parts = $sequence->splitAt(2);
-
-        $this->assertSame([2, 3, 4, 5], \iterator_to_array($sequence->iterator()));
-        $this->assertInstanceOf(Sequence::class, $parts);
-        $this->assertTrue($parts->isOfType(Sequence::class));
-        $this->assertCount(2, $parts);
-        $this->assertTrue($parts->first()->isOfType('int'));
-        $this->assertTrue($parts->last()->isOfType('int'));
-        $this->assertSame([2, 3], unwrap($parts->first()));
-        $this->assertSame([4, 5], unwrap($parts->last()));
-    }
-
     public function testTake()
     {
         $loaded = false;
-        $a = new Lazy('int', static function() use (&$loaded) {
+        $a = new Lazy(static function() use (&$loaded) {
             yield 2;
             yield 3;
             yield 4;
@@ -519,7 +498,7 @@ class LazyTest extends TestCase
     public function testSequenceNotCompletelyLoadedWhenTakingFewerThanItsSize()
     {
         $loaded = false;
-        $a = new Lazy('int', static function() use (&$loaded) {
+        $a = new Lazy(static function() use (&$loaded) {
             yield 2;
             yield 3;
             yield 4;
@@ -535,7 +514,7 @@ class LazyTest extends TestCase
 
     public function testTakeEnd()
     {
-        $a = new Lazy('int', static function() {
+        $a = new Lazy(static function() {
             yield 2;
             yield 3;
             yield 4;
@@ -551,12 +530,12 @@ class LazyTest extends TestCase
     {
         $aLoaded = false;
         $bLoaded = false;
-        $a = new Lazy('int', static function() use (&$aLoaded) {
+        $a = new Lazy(static function() use (&$aLoaded) {
             yield 1;
             yield 2;
             $aLoaded = true;
         });
-        $b = new Lazy('int', static function() use (&$bLoaded) {
+        $b = new Lazy(static function() use (&$bLoaded) {
             yield 3;
             yield 4;
             $bLoaded = true;
@@ -577,12 +556,12 @@ class LazyTest extends TestCase
     {
         $aLoaded = false;
         $bLoaded = false;
-        $a = new Lazy('int', static function() use (&$aLoaded) {
+        $a = new Lazy(static function() use (&$aLoaded) {
             yield 1;
             yield 2;
             $aLoaded = true;
         });
-        $b = new Lazy('int', static function() use (&$bLoaded) {
+        $b = new Lazy(static function() use (&$bLoaded) {
             yield 2;
             yield 3;
             $bLoaded = true;
@@ -602,7 +581,7 @@ class LazyTest extends TestCase
     public function testAdd()
     {
         $loaded = false;
-        $a = new Lazy('int', static function() use (&$loaded) {
+        $a = new Lazy(static function() use (&$loaded) {
             yield 1;
             $loaded = true;
         });
@@ -617,7 +596,7 @@ class LazyTest extends TestCase
 
     public function testSort()
     {
-        $a = new Lazy('int', static function() {
+        $a = new Lazy(static function() {
             yield 1;
             yield 4;
             yield 3;
@@ -632,7 +611,7 @@ class LazyTest extends TestCase
 
     public function testReduce()
     {
-        $sequence = new Lazy('int', static function() {
+        $sequence = new Lazy(static function() {
             yield 1;
             yield 2;
             yield 3;
@@ -645,7 +624,7 @@ class LazyTest extends TestCase
     public function testClear()
     {
         $loaded = false;
-        $a = new Lazy('int', static function() use (&$loaded) {
+        $a = new Lazy(static function() use (&$loaded) {
             yield 1;
             yield 2;
             $loaded = true;
@@ -662,7 +641,7 @@ class LazyTest extends TestCase
     public function testReverse()
     {
         $loaded = false;
-        $a = new Lazy('int', static function() use (&$loaded) {
+        $a = new Lazy(static function() use (&$loaded) {
             yield 1;
             yield 2;
             yield 3;
@@ -682,11 +661,11 @@ class LazyTest extends TestCase
     {
         $aLoaded = false;
         $bLoaded = false;
-        $a = new Lazy('int', static function() use (&$aLoaded) {
+        $a = new Lazy(static function() use (&$aLoaded) {
             yield 1;
             $aLoaded = true;
         });
-        $b = new Lazy('int', static function() use (&$bLoaded) {
+        $b = new Lazy(static function() use (&$bLoaded) {
             if (false) {
                 yield 1;
             }
@@ -701,68 +680,10 @@ class LazyTest extends TestCase
         $this->assertTrue($bLoaded);
     }
 
-    public function testToSequenceOf()
-    {
-        $loaded = false;
-        $sequence = new Lazy('int', static function() use (&$loaded) {
-            yield 1;
-            yield 2;
-            yield 3;
-            $loaded = true;
-        });
-        $sequence = $sequence->toSequenceOf('string|int', static function($i) {
-            yield (string) $i;
-            yield $i;
-        });
-
-        $this->assertFalse($loaded);
-        $this->assertInstanceOf(Sequence::class, $sequence);
-        $this->assertSame(
-            ['1', 1, '2', 2, '3', 3],
-            unwrap($sequence),
-        );
-        $this->assertTrue($loaded);
-    }
-
-    public function testToSetOf()
-    {
-        $sequence = new Lazy('int', static function() {
-            yield 1;
-            yield 2;
-            yield 3;
-        });
-        $set = $sequence->toSetOf('string|int', static function($i) {
-            yield (string) $i;
-            yield $i;
-        });
-
-        $this->assertInstanceOf(Set::class, $set);
-        $this->assertSame(
-            ['1', 1, '2', 2, '3', 3],
-            unwrap($set),
-        );
-    }
-
-    public function testToMapOf()
-    {
-        $sequence = new Lazy('int', static function() {
-            yield 1;
-            yield 2;
-            yield 3;
-        });
-        $map = $sequence->toMapOf('string', 'int', static fn($i) => yield (string) $i => $i);
-
-        $this->assertInstanceOf(Map::class, $map);
-        $this->assertCount(3, $map);
-        $this->assertSame(1, $map->get('1'));
-        $this->assertSame(2, $map->get('2'));
-        $this->assertSame(3, $map->get('3'));
-    }
-
     public function testFind()
     {
         $count = 0;
-        $sequence = new Lazy('int', static function() use (&$count) {
+        $sequence = new Lazy(static function() use (&$count) {
             ++$count;
             yield 1;
             ++$count;
@@ -771,15 +692,146 @@ class LazyTest extends TestCase
             yield 3;
         });
 
-        $this->assertSame(1, $sequence->find(static fn($i) => $i === 1));
+        $this->assertSame(
+            1,
+            $sequence->find(static fn($i) => $i === 1)->match(
+                static fn($i) => $i,
+                static fn() => null,
+            ),
+        );
         $this->assertSame(1, $count);
-        $this->assertSame(2, $sequence->find(static fn($i) => $i === 2));
+        $this->assertSame(
+            2,
+            $sequence->find(static fn($i) => $i === 2)->match(
+                static fn($i) => $i,
+                static fn() => null,
+            ),
+        );
         $this->assertSame(3, $count);
-        $this->assertSame(3, $sequence->find(static fn($i) => $i === 3));
+        $this->assertSame(
+            3,
+            $sequence->find(static fn($i) => $i === 3)->match(
+                static fn($i) => $i,
+                static fn() => null,
+            ),
+        );
         $this->assertSame(6, $count);
 
-        $this->expectException(NoElementMatchingPredicateFound::class);
+        $this->assertNull(
+            $sequence->find(static fn($i) => $i === 0)->match(
+                static fn($i) => $i,
+                static fn() => null,
+            ),
+        );
+    }
 
-        $sequence->find(static fn($i) => $i === 0);
+    public function testCallCleanupWhenGettingIndexBeforeTheEndOfGenerator()
+    {
+        $cleanupCalled = false;
+        $sequence = new Lazy(static function($registerCleanup) use (&$cleanupCalled) {
+            $registerCleanup(static function() use (&$cleanupCalled) {
+                $cleanupCalled = true;
+            });
+            yield 2;
+            yield 3;
+            yield 4;
+            yield 5;
+        });
+        $this->assertFalse($cleanupCalled);
+        $value = $sequence->get(1)->match(
+            static fn($value) => $value,
+            static fn() => null,
+        );
+
+        $this->assertSame(3, $value);
+        $this->assertTrue($cleanupCalled);
+    }
+
+    public function testCallCleanupWhenElementBeingLookedForIsFoundBeforeTheEndOfGenerator()
+    {
+        $cleanupCalled = false;
+        $sequence = new Lazy(static function($registerCleanup) use (&$cleanupCalled) {
+            $registerCleanup(static function() use (&$cleanupCalled) {
+                $cleanupCalled = true;
+            });
+            yield 2;
+            yield 3;
+            yield 4;
+            yield 5;
+        });
+
+        $this->assertFalse($cleanupCalled);
+        $this->assertTrue($sequence->contains(3));
+        $this->assertTrue($cleanupCalled);
+    }
+
+    public function testCallCleanupWhenIndexOfElementBeingLookedForIsFoundBeforeTheEndOfGenerator()
+    {
+        $cleanupCalled = false;
+        $sequence = new Lazy(static function($registerCleanup) use (&$cleanupCalled) {
+            $registerCleanup(static function() use (&$cleanupCalled) {
+                $cleanupCalled = true;
+            });
+            yield 2;
+            yield 3;
+            yield 4;
+            yield 5;
+        });
+
+        $this->assertFalse($cleanupCalled);
+        $index = $sequence->indexOf(3)->match(
+            static fn($index) => $index,
+            static fn() => null,
+        );
+        $this->assertSame(1, $index);
+        $this->assertTrue($cleanupCalled);
+    }
+
+    public function testCallCleanupWhenTakingLessElementsThanContainedInTheGenerator()
+    {
+        $cleanupCalled = false;
+        $sequence = new Lazy(static function($registerCleanup) use (&$cleanupCalled) {
+            $registerCleanup(static function() use (&$cleanupCalled) {
+                $cleanupCalled = true;
+            });
+            yield 2;
+            yield 3;
+            yield 4;
+            yield 5;
+        });
+
+        $this->assertFalse($cleanupCalled);
+        $this->assertSame([2, 3], \iterator_to_array($sequence->take(2)->iterator()));
+        $this->assertTrue($cleanupCalled);
+    }
+
+    public function testCallCleanupWhenFindingElementBeforeTheEndOfGenerator()
+    {
+        $cleanupCalled = false;
+        $sequence = new Lazy(static function($registerCleanup) use (&$cleanupCalled) {
+            $registerCleanup(static function() use (&$cleanupCalled) {
+                $cleanupCalled = true;
+            });
+            yield 2;
+            yield 3;
+            yield 4;
+            yield 5;
+        });
+        $this->assertFalse($cleanupCalled);
+        $value = $sequence->find(static fn($value) => $value === 3)->match(
+            static fn($value) => $value,
+            static fn() => null,
+        );
+
+        $this->assertSame(3, $value);
+        $this->assertTrue($cleanupCalled);
+    }
+
+    public function get($map, $index)
+    {
+        return $map->get($index)->match(
+            static fn($value) => $value,
+            static fn() => null,
+        );
     }
 }

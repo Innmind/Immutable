@@ -23,11 +23,12 @@ interface Implementation
     public function map(callable $map): self;
 
     /**
+     * @template A
      * @template B
      *
-     * @param callable(R): Either<L, B> $map
+     * @param callable(R): Either<A, B> $map
      *
-     * @return Either<L, B>
+     * @return Either<L|A, B>
      */
     public function flatMap(callable $map): Either;
 
@@ -43,25 +44,30 @@ interface Implementation
     /**
      * @template T
      *
-     * @param callable(L): T $left
      * @param callable(R): T $right
+     * @param callable(L): T $left
      *
      * @return T
      */
-    public function match(callable $left, callable $right);
+    public function match(callable $right, callable $left);
 
     /**
-     * @param callable(): Either<L, R> $otherwise
+     * @template A
+     * @template B
      *
-     * @return Either<L, R>
+     * @param callable(L): Either<A, B> $otherwise
+     *
+     * @return Either<A, R|B>
      */
     public function otherwise(callable $otherwise): Either;
 
     /**
-     * @param callable(R): bool $predicate
-     * @param callable(): L $otherwise
+     * @template A
      *
-     * @return self<L, R>
+     * @param callable(R): bool $predicate
+     * @param callable(): A $otherwise
+     *
+     * @return self<L|A, R>
      */
     public function filter(callable $predicate, callable $otherwise): self;
 }

@@ -34,8 +34,6 @@ function accessResource(User $user): Either {
 
 **Note**: `ServerRequest`, `User`, `Resource` and `Error` are imaginary classes.
 
-**Important**: this structure is immutable and is only typed with [Psalm](http://psalm.dev) to keep the interface simple and jump between types more easily. So make sure to use Psalm in your code so you know if you use the structure correctly.
-
 ## `::left()`
 
 This builds an `Either` instance with the given value in the left hand side.
@@ -78,8 +76,6 @@ $either = identify($serverRequest);
 $resource = $either->flatMap(fn(User $user): Either => accessResource($user));
 ```
 
-**Important**: the left type of an `Either` returned by the `->flatMap` cannot change as the next call on `$resource` you wouldn't know if it's the old left type or the new one.
-
 ## `->match()`
 
 This is the only way to extract the wrapped value.
@@ -89,18 +85,16 @@ This is the only way to extract the wrapped value.
 $response = identify($serverRequest)
     ->flatMap(fn(User $user): Either => accessResource($user))
     ->match(
-        fn(Error $error) => new Response(400, $error->message()), // here the error can be from identify or from accessResource
         fn(Resource $resource) => new Response(200, $resource->toString()),
+        fn(Error $error) => new Response(400, $error->message()), // here the error can be from identify or from accessResource
     );
 ```
 
 **Note**: `Response` is an imaginary class.
 
-Both functions used with `->match()` **must** have the same return type. Otherwise you would have to check the type of the returned value to know what to do next, this would break the logic of this approach that frees you from writing any `if` statement.
-
 ## `->otherwise()`
 
-This is like `->flatMap()` but is called when the instance contains a left value. The callable must return an `Either` with the same types as the previous one.
+This is like `->flatMap()` but is called when the instance contains a left value. The callable must return a new `Either` object.
 
 ```php
 /**
@@ -130,8 +124,8 @@ identify($request)
         fn() => new Error('User is not allowed'),
     )
     ->match(
-        fn(Error $error) => print($error->message()), // can be "User not found" or "User is not allowed"
         fn(User $user) => doSomething($user), // here we know the user is allowed
+        fn(Error $error) => print($error->message()), // can be "User not found" or "User is not allowed"
     );
 ```
 

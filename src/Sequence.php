@@ -3,31 +3,20 @@ declare(strict_types = 1);
 
 namespace Innmind\Immutable;
 
-use Innmind\Immutable\Exception\{
-    LogicException,
-    CannotGroupEmptyStructure,
-    ElementNotFound,
-    OutOfBoundException,
-    NoElementMatchingPredicateFound,
-};
-
 /**
  * @template T
+ * @psalm-immutable
  */
 final class Sequence implements \Countable
 {
-    private string $type;
-    private ValidateArgument $validate;
     /** @var Sequence\Implementation<T> */
     private Sequence\Implementation $implementation;
 
     /**
      * @param Sequence\Implementation<T> $implementation
      */
-    private function __construct(string $type, Sequence\Implementation $implementation)
+    private function __construct(Sequence\Implementation $implementation)
     {
-        $this->type = $type;
-        $this->validate = Type::of($type);
         $this->implementation = $implementation;
     }
 
@@ -36,7 +25,7 @@ final class Sequence implements \Countable
      *
      * Example:
      * <code>
-     * Sequence::of('int')(1)(3)
+     * Sequence::of()(1)(3)
      * </code>
      *
      * @param T $element
@@ -45,34 +34,21 @@ final class Sequence implements \Countable
      */
     public function __invoke($element): self
     {
-        ($this->validate)($element, 1);
-
-        $self = clone $this;
-        $self->implementation = ($this->implementation)($element);
-
-        return $self;
+        return new self(($this->implementation)($element));
     }
 
     /**
      * @template V
+     * @no-named-arguments
+     * @psalm-pure
      *
      * @param V $values
      *
      * @return self<V>
      */
-    public static function of(string $type, ...$values): self
+    public static function of(...$values): self
     {
-        $self = new self($type, new Sequence\Primitive($type, ...$values));
-        $self->implementation->reduce(
-            1,
-            static function(int $position, $element) use ($self): int {
-                ($self->validate)($element, $position);
-
-                return $position + 1;
-            }
-        );
-
-        return $self;
+        return new self(new Sequence\Primitive($values));
     }
 
     /**
@@ -82,14 +58,15 @@ final class Sequence implements \Countable
      * Use this mode when the amount of data may not fit in memory
      *
      * @template V
+     * @psalm-pure
      *
      * @param \Generator<V> $generator
      *
      * @return self<V>
      */
-    public static function defer(string $type, \Generator $generator): self
+    public static function defer(\Generator $generator): self
     {
-        return new self($type, new Sequence\Defer($type, $generator));
+        return new self(new Sequence\Defer($generator));
     }
 
     /**
@@ -101,81 +78,83 @@ final class Sequence implements \Countable
      * as parsing a file or calling an API
      *
      * @template V
+     * @psalm-pure
+     * @psalm-type RegisterCleanup = callable(callable(): void): void
      *
-     * @param callable(): \Generator<V> $generator
+     * @param callable(RegisterCleanup): \Generator<V> $generator
      *
      * @return self<V>
      */
-    public static function lazy(string $type, callable $generator): self
+    public static function lazy(callable $generator): self
     {
-        return new self($type, new Sequence\Lazy($type, $generator));
+        return new self(new Sequence\Lazy($generator));
     }
 
     /**
-     * @param mixed $values
+     * @no-named-arguments
+     * @psalm-pure
      *
      * @return self<mixed>
      */
-    public static function mixed(...$values): self
+    public static function mixed(mixed ...$values): self
     {
-        return new self('mixed', new Sequence\Primitive('mixed', ...$values));
+        return new self(new Sequence\Primitive($values));
     }
 
     /**
+     * @no-named-arguments
+     * @psalm-pure
+     *
      * @return self<int>
      */
     public static function ints(int ...$values): self
     {
         /** @var self<int> */
-        $self = new self('int', new Sequence\Primitive('int', ...$values));
+        $self = new self(new Sequence\Primitive($values));
 
         return $self;
     }
 
     /**
+     * @no-named-arguments
+     * @psalm-pure
+     *
      * @return self<float>
      */
     public static function floats(float ...$values): self
     {
         /** @var self<float> */
-        $self = new self('float', new Sequence\Primitive('float', ...$values));
+        $self = new self(new Sequence\Primitive($values));
 
         return $self;
     }
 
     /**
+     * @no-named-arguments
+     * @psalm-pure
+     *
      * @return self<string>
      */
     public static function strings(string ...$values): self
     {
         /** @var self<string> */
-        $self = new self('string', new Sequence\Primitive('string', ...$values));
+        $self = new self(new Sequence\Primitive($values));
 
         return $self;
     }
 
     /**
+     * @no-named-arguments
+     * @psalm-pure
+     *
      * @return self<object>
      */
     public static function objects(object ...$values): self
     {
         /** @var self<object> */
-        $self = new self('object', new Sequence\Primitive('object', ...$values));
+        $self = new self(new Sequence\Primitive($values));
 
         return $self;
-    }
-
-    public function isOfType(string $type): bool
-    {
-        return $this->type === $type;
-    }
-
-    /**
-     * Type of the elements
-     */
-    public function type(): string
-    {
-        return $this->type;
     }
 
     public function size(): int
@@ -191,13 +170,10 @@ final class Sequence implements \Countable
     /**
      * Return the element at the given index
      *
-     * @throws OutOfBoundException
-     *
-     * @return T
+     * @return Maybe<T>
      */
-    public function get(int $index)
+    public function get(int $index): Maybe
     {
-        /** @var T */
         return $this->implementation->get($index);
     }
 
@@ -210,14 +186,9 @@ final class Sequence implements \Countable
      */
     public function diff(self $sequence): self
     {
-        assertSequence($this->type, $sequence, 1);
-
-        $self = clone $this;
-        $self->implementation = $this->implementation->diff(
+        return new self($this->implementation->diff(
             $sequence->implementation,
-        );
-
-        return $self;
+        ));
     }
 
     /**
@@ -227,36 +198,31 @@ final class Sequence implements \Countable
      */
     public function distinct(): self
     {
-        $self = clone $this;
-        $self->implementation = $this->implementation->distinct();
-
-        return $self;
+        return new self($this->implementation->distinct());
     }
 
     /**
      * Remove the n first elements
      *
+     * @param positive-int $size
+     *
      * @return self<T>
      */
     public function drop(int $size): self
     {
-        $self = clone $this;
-        $self->implementation = $this->implementation->drop($size);
-
-        return $self;
+        return new self($this->implementation->drop($size));
     }
 
     /**
      * Remove the n last elements
      *
+     * @param positive-int $size
+     *
      * @return self<T>
      */
     public function dropEnd(int $size): self
     {
-        $self = clone $this;
-        $self->implementation = $this->implementation->dropEnd($size);
-
-        return $self;
+        return new self($this->implementation->dropEnd($size));
     }
 
     /**
@@ -266,8 +232,6 @@ final class Sequence implements \Countable
      */
     public function equals(self $sequence): bool
     {
-        assertSequence($this->type, $sequence, 1);
-
         return $this->implementation->equals(
             $sequence->implementation,
         );
@@ -282,10 +246,7 @@ final class Sequence implements \Countable
      */
     public function filter(callable $predicate): self
     {
-        $self = clone $this;
-        $self->implementation = $this->implementation->filter($predicate);
-
-        return $self;
+        return new self($this->implementation->filter($predicate));
     }
 
     /**
@@ -293,9 +254,9 @@ final class Sequence implements \Countable
      *
      * @param callable(T): void $function
      */
-    public function foreach(callable $function): void
+    public function foreach(callable $function): SideEffect
     {
-        $this->implementation->foreach($function);
+        return $this->implementation->foreach($function);
     }
 
     /**
@@ -303,9 +264,8 @@ final class Sequence implements \Countable
      * discriminator function
      *
      * @template D
-     * @param callable(T): D $discriminator
      *
-     * @throws CannotGroupEmptyStructure
+     * @param callable(T): D $discriminator
      *
      * @return Map<D, self<T>>
      */
@@ -315,53 +275,22 @@ final class Sequence implements \Countable
     }
 
     /**
-     * Return a new map of pairs grouped by keys determined with the given
-     * discriminator function
-     *
-     * @template D
-     * @param string $type D
-     * @param callable(T): D $discriminator
-     *
-     * @return Map<D, self<T>>
-     */
-    public function group(string $type, callable $discriminator): Map
-    {
-        /**
-         * @psalm-suppress MissingClosureParamType
-         * @var Map<D, self<T>>
-         */
-        return $this->reduce(
-            Map::of($type, self::class),
-            function(Map $groups, $value) use ($discriminator): Map {
-                /** @var T $value */
-                $key = $discriminator($value);
-                /** @var self<T> */
-                $group = $groups->contains($key) ? $groups->get($key) : $this->clear();
-
-                return ($groups)($key, ($group)($value));
-            },
-        );
-    }
-
-    /**
      * Return the first element
      *
-     * @return T
+     * @return Maybe<T>
      */
-    public function first()
+    public function first(): Maybe
     {
-        /** @var T */
         return $this->implementation->first();
     }
 
     /**
      * Return the last element
      *
-     * @return T
+     * @return Maybe<T>
      */
-    public function last()
+    public function last(): Maybe
     {
-        /** @var T */
         return $this->implementation->last();
     }
 
@@ -372,8 +301,6 @@ final class Sequence implements \Countable
      */
     public function contains($element): bool
     {
-        ($this->validate)($element, 1);
-
         return $this->implementation->contains($element);
     }
 
@@ -382,12 +309,10 @@ final class Sequence implements \Countable
      *
      * @param T $element
      *
-     * @throws ElementNotFound
+     * @return Maybe<int>
      */
-    public function indexOf($element): int
+    public function indexOf($element): Maybe
     {
-        ($this->validate)($element, 1);
-
         return $this->implementation->indexOf($element);
     }
 
@@ -398,44 +323,38 @@ final class Sequence implements \Countable
      */
     public function indices(): self
     {
-        return new self('int', $this->implementation->indices());
+        return new self($this->implementation->indices());
     }
 
     /**
      * Return a new sequence by applying the given function to all elements
      *
-     * @param callable(T): T $function
-     *
-     * @return self<T>
-     */
-    public function map(callable $function): self
-    {
-        $self = clone $this;
-        $self->implementation = $this->implementation->map($function);
-
-        return $self;
-    }
-
-    /**
-     * Create a new Sequence with the exact same number of elements but with a
-     * new type transformed via the given function
-     *
      * @template S
      *
-     * @param callable(T): S $map
+     * @param callable(T): S $function
      *
      * @return self<S>
      */
-    public function mapTo(string $type, callable $map): self
+    public function map(callable $function): self
     {
-        /**
-         * @psalm-suppress MixedArgument
-         * @psalm-suppress MissingClosureParamType
-         */
-        return $this->toSequenceOf(
-            $type,
-            static fn($value): \Generator => yield $map($value),
-        );
+        return new self($this->implementation->map($function));
+    }
+
+    /**
+     * Append each sequence created by each value of the initial sequence
+     *
+     * @template S
+     *
+     * @param callable(T): self<S> $map
+     *
+     * @return self<S>
+     */
+    public function flatMap(callable $map): self
+    {
+        /** @var callable(self<S>): Sequence\Implementation<S> */
+        $exfiltrate = static fn(self $sequence): Sequence\Implementation => $sequence->implementation;
+
+        return $this->implementation->flatMap($map, $exfiltrate);
     }
 
     /**
@@ -447,12 +366,7 @@ final class Sequence implements \Countable
      */
     public function pad(int $size, $element): self
     {
-        ($this->validate)($element, 2);
-
-        $self = clone $this;
-        $self->implementation = $this->implementation->pad($size, $element);
-
-        return $self;
+        return new self($this->implementation->pad($size, $element));
     }
 
     /**
@@ -474,48 +388,31 @@ final class Sequence implements \Countable
      */
     public function slice(int $from, int $until): self
     {
-        $self = clone $this;
-        $self->implementation = $this->implementation->slice($from, $until);
-
-        return $self;
-    }
-
-    /**
-     * Split the sequence in a sequence of 2 sequences splitted at the given position
-     *
-     * @throws OutOfBoundException
-     *
-     * @return self<self<T>>
-     */
-    public function splitAt(int $position): self
-    {
-        return $this->implementation->splitAt($position);
+        return new self($this->implementation->slice($from, $until));
     }
 
     /**
      * Return a sequence with the n first elements
      *
+     * @param positive-int $size
+     *
      * @return self<T>
      */
     public function take(int $size): self
     {
-        $self = clone $this;
-        $self->implementation = $this->implementation->take($size);
-
-        return $self;
+        return new self($this->implementation->take($size));
     }
 
     /**
      * Return a sequence with the n last elements
      *
+     * @param positive-int $size
+     *
      * @return self<T>
      */
     public function takeEnd(int $size): self
     {
-        $self = clone $this;
-        $self->implementation = $this->implementation->takeEnd($size);
-
-        return $self;
+        return new self($this->implementation->takeEnd($size));
     }
 
     /**
@@ -527,14 +424,9 @@ final class Sequence implements \Countable
      */
     public function append(self $sequence): self
     {
-        assertSequence($this->type, $sequence, 1);
-
-        $self = clone $this;
-        $self->implementation = $this->implementation->append(
+        return new self($this->implementation->append(
             $sequence->implementation,
-        );
-
-        return $self;
+        ));
     }
 
     /**
@@ -547,14 +439,9 @@ final class Sequence implements \Countable
      */
     public function intersect(self $sequence): self
     {
-        assertSequence($this->type, $sequence, 1);
-
-        $self = clone $this;
-        $self->implementation = $this->implementation->intersect(
+        return new self($this->implementation->intersect(
             $sequence->implementation,
-        );
-
-        return $self;
+        ));
     }
 
     /**
@@ -578,16 +465,14 @@ final class Sequence implements \Countable
      */
     public function sort(callable $function): self
     {
-        $self = clone $this;
-        $self->implementation = $this->implementation->sort($function);
-
-        return $self;
+        return new self($this->implementation->sort($function));
     }
 
     /**
      * Reduce the sequence to a single value
      *
      * @template R
+     *
      * @param R $carry
      * @param callable(R, T): R $reducer
      *
@@ -605,10 +490,7 @@ final class Sequence implements \Countable
      */
     public function clear(): self
     {
-        $self = clone $this;
-        $self->implementation = new Sequence\Primitive($this->type);
-
-        return $self;
+        return new self(new Sequence\Primitive);
     }
 
     /**
@@ -618,10 +500,7 @@ final class Sequence implements \Countable
      */
     public function reverse(): self
     {
-        $self = clone $this;
-        $self->implementation = $this->implementation->reverse();
-
-        return $self;
+        return new self($this->implementation->reverse());
     }
 
     public function empty(): bool
@@ -630,52 +509,31 @@ final class Sequence implements \Countable
     }
 
     /**
-     * @template ST
-     *
-     * @param null|callable(T): \Generator<ST> $mapper
-     *
-     * @return self<ST>
+     * @return list<T>
      */
-    public function toSequenceOf(string $type, callable $mapper = null): self
+    public function toList(): array
     {
-        return $this->implementation->toSequenceOf($type, $mapper);
-    }
+        /**
+         * @psalm-suppress MixedAssignment
+         * @var list<T>
+         */
+        return $this->reduce(
+            [],
+            static function(array $carry, $value): array {
+                $carry[] = $value;
 
-    /**
-     * @template ST
-     *
-     * @param null|callable(T): \Generator<ST> $mapper
-     *
-     * @return Set<ST>
-     */
-    public function toSetOf(string $type, callable $mapper = null): Set
-    {
-        return $this->implementation->toSetOf($type, $mapper);
-    }
-
-    /**
-     * @template MT
-     * @template MS
-     *
-     * @param callable(T): \Generator<MT, MS> $mapper
-     *
-     * @return Map<MT, MS>
-     */
-    public function toMapOf(string $key, string $value, callable $mapper): Map
-    {
-        return $this->implementation->toMapOf($key, $value, $mapper);
+                return $carry;
+            },
+        );
     }
 
     /**
      * @param callable(T): bool $predicate
      *
-     * @throws NoElementMatchingPredicateFound
-     *
-     * @return T
+     * @return Maybe<T>
      */
-    public function find(callable $predicate)
+    public function find(callable $predicate): Maybe
     {
-        /** @var T */
         return $this->implementation->find($predicate);
     }
 
@@ -684,10 +542,7 @@ final class Sequence implements \Countable
      */
     public function matches(callable $predicate): bool
     {
-        /**
-         * @psalm-suppress MixedArgument
-         * @psalm-suppress MissingClosureParamType
-         */
+        /** @psalm-suppress MixedArgument */
         return $this->reduce(
             true,
             static fn(bool $matches, $value): bool => $matches && $predicate($value),
@@ -699,12 +554,9 @@ final class Sequence implements \Countable
      */
     public function any(callable $predicate): bool
     {
-        try {
-            $this->find($predicate);
-
-            return true;
-        } catch (NoElementMatchingPredicateFound $e) {
-            return false;
-        }
+        return $this->find($predicate)->match(
+            static fn() => true,
+            static fn() => false,
+        );
     }
 }

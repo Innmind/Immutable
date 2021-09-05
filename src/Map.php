@@ -3,35 +3,18 @@ declare(strict_types = 1);
 
 namespace Innmind\Immutable;
 
-use Innmind\Immutable\{
-    ValidateArgument\ClassType,
-    Exception\LogicException,
-    Exception\ElementNotFound,
-    Exception\CannotGroupEmptyStructure,
-};
-
 /**
  * @template T
  * @template S
+ * @psalm-immutable
  */
 final class Map implements \Countable
 {
     private Map\Implementation $implementation;
-    private string $keyType;
-    private string $valueType;
-    private ValidateArgument $validateKey;
-    private ValidateArgument $validateValue;
 
-    private function __construct(
-        string $keyType,
-        string $valueType,
-        Map\Implementation $implementation
-    ) {
+    private function __construct(Map\Implementation $implementation)
+    {
         $this->implementation = $implementation;
-        $this->keyType = $keyType;
-        $this->valueType = $valueType;
-        $this->validateKey = Type::of($keyType);
-        $this->validateValue = Type::of($valueType);
     }
 
     /**
@@ -39,7 +22,7 @@ final class Map implements \Countable
      *
      * Example:
      * <code>
-     * Map::of('int', 'int')
+     * Map::of()
      *     (1, 2)
      *     (3, 4)
      * </code>
@@ -51,55 +34,27 @@ final class Map implements \Countable
      */
     public function __invoke($key, $value): self
     {
-        ($this->validateKey)($key, 1);
-        ($this->validateValue)($value, 2);
-
-        $map = clone $this;
-        $map->implementation = ($this->implementation)($key, $value);
-
-        return $map;
+        return new self(($this->implementation)($key, $value));
     }
 
     /**
      * @template U
      * @template V
+     * @psalm-pure
+     *
+     * @param list<array{0: U, 1: V}> $pairs
      *
      * @return self<U, V>
      */
-    public static function of(string $key, string $value): self
+    public static function of(array ...$pairs): self
     {
-        $type = Type::of($key);
+        $self = new self(new Map\Uninitialized);
 
-        if ($type instanceof ClassType || $key === 'object') {
-            return new self($key, $value, new Map\ObjectKeys($key, $value));
+        foreach ($pairs as [$key, $value]) {
+            $self = ($self)($key, $value);
         }
 
-        if (\in_array($key, ['int', 'integer', 'string'], true)) {
-            return new self($key, $value, new Map\Primitive($key, $value));
-        }
-
-        return new self($key, $value, new Map\DoubleIndex($key, $value));
-    }
-
-    public function isOfType(string $key, string $value): bool
-    {
-        return $this->keyType === $key && $this->valueType === $value;
-    }
-
-    /**
-     * Return the key type for this map
-     */
-    public function keyType(): string
-    {
-        return $this->implementation->keyType();
-    }
-
-    /**
-     * Return the value type for this map
-     */
-    public function valueType(): string
-    {
-        return $this->implementation->valueType();
+        return $self;
     }
 
     public function size(): int
@@ -109,7 +64,7 @@ final class Map implements \Countable
 
     public function count(): int
     {
-        return $this->implementation->count();
+        return $this->size();
     }
 
     /**
@@ -130,15 +85,10 @@ final class Map implements \Countable
      *
      * @param T $key
      *
-     * @throws ElementNotFound
-     *
-     * @return S
+     * @return Maybe<S>
      */
-    public function get($key)
+    public function get($key): Maybe
     {
-        ($this->validateKey)($key, 1);
-
-        /** @var S */
         return $this->implementation->get($key);
     }
 
@@ -149,22 +99,17 @@ final class Map implements \Countable
      */
     public function contains($key): bool
     {
-        ($this->validateKey)($key, 1);
-
         return $this->implementation->contains($key);
     }
 
     /**
-     * Return an empty map given the same given type
+     * Return an empty map of the same type
      *
      * @return self<T, S>
      */
     public function clear(): self
     {
-        $map = clone $this;
-        $map->implementation = $this->implementation->clear();
-
-        return $map;
+        return new self($this->implementation->clear());
     }
 
     /**
@@ -174,8 +119,6 @@ final class Map implements \Countable
      */
     public function equals(self $map): bool
     {
-        assertMap($this->keyType, $this->valueType, $map, 1);
-
         return $this->implementation->equals($map->implementation);
     }
 
@@ -188,10 +131,7 @@ final class Map implements \Countable
      */
     public function filter(callable $predicate): self
     {
-        $map = $this->clear();
-        $map->implementation = $this->implementation->filter($predicate);
-
-        return $map;
+        return new self($this->implementation->filter($predicate));
     }
 
     /**
@@ -199,9 +139,9 @@ final class Map implements \Countable
      *
      * @param callable(T, S): void $function
      */
-    public function foreach(callable $function): void
+    public function foreach(callable $function): SideEffect
     {
-        $this->implementation->foreach($function);
+        return $this->implementation->foreach($function);
     }
 
     /**
@@ -209,49 +149,14 @@ final class Map implements \Countable
      * discriminator function
      *
      * @template D
-     * @param callable(T, S): D $discriminator
      *
-     * @throws CannotGroupEmptyStructure
+     * @param callable(T, S): D $discriminator
      *
      * @return self<D, self<T, S>>
      */
     public function groupBy(callable $discriminator): self
     {
         return $this->implementation->groupBy($discriminator);
-    }
-
-    /**
-     * Return a new map of pairs' sequences grouped by keys determined with the given
-     * discriminator function
-     *
-     * @template D
-     * @param string $type D
-     * @param callable(T, S): D $discriminator
-     *
-     * @return self<D, self<T, S>>
-     */
-    public function group(string $type, callable $discriminator): self
-    {
-        /**
-         * @psalm-suppress MissingClosureParamType
-         * @var self<D, self<T, S>>
-         */
-        return $this->reduce(
-            self::of($type, self::class),
-            function(self $groups, $key, $value) use ($discriminator): self {
-                /**
-                 * @var self<D, self<T, S>> $groups
-                 * @var T $key
-                 * @var S $value
-                 */
-                $discriminant = $discriminator($key, $value);
-                /** @psalm-suppress InvalidArgument Psalm doesn't read correctly the templates for $groups */
-                $group = $groups->contains($discriminant) ? $groups->get($discriminant) : $this->clear();
-
-                /** @psalm-suppress InvalidArgument */
-                return ($groups)($discriminant, ($group)($key, $value));
-            },
-        );
     }
 
     /**
@@ -277,18 +182,37 @@ final class Map implements \Countable
     /**
      * Apply the given function on all elements and return a new map
      *
-     * Keys can't be modified
+     * @template B
      *
-     * @param callable(T, S): (S|Pair<T, S>) $function
+     * @param callable(T, S): B $function
      *
-     * @return self<T, S>
+     * @return self<T, B>
      */
     public function map(callable $function): self
     {
-        $map = $this->clear();
-        $map->implementation = $this->implementation->map($function);
+        return new self($this->implementation->map($function));
+    }
 
-        return $map;
+    /**
+     * Merge all Maps created by each value from the initial Map
+     *
+     * @template A
+     * @template B
+     *
+     * @param callable(T, S): self<A, B> $map
+     *
+     * @return self<A, B>
+     */
+    public function flatMap(callable $map): self
+    {
+        /**
+         * @psalm-suppress InvalidArgument
+         * @psalm-suppress MixedArgument
+         */
+        return $this->reduce(
+            self::of(),
+            static fn(self $carry, $key, $value) => $carry->merge($map($key, $value)),
+        );
     }
 
     /**
@@ -300,12 +224,7 @@ final class Map implements \Countable
      */
     public function remove($key): self
     {
-        ($this->validateKey)($key, 1);
-
-        $map = clone $this;
-        $map->implementation = $this->implementation->remove($key);
-
-        return $map;
+        return new self($this->implementation->remove($key));
     }
 
     /**
@@ -317,12 +236,7 @@ final class Map implements \Countable
      */
     public function merge(self $map): self
     {
-        assertMap($this->keyType, $this->valueType, $map, 1);
-
-        $self = clone $this;
-        $self->implementation = $this->implementation->merge($map->implementation);
-
-        return $self;
+        return new self($this->implementation->merge($map->implementation));
     }
 
     /**
@@ -357,40 +271,13 @@ final class Map implements \Countable
     }
 
     /**
-     * @template ST
+     * @param callable(T, S): bool $predicate
      *
-     * @param callable(T, S): \Generator<ST> $mapper
-     *
-     * @return Sequence<ST>
+     * @return Maybe<Pair<T, S>>
      */
-    public function toSequenceOf(string $type, callable $mapper): Sequence
+    public function find(callable $predicate): Maybe
     {
-        return $this->implementation->toSequenceOf($type, $mapper);
-    }
-
-    /**
-     * @template ST
-     *
-     * @param callable(T, S): \Generator<ST> $mapper
-     *
-     * @return Set<ST>
-     */
-    public function toSetOf(string $type, callable $mapper): Set
-    {
-        return $this->implementation->toSetOf($type, $mapper);
-    }
-
-    /**
-     * @template MT
-     * @template MS
-     *
-     * @param null|callable(T, S): \Generator<MT, MS> $mapper
-     *
-     * @return self<MT, MS>
-     */
-    public function toMapOf(string $key, string $value, callable $mapper = null): self
-    {
-        return $this->implementation->toMapOf($key, $value, $mapper);
+        return $this->implementation->find($predicate);
     }
 
     /**
@@ -398,10 +285,7 @@ final class Map implements \Countable
      */
     public function matches(callable $predicate): bool
     {
-        /**
-         * @psalm-suppress MixedArgument
-         * @psalm-suppress MissingClosureParamType
-         */
+        /** @psalm-suppress MixedArgument */
         return $this->reduce(
             true,
             static fn(bool $matches, $key, $value): bool => $matches && $predicate($key, $value),
@@ -413,13 +297,9 @@ final class Map implements \Countable
      */
     public function any(callable $predicate): bool
     {
-        /**
-         * @psalm-suppress MixedArgument
-         * @psalm-suppress MissingClosureParamType
-         */
-        return $this->reduce(
-            false,
-            static fn(bool $any, $key, $value): bool => $any || $predicate($key, $value),
+        return $this->find($predicate)->match(
+            static fn() => true,
+            static fn() => false,
         );
     }
 }

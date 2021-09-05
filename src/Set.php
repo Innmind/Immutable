@@ -3,25 +3,17 @@ declare(strict_types = 1);
 
 namespace Innmind\Immutable;
 
-use Innmind\Immutable\Exception\{
-    CannotGroupEmptyStructure,
-    NoElementMatchingPredicateFound,
-};
-
 /**
  * @template T
+ * @psalm-immutable
  */
 final class Set implements \Countable
 {
-    private string $type;
-    private ValidateArgument $validate;
     /** @var Set\Implementation<T> */
     private Set\Implementation $implementation;
 
-    private function __construct(string $type, Set\Implementation $implementation)
+    private function __construct(Set\Implementation $implementation)
     {
-        $this->type = $type;
-        $this->validate = Type::of($type);
         $this->implementation = $implementation;
     }
 
@@ -30,7 +22,7 @@ final class Set implements \Countable
      *
      * Example:
      * <code>
-     * Set::of('int')(1)(3)
+     * Set::of()(1)(3)
      * </code>
      *
      * @param T $element
@@ -39,24 +31,21 @@ final class Set implements \Countable
      */
     public function __invoke($element): self
     {
-        ($this->validate)($element, 1);
-
-        $self = clone $this;
-        $self->implementation = ($this->implementation)($element);
-
-        return $self;
+        return new self(($this->implementation)($element));
     }
 
     /**
      * @template V
+     * @no-named-arguments
+     * @psalm-pure
      *
      * @param V $values
      *
      * @return self<V>
      */
-    public static function of(string $type, ...$values): self
+    public static function of(...$values): self
     {
-        return new self($type, new Set\Primitive($type, ...$values));
+        return new self(Set\Primitive::of(...$values));
     }
 
     /**
@@ -66,14 +55,15 @@ final class Set implements \Countable
      * Use this mode when the amount of data may not fit in memory
      *
      * @template V
+     * @psalm-pure
      *
      * @param \Generator<V> $generator
      *
      * @return self<V>
      */
-    public static function defer(string $type, \Generator $generator): self
+    public static function defer(\Generator $generator): self
     {
-        return new self($type, new Set\Defer($type, $generator));
+        return new self(Set\Defer::of($generator));
     }
 
     /**
@@ -85,81 +75,83 @@ final class Set implements \Countable
      * as parsing a file or calling an API
      *
      * @template V
+     * @psalm-pure
+     * @psalm-type RegisterCleanup = callable(callable(): void): void
      *
-     * @param callable(): \Generator<V> $generator
+     * @param callable(RegisterCleanup): \Generator<V> $generator
      *
      * @return self<V>
      */
-    public static function lazy(string $type, callable $generator): self
+    public static function lazy(callable $generator): self
     {
-        return new self($type, new Set\Lazy($type, $generator));
+        return new self(Set\Lazy::of($generator));
     }
 
     /**
-     * @param mixed $values
+     * @no-named-arguments
+     * @psalm-pure
      *
      * @return self<mixed>
      */
-    public static function mixed(...$values): self
+    public static function mixed(mixed ...$values): self
     {
-        return new self('mixed', new Set\Primitive('mixed', ...$values));
+        return new self(Set\Primitive::of(...$values));
     }
 
     /**
+     * @no-named-arguments
+     * @psalm-pure
+     *
      * @return self<int>
      */
     public static function ints(int ...$values): self
     {
         /** @var self<int> */
-        $self = new self('int', new Set\Primitive('int', ...$values));
+        $self = new self(Set\Primitive::of(...$values));
 
         return $self;
     }
 
     /**
+     * @no-named-arguments
+     * @psalm-pure
+     *
      * @return self<float>
      */
     public static function floats(float ...$values): self
     {
         /** @var self<float> */
-        $self = new self('float', new Set\Primitive('float', ...$values));
+        $self = new self(Set\Primitive::of(...$values));
 
         return $self;
     }
 
     /**
+     * @no-named-arguments
+     * @psalm-pure
+     *
      * @return self<string>
      */
     public static function strings(string ...$values): self
     {
         /** @var self<string> */
-        $self = new self('string', new Set\Primitive('string', ...$values));
+        $self = new self(Set\Primitive::of(...$values));
 
         return $self;
     }
 
     /**
+     * @no-named-arguments
+     * @psalm-pure
+     *
      * @return self<object>
      */
     public static function objects(object ...$values): self
     {
         /** @var self<object> */
-        $self = new self('object', new Set\Primitive('object', ...$values));
+        $self = new self(Set\Primitive::of(...$values));
 
         return $self;
-    }
-
-    public function isOfType(string $type): bool
-    {
-        return $this->type === $type;
-    }
-
-    /**
-     * Return the type of this set
-     */
-    public function type(): string
-    {
-        return $this->type;
     }
 
     public function size(): int
@@ -181,14 +173,9 @@ final class Set implements \Countable
      */
     public function intersect(self $set): self
     {
-        assertSet($this->type, $set, 1);
-
-        $newSet = clone $this;
-        $newSet->implementation = $this->implementation->intersect(
+        return new self($this->implementation->intersect(
             $set->implementation,
-        );
-
-        return $newSet;
+        ));
     }
 
     /**
@@ -210,8 +197,6 @@ final class Set implements \Countable
      */
     public function contains($element): bool
     {
-        ($this->validate)($element, 1);
-
         return $this->implementation->contains($element);
     }
 
@@ -224,12 +209,7 @@ final class Set implements \Countable
      */
     public function remove($element): self
     {
-        ($this->validate)($element, 1);
-
-        $self = clone $this;
-        $self->implementation = $this->implementation->remove($element);
-
-        return $self;
+        return new self($this->implementation->remove($element));
     }
 
     /**
@@ -241,14 +221,9 @@ final class Set implements \Countable
      */
     public function diff(self $set): self
     {
-        assertSet($this->type, $set, 1);
-
-        $self = clone $this;
-        $self->implementation = $this->implementation->diff(
+        return new self($this->implementation->diff(
             $set->implementation,
-        );
-
-        return $self;
+        ));
     }
 
     /**
@@ -258,8 +233,6 @@ final class Set implements \Countable
      */
     public function equals(self $set): bool
     {
-        assertSet($this->type, $set, 1);
-
         return $this->implementation->equals($set->implementation);
     }
 
@@ -272,10 +245,7 @@ final class Set implements \Countable
      */
     public function filter(callable $predicate): self
     {
-        $set = clone $this;
-        $set->implementation = $this->implementation->filter($predicate);
-
-        return $set;
+        return new self($this->implementation->filter($predicate));
     }
 
     /**
@@ -283,9 +253,9 @@ final class Set implements \Countable
      *
      * @param callable(T): void $function
      */
-    public function foreach(callable $function): void
+    public function foreach(callable $function): SideEffect
     {
-        $this->implementation->foreach($function);
+        return $this->implementation->foreach($function);
     }
 
     /**
@@ -293,9 +263,8 @@ final class Set implements \Countable
      * discriminator function
      *
      * @template D
-     * @param callable(T): D $discriminator
      *
-     * @throws CannotGroupEmptyStructure
+     * @param callable(T): D $discriminator
      *
      * @return Map<D, self<T>>
      */
@@ -305,68 +274,37 @@ final class Set implements \Countable
     }
 
     /**
-     * Return a new map of pairs grouped by keys determined with the given
-     * discriminator function
-     *
-     * @template D
-     * @param string $type D
-     * @param callable(T): D $discriminator
-     *
-     * @return Map<D, self<T>>
-     */
-    public function group(string $type, callable $discriminator): Map
-    {
-        /**
-         * @psalm-suppress MissingClosureParamType
-         * @var Map<D, self<T>>
-         */
-        return $this->reduce(
-            Map::of($type, self::class),
-            function(Map $groups, $value) use ($discriminator): Map {
-                /** @var T $value */
-                $key = $discriminator($value);
-                /** @var self<T> */
-                $group = $groups->contains($key) ? $groups->get($key) : $this->clear();
-
-                return ($groups)($key, ($group)($value));
-            },
-        );
-    }
-
-    /**
      * Return a new set by applying the given function to all elements
-     *
-     * @param callable(T): T $function
-     *
-     * @return self<T>
-     */
-    public function map(callable $function): self
-    {
-        $self = $this->clear();
-        $self->implementation = $this->implementation->map($function);
-
-        return $self;
-    }
-
-    /**
-     * Create a new Set with the exact same number of elements but with a
-     * new type transformed via the given function
      *
      * @template S
      *
-     * @param callable(T): S $map
+     * @param callable(T): S $function
      *
      * @return self<S>
      */
-    public function mapTo(string $type, callable $map): self
+    public function map(callable $function): self
+    {
+        return new self($this->implementation->map($function));
+    }
+
+    /**
+     * Merge all sets created by each value from the original set
+     *
+     * @template S
+     *
+     * @param callable(T): self<S> $map
+     *
+     * @return self<S>
+     */
+    public function flatMap(callable $map): self
     {
         /**
+         * @psalm-suppress InvalidArgument
          * @psalm-suppress MixedArgument
-         * @psalm-suppress MissingClosureParamType
          */
-        return $this->toSetOf(
-            $type,
-            static fn($value): \Generator => yield $map($value),
+        return $this->reduce(
+            self::of(),
+            static fn(self $carry, $value) => $carry->merge($map($value)),
         );
     }
 
@@ -403,20 +341,16 @@ final class Set implements \Countable
      */
     public function merge(self $set): self
     {
-        assertSet($this->type, $set, 1);
-
-        $self = clone $this;
-        $self->implementation = $this->implementation->merge(
+        return new self($this->implementation->merge(
             $set->implementation,
-        );
-
-        return $self;
+        ));
     }
 
     /**
      * Reduce the set to a single value
      *
      * @template R
+     *
      * @param R $carry
      * @param callable(R, T): R $reducer
      *
@@ -434,10 +368,7 @@ final class Set implements \Countable
      */
     public function clear(): self
     {
-        $self = clone $this;
-        $self->implementation = $this->implementation->clear();
-
-        return $self;
+        return new self($this->implementation->clear());
     }
 
     public function empty(): bool
@@ -446,52 +377,12 @@ final class Set implements \Countable
     }
 
     /**
-     * @template ST
-     *
-     * @param null|callable(T): \Generator<ST> $mapper
-     *
-     * @return Sequence<ST>
-     */
-    public function toSequenceOf(string $type, callable $mapper = null): Sequence
-    {
-        return $this->implementation->toSequenceOf($type, $mapper);
-    }
-
-    /**
-     * @template ST
-     *
-     * @param null|callable(T): \Generator<ST> $mapper
-     *
-     * @return self<ST>
-     */
-    public function toSetOf(string $type, callable $mapper = null): self
-    {
-        return $this->implementation->toSetOf($type, $mapper);
-    }
-
-    /**
-     * @template MT
-     * @template MS
-     *
-     * @param callable(T): \Generator<MT, MS> $mapper
-     *
-     * @return Map<MT, MS>
-     */
-    public function toMapOf(string $key, string $value, callable $mapper): Map
-    {
-        return $this->implementation->toMapOf($key, $value, $mapper);
-    }
-
-    /**
      * @param callable(T): bool $predicate
      *
-     * @throws NoElementMatchingPredicateFound
-     *
-     * @return T
+     * @return Maybe<T>
      */
-    public function find(callable $predicate)
+    public function find(callable $predicate): Maybe
     {
-        /** @var T */
         return $this->implementation->find($predicate);
     }
 
@@ -500,10 +391,7 @@ final class Set implements \Countable
      */
     public function matches(callable $predicate): bool
     {
-        /**
-         * @psalm-suppress MixedArgument
-         * @psalm-suppress MissingClosureParamType
-         */
+        /** @psalm-suppress MixedArgument */
         return $this->reduce(
             true,
             static fn(bool $matches, $value): bool => $matches && $predicate($value),
@@ -515,12 +403,28 @@ final class Set implements \Countable
      */
     public function any(callable $predicate): bool
     {
-        try {
-            $this->find($predicate);
+        return $this->find($predicate)->match(
+            static fn() => true,
+            static fn() => false,
+        );
+    }
 
-            return true;
-        } catch (NoElementMatchingPredicateFound $e) {
-            return false;
-        }
+    /**
+     * @return list<T>
+     */
+    public function toList(): array
+    {
+        /**
+         * @psalm-suppress MixedAssignment
+         * @var list<T>
+         */
+        return $this->reduce(
+            [],
+            static function(array $carry, $value): array {
+                $carry[] = $value;
+
+                return $carry;
+            },
+        );
     }
 }

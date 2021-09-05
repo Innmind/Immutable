@@ -5,44 +5,31 @@ namespace Innmind\Immutable\Map;
 
 use Innmind\Immutable\{
     Map,
-    Type,
     Str,
     Sequence,
     Set,
     Pair,
-    ValidateArgument,
-    Exception\LogicException,
-    Exception\ElementNotFound,
-    Exception\CannotGroupEmptyStructure,
+    Maybe,
+    SideEffect,
 };
 
 /**
  * @template T
  * @template S
+ * @psalm-immutable
  */
 final class DoubleIndex implements Implementation
 {
-    private string $keyType;
-    private string $valueType;
-    private ValidateArgument $validateKey;
-    private ValidateArgument $validateValue;
-    /** @var Sequence\Implementation<T> */
-    private Sequence\Implementation $keys;
-    /** @var Sequence\Implementation<S> */
-    private Sequence\Implementation $values;
     /** @var Sequence\Implementation<Pair<T, S>> */
     private Sequence\Implementation $pairs;
 
-    public function __construct(string $keyType, string $valueType)
+    /**
+     * @param Sequence\Implementation<Pair<T, S>> $pairs
+     */
+    public function __construct(Sequence\Implementation $pairs = null)
     {
-        $this->validateKey = Type::of($keyType);
-        $this->validateValue = Type::of($valueType);
-        $this->keyType = $keyType;
-        $this->valueType = $valueType;
-        $this->keys = new Sequence\Primitive($keyType);
-        $this->values = new Sequence\Primitive($valueType);
         /** @var Sequence\Implementation<Pair<T, S>> */
-        $this->pairs = new Sequence\Primitive(Pair::class);
+        $this->pairs = $pairs ?? new Sequence\Primitive;
     }
 
     /**
@@ -53,60 +40,48 @@ final class DoubleIndex implements Implementation
      */
     public function __invoke($key, $value): self
     {
-        ($this->validateKey)($key, 1);
-        ($this->validateValue)($value, 2);
+        $map = $this->remove($key);
 
-        $map = clone $this;
-
-        if ($this->keys->contains($key)) {
-            $index = $this->keys->indexOf($key);
-            $map->values = $this->values->take($index)($value)->append($this->values->drop($index + 1));
-            $map->pairs = $this->pairs->take($index)(new Pair($key, $value))->append($this->pairs->drop($index + 1));
-        } else {
-            $map->keys = ($this->keys)($key);
-            $map->values = ($this->values)($value);
-            $map->pairs = ($this->pairs)(new Pair($key, $value));
-        }
-
-        return $map;
+        return new self(($map->pairs)(new Pair($key, $value)));
     }
 
-    public function keyType(): string
+    /**
+     * @template A
+     * @template B
+     * @psalm-pure
+     *
+     * @param A $key
+     * @param B $value
+     *
+     * @return self<A, B>
+     */
+    public static function of($key, $value): self
     {
-        return $this->keyType;
-    }
-
-    public function valueType(): string
-    {
-        return $this->valueType;
+        /** @psalm-suppress MixedArgumentTypeCoercion */
+        return new self(new Sequence\Primitive([new Pair($key, $value)]));
     }
 
     public function size(): int
     {
-        return $this->keys->size();
+        return $this->pairs->size();
     }
 
     public function count(): int
     {
-        return $this->keys->count();
+        return $this->size();
     }
 
     /**
      * @param T $key
      *
-     * @throws ElementNotFound
-     *
-     * @return S
+     * @return Maybe<S>
      */
-    public function get($key)
+    public function get($key): Maybe
     {
-        if (!$this->keys->contains($key)) {
-            throw new ElementNotFound($key);
-        }
-
-        return $this->values->get(
-            $this->keys->indexOf($key),
-        );
+        return $this
+            ->pairs
+            ->find(static fn($pair) => $pair->key() === $key)
+            ->map(static fn($pair) => $pair->value());
     }
 
     /**
@@ -114,7 +89,13 @@ final class DoubleIndex implements Implementation
      */
     public function contains($key): bool
     {
-        return $this->keys->contains($key);
+        return $this
+            ->pairs
+            ->find(static fn($pair) => $pair->key() === $key)
+            ->match(
+                static fn() => true,
+                static fn() => false,
+            );
     }
 
     /**
@@ -122,12 +103,7 @@ final class DoubleIndex implements Implementation
      */
     public function clear(): self
     {
-        $map = clone $this;
-        $map->keys = $this->keys->clear();
-        $map->values = $this->values->clear();
-        $map->pairs = $this->pairs->clear();
-
-        return $map;
+        return new self($this->pairs->clear());
     }
 
     /**
@@ -140,7 +116,15 @@ final class DoubleIndex implements Implementation
         }
 
         foreach ($this->pairs->iterator() as $pair) {
-            if ($map->get($pair->key()) !== $pair->value()) {
+            $equals = $map
+                ->get($pair->key())
+                ->filter(static fn($value) => $value === $pair->value())
+                ->match(
+                    static fn() => true,
+                    static fn() => false,
+                );
+
+            if (!$equals) {
                 return false;
             }
         }
@@ -155,66 +139,43 @@ final class DoubleIndex implements Implementation
      */
     public function filter(callable $predicate): self
     {
-        $map = $this->clear();
-
-        foreach ($this->pairs->iterator() as $pair) {
-            if ($predicate($pair->key(), $pair->value()) === true) {
-                $map->keys = ($map->keys)($pair->key());
-                $map->values = ($map->values)($pair->value());
-                $map->pairs = ($map->pairs)($pair);
-            }
-        }
-
-        return $map;
+        return new self($this->pairs->filter(
+            static fn($pair) => $predicate($pair->key(), $pair->value()),
+        ));
     }
 
     /**
      * @param callable(T, S): void $function
      */
-    public function foreach(callable $function): void
+    public function foreach(callable $function): SideEffect
     {
         foreach ($this->pairs->iterator() as $pair) {
             $function($pair->key(), $pair->value());
         }
+
+        return new SideEffect;
     }
 
     /**
      * @template D
-     * @param callable(T, S): D $discriminator
      *
-     * @throws CannotGroupEmptyStructure
+     * @param callable(T, S): D $discriminator
      *
      * @return Map<D, Map<T, S>>
      */
     public function groupBy(callable $discriminator): Map
     {
-        if ($this->empty()) {
-            throw new CannotGroupEmptyStructure;
-        }
-
-        $groups = null;
+        /** @var Map<D, Map<T, S>> */
+        $groups = Map::of();
 
         foreach ($this->pairs->iterator() as $pair) {
             $key = $discriminator($pair->key(), $pair->value());
 
-            if ($groups === null) {
-                /** @var Map<D, Map<T, S>> */
-                $groups = Map::of(
-                    Type::determine($key),
-                    Map::class,
-                );
-            }
-
-            if ($groups->contains($key)) {
-                $group = $groups->get($key);
-                $group = ($group)($pair->key(), $pair->value());
-
-                $groups = ($groups)($key, $group);
-            } else {
-                $group = $this->clearMap()($pair->key(), $pair->value());
-
-                $groups = ($groups)($key, $group);
-            }
+            $group = $groups->get($key)->match(
+                static fn($group) => $group,
+                fn() => $this->clearMap(),
+            );
+            $groups = ($groups)($key, ($group)($pair->key(), $pair->value()));
         }
 
         /** @var Map<D, Map<T, S>> */
@@ -226,7 +187,10 @@ final class DoubleIndex implements Implementation
      */
     public function keys(): Set
     {
-        return $this->keys->toSetOf($this->keyType);
+        return $this
+            ->pairs
+            ->map(static fn($pair) => $pair->key())
+            ->toSet();
     }
 
     /**
@@ -234,35 +198,25 @@ final class DoubleIndex implements Implementation
      */
     public function values(): Sequence
     {
-        return $this->values->toSequenceOf($this->valueType);
+        return $this
+            ->pairs
+            ->map(static fn($pair) => $pair->value())
+            ->toSequence();
     }
 
     /**
-     * @param callable(T, S): (S|Pair<T, S>) $function
+     * @template B
      *
-     * @return self<T, S>
+     * @param callable(T, S): B $function
+     *
+     * @return self<T, B>
      */
     public function map(callable $function): self
     {
-        $map = $this->clear();
-
-        foreach ($this->pairs->iterator() as $pair) {
-            $return = $function($pair->key(), $pair->value());
-
-            if ($return instanceof Pair) {
-                /** @var T */
-                $key = $return->key();
-                /** @var S */
-                $value = $return->value();
-            } else {
-                $key = $pair->key();
-                $value = $return;
-            }
-
-            $map = ($map)($key, $value);
-        }
-
-        return $map;
+        return new self($this->pairs->map(static fn($pair) => new Pair(
+            $pair->key(),
+            $function($pair->key(), $pair->value()),
+        )));
     }
 
     /**
@@ -270,28 +224,11 @@ final class DoubleIndex implements Implementation
      *
      * @return self<T, S>
      */
-    public function remove($key): Implementation
+    public function remove($key): self
     {
-        if (!$this->contains($key)) {
-            return $this;
-        }
-
-        $index = $this->keys->indexOf($key);
-        $map = clone $this;
-        $map->keys = $this
-            ->keys
-            ->slice(0, $index)
-            ->append($this->keys->slice($index + 1, $this->keys->size()));
-        $map->values = $this
-            ->values
-            ->slice(0, $index)
-            ->append($this->values->slice($index + 1, $this->values->size()));
-        $map->pairs = $this
-            ->pairs
-            ->slice(0, $index)
-            ->append($this->pairs->slice($index + 1, $this->pairs->size()));
-
-        return $map;
+        return new self($this->pairs->filter(
+            static fn($pair) => $pair->key() !== $key
+        ));
     }
 
     /**
@@ -331,14 +268,7 @@ final class DoubleIndex implements Implementation
             }
         }
 
-        /**
-         * @psalm-suppress InvalidScalarArgument
-         * @psalm-suppress InvalidArgument
-         * @var Map<bool, Map<T, S>>
-         */
-        return Map::of('bool', Map::class)
-            (true, $truthy)
-            (false, $falsy);
+        return Map::of([true, $truthy], [false, $falsy]);
     }
 
     /**
@@ -362,75 +292,9 @@ final class DoubleIndex implements Implementation
         return $this->pairs->empty();
     }
 
-    /**
-     * @template ST
-     *
-     * @param callable(T, S): \Generator<ST> $mapper
-     *
-     * @return Sequence<ST>
-     */
-    public function toSequenceOf(string $type, callable $mapper): Sequence
+    public function find(callable $predicate): Maybe
     {
-        /** @var Sequence<ST> */
-        $sequence = Sequence::of($type);
-
-        foreach ($this->pairs->iterator() as $pair) {
-            foreach ($mapper($pair->key(), $pair->value()) as $newValue) {
-                $sequence = ($sequence)($newValue);
-            }
-        }
-
-        return $sequence;
-    }
-
-    /**
-     * @template ST
-     *
-     * @param callable(T, S): \Generator<ST> $mapper
-     *
-     * @return Set<ST>
-     */
-    public function toSetOf(string $type, callable $mapper): Set
-    {
-        /** @var Set<ST> */
-        $set = Set::of($type);
-
-        foreach ($this->pairs->iterator() as $pair) {
-            foreach ($mapper($pair->key(), $pair->value()) as $newValue) {
-                $set = ($set)($newValue);
-            }
-        }
-
-        return $set;
-    }
-
-    /**
-     * @template MT
-     * @template MS
-     *
-     * @param null|callable(T, S): \Generator<MT, MS> $mapper
-     *
-     * @return Map<MT, MS>
-     */
-    public function toMapOf(string $key, string $value, callable $mapper = null): Map
-    {
-        /** @psalm-suppress MissingClosureParamType */
-        $mapper ??= static fn($k, $v): \Generator => yield $k => $v;
-
-        /** @var Map<MT, MS> */
-        $map = Map::of($key, $value);
-
-        foreach ($this->pairs->iterator() as $pair) {
-            /**
-             * @var MT $newKey
-             * @var MS $newValue
-             */
-            foreach ($mapper($pair->key(), $pair->value()) as $newKey => $newValue) {
-                $map = ($map)($newKey, $newValue);
-            }
-        }
-
-        return $map;
+        return $this->pairs->find(static fn($pair) => $predicate($pair->key(), $pair->value()));
     }
 
     /**
@@ -438,6 +302,6 @@ final class DoubleIndex implements Implementation
      */
     private function clearMap(): Map
     {
-        return Map::of($this->keyType, $this->valueType);
+        return Map::of();
     }
 }

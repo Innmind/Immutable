@@ -7,7 +7,7 @@ use Innmind\Immutable\{
     RegExp,
     Str,
     Map,
-    Exception\DomainException
+    Exception\LogicException
 };
 use PHPUnit\Framework\TestCase;
 
@@ -30,7 +30,7 @@ class RegExpTest extends TestCase
 
     public function testThrowWhenInvalidRegexp()
     {
-        $this->expectException(DomainException::class);
+        $this->expectException(LogicException::class);
 
         RegExp::of('/foo');
     }
@@ -50,8 +50,14 @@ class RegExpTest extends TestCase
         $map = $regexp->capture(Str::of('foo123bar'));
 
         $this->assertInstanceOf(Map::class, $map);
-        $this->assertSame('scalar', $map->keyType());
-        $this->assertSame(Str::class, $map->valueType());
-        $this->assertSame('1', $map->get('i')->toString());
+        $this->assertSame('1', $this->get($map, 'i')->toString());
+    }
+
+    public function get($map, $index)
+    {
+        return $map->get($index)->match(
+            static fn($value) => $value,
+            static fn() => null,
+        );
     }
 }

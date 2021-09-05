@@ -8,34 +8,24 @@ use Innmind\Immutable\{
     Sequence,
     Str,
     Set,
-    Type,
-    ValidateArgument,
-    Exception\OutOfBoundException,
-    Exception\LogicException,
-    Exception\ElementNotFound,
-    Exception\CannotGroupEmptyStructure,
-    Exception\NoElementMatchingPredicateFound,
+    Maybe,
+    SideEffect,
 };
 
 /**
  * @template T
+ * @psalm-immutable
  */
 final class Primitive implements Implementation
 {
-    private string $type;
-    private ValidateArgument $validate;
     /** @var list<T> */
     private array $values;
-    private ?int $size = null;
 
     /**
-     * @param T $values
+     * @param list<T> $values
      */
-    public function __construct(string $type, ...$values)
+    public function __construct(array $values = [])
     {
-        $this->type = $type;
-        $this->validate = Type::of($type);
-        /** @var list<T> */
         $this->values = $values;
     }
 
@@ -46,21 +36,15 @@ final class Primitive implements Implementation
      */
     public function __invoke($element): self
     {
-        $self = clone $this;
-        $self->values[] = $element;
-        $self->size = $this->size() + 1;
+        $values = $this->values;
+        $values[] = $element;
 
-        return $self;
-    }
-
-    public function type(): string
-    {
-        return $this->type;
+        return new self($values);
     }
 
     public function size(): int
     {
-        return $this->size ?? $this->size = \count($this->values);
+        return \count($this->values);
     }
 
     public function count(): int
@@ -69,7 +53,7 @@ final class Primitive implements Implementation
     }
 
     /**
-     * @return \Iterator<T>
+     * @return \Iterator<int, T>
      */
     public function iterator(): \Iterator
     {
@@ -77,17 +61,16 @@ final class Primitive implements Implementation
     }
 
     /**
-     * @throws OutOfBoundException
-     *
-     * @return T
+     * @return Maybe<T>
      */
-    public function get(int $index)
+    public function get(int $index): Maybe
     {
         if (!$this->has($index)) {
-            throw new OutOfBoundException;
+            /** @var Maybe<T> */
+            return Maybe::nothing();
         }
 
-        return $this->values[$index];
+        return Maybe::just($this->values[$index]);
     }
 
     /**
@@ -97,8 +80,7 @@ final class Primitive implements Implementation
      */
     public function diff(Implementation $sequence): self
     {
-        /** @psalm-suppress MissingClosureParamType */
-        return $this->filter(static function($value) use ($sequence): bool {
+        return $this->filter(static function(mixed $value) use ($sequence): bool {
             /** @var T $value */
             return !$sequence->contains($value);
         });
@@ -109,17 +91,16 @@ final class Primitive implements Implementation
      */
     public function distinct(): self
     {
-        /** @psalm-suppress MissingClosureParamType */
         return $this->reduce(
             $this->clear(),
-            static function(self $values, $value): self {
+            static function(self $values, mixed $value): self {
                 /** @var T $value */
                 if ($values->contains($value)) {
                     return $values;
                 }
 
                 return ($values)($value);
-            }
+            },
         );
     }
 
@@ -128,10 +109,7 @@ final class Primitive implements Implementation
      */
     public function drop(int $size): self
     {
-        $self = $this->clear();
-        $self->values = \array_slice($this->values, $size);
-
-        return $self;
+        return new self(\array_slice($this->values, $size));
     }
 
     /**
@@ -139,10 +117,7 @@ final class Primitive implements Implementation
      */
     public function dropEnd(int $size): self
     {
-        $self = $this->clear();
-        $self->values = \array_slice($this->values, 0, $this->size() - $size);
-
-        return $self;
+        return new self(\array_slice($this->values, 0, $this->size() - $size));
     }
 
     /**
@@ -150,6 +125,7 @@ final class Primitive implements Implementation
      */
     public function equals(Implementation $sequence): bool
     {
+        /** @psalm-suppress ImpureFunctionCall */
         return $this->values === \iterator_to_array($sequence->iterator());
     }
 
@@ -160,60 +136,45 @@ final class Primitive implements Implementation
      */
     public function filter(callable $predicate): self
     {
-        $self = $this->clear();
-        $self->values = \array_values(\array_filter(
+        /** @psalm-suppress ImpureFunctionCall */
+        return new self(\array_values(\array_filter(
             $this->values,
             $predicate,
-        ));
-
-        return $self;
+        )));
     }
 
     /**
      * @param callable(T): void $function
      */
-    public function foreach(callable $function): void
+    public function foreach(callable $function): SideEffect
     {
         foreach ($this->values as $value) {
             $function($value);
         }
+
+        return new SideEffect;
     }
 
     /**
      * @template D
      * @param callable(T): D $discriminator
      *
-     * @throws CannotGroupEmptyStructure
-     *
      * @return Map<D, Sequence<T>>
      */
     public function groupBy(callable $discriminator): Map
     {
-        if ($this->empty()) {
-            throw new CannotGroupEmptyStructure;
-        }
-
-        $groups = null;
+        /** @var Map<D, Sequence<T>> */
+        $groups = Map::of();
 
         foreach ($this->values as $value) {
             $key = $discriminator($value);
 
-            if ($groups === null) {
-                /** @var Map<D, Sequence<T>> */
-                $groups = Map::of(
-                    Type::determine($key),
-                    Sequence::class,
-                );
-            }
-
-            if ($groups->contains($key)) {
-                $group = $groups->get($key);
-                $group = ($group)($value);
-
-                $groups = ($groups)($key, $group);
-            } else {
-                $groups = ($groups)($key, Sequence::of($this->type, $value));
-            }
+            /** @var Sequence<T> */
+            $group = $groups->get($key)->match(
+                static fn($group) => $group,
+                static fn() => Sequence::of(),
+            );
+            $groups = ($groups)($key, ($group)($value));
         }
 
         /** @var Map<D, Sequence<T>> */
@@ -221,17 +182,17 @@ final class Primitive implements Implementation
     }
 
     /**
-     * @return T
+     * @return Maybe<T>
      */
-    public function first()
+    public function first(): Maybe
     {
         return $this->get(0);
     }
 
     /**
-     * @return T
+     * @return Maybe<T>
      */
-    public function last()
+    public function last(): Maybe
     {
         return $this->get($this->size() - 1);
     }
@@ -247,17 +208,18 @@ final class Primitive implements Implementation
     /**
      * @param T $element
      *
-     * @throws ElementNotFound
+     * @return Maybe<int>
      */
-    public function indexOf($element): int
+    public function indexOf($element): Maybe
     {
         $index = \array_search($element, $this->values, true);
 
         if ($index === false) {
-            throw new ElementNotFound($element);
+            /** @var Maybe<int> */
+            return Maybe::nothing();
         }
 
-        return $index;
+        return Maybe::just($index);
     }
 
     /**
@@ -269,37 +231,44 @@ final class Primitive implements Implementation
     {
         if ($this->empty()) {
             /** @var self<int> */
-            return new self('int');
+            return new self;
         }
 
         /** @var self<int> */
-        return new self('int', ...\range(0, $this->size() - 1));
+        return new self(\range(0, $this->size() - 1));
     }
 
     /**
-     * @param callable(T): T $function
+     * @template S
      *
-     * @return self<T>
+     * @param callable(T): S $function
+     *
+     * @return self<S>
      */
     public function map(callable $function): self
     {
-        $validate = $this->validate;
+        /** @psalm-suppress ImpureFunctionCall */
+        return new self(\array_map($function, $this->values));
+    }
+
+    /**
+     * @template S
+     *
+     * @param callable(T): Sequence<S> $map
+     * @param callable(Sequence<S>): Implementation<S> $exfiltrate
+     *
+     * @return Sequence<S>
+     */
+    public function flatMap(callable $map, callable $exfiltrate): Sequence
+    {
         /**
-         * @psalm-suppress MissingClosureParamType
-         * @psalm-suppress MissingClosureReturnType
+         * @psalm-suppress MixedArgument
+         * @var Sequence<S>
          */
-        $function = static function($value) use ($validate, $function) {
-            /** @var T $value */
-            $returned = $function($value);
-            ($validate)($returned, 1);
-
-            return $returned;
-        };
-
-        $self = clone $this;
-        $self->values = \array_map($function, $this->values);
-
-        return $self;
+        return $this->reduce(
+            Sequence::of(),
+            static fn(Sequence $carry, $value) => $carry->append($map($value)),
+        );
     }
 
     /**
@@ -309,10 +278,7 @@ final class Primitive implements Implementation
      */
     public function pad(int $size, $element): self
     {
-        $self = $this->clear();
-        $self->values = \array_pad($this->values, $size, $element);
-
-        return $self;
+        return new self(\array_pad($this->values, $size, $element));
     }
 
     /**
@@ -335,17 +301,10 @@ final class Primitive implements Implementation
             }
         }
 
-        $true = Sequence::of($this->type, ...$truthy);
-        $false = Sequence::of($this->type, ...$falsy);
+        $true = Sequence::of(...$truthy);
+        $false = Sequence::of(...$falsy);
 
-        /**
-         * @psalm-suppress InvalidScalarArgument
-         * @psalm-suppress InvalidArgument
-         * @var Map<bool, Sequence<T>>
-         */
-        return Map::of('bool', Sequence::class)
-            (true, $true)
-            (false, $false);
+        return Map::of([true, $true], [false, $false]);
     }
 
     /**
@@ -353,29 +312,11 @@ final class Primitive implements Implementation
      */
     public function slice(int $from, int $until): self
     {
-        $self = $this->clear();
-        $self->values = \array_slice(
+        return new self(\array_slice(
             $this->values,
             $from,
             $until - $from,
-        );
-
-        return $self;
-    }
-
-    /**
-     * @throws OutOfBoundException
-     *
-     * @return Sequence<Sequence<T>>
-     */
-    public function splitAt(int $index): Sequence
-    {
-        /** @var Sequence<Sequence<T>> */
-        return Sequence::of(
-            Sequence::class,
-            $this->slice(0, $index)->toSequenceOf($this->type),
-            $this->slice($index, $this->size())->toSequenceOf($this->type),
-        );
+        ));
     }
 
     /**
@@ -401,11 +342,11 @@ final class Primitive implements Implementation
      */
     public function append(Implementation $sequence): self
     {
-        $self = $this->clear();
-        /** @var list<T> */
-        $self->values = \array_merge($this->values, \iterator_to_array($sequence->iterator()));
-
-        return $self;
+        /** @psalm-suppress ImpureFunctionCall */
+        return new self(\array_merge(
+            $this->values,
+            \iterator_to_array($sequence->iterator()),
+        ));
     }
 
     /**
@@ -415,8 +356,7 @@ final class Primitive implements Implementation
      */
     public function intersect(Implementation $sequence): self
     {
-        /** @psalm-suppress MissingClosureParamType */
-        return $this->filter(static function($value) use ($sequence): bool {
+        return $this->filter(static function(mixed $value) use ($sequence): bool {
             /** @var T $value */
             return $sequence->contains($value);
         });
@@ -430,6 +370,7 @@ final class Primitive implements Implementation
     public function sort(callable $function): self
     {
         $self = clone $this;
+        /** @psalm-suppress ImpureFunctionCall */
         \usort($self->values, $function);
 
         return $self;
@@ -444,7 +385,10 @@ final class Primitive implements Implementation
      */
     public function reduce($carry, callable $reducer)
     {
-        /** @var R */
+        /**
+         * @psalm-suppress ImpureFunctionCall
+         * @var R
+         */
         return \array_reduce($this->values, $reducer, $carry);
     }
 
@@ -453,7 +397,7 @@ final class Primitive implements Implementation
      */
     public function clear(): Implementation
     {
-        return new self($this->type);
+        return new self;
     }
 
     /**
@@ -461,10 +405,7 @@ final class Primitive implements Implementation
      */
     public function reverse(): self
     {
-        $self = clone $this;
-        $self->values = \array_reverse($this->values);
-
-        return $self;
+        return new self(\array_reverse($this->values));
     }
 
     public function empty(): bool
@@ -473,86 +414,31 @@ final class Primitive implements Implementation
     }
 
     /**
-     * @template ST
-     *
-     * @param null|callable(T): \Generator<ST> $mapper
-     *
-     * @return Sequence<ST>
+     * @return Sequence<T>
      */
-    public function toSequenceOf(string $type, callable $mapper = null): Sequence
+    public function toSequence(): Sequence
     {
-        /** @psalm-suppress MissingClosureParamType */
-        $mapper ??= static fn($v): \Generator => yield $v;
-
-        /** @var Sequence<ST> */
-        $sequence = Sequence::of($type);
-
-        foreach ($this->values as $value) {
-            /** @var ST $newValue */
-            foreach ($mapper($value) as $newValue) {
-                $sequence = ($sequence)($newValue);
-            }
-        }
-
-        return $sequence;
+        return Sequence::of(...$this->values);
     }
 
     /**
-     * @template ST
-     *
-     * @param null|callable(T): \Generator<ST> $mapper
-     *
-     * @return Set<ST>
+     * @return Set<T>
      */
-    public function toSetOf(string $type, callable $mapper = null): Set
+    public function toSet(): Set
     {
-        /** @psalm-suppress MissingClosureParamType */
-        $mapper ??= static fn($v): \Generator => yield $v;
-
-        /** @var Set<ST> */
-        $set = Set::of($type);
-
-        foreach ($this->values as $value) {
-            /** @var ST $newValue */
-            foreach ($mapper($value) as $newValue) {
-                $set = ($set)($newValue);
-            }
-        }
-
-        return $set;
+        return Set::of(...$this->values);
     }
 
-    /**
-     * @template MT
-     * @template MS
-     *
-     * @param callable(T): \Generator<MT, MS> $mapper
-     *
-     * @return Map<MT, MS>
-     */
-    public function toMapOf(string $key, string $value, callable $mapper): Map
-    {
-        /** @var Map<MT, MS> */
-        $map = Map::of($key, $value);
-
-        foreach ($this->values as $value) {
-            foreach ($mapper($value) as $newKey => $newValue) {
-                $map = ($map)($newKey, $newValue);
-            }
-        }
-
-        return $map;
-    }
-
-    public function find(callable $predicate)
+    public function find(callable $predicate): Maybe
     {
         foreach ($this->values as $value) {
             if ($predicate($value) === true) {
-                return $value;
+                return Maybe::just($value);
             }
         }
 
-        throw new NoElementMatchingPredicateFound;
+        /** @var Maybe<T> */
+        return Maybe::nothing();
     }
 
     private function has(int $index): bool

@@ -41,9 +41,11 @@ interface Implementation
     public function match(callable $just, callable $nothing);
 
     /**
-     * @param callable(): Maybe<T> $otherwise
+     * @template V
      *
-     * @return Maybe<T>
+     * @param callable(): Maybe<V> $otherwise
+     *
+     * @return Maybe<T|V>
      */
     public function otherwise(callable $otherwise): Maybe;
 

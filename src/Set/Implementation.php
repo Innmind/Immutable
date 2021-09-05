@@ -8,12 +8,13 @@ use Innmind\Immutable\{
     Sequence,
     Set,
     Str,
-    Exception\CannotGroupEmptyStructure,
-    Exception\NoElementMatchingPredicateFound,
+    Maybe,
+    SideEffect,
 };
 
 /**
  * @template T
+ * @psalm-immutable
  */
 interface Implementation extends \Countable
 {
@@ -26,14 +27,10 @@ interface Implementation extends \Countable
      */
     public function __invoke($element): self;
 
-    /**
-     * Return the type of this set
-     */
-    public function type(): string;
     public function size(): int;
 
     /**
-     * @return \Iterator<T>
+     * @return \Iterator<int, T>
      */
     public function iterator(): \Iterator;
 
@@ -92,16 +89,15 @@ interface Implementation extends \Countable
      *
      * @param callable(T): void $function
      */
-    public function foreach(callable $function): void;
+    public function foreach(callable $function): SideEffect;
 
     /**
      * Return a new map of pairs grouped by keys determined with the given
      * discriminator function
      *
      * @template D
-     * @param callable(T): D $discriminator
      *
-     * @throws CannotGroupEmptyStructure
+     * @param callable(T): D $discriminator
      *
      * @return Map<D, Set<T>>
      */
@@ -110,9 +106,11 @@ interface Implementation extends \Countable
     /**
      * Return a new set by applying the given function to all elements
      *
-     * @param callable(T): T $function
+     * @template S
      *
-     * @return self<T>
+     * @param callable(T): S $function
+     *
+     * @return self<S>
      */
     public function map(callable $function): self;
 
@@ -163,39 +161,14 @@ interface Implementation extends \Countable
     public function empty(): bool;
 
     /**
-     * @template ST
-     *
-     * @param null|callable(T): \Generator<ST> $mapper
-     *
-     * @return Sequence<ST>
-     */
-    public function toSequenceOf(string $type, callable $mapper = null): Sequence;
-
-    /**
-     * @template ST
-     *
-     * @param null|callable(T): \Generator<ST> $mapper
-     *
-     * @return Set<ST>
-     */
-    public function toSetOf(string $type, callable $mapper = null): Set;
-
-    /**
-     * @template MT
-     * @template MS
-     *
-     * @param callable(T): \Generator<MT, MS> $mapper
-     *
-     * @return Map<MT, MS>
-     */
-    public function toMapOf(string $key, string $value, callable $mapper): Map;
-
-    /**
      * @param callable(T): bool $predicate
      *
-     * @throws NoElementMatchingPredicateFound
-     *
-     * @return T
+     * @return Maybe<T>
      */
-    public function find(callable $predicate);
+    public function find(callable $predicate): Maybe;
+
+    /**
+     * @return Sequence\Implementation<T>
+     */
+    public function sequence(): Sequence\Implementation;
 }

@@ -9,14 +9,15 @@ use Innmind\Immutable\{
     Set,
     Sequence,
     Pair,
-    Exception\CannotGroupEmptyStructure,
-    Exception\ElementNotFound,
+    Maybe,
+    SideEffect,
 };
 
 /**
  * @template T
  * @template S
  * @internal Dot not code against this interface
+ * @psalm-immutable
  */
 interface Implementation extends \Countable
 {
@@ -30,16 +31,6 @@ interface Implementation extends \Countable
      */
     public function __invoke($key, $value): self;
 
-    /**
-     * Return the key type for this map
-     */
-    public function keyType(): string;
-
-    /**
-     * Return the value type for this map
-     */
-    public function valueType(): string;
-
     public function size(): int;
 
     /**
@@ -47,11 +38,9 @@ interface Implementation extends \Countable
      *
      * @param T $key
      *
-     * @throws ElementNotFound
-     *
-     * @return S
+     * @return Maybe<S>
      */
-    public function get($key);
+    public function get($key): Maybe;
 
     /**
      * Check if there is an element for the given key
@@ -88,16 +77,15 @@ interface Implementation extends \Countable
      *
      * @param callable(T, S): void $function
      */
-    public function foreach(callable $function): void;
+    public function foreach(callable $function): SideEffect;
 
     /**
      * Return a new map of pairs' sequences grouped by keys determined with the given
      * discriminator function
      *
      * @template D
-     * @param callable(T, S): D $discriminator
      *
-     * @throws CannotGroupEmptyStructure
+     * @param callable(T, S): D $discriminator
      *
      * @return Map<D, Map<T, S>>
      */
@@ -120,11 +108,11 @@ interface Implementation extends \Countable
     /**
      * Apply the given function on all elements and return a new map
      *
-     * Keys can't be modified
+     * @template B
      *
-     * @param callable(T, S): (S|Pair<T, S>) $function
+     * @param callable(T, S): B $function
      *
-     * @return self<T, S>
+     * @return self<T, B>
      */
     public function map(callable $function): self;
 
@@ -169,30 +157,9 @@ interface Implementation extends \Countable
     public function empty(): bool;
 
     /**
-     * @template ST
+     * @param callable(T, S): bool $predicate
      *
-     * @param callable(T, S): \Generator<ST> $mapper
-     *
-     * @return Sequence<ST>
+     * @return Maybe<Pair<T, S>>
      */
-    public function toSequenceOf(string $type, callable $mapper): Sequence;
-
-    /**
-     * @template ST
-     *
-     * @param callable(T, S): \Generator<ST> $mapper
-     *
-     * @return Set<ST>
-     */
-    public function toSetOf(string $type, callable $mapper): Set;
-
-    /**
-     * @template MT
-     * @template MS
-     *
-     * @param null|callable(T, S): \Generator<MT, MS> $mapper
-     *
-     * @return Map<MT, MS>
-     */
-    public function toMapOf(string $key, string $value, callable $mapper = null): Map;
+    public function find(callable $predicate): Maybe;
 }
