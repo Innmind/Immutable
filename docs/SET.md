@@ -2,23 +2,13 @@
 
 A set is an unordered list of unique elements.
 
-A sequence is always typed in order to be sure it only contains elements of the type you specified. If you try to add an element of a different type it will throw an error.
-
 ## `::of()`
-
-The `of` static method allows you to create a new set of the given [type](types.html):
 
 ```php
 use Innmind\Immutable\Set;
 
 /** @var Set<int> */
-$set = Set::of('int');
-```
-
-This named constructor also allows you to directly add elements when initialising the set:
-
-```php
-Set::of('int', 1, 2, 3, $etc);
+Set::of(1, 2, 3, $etc);
 ```
 
 ## `::defer()`
@@ -28,12 +18,12 @@ This named constructor is for advanced use cases where you want the data of your
 An example for such a use case is a set of log lines coming from a file:
 
 ```php
-$set = Set::defer('string', (function() {
+$set = Set::defer((function() {
     yield from readSomeFile('apache.log');
 })());
 ```
 
-The method as always ask the type of the elements and a generator that will provide the elements. Once the elements are loaded they are kept in memory so you can run multiple operations on it without loading the file twice.
+The method ask a generator that will provide the elements. Once the elements are loaded they are kept in memory so you can run multiple operations on it without loading the file twice.
 
 **Important**: beware of the case where the source you read the elements is not altered before the first use of the set.
 
@@ -42,7 +32,7 @@ The method as always ask the type of the elements and a generator that will prov
 This is similar to `::defer()` with the exception that the elements are not kept in memory but reloaded upon each use.
 
 ```php
-$set = Set::lazy('string', function() {
+$set = Set::lazy(function() {
     yield from readSomeFile('apache.log');
 });
 ```
@@ -51,42 +41,23 @@ $set = Set::lazy('string', function() {
 
 ## `::mixed()`
 
-This is a shortcut for `::of('mixed', ...$mixed)`.
+This is a shortcut for `::of(mixed ...$mixed)`.
 
 ## `::ints()`
 
-This is a shortcut for `::of('int', int ...$ints)`.
+This is a shortcut for `::of(int ...$ints)`.
 
 ## `::floats()`
 
-This is a shortcut for `::of('float', float ...$floats)`.
+This is a shortcut for `::of(float ...$floats)`.
 
 ## `::strings()`
 
-This is a shortcut for `::of('string', string ...$strings)`.
+This is a shortcut for `::of(string ...$strings)`.
 
 ## `::objects()`
 
-This is a shortcut for `::of('object', object ...$objects)`.
-
-## `->isOfType()`
-
-This method is here to help you know if the set is of a certain type:
-
-```php
-$set = Set::of('stdClass');
-$set->isOfType('int'); // false
-$set->isOfType('stdClass'); // true
-```
-
-## `->type()`
-
-This returns the type you specified at initialisation.
-
-```php
-$set = Set::of('stdClass');
-$set->type(); // 'stdClass'
-```
+This is a shortcut for `::of(object ...$objects)`.
 
 ## `->__invoke()`
 
@@ -138,7 +109,7 @@ Check if the element is present in the set.
 $set = Set::ints(1, 42, 3);
 $set->contains(2); // false
 $set->contains(42); // true
-$set->contains('42'); // throws \TypeError
+$set->contains('42'); // false but psalm will raise an error
 ```
 
 ## `->remove()`
@@ -165,7 +136,7 @@ Check if two sets are identical.
 
 ```php
 Set::ints(1, 2)->equals(Set::ints(2, 1)); // true
-Set::ints()->equals(Set::strings()); // throws \TypeError
+Set::ints()->equals(Set::strings()); // false but psalm will raise an error
 ```
 
 ## `->filter()`
@@ -179,15 +150,15 @@ $set->equals(Set::ints(2, 4));
 
 ## `->foreach()`
 
-Use this method to call a function for each element of the set. Since this method doesn't return anything it is the only place acceptable to create side effects.
+Use this method to call a function for each element of the set. Since this structure is immutable it returns a `SideEffect` object, as its name suggest it is the only place acceptable to create side effects.
 
 ```php
-Set::strings('hello', 'world')->foreach(function(string $string): void {
+$sideEffect = Set::strings('hello', 'world')->foreach(function(string $string): void {
     echo $string.' ';
 });
 ```
 
-## `->group()`
+## `->groupBy()`
 
 This will create multiples sets with elements regrouped under the same key computed by the given function.
 
@@ -199,38 +170,33 @@ $urls = Set::strings(
     'ftp://example.com',
 );
 /** @var Innmind\Immutable\Map<string, Set<string>> */
-$map = $urls->group(
-    'string',
-    fn(string $url): string => \parse_url($url)['scheme'],
-);
-$map->get('http')->equals(Set::strings('http://example.com', 'http://example.com/foo')); // true
-$map->get('https')->equals(Set::strings('https://example.com')); // true
-$map->get('ftp')->equals(Set::strings('ftp://example.com')); // true
-```
-
-## `->groupBy()`
-
-This is similar to the `->group()` method with the exception that the key type of the returned [`Map`](map.html) will be determined by the first computed key value.
-
-Since the key type is computed you cannot call `->groupBy()` on an empty set, otherwise it will throw `Innmind\Immutable\Exception\CannotGroupEmptyStructure`.
-
-```php
-$urls = Set::strings(
-    'http://example.com',
-    'http://example.com/foo',
-    'https://example.com',
-    'ftp://example.com',
-);
-/** @var Innmind\Immutable\Map<string, Set<string>> */
 $map = $urls->groupBy(fn(string $url): string => \parse_url($url)['scheme']);
-$map->get('http')->equals(Set::strings('http://example.com', 'http://example.com/foo')); // true
-$map->get('https')->equals(Set::strings('https://example.com')); // true
-$map->get('ftp')->equals(Set::strings('ftp://example.com')); // true
+$map
+    ->get('http')
+    ->match(
+        static fn($group) => $group,
+        static fn() => Set::strings(),
+    )
+    ->equals(Set::strings('http://example.com', 'http://example.com/foo')); // true
+$map
+    ->get('https')
+    ->match(
+        static fn($group) => $group,
+        static fn() => Set::strings(),
+    )
+    ->equals(Set::strings('https://example.com')); // true
+$map
+    ->get('ftp')
+    ->match(
+        static fn($group) => $group,
+        static fn() => Set::strings(),
+    )
+    ->equals(Set::strings('ftp://example.com')); // true
 ```
 
 ## `->map()`
 
-Create a new set of the same type with the exact same number of elements but modified by the given function.
+Create a new set with the exact same number of elements but modified by the given function.
 
 ```php
 $ints = Set::ints(1, 2, 3);
@@ -238,26 +204,28 @@ $squares = $ints->map(fn($i) => $i**2);
 $squares->equals(Set::ints(1, 4, 9)); // true
 ```
 
-## `->mapTo()`
-
-This is similar to `->map()` except you can change the type of the generated set.
-
-```php
-$ints = Set::ints(1, 2, 3);
-$squares = $ints->mapTo('string', fn($i) => (string) ($i**2));
-$squares->equals(Set::strings('1', '4', '9')); // true
-```
-
 ## `->partition()`
 
-This method is similar to `->group()` method but the map keys are always booleans. The difference is that here the 2 keys are always present whereas with `->group()` it will depend on the original set.
+This method is similar to `->groupBy()` method but the map keys are always booleans. The difference is that here the 2 keys are always present whereas with `->groupBy()` it will depend on the original set.
 
 ```php
 $set = Set::ints(1, 2, 3);
 /** @var Map<bool, Set<int>> */
 $map = $set->partition(fn($int) => $int % 2 === 0);
-$map->get(true)->equals(Set::ints(2)); // true
-$map->get(false)->equals(Set::ints(1, 3)); // true
+$map
+    ->get(true)
+    ->match(
+        static fn($partition) => $partition,
+        static fn() => Set::ints(),
+    )
+    ->equals(Set::ints(2)); // true
+$map
+    ->get(false)
+    ->match(
+        static fn($partition) => $partition,
+        static fn() => Set::ints(),
+    )
+    ->equals(Set::ints(1, 3)); // true
 ```
 
 ## `->sort()`
@@ -290,7 +258,7 @@ $sum; // 10
 
 ## `->clear()`
 
-Create an empty new set of the same type.
+Create an empty new set of the same type. (To avoid to redeclare the types manually in a docblock)
 
 ```php
 $set = Set::ints(1);
@@ -306,64 +274,15 @@ Set::ints()->empty(); // true
 Set::ints(1)->empty(); // false
 ```
 
-## `->toSequenceOf()`
-
-Similar to `->toSetOf()` but it returns a [`Sequence`](sequence.html) instead. Since the source is a set (so without ordering) the order of elements in the sequence cannot be guaranteed.
-
-```php
-$sequence = Set::ints(1, 2, 3)->toSequenceOf(
-    'int|string',
-    function(int $int) {
-        yield $int;
-        yield (string) $int;
-    },
-);
-$sequence->equals(Sequence::of('int|string', 1, '1', 2, '2', 3, '3')); // true
-```
-
-## `->toSetOf()`
-
-This is similar to `->mapTo()` but you can yield multiple values for one original element.
-
-```php
-$set = Set::ints(1, 2, 3)->toSetOf(
-    'int|string',
-    function(int $int) {
-        yield $int;
-        yield (string) $int;
-    },
-);
-$set->equals(Set::of('int|string', 1, '1', 2, '2', 3, '3')); // true
-```
-
-## `->toMapOf()`
-
-Similar to `->toSetOf()` but it returns a [`Map`](map.html) instead.
-
-```php
-$map = Set::ints(1, 2, 3)->toMapOf(
-    'string',
-    'int',
-    function(int $int) {
-        yield (string) $int => $int;
-    },
-);
-$map->equals(
-    Map::of('string', 'int')
-        ('1', 1)
-        ('2', 2)
-        ('3', 3)
-); // true
-```
-
 ## `->find()`
 
 Returns the first element that matches the predicate.
 
 ```php
 $set = Set::ints(2, 4, 6, 8, 9, 10, 11);
+/** @var Maybe<int> $firstOdd */
 $firstOdd = $set->find(fn($i) => $i % 2 === 1);
-$firstOdd; // could be 9 or 11, because there is no ordering
+$firstOdd; // could contain 9 or 11, because there is no ordering
 ```
 
 ## `->matches()`
