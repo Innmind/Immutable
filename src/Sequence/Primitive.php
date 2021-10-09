@@ -441,6 +441,16 @@ final class Primitive implements Implementation
         return Maybe::nothing();
     }
 
+    public function match(callable $wrap, callable $match, callable $empty)
+    {
+        return $this
+            ->first()
+            ->match(
+                fn($first) => $match($first, $wrap($this->drop(1))),
+                $empty,
+            );
+    }
+
     private function has(int $index): bool
     {
         return \array_key_exists($index, $this->values);

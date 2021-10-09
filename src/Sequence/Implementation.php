@@ -273,4 +273,15 @@ interface Implementation extends \Countable
      * @return Maybe<T>
      */
     public function find(callable $predicate): Maybe;
+
+    /**
+     * @template R
+     *
+     * @param callable(self<T>): Sequence<T> $wrap
+     * @param callable(T, Sequence<T>): R $match
+     * @param callable(): R $empty
+     *
+     * @return R
+     */
+    public function match(callable $wrap, callable $match, callable $empty);
 }

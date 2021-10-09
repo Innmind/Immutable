@@ -641,6 +641,13 @@ final class Lazy implements Implementation
         return Maybe::nothing();
     }
 
+    public function match(callable $wrap, callable $match, callable $empty)
+    {
+        $generator = ($this->values)(self::bypassCleanup());
+
+        return (new Defer($generator))->match($wrap, $match, $empty);
+    }
+
     /**
      * @return Implementation<T>
      */

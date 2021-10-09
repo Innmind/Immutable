@@ -568,6 +568,16 @@ final class Defer implements Implementation
         return Maybe::nothing();
     }
 
+    public function match(callable $wrap, callable $match, callable $empty)
+    {
+        return $this
+            ->first()
+            ->match(
+                fn($first) => $match($first, $wrap($this->drop(1))),
+                $empty,
+            );
+    }
+
     /**
      * @return Implementation<T>
      */
