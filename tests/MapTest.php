@@ -31,8 +31,8 @@ class MapTest extends TestCase
             $map->equals(
                 Map::of()
                     ->put(1, 1.1)
-                    ->put(2, 2.1)
-            )
+                    ->put(2, 2.1),
+            ),
         );
     }
 
@@ -127,8 +127,8 @@ class MapTest extends TestCase
                 ->equals(
                     Map::of()
                         ->put('foo_res', 'res')
-                        ->put('bar_res', 'res')
-                )
+                        ->put('bar_res', 'res'),
+                ),
         );
 
         $m = Map::of()
@@ -384,7 +384,7 @@ class MapTest extends TestCase
             42,
             static function(float $carry, int $key, int $value): float {
                 return $carry / ($key * $value);
-            }
+            },
         );
 
         $this->assertSame(2.625, $v);

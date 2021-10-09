@@ -17,7 +17,7 @@ class SequenceTest extends TestCase
     {
         $this->assertInstanceOf(
             Set::class,
-            Sequence::of(new Set\Chars)
+            Sequence::of(new Set\Chars),
         );
     }
 
@@ -38,7 +38,7 @@ class SequenceTest extends TestCase
     {
         $sequences = Sequence::of(
             new Set\Chars,
-            Set\Integers::between(0, 50)
+            Set\Integers::between(0, 50),
         );
         $sizes = [];
 

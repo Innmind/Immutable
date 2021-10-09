@@ -372,7 +372,7 @@ final class Lazy implements Implementation
                         yield $inner;
                     }
                 }
-            }
+            },
         );
     }
 

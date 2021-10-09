@@ -19,8 +19,8 @@ class MapTest extends TestCase
             Set::class,
             Map::of(
                 Set\Chars::any(),
-                Set\Chars::any()
-            )
+                Set\Chars::any(),
+            ),
         );
     }
 
@@ -28,7 +28,7 @@ class MapTest extends TestCase
     {
         $maps = Map::of(
             Set\Chars::any(),
-            Set\Integers::any()
+            Set\Integers::any(),
         );
 
         $this->assertInstanceOf(\Generator::class, $maps->values(new RandomInt));
@@ -47,7 +47,7 @@ class MapTest extends TestCase
         $maps = Map::of(
             Set\Chars::any(),
             Set\Chars::any(),
-            Set\Integers::between(0, 50)
+            Set\Integers::between(0, 50),
         );
         $sizes = [];
 
@@ -62,7 +62,7 @@ class MapTest extends TestCase
     {
         $maps1 = Map::of(
             Set\Chars::any(),
-            Set\Chars::any()
+            Set\Chars::any(),
         );
         $maps2 = $maps1->take(50);
 

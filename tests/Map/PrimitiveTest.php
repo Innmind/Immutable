@@ -95,8 +95,8 @@ class PrimitiveTest extends TestCase
             (new Primitive)('foo_res', 'res')('foo_bar_res', 'res')->equals(
                 (new Primitive)
                     ('foo_res', 'res')
-                    ('bar_res', 'res')
-            )
+                    ('bar_res', 'res'),
+            ),
         );
 
         $m = (new Primitive)
@@ -339,7 +339,7 @@ class PrimitiveTest extends TestCase
             42,
             static function(float $carry, int $key, int $value): float {
                 return $carry / ($key * $value);
-            }
+            },
         );
 
         $this->assertSame(2.625, $v);

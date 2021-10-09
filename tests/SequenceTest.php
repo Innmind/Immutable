@@ -28,8 +28,8 @@ class SequenceTest extends TestCase
                 Sequence::of()
                     ->add(1)
                     ->add(2)
-                    ->add(3)
-            )
+                    ->add(3),
+            ),
         );
     }
 
@@ -115,7 +115,7 @@ class SequenceTest extends TestCase
             Sequence::of()
                 ->add(1)
                 ->add(2)
-                ->size()
+                ->size(),
         );
     }
 
@@ -125,7 +125,7 @@ class SequenceTest extends TestCase
             2,
             Sequence::of()
                 ->add(1)
-                ->add(2)
+                ->add(2),
         );
     }
 
@@ -592,7 +592,7 @@ class SequenceTest extends TestCase
                 0,
                 static function(int $carry, int $value): int {
                     return $carry + $value;
-                }
+                },
             );
 
         $this->assertSame(10, $value);

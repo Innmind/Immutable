@@ -227,7 +227,7 @@ final class DoubleIndex implements Implementation
     public function remove($key): self
     {
         return new self($this->pairs->filter(
-            static fn($pair) => $pair->key() !== $key
+            static fn($pair) => $pair->key() !== $key,
         ));
     }
 
