@@ -74,8 +74,8 @@ final class Lazy implements Implementation
     public function iterator(): \Iterator
     {
         // when accessing the iterator from the outside we cannot know when it
-        // will be stop being iterated over so we can't have a way to notify the
-        // generator to cleanup its ressources, so we pass an empty function
+        // will be stopped being iterated over so we can't have a way to notify
+        // the generator to cleanup its ressources, so we pass an empty function
         // that does nothing
         return ($this->values)(self::bypassCleanup());
     }
