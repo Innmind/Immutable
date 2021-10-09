@@ -17,7 +17,7 @@ class SetTest extends TestCase
     {
         $this->assertInstanceOf(
             DataSet::class,
-            Set::of(new DataSet\Chars)
+            Set::of(new DataSet\Chars),
         );
     }
 
@@ -40,7 +40,7 @@ class SetTest extends TestCase
     {
         $sets = Set::of(
             new DataSet\Chars,
-            DataSet\Integers::between(0, 50)
+            DataSet\Integers::between(0, 50),
         );
         $sizes = [];
 

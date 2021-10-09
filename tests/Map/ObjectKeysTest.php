@@ -319,7 +319,7 @@ class ObjectKeysTest extends TestCase
             42,
             static function(float $carry, \stdClass $key, int $value): float {
                 return $carry / $value;
-            }
+            },
         );
 
         $this->assertSame(10.5, $v);

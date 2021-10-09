@@ -28,8 +28,8 @@ class SequenceTest extends TestCase
                 Sequence::of()
                     ->add(1)
                     ->add(2)
-                    ->add(3)
-            )
+                    ->add(3),
+            ),
         );
     }
 
@@ -115,7 +115,7 @@ class SequenceTest extends TestCase
             Sequence::of()
                 ->add(1)
                 ->add(2)
-                ->size()
+                ->size(),
         );
     }
 
@@ -125,7 +125,7 @@ class SequenceTest extends TestCase
             2,
             Sequence::of()
                 ->add(1)
-                ->add(2)
+                ->add(2),
         );
     }
 
@@ -592,7 +592,7 @@ class SequenceTest extends TestCase
                 0,
                 static function(int $carry, int $value): int {
                     return $carry + $value;
-                }
+                },
             );
 
         $this->assertSame(10, $value);
@@ -765,6 +765,58 @@ class SequenceTest extends TestCase
         $this->assertSame(1, $started);
         $this->assertFalse($cleanupCalled);
         $this->assertTrue($endReached);
+    }
+
+    public function testMatch()
+    {
+        $sequence = Sequence::of(1, 2, 3, 4);
+        [$head, $tail] = $sequence->match(
+            static fn($head, $tail) => [$head, $tail],
+            static fn() => [null, null],
+        );
+
+        $this->assertSame(1, $head);
+        $this->assertTrue($tail->equals(Sequence::of(2, 3, 4)));
+        $this->assertSame([1, 2, 3, 4], $sequence->toList());
+    }
+
+    public function testDeferredMatch()
+    {
+        $sequence = Sequence::defer((static function() {
+            yield 1;
+            yield 2;
+            yield 3;
+            yield 4;
+        })());
+        [$head, $tail] = $sequence->match(
+            static fn($head, $tail) => [$head, $tail],
+            static fn() => [null, null],
+        );
+
+        $this->assertSame(1, $head);
+        $this->assertTrue($tail->equals(Sequence::of(2, 3, 4)));
+        $this->assertSame([1, 2, 3, 4], $sequence->toList());
+    }
+
+    public function testLazyMatch()
+    {
+        $started = 0;
+        $sequence = Sequence::lazy(static function() use (&$started) {
+            ++$started;
+            yield 1;
+            yield 2;
+            yield 3;
+            yield 4;
+        });
+        [$head, $tail] = $sequence->match(
+            static fn($head, $tail) => [$head, $tail],
+            static fn() => [null, null],
+        );
+
+        $this->assertSame(1, $head);
+        $this->assertTrue($tail->equals(Sequence::of(2, 3, 4)));
+        $this->assertSame(1, $started);
+        $this->assertSame([1, 2, 3, 4], $sequence->toList());
     }
 
     public function get($map, $index)

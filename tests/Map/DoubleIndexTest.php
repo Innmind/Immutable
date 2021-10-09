@@ -106,8 +106,8 @@ class DoubleIndexTest extends TestCase
             (new DoubleIndex)('foo_res', 'res')('foo_bar_res', 'res')->equals(
                 (new DoubleIndex)
                     ('foo_res', 'res')
-                    ('bar_res', 'res')
-            )
+                    ('bar_res', 'res'),
+            ),
         );
 
         $m = (new DoubleIndex)
@@ -349,7 +349,7 @@ class DoubleIndexTest extends TestCase
             42,
             static function(float $carry, int $key, int $value): float {
                 return $carry / ($key * $value);
-            }
+            },
         );
 
         $this->assertSame(2.625, $v);

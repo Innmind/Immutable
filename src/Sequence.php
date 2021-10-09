@@ -538,6 +538,23 @@ final class Sequence implements \Countable
     }
 
     /**
+     * @template R
+     *
+     * @param callable(T, self<T>): R $match
+     * @param callable(): R $empty
+     *
+     * @return R
+     */
+    public function match(callable $match, callable $empty)
+    {
+        return $this->implementation->match(
+            static fn($implementation) => new self($implementation),
+            $match,
+            $empty,
+        );
+    }
+
+    /**
      * @param callable(T): bool $predicate
      */
     public function matches(callable $predicate): bool

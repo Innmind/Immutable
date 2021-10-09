@@ -32,7 +32,7 @@
         "phpunit/phpunit": "~9.0",
         "vimeo/psalm": "~4.1",
         "innmind/black-box": "^4.4",
-        "innmind/coding-standard": "^1.0"
+        "innmind/coding-standard": "~2.0"
     },
     "conflict": {
         "innmind/black-box": "<4.4|~5.0",

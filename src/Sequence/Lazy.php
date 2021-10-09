@@ -74,8 +74,8 @@ final class Lazy implements Implementation
     public function iterator(): \Iterator
     {
         // when accessing the iterator from the outside we cannot know when it
-        // will be stop being iterated over so we can't have a way to notify the
-        // generator to cleanup its ressources, so we pass an empty function
+        // will be stopped being iterated over so we can't have a way to notify
+        // the generator to cleanup its ressources, so we pass an empty function
         // that does nothing
         return ($this->values)(self::bypassCleanup());
     }
@@ -372,7 +372,7 @@ final class Lazy implements Implementation
                         yield $inner;
                     }
                 }
-            }
+            },
         );
     }
 
@@ -639,6 +639,13 @@ final class Lazy implements Implementation
 
         /** @var Maybe<T> */
         return Maybe::nothing();
+    }
+
+    public function match(callable $wrap, callable $match, callable $empty)
+    {
+        $generator = ($this->values)(self::bypassCleanup());
+
+        return (new Defer($generator))->match($wrap, $match, $empty);
     }
 
     /**

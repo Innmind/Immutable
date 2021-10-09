@@ -25,8 +25,8 @@ class SetTest extends TestCase
                 Set::of()
                     ->add(1)
                     ->add(2)
-                    ->add(3)
-            )
+                    ->add(3),
+            ),
         );
     }
 
@@ -197,16 +197,16 @@ class SetTest extends TestCase
                 Set::of()
                     ->add(24)
                     ->add(66)
-                    ->add(42)
-            )
+                    ->add(42),
+            ),
         );
         $this->assertTrue(Set::of()->equals(Set::of()));
         $this->assertFalse(
             $s->equals(
                 Set::of()
                     ->add(24)
-                    ->add(66)
-            )
+                    ->add(66),
+            ),
         );
     }
 
@@ -335,16 +335,16 @@ class SetTest extends TestCase
                     Set::of()
                         ->add(24)
                         ->add(42)
-                        ->add(66)
+                        ->add(66),
                 )
-                ->equals($s)
+                ->equals($s),
         );
         $this->assertSame(
             [24, 42, 66, 90, 114],
             $s->merge(
                 Set::of()
                     ->add(90)
-                    ->add(114)
+                    ->add(114),
             )->toList(),
         );
         $this->assertSame([24, 42, 66], $s->toList());
@@ -361,7 +361,7 @@ class SetTest extends TestCase
             42,
             static function(float $carry, int $value): float {
                 return $carry / $value;
-            }
+            },
         );
 
         $this->assertSame(1.75, $v);
@@ -378,7 +378,7 @@ class SetTest extends TestCase
                 ->add(42.1)
                 ->add(true)
                 ->add([])
-                ->toList()
+                ->toList(),
         );
     }
 

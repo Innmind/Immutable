@@ -24,7 +24,7 @@ final class Map
     public static function of(
         Set $keys,
         Set $values,
-        Set\Integers $sizes = null
+        Set\Integers $sizes = null,
     ): Set {
         return Set\Decorate::immutable(
             static fn(array $pairs): Structure => \array_reduce(

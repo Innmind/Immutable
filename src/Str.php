@@ -458,7 +458,7 @@ final class Str
     {
         return new self(
             $mask === null ? \rtrim($this->value) : \rtrim($this->value, $mask),
-            $this->encoding
+            $this->encoding,
         );
     }
 
@@ -469,7 +469,7 @@ final class Str
     {
         return new self(
             $mask === null ? \ltrim($this->value) : \ltrim($this->value, $mask),
-            $this->encoding
+            $this->encoding,
         );
     }
 

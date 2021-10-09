@@ -423,3 +423,22 @@ Sequence::ints(1, 3, 5, 7)->any($isOdd); // true
 Sequence::ints(1, 3, 4, 5, 7)->any($isOdd); // true
 Sequence::ints(2, 4, 6, 8)->any($isOdd); // false
 ```
+
+## `->match()`
+
+This is a similar approach to pattern matching allowing you to decompose a sequence by accessing the first element and the rest of the sequence.
+
+```php
+function sum(Sequence $ints): int
+{
+    return $ints->match(
+        fn(int $head, Sequence $tail) => $head + $sum($tail),
+        fn() => 0,
+    );
+}
+
+$result = sum(Sequence::of(1, 2, 3, 4));
+$result; // 10
+```
+
+**Important**: for lasy sequences bear in mind that the values will be kept in memory while the first call to `->match` didn't return.
