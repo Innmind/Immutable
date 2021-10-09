@@ -47,6 +47,10 @@ return static function(Config $config): Config
                     'Either',
                     Path::of('EITHER.md'),
                 ),
+                Entry::markdown(
+                    'State',
+                    Path::of('STATE.md'),
+                ),
             )->alwaysOpen(),
             Entry::section(
                 'Use cases',

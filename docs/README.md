@@ -19,6 +19,7 @@ This library provides the 7 following structures:
 - [`RegExp`](REGEXP.md)
 - [`Maybe`](MAYBE.md)
 - [`Either`](EITHER.md)
+- [`State`](STATE.md)
 
 See the documentation for each structure to understand how to use them.
 
