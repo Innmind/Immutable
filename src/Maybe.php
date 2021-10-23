@@ -52,16 +52,15 @@ final class Maybe
      * @psalm-pure
      *
      * @param V|null $value
+     * @param V|null $nothing
      *
      * @return self<V>
      */
-    public static function of($value): self
+    public static function of($value, $nothing = null): self
     {
-        if (\is_null($value)) {
-            return self::nothing();
-        }
-
-        return self::just($value);
+        return ($nothing === $value) ?
+            self::nothing():
+            self::just($value);
     }
 
     /**
