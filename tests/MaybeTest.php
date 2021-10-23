@@ -56,6 +56,14 @@ class MaybeTest extends TestCase
                         static fn() => $nothing,
                     ),
                 );
+
+                $this->assertSame(
+                    $nothing,
+                    Maybe::of(0, 0)->match(
+                        static fn() => $unwanted,
+                        static fn() => $nothing,
+                    ),
+                );
             });
     }
 
