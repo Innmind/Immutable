@@ -92,7 +92,6 @@ final class Str
     {
         /** @var Sequence<self> */
         $sequence = Sequence::of();
-        /** @var list<string> */
         $parts = \mb_str_split($this->value, $size, $this->encoding);
 
         foreach ($parts as $value) {
