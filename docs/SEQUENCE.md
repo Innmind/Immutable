@@ -432,7 +432,7 @@ This is a similar approach to pattern matching allowing you to decompose a seque
 function sum(Sequence $ints): int
 {
     return $ints->match(
-        fn(int $head, Sequence $tail) => $head + $sum($tail),
+        fn(int $head, Sequence $tail) => $head + sum($tail),
         fn() => 0,
     );
 }

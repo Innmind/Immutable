@@ -32,7 +32,7 @@ final class Accumulate implements \Iterator
     /**
      * @return S
      */
-    public function current()
+    public function current(): mixed
     {
         /** @psalm-suppress UnusedMethodCall */
         $this->pop();
@@ -43,7 +43,7 @@ final class Accumulate implements \Iterator
     /**
      * @return T
      */
-    public function key()
+    public function key(): mixed
     {
         /** @psalm-suppress UnusedMethodCall */
         $this->pop();
