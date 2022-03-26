@@ -18,20 +18,35 @@ jobs:
         with:
           php-version: ${{ matrix.php-version }}
           extensions: mbstring, intl
-          coverage: xdebug
-      - name: Get Composer Cache Directory
-        id: composer-cache
-        run: echo "::set-output name=dir::$(composer config cache-files-dir)"
-      - name: Cache dependencies
-        uses: actions/cache@v2
+          coverage: none
+      - name: Composer
+        uses: "ramsey/composer-install@v2"
+      - name: PHPUnit
+        run: vendor/bin/phpunit
+        env:
+          BLACKBOX_SET_SIZE: 20
+  coverage:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macOS-latest]
+        php-version: ['8.0', '8.1']
+    name: 'Coverage'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
         with:
-          path: ${{ steps.composer-cache.outputs.dir }}
-          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
-          restore-keys: ${{ runner.os }}-composer-
-      - name: Install Dependencies
-        run: composer install --no-progress
+          php-version: ${{ matrix.php-version }}
+          extensions: mbstring, intl
+          coverage: xdebug
+      - name: Composer
+        uses: "ramsey/composer-install@v2"
       - name: PHPUnit
         run: vendor/bin/phpunit --coverage-clover=coverage.clover
+        env:
+          BLACKBOX_SET_SIZE: 1
       - uses: codecov/codecov-action@v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
@@ -49,17 +64,8 @@ jobs:
         with:
           php-version: ${{ matrix.php-version }}
           extensions: mbstring, intl
-      - name: Get Composer Cache Directory
-        id: composer-cache
-        run: echo "::set-output name=dir::$(composer config cache-files-dir)"
-      - name: Cache dependencies
-        uses: actions/cache@v2
-        with:
-          path: ${{ steps.composer-cache.outputs.dir }}
-          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
-          restore-keys: ${{ runner.os }}-composer-
-      - name: Install Dependencies
-        run: composer install --no-progress
+      - name: Composer
+        uses: "ramsey/composer-install@v2"
       - name: Psalm
         run: vendor/bin/psalm --shepherd
   cs:
@@ -76,16 +82,7 @@ jobs:
         with:
           php-version: ${{ matrix.php-version }}
           extensions: mbstring, intl
-      - name: Get Composer Cache Directory
-        id: composer-cache
-        run: echo "::set-output name=dir::$(composer config cache-files-dir)"
-      - name: Cache dependencies
-        uses: actions/cache@v2
-        with:
-          path: ${{ steps.composer-cache.outputs.dir }}
-          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
-          restore-keys: ${{ runner.os }}-composer-
-      - name: Install Dependencies
-        run: composer install --no-progress
+      - name: Composer
+        uses: "ramsey/composer-install@v2"
       - name: CS
         run: vendor/bin/php-cs-fixer fix --diff --dry-run

@@ -469,6 +469,23 @@ final class Sequence implements \Countable
     }
 
     /**
+     * @param Monoid<T> $monoid
+     *
+     * @return T
+     */
+    public function fold(Monoid $monoid)
+    {
+        /**
+         * @psalm-suppress MissingClosureParamType
+         * @psalm-suppress MixedArgument
+         */
+        return $this->reduce(
+            $monoid->identity(),
+            static fn($a, $b) => $monoid->combine($a, $b),
+        );
+    }
+
+    /**
      * Reduce the sequence to a single value
      *
      * @template R
