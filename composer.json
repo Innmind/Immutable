@@ -20,7 +20,8 @@
     "autoload": {
         "psr-4": {
             "Innmind\\Immutable\\": "src/",
-            "Fixtures\\Innmind\\Immutable\\": "fixtures/"
+            "Fixtures\\Innmind\\Immutable\\": "fixtures/",
+            "Properties\\Innmind\\Immutable\\": "properties/"
         }
     },
     "autoload-dev": {
