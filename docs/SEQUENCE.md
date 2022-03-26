@@ -351,6 +351,20 @@ $sequence = $sequence->sort(fn($a, $b) => $a <=> $b);
 $sequence->equals(Sequence::ints(1, 2, 3, 4));
 ```
 
+## `->fold()`
+
+This is similar to the `reduce` method but only takes a [`Monoid`](MONOIDS.md) as an argument.
+
+```php
+use Innmind\Immutable\Monoid\Concat;
+
+$lines = Sequence::of("foo\n", "bar\n", 'baz')
+    ->map(fn($line) => Str::of($line))
+    ->fold(new Concat);
+
+$lines->equals("foo\nbar\nbaz"); // true
+```
+
 ## `->reduce()`
 
 Iteratively compute a value for all the elements in the sequence.

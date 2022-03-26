@@ -51,6 +51,10 @@ return static function(Config $config): Config
                     'State',
                     Path::of('STATE.md'),
                 ),
+                Entry::markdown(
+                    'Monoids',
+                    Path::of('MONOIDS.md'),
+                ),
             )->alwaysOpen(),
             Entry::section(
                 'Use cases',
