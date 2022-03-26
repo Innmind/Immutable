@@ -8,6 +8,7 @@ use Innmind\Immutable\{
     Str,
     Set,
     Map,
+    Monoid\Concat,
 };
 use PHPUnit\Framework\TestCase;
 
@@ -817,6 +818,19 @@ class SequenceTest extends TestCase
         $this->assertTrue($tail->equals(Sequence::of(2, 3, 4)));
         $this->assertSame(1, $started);
         $this->assertSame([1, 2, 3, 4], $sequence->toList());
+    }
+
+    public function testFold()
+    {
+        $str = Sequence::of(Str::of('foo'), Str::of('bar'), Str::of('baz'))->fold(new Concat);
+
+        $this->assertInstanceOf(Str::class, $str);
+        $this->assertSame('foobarbaz', $str->toString());
+
+        $str = Sequence::of(Str::of('baz'), Str::of('foo'), Str::of('bar'))->fold(new Concat);
+
+        $this->assertInstanceOf(Str::class, $str);
+        $this->assertSame('bazfoobar', $str->toString());
     }
 
     public function get($map, $index)
