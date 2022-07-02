@@ -130,4 +130,12 @@ final class Either
     {
         return new self($this->either->filter($predicate, $otherwise));
     }
+
+    /**
+     * @return Maybe<R>
+     */
+    public function maybe(): Maybe
+    {
+        return $this->either->maybe();
+    }
 }

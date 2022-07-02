@@ -3,7 +3,10 @@ declare(strict_types = 1);
 
 namespace Innmind\Immutable\Either;
 
-use Innmind\Immutable\Either;
+use Innmind\Immutable\{
+    Either,
+    Maybe,
+};
 
 /**
  * @template L1
@@ -65,5 +68,10 @@ final class Right implements Implementation
         }
 
         return new Left($otherwise());
+    }
+
+    public function maybe(): Maybe
+    {
+        return Maybe::just($this->value);
     }
 }
