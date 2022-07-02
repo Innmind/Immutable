@@ -138,3 +138,18 @@ This is similar to the `->map()` function but will be applied on the left value 
 $either = identify($request)
     ->leftMap(fn(Error $error) => new ErrorResponse($error));
 ```
+
+## `->maybe()`
+
+This returns a [`Maybe`](MAYBE.md) containing the right value, in case of a left value it returns a `Maybe` with nothing inside.
+
+```php
+Either::right('something')->maybe()->match(
+    static fn($value) => $value,
+    static fn() => null,
+); // returns 'something'
+Either::left('something')->maybe()->match(
+    static fn($value) => $value,
+    static fn() => null,
+); // returns null
+```

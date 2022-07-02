@@ -328,4 +328,28 @@ class EitherTest extends TestCase
                 );
             });
     }
+
+    public function testMaybe()
+    {
+        $this
+            ->forAll(
+                Set\AnyType::any(),
+                Set\AnyType::any(),
+            )
+            ->then(function($left, $right) {
+                $this->assertSame(
+                    $right,
+                    Either::right($right)->maybe()->match(
+                        static fn($value) => $value,
+                        static fn() => null,
+                    ),
+                );
+                $this->assertNull(
+                    Either::left($left)->maybe()->match(
+                        static fn($value) => $value,
+                        static fn() => null,
+                    ),
+                );
+            });
+    }
 }
