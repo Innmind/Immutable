@@ -122,3 +122,21 @@ $validDsn = $dsn->filter(fn(string $url): bool => \filter_var($url, \FILTER_VALI
 ```
 
 `$validDsn` will contain either a valid url or nothing.
+
+## `->either()`
+
+This returns an [`Either`](EITHER.md) containing the value on the right side and `null` on the left side.
+
+```php
+Maybe::just('something')->either()->match(
+    static fn($right) => $right,
+    static fn() => null,
+); // returns 'something'
+Maybe::nothing()
+    ->either()
+    ->leftMap(static fn() => 'something')
+    ->match(
+        static fn() => null,
+        static fn($left) => $left,
+    ); // return 'something'
+```

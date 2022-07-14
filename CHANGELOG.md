@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.4.0 - 2022-07-14
+
+### Added
+
+- `Innmind\Immutable\Maybe::either()`
+
 ## 4.3.0 - 2022-07-02
 
 ### Added
