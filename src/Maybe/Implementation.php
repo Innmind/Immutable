@@ -3,7 +3,10 @@ declare(strict_types = 1);
 
 namespace Innmind\Immutable\Maybe;
 
-use Innmind\Immutable\Maybe;
+use Innmind\Immutable\{
+    Maybe,
+    Either,
+};
 
 /**
  * @template T
@@ -55,4 +58,9 @@ interface Implementation
      * @return self<T>
      */
     public function filter(callable $predicate): self;
+
+    /**
+     * @return Either<null, T>
+     */
+    public function either(): Either;
 }

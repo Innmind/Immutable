@@ -3,7 +3,10 @@ declare(strict_types = 1);
 
 namespace Innmind\Immutable\Maybe;
 
-use Innmind\Immutable\Maybe;
+use Innmind\Immutable\{
+    Maybe,
+    Either,
+};
 
 /**
  * @psalm-immutable
@@ -34,5 +37,10 @@ final class Nothing implements Implementation
     public function filter(callable $predicate): self
     {
         return $this;
+    }
+
+    public function either(): Either
+    {
+        return Either::left(null);
     }
 }

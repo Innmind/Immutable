@@ -3,7 +3,10 @@ declare(strict_types = 1);
 
 namespace Innmind\Immutable\Maybe;
 
-use Innmind\Immutable\Maybe;
+use Innmind\Immutable\{
+    Maybe,
+    Either,
+};
 
 /**
  * @template V
@@ -51,5 +54,10 @@ final class Just implements Implementation
         }
 
         return new Nothing;
+    }
+
+    public function either(): Either
+    {
+        return Either::right($this->value);
     }
 }

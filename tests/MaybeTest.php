@@ -3,7 +3,10 @@ declare(strict_types = 1);
 
 namespace Tests\Innmind\Immutable;
 
-use Innmind\Immutable\Maybe;
+use Innmind\Immutable\{
+    Maybe,
+    Either,
+};
 use PHPUnit\Framework\TestCase;
 use Innmind\BlackBox\{
     PHPUnit\BlackBox,
@@ -409,6 +412,27 @@ class MaybeTest extends TestCase
                     return Maybe::just($args[0]);
                 });
                 $this->assertFalse($called);
+            });
+    }
+
+    public function testEither()
+    {
+        $this
+            ->forAll(Set\AnyType::any())
+            ->then(function($value) {
+                $this->assertInstanceOf(Either::class, Maybe::just($value)->either());
+                $this->assertInstanceOf(Either::class, Maybe::nothing()->either());
+                $this->assertSame(
+                    $value,
+                    Maybe::just($value)->either()->match(
+                        static fn($value) => $value,
+                        static fn() => null,
+                    ),
+                );
+                $this->assertNull(Maybe::nothing()->either()->match(
+                    static fn($value) => $value,
+                    static fn() => null,
+                ));
             });
     }
 
