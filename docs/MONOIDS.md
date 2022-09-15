@@ -2,7 +2,7 @@
 
 Monoids describe a way to combine two values of a given type. A monoid contains an identity value that when combined with another value doesn't change its value. The combine operation has to be associative meaning `combine(a, combine(b, c))` is the same as `combine(combine(a, b), c)`.
 
-A simple monoid is an addition because adding `0` (the identity value) to any other integer won't change the value and `add(1, add(2, 3))` is the the same result as `add(add(1, 2), 6)` (both return 6).
+A simple monoid is an addition because adding `0` (the identity value) to any other integer won't change the value and `add(1, add(2, 3))` is the the same result as `add(add(1, 2), 3)` (both return 6).
 
 This library comes with a few monoids:
 - `Innmind\Immutable\Monoid\Concat` to append 2 instances of `Innmind\Immutable\Str` together
