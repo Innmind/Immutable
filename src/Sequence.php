@@ -593,4 +593,19 @@ final class Sequence implements \Countable
             static fn() => false,
         );
     }
+
+    /**
+     * If both sequences are not of the same length it will stop when it has
+     * reached the end of the shortest of the two
+     *
+     * @template S
+     *
+     * @param self<S> $sequence
+     *
+     * @return self<array{T, S}>
+     */
+    public function zip(self $sequence): self
+    {
+        return new self($this->implementation->zip($sequence->implementation));
+    }
 }

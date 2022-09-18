@@ -833,6 +833,148 @@ class SequenceTest extends TestCase
         $this->assertSame('bazfoobar', $str->toString());
     }
 
+    public function testZip()
+    {
+        $zipped = Sequence::of(0, 1, 2, 3)->zip(
+            Sequence::of('a', 'b', 'c', 'd'),
+        );
+
+        $this->assertSame(
+            [[0, 'a'], [1, 'b'], [2, 'c'], [3, 'd']],
+            $zipped->toList(),
+        );
+
+        $zipped = Sequence::defer((static function() {
+            yield 0;
+            yield 1;
+            yield 2;
+            yield 3;
+        })())->zip(
+            Sequence::defer((static function() {
+                yield 'a';
+                yield 'b';
+                yield 'c';
+                yield 'd';
+            })()),
+        );
+
+        $this->assertSame(
+            [[0, 'a'], [1, 'b'], [2, 'c'], [3, 'd']],
+            $zipped->toList(),
+        );
+
+        $zipped = Sequence::lazy(static function() {
+            yield 0;
+            yield 1;
+            yield 2;
+            yield 3;
+        })->zip(
+            Sequence::lazy(static function() {
+                yield 'a';
+                yield 'b';
+                yield 'c';
+                yield 'd';
+            }),
+        );
+
+        $this->assertSame(
+            [[0, 'a'], [1, 'b'], [2, 'c'], [3, 'd']],
+            $zipped->toList(),
+        );
+    }
+
+    public function testZipOfDifferentLengths()
+    {
+        $zipped = Sequence::of(0, 1, 2)->zip(
+            Sequence::of('a', 'b', 'c', 'd'),
+        );
+
+        $this->assertSame(
+            [[0, 'a'], [1, 'b'], [2, 'c']],
+            $zipped->toList(),
+        );
+        $zipped = Sequence::of(0, 1, 2, 3)->zip(
+            Sequence::of('a', 'b', 'c'),
+        );
+
+        $this->assertSame(
+            [[0, 'a'], [1, 'b'], [2, 'c']],
+            $zipped->toList(),
+        );
+
+        $zipped = Sequence::defer((static function() {
+            yield 0;
+            yield 1;
+            yield 2;
+        })())->zip(
+            Sequence::defer((static function() {
+                yield 'a';
+                yield 'b';
+                yield 'c';
+                yield 'd';
+            })()),
+        );
+
+        $this->assertSame(
+            [[0, 'a'], [1, 'b'], [2, 'c']],
+            $zipped->toList(),
+        );
+
+        $zipped = Sequence::defer((static function() {
+            yield 0;
+            yield 1;
+            yield 2;
+            yield 3;
+        })())->zip(
+            Sequence::defer((static function() {
+                yield 'a';
+                yield 'b';
+                yield 'c';
+            })()),
+        );
+
+        $this->assertSame(
+            [[0, 'a'], [1, 'b'], [2, 'c']],
+            $zipped->toList(),
+        );
+
+        $zipped = Sequence::lazy(static function() {
+            yield 0;
+            yield 1;
+            yield 2;
+        })->zip(
+            Sequence::lazy(static function() {
+                yield 'a';
+                yield 'b';
+                yield 'c';
+                yield 'd';
+            }),
+        );
+
+        $this->assertSame(
+            [[0, 'a'], [1, 'b'], [2, 'c']],
+            $zipped->toList(),
+        );
+
+        $zipped = Sequence::lazy(static function() {
+            yield 0;
+            yield 1;
+            yield 2;
+            yield 3;
+        })->zip(
+            Sequence::lazy(static function() {
+                yield 'a';
+                yield 'b';
+                yield 'c';
+            }),
+        );
+
+        $this->assertSame(
+            [[0, 'a'], [1, 'b'], [2, 'c']],
+            $zipped->toList(),
+        );
+    }
+
     public function get($map, $index)
     {
         return $map->get($index)->match(
