@@ -106,7 +106,7 @@
     </aside>
     <main><h1 id="monoids"><a href="#monoids" class="anchor">#</a>Monoids</h1>
 <p>Monoids describe a way to combine two values of a given type. A monoid contains an identity value that when combined with another value doesn't change its value. The combine operation has to be associative meaning <code>combine(a, combine(b, c))</code> is the same as <code>combine(combine(a, b), c)</code>.</p>
-<p>A simple monoid is an addition because adding <code>0</code> (the identity value) to any other integer won't change the value and <code>add(1, add(2, 3))</code> is the the same result as <code>add(add(1, 2), 6)</code> (both return 6).</p>
+<p>A simple monoid is an addition because adding <code>0</code> (the identity value) to any other integer won't change the value and <code>add(1, add(2, 3))</code> is the the same result as <code>add(add(1, 2), 3)</code> (both return 6).</p>
 <p>This library comes with a few monoids:</p>
 <ul>
 <li><code>Innmind\Immutable\Monoid\Concat</code> to append 2 instances of <code>Innmind\Immutable\Str</code> together</li>

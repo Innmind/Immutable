@@ -351,7 +351,16 @@ Sequence::ints(2, 4, 6, 8)->any($isOdd); // false</code></pre>
 
 $result = sum(Sequence::of(1, 2, 3, 4));
 $result; // 10</code></pre>
-<p><strong>Important</strong>: for lasy sequences bear in mind that the values will be kept in memory while the first call to <code>->match</code> didn't return.</p></main>
+<p><strong>Important</strong>: for lasy sequences bear in mind that the values will be kept in memory while the first call to <code>->match</code> didn't return.</p>
+<h2 id="zip"><a href="#zip" class="anchor">#</a><code>->zip()</code></h2>
+<p>This method allows to merge 2 sequences into a new one by combining the values of the 2 into pairs.</p>
+<pre><code class="language-php">$firnames = Sequence::of('John', 'Luke', 'James');
+$lastnames = Sequence::of('Doe', 'Skywalker', 'Kirk');
+
+$pairs = $firnames
+    ->zip($lastnames)
+    ->toList();
+$pairs; // [['John', 'Doe'], ['Luke', 'Skywalker'], ['James', 'Kirk']]</code></pre></main>
     <footer>
         <a href="https://github.com/innmind/Immutable/" target="_blank">GitHub</a>
     </footer>
