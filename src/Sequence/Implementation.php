@@ -284,4 +284,13 @@ interface Implementation extends \Countable
      * @return R
      */
     public function match(callable $wrap, callable $match, callable $empty);
+
+    /**
+     * @template S
+     *
+     * @param self<S> $sequence
+     *
+     * @return self<array{T, S}>
+     */
+    public function zip(self $sequence): self;
 }

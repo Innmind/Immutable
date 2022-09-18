@@ -456,3 +456,17 @@ $result; // 10
 ```
 
 **Important**: for lasy sequences bear in mind that the values will be kept in memory while the first call to `->match` didn't return.
+
+## `->zip()`
+
+This method allows to merge 2 sequences into a new one by combining the values of the 2 into pairs.
+
+```php
+$firnames = Sequence::of('John', 'Luke', 'James');
+$lastnames = Sequence::of('Doe', 'Skywalker', 'Kirk');
+
+$pairs = $firnames
+    ->zip($lastnames)
+    ->toList();
+$pairs; // [['John', 'Doe'], ['Luke', 'Skywalker'], ['James', 'Kirk']]
+```

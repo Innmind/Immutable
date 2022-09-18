@@ -649,6 +649,35 @@ final class Lazy implements Implementation
     }
 
     /**
+     * @template S
+     *
+     * @param Implementation<S> $sequence
+     *
+     * @return Implementation<array{T, S}>
+     */
+    public function zip(Implementation $sequence): Implementation
+    {
+        $values = $this->values;
+
+        /** @var Implementation<array{T, S}> */
+        return new self(
+            static function(callable $registerCleanup) use ($values, $sequence) {
+                /** @var RegisterCleanup $registerCleanup */
+                $other = self::open($sequence, $registerCleanup);
+
+                foreach ($values($registerCleanup) as $value) {
+                    if (!$other->valid()) {
+                        return;
+                    }
+
+                    yield [$value, $other->current()];
+                    $other->next();
+                }
+            },
+        );
+    }
+
+    /**
      * @return Implementation<T>
      */
     private function load(): Implementation

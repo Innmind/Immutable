@@ -451,6 +451,35 @@ final class Primitive implements Implementation
             );
     }
 
+    /**
+     * @template S
+     *
+     * @param Implementation<S> $sequence
+     *
+     * @return Implementation<array{T, S}>
+     */
+    public function zip(Implementation $sequence): Implementation
+    {
+        /** @var list<array{T, S}> */
+        $values = [];
+        $other = $sequence->iterator();
+
+        foreach ($this->iterator() as $value) {
+            /** @psalm-suppress ImpureMethodCall */
+            if (!$other->valid()) {
+                break;
+            }
+
+            /** @psalm-suppress ImpureMethodCall */
+            $values[] = [$value, $other->current()];
+            /** @psalm-suppress ImpureMethodCall */
+            $other->next();
+        }
+
+        /** @var Implementation<array{T, S}> */
+        return new self($values);
+    }
+
     private function has(int $index): bool
     {
         return \array_key_exists($index, $this->values);

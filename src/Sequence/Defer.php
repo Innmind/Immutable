@@ -579,6 +579,31 @@ final class Defer implements Implementation
     }
 
     /**
+     * @template S
+     *
+     * @param Implementation<S> $sequence
+     *
+     * @return Implementation<array{T, S}>
+     */
+    public function zip(Implementation $sequence): Implementation
+    {
+        /** @var Implementation<array{T, S}> */
+        return new self(
+            (static function(\Iterator $self, \Iterator $other) {
+                /** @var \Iterator<T> $self */
+                foreach ($self as $value) {
+                    if (!$other->valid()) {
+                        return;
+                    }
+
+                    yield [$value, $other->current()];
+                    $other->next();
+                }
+            })($this->values, $sequence->iterator()),
+        );
+    }
+
+    /**
      * @return Implementation<T>
      */
     private function load(): Implementation

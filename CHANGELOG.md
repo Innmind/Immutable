@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.5.0 - 2022-09-18
+
+### Added
+
+- `Innmind\Immutable\Sequence::zip()`
+
 ## 4.4.0 - 2022-07-14
 
 ### Added
