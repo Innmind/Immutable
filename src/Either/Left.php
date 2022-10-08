@@ -48,16 +48,19 @@ final class Left implements Implementation
 
     public function leftMap(callable $map): self
     {
+        /** @psalm-suppress ImpureFunctionCall */
         return new self($map($this->value));
     }
 
     public function match(callable $right, callable $left)
     {
+        /** @psalm-suppress ImpureFunctionCall */
         return $left($this->value);
     }
 
     public function otherwise(callable $otherwise): Either
     {
+        /** @psalm-suppress ImpureFunctionCall */
         return $otherwise($this->value);
     }
 

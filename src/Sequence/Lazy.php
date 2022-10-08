@@ -77,6 +77,7 @@ final class Lazy implements Implementation
         // will be stopped being iterated over so we can't have a way to notify
         // the generator to cleanup its ressources, so we pass an empty function
         // that does nothing
+        /** @psalm-suppress ImpureFunctionCall */
         return ($this->values)(self::bypassCleanup());
     }
 
@@ -87,6 +88,7 @@ final class Lazy implements Implementation
     {
         $iteration = 0;
         $cleanup = self::noCleanup();
+        /** @psalm-suppress ImpureFunctionCall */
         $generator = ($this->values)(static function(callable $userDefinedCleanup) use (&$cleanup) {
             $cleanup = $userDefinedCleanup;
         });
@@ -213,6 +215,7 @@ final class Lazy implements Implementation
     public function foreach(callable $function): SideEffect
     {
         foreach ($this->iterator() as $value) {
+            /** @psalm-suppress ImpureFunctionCall */
             $function($value);
         }
 
@@ -261,6 +264,7 @@ final class Lazy implements Implementation
     public function contains($element): bool
     {
         $cleanup = self::noCleanup();
+        /** @psalm-suppress ImpureFunctionCall */
         $generator = ($this->values)(static function(callable $userDefinedCleanup) use (&$cleanup) {
             $cleanup = $userDefinedCleanup;
         });
@@ -286,6 +290,7 @@ final class Lazy implements Implementation
     {
         $index = 0;
         $cleanup = self::noCleanup();
+        /** @psalm-suppress ImpureFunctionCall */
         $generator = ($this->values)(static function(callable $userDefinedCleanup) use (&$cleanup) {
             $cleanup = $userDefinedCleanup;
         });
@@ -551,6 +556,7 @@ final class Lazy implements Implementation
     public function reduce($carry, callable $reducer)
     {
         foreach ($this->iterator() as $value) {
+            /** @psalm-suppress ImpureFunctionCall */
             $carry = $reducer($carry, $value);
         }
 
@@ -624,11 +630,13 @@ final class Lazy implements Implementation
     public function find(callable $predicate): Maybe
     {
         $cleanup = self::noCleanup();
+        /** @psalm-suppress ImpureFunctionCall */
         $generator = ($this->values)(static function(callable $userDefinedCleanup) use (&$cleanup) {
             $cleanup = $userDefinedCleanup;
         });
 
         foreach ($generator as $value) {
+            /** @psalm-suppress ImpureFunctionCall */
             if ($predicate($value) === true) {
                 /** @psalm-suppress MixedFunctionCall Due to the reference in the closure above */
                 $cleanup();
@@ -643,6 +651,7 @@ final class Lazy implements Implementation
 
     public function match(callable $wrap, callable $match, callable $empty)
     {
+        /** @psalm-suppress ImpureFunctionCall */
         $generator = ($this->values)(self::bypassCleanup());
 
         return (new Defer($generator))->match($wrap, $match, $empty);

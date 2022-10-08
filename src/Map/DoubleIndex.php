@@ -150,6 +150,7 @@ final class DoubleIndex implements Implementation
     public function foreach(callable $function): SideEffect
     {
         foreach ($this->pairs->iterator() as $pair) {
+            /** @psalm-suppress ImpureFunctionCall */
             $function($pair->key(), $pair->value());
         }
 
@@ -169,6 +170,7 @@ final class DoubleIndex implements Implementation
         $groups = Map::of();
 
         foreach ($this->pairs->iterator() as $pair) {
+            /** @psalm-suppress ImpureFunctionCall */
             $key = $discriminator($pair->key(), $pair->value());
 
             $group = $groups->get($key)->match(
@@ -259,6 +261,7 @@ final class DoubleIndex implements Implementation
             $key = $pair->key();
             $value = $pair->value();
 
+            /** @psalm-suppress ImpureFunctionCall */
             $return = $predicate($key, $value);
 
             if ($return === true) {
@@ -281,6 +284,7 @@ final class DoubleIndex implements Implementation
     public function reduce($carry, callable $reducer)
     {
         foreach ($this->pairs->iterator() as $pair) {
+            /** @psalm-suppress ImpureFunctionCall */
             $carry = $reducer($carry, $pair->key(), $pair->value());
         }
 

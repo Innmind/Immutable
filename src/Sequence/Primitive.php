@@ -149,6 +149,7 @@ final class Primitive implements Implementation
     public function foreach(callable $function): SideEffect
     {
         foreach ($this->values as $value) {
+            /** @psalm-suppress ImpureFunctionCall */
             $function($value);
         }
 
@@ -167,6 +168,7 @@ final class Primitive implements Implementation
         $groups = Map::of();
 
         foreach ($this->values as $value) {
+            /** @psalm-suppress ImpureFunctionCall */
             $key = $discriminator($value);
 
             /** @var Sequence<T> */
@@ -294,6 +296,7 @@ final class Primitive implements Implementation
         $falsy = [];
 
         foreach ($this->values as $value) {
+            /** @psalm-suppress ImpureFunctionCall */
             if ($predicate($value) === true) {
                 $truthy[] = $value;
             } else {
@@ -432,6 +435,7 @@ final class Primitive implements Implementation
     public function find(callable $predicate): Maybe
     {
         foreach ($this->values as $value) {
+            /** @psalm-suppress ImpureFunctionCall */
             if ($predicate($value) === true) {
                 return Maybe::just($value);
             }

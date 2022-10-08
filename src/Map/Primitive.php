@@ -160,6 +160,7 @@ final class Primitive implements Implementation
         $values = [];
 
         foreach ($this->values as $k => $v) {
+            /** @psalm-suppress ImpureFunctionCall */
             if ($predicate($k, $v) === true) {
                 $values[$k] = $v;
             }
@@ -174,6 +175,7 @@ final class Primitive implements Implementation
     public function foreach(callable $function): SideEffect
     {
         foreach ($this->values as $k => $v) {
+            /** @psalm-suppress ImpureFunctionCall */
             $function($k, $v);
         }
 
@@ -193,6 +195,7 @@ final class Primitive implements Implementation
         $groups = Map::of();
 
         foreach ($this->values as $key => $value) {
+            /** @psalm-suppress ImpureFunctionCall */
             $discriminant = $discriminator($key, $value);
 
             $group = $groups->get($discriminant)->match(
@@ -241,6 +244,7 @@ final class Primitive implements Implementation
         $values = [];
 
         foreach ($this->values as $k => $v) {
+            /** @psalm-suppress ImpureFunctionCall */
             $values[$k] = $function($k, $v);
         }
 
@@ -289,6 +293,7 @@ final class Primitive implements Implementation
         $falsy = $this->clearMap();
 
         foreach ($this->values as $k => $v) {
+            /** @psalm-suppress ImpureFunctionCall */
             $return = $predicate($k, $v);
 
             if ($return === true) {
@@ -311,6 +316,7 @@ final class Primitive implements Implementation
     public function reduce($carry, callable $reducer)
     {
         foreach ($this->values as $k => $v) {
+            /** @psalm-suppress ImpureFunctionCall */
             $carry = $reducer($carry, $k, $v);
         }
 
@@ -329,6 +335,7 @@ final class Primitive implements Implementation
     public function find(callable $predicate): Maybe
     {
         foreach ($this->values as $k => $v) {
+            /** @psalm-suppress ImpureFunctionCall */
             if ($predicate($k, $v)) {
                 return Maybe::just(new Pair($k, $v));
             }

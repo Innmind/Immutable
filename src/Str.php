@@ -520,6 +520,7 @@ final class Str
      */
     public function map(callable $map): self
     {
+        /** @psalm-suppress ImpureFunctionCall */
         return new self($map($this->value, $this->encoding), $this->encoding);
     }
 
@@ -528,6 +529,7 @@ final class Str
      */
     public function flatMap(callable $map): self
     {
+        /** @psalm-suppress ImpureFunctionCall */
         return $map($this->value, $this->encoding);
     }
 

@@ -83,6 +83,7 @@ final class State
      */
     public function run($state): Result
     {
+        /** @psalm-suppress ImpureFunctionCall */
         return ($this->run)($state);
     }
 }
