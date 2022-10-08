@@ -178,6 +178,10 @@ $dsn = env('DATABASE_LOGGER_DSN')
 /** @var Maybe<string> */
 $validDsn = $dsn->filter(fn(string $url): bool => \filter_var($url, \FILTER_VALIDATE_URL));</code></pre>
 <p><code>$validDsn</code> will contain either a valid url or nothing.</p>
+<h2 id="keep"><a href="#keep" class="anchor">#</a><code>->keep()</code></h2>
+<p>This is similar to <code>->filter()</code> with the advantage of psalm understanding the type in the new <code>Maybe</code>.</p>
+<h2 id="exclude"><a href="#exclude" class="anchor">#</a><code>->exclude()</code></h2>
+<p>This is the inverse of the <code>->filter()</code> method.</p>
 <h2 id="either"><a href="#either" class="anchor">#</a><code>->either()</code></h2>
 <p>This returns an <a href="EITHER.html"><code>Either</code></a> containing the value on the right side and <code>null</code> on the left side.</p>
 <pre><code class="language-php">Maybe::just('something')->either()->match(
