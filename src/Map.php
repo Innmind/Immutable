@@ -141,6 +141,19 @@ final class Map implements \Countable
     }
 
     /**
+     * Exclude elements that match the predicate
+     *
+     * @param callable(T, S): bool $predicate
+     *
+     * @return self<T, S>
+     */
+    public function exclude(callable $predicate): self
+    {
+        /** @psalm-suppress MixedArgument */
+        return $this->filter(static fn($key, $value) => !$predicate($key, $value));
+    }
+
+    /**
      * Run the given function for each element of the map
      *
      * @param callable(T, S): void $function

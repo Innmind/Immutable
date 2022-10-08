@@ -212,6 +212,13 @@ class MaybeTest extends TestCase
         }));
     }
 
+    public function testExcludePredicateIsNotCalledWhenNoValue()
+    {
+        $this->assertInstanceOf(Maybe::class, Maybe::nothing()->exclude(static function() {
+            throw new \Exception;
+        }));
+    }
+
     public function testReturnItselfWhenFilterPredicateReturnsTrue()
     {
         $this
@@ -237,6 +244,31 @@ class MaybeTest extends TestCase
             });
     }
 
+    public function testReturnItselfWhenExcludePredicateReturnsFalse()
+    {
+        $this
+            ->forAll(
+                $this->value(),
+                $this->value(),
+            )
+            ->then(function($initial, $nothing) {
+                $maybe = Maybe::just($initial)->exclude(function($value) use ($initial) {
+                    $this->assertSame($initial, $value);
+
+                    return false;
+                });
+
+                $this->assertInstanceOf(Maybe::class, $maybe);
+                $this->assertSame(
+                    $initial,
+                    $maybe->match(
+                        static fn($value) => $value,
+                        static fn() => $nothing,
+                    ),
+                );
+            });
+    }
+
     public function testReturnsANothingWhenFilterPredicateReturnsFalse()
     {
         $this
@@ -249,6 +281,31 @@ class MaybeTest extends TestCase
                     $this->assertSame($initial, $value);
 
                     return false;
+                });
+
+                $this->assertInstanceOf(Maybe::class, $maybe);
+                $this->assertSame(
+                    $nothing,
+                    $maybe->match(
+                        static fn($value) => $value,
+                        static fn() => $nothing,
+                    ),
+                );
+            });
+    }
+
+    public function testReturnsANothingWhenExcludePredicateReturnsTrue()
+    {
+        $this
+            ->forAll(
+                $this->value(),
+                $this->value(),
+            )
+            ->then(function($initial, $nothing) {
+                $maybe = Maybe::just($initial)->exclude(function($value) use ($initial) {
+                    $this->assertSame($initial, $value);
+
+                    return true;
                 });
 
                 $this->assertInstanceOf(Maybe::class, $maybe);

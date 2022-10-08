@@ -98,6 +98,16 @@ $map = $map->filter(fn($key, $value) => ($key + $value) % 2 === 0);
 $map->equals(Map::of([1, 1]));
 ```
 
+## `->exclude()`
+
+Removes the pairs from the map that match the given predicate.
+
+```php
+$map = Map::of([1, 1], [3, 2]);
+$map = $map->exclude(fn($key, $value) => ($key + $value) % 2 === 0);
+$map->equals(Map::of([3, 2]));
+```
+
 ## `->foreach()`
 
 Use this method to call a function for each pair of the map. Since this structure is immutable it returns a `SideEffect` object, as its name suggest it is the only place acceptable to create side effects.

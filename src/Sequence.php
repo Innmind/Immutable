@@ -258,6 +258,19 @@ final class Sequence implements \Countable
     }
 
     /**
+     * Return all elements that don't satisfy the given predicate
+     *
+     * @param callable(T): bool $predicate
+     *
+     * @return self<T>
+     */
+    public function exclude(callable $predicate): self
+    {
+        /** @psalm-suppress MixedArgument */
+        return $this->filter(static fn($value) => !$predicate($value));
+    }
+
+    /**
      * Apply the given function to all elements of the sequence
      *
      * @param callable(T): void $function

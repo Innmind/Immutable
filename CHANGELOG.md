@@ -1,5 +1,14 @@
 # Changelog
 
+## [Unreleased]
+
+## Added
+
+- `Innmind\Immutable\Map::exclude()`
+- `Innmind\Immutable\Maybe::exclude()`
+- `Innmind\Immutable\Sequence::exclude()`
+- `Innmind\Immutable\Set::exclude()`
+
 ## 4.5.0 - 2022-09-18
 
 ### Added

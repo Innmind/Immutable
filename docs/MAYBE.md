@@ -123,6 +123,10 @@ $validDsn = $dsn->filter(fn(string $url): bool => \filter_var($url, \FILTER_VALI
 
 `$validDsn` will contain either a valid url or nothing.
 
+## `->exclude()`
+
+This is the inverse of the `->filter()` method.
+
 ## `->either()`
 
 This returns an [`Either`](EITHER.md) containing the value on the right side and `null` on the left side.

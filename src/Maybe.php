@@ -135,6 +135,17 @@ final class Maybe
     }
 
     /**
+     * @param callable(T): bool $predicate
+     *
+     * @return self<T>
+     */
+    public function exclude(callable $predicate): self
+    {
+        /** @psalm-suppress MixedArgument */
+        return $this->filter(static fn($value) => !$predicate($value));
+    }
+
+    /**
      * @return Either<null, T>
      */
     public function either(): Either

@@ -165,6 +165,28 @@ class MapTest extends TestCase
         $this->assertFalse($m2->contains(2));
     }
 
+    public function testExclude()
+    {
+        $m = Map::of()
+            ->put(0, 1)
+            ->put(1, 2)
+            ->put(2, 3)
+            ->put(4, 5);
+
+        $m2 = $m->exclude(static function(int $key, int $value) {
+            return ($key + $value) % 3 === 0;
+        });
+
+        $this->assertNotSame($m, $m2);
+        $this->assertInstanceOf(Map::class, $m2);
+        $this->assertSame(4, $m->size());
+        $this->assertSame(2, $m2->size());
+        $this->assertFalse($m2->contains(1));
+        $this->assertFalse($m2->contains(4));
+        $this->assertTrue($m2->contains(0));
+        $this->assertTrue($m2->contains(2));
+    }
+
     public function testForeach()
     {
         $m = Map::of()
