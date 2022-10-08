@@ -157,11 +157,17 @@ final class Sequence implements \Countable
         return $self;
     }
 
+    /**
+     * @return 0|positive-int
+     */
     public function size(): int
     {
         return $this->implementation->size();
     }
 
+    /**
+     * @return 0|positive-int
+     */
     public function count(): int
     {
         return $this->implementation->size();
@@ -169,6 +175,8 @@ final class Sequence implements \Countable
 
     /**
      * Return the element at the given index
+     *
+     * @param 0|positive-int $index
      *
      * @return Maybe<T>
      */
@@ -204,7 +212,7 @@ final class Sequence implements \Countable
     /**
      * Remove the n first elements
      *
-     * @param positive-int $size
+     * @param 0|positive-int $size
      *
      * @return self<T>
      */
@@ -216,7 +224,7 @@ final class Sequence implements \Countable
     /**
      * Remove the n last elements
      *
-     * @param positive-int $size
+     * @param 0|positive-int $size
      *
      * @return self<T>
      */
@@ -238,6 +246,22 @@ final class Sequence implements \Countable
     }
 
     /**
+     * This is the same behaviour as `filter` but it allows Psalm to understand
+     * the type of the values contained in the returned Sequence
+     *
+     * @template S
+     *
+     * @param Predicate<S> $predicate
+     *
+     * @return self<S>
+     */
+    public function keep(Predicate $predicate): self
+    {
+        /** @var self<S> */
+        return $this->filter($predicate);
+    }
+
+    /**
      * Return all elements that satisfy the given predicate
      *
      * @param callable(T): bool $predicate
@@ -247,6 +271,19 @@ final class Sequence implements \Countable
     public function filter(callable $predicate): self
     {
         return new self($this->implementation->filter($predicate));
+    }
+
+    /**
+     * Return all elements that don't satisfy the given predicate
+     *
+     * @param callable(T): bool $predicate
+     *
+     * @return self<T>
+     */
+    public function exclude(callable $predicate): self
+    {
+        /** @psalm-suppress MixedArgument */
+        return $this->filter(static fn($value) => !$predicate($value));
     }
 
     /**
@@ -309,7 +346,7 @@ final class Sequence implements \Countable
      *
      * @param T $element
      *
-     * @return Maybe<int>
+     * @return Maybe<0|positive-int>
      */
     public function indexOf($element): Maybe
     {
@@ -319,7 +356,7 @@ final class Sequence implements \Countable
     /**
      * Return the list of indices
      *
-     * @return self<int>
+     * @return self<0|positive-int>
      */
     public function indices(): self
     {
@@ -360,6 +397,7 @@ final class Sequence implements \Countable
     /**
      * Pad the sequence to a defined size with the given element
      *
+     * @param 0|positive-int $size
      * @param T $element
      *
      * @return self<T>
@@ -384,6 +422,9 @@ final class Sequence implements \Countable
     /**
      * Slice the sequence
      *
+     * @param 0|positive-int $from
+     * @param 0|positive-int $until
+     *
      * @return self<T>
      */
     public function slice(int $from, int $until): self
@@ -394,7 +435,7 @@ final class Sequence implements \Countable
     /**
      * Return a sequence with the n first elements
      *
-     * @param positive-int $size
+     * @param 0|positive-int $size
      *
      * @return self<T>
      */
@@ -406,7 +447,7 @@ final class Sequence implements \Countable
     /**
      * Return a sequence with the n last elements
      *
-     * @param positive-int $size
+     * @param 0|positive-int $size
      *
      * @return self<T>
      */

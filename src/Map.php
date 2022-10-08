@@ -57,11 +57,17 @@ final class Map implements \Countable
         return $self;
     }
 
+    /**
+     * @return 0|positive-int
+     */
     public function size(): int
     {
         return $this->implementation->size();
     }
 
+    /**
+     * @return 0|positive-int
+     */
     public function count(): int
     {
         return $this->size();
@@ -132,6 +138,19 @@ final class Map implements \Countable
     public function filter(callable $predicate): self
     {
         return new self($this->implementation->filter($predicate));
+    }
+
+    /**
+     * Exclude elements that match the predicate
+     *
+     * @param callable(T, S): bool $predicate
+     *
+     * @return self<T, S>
+     */
+    public function exclude(callable $predicate): self
+    {
+        /** @psalm-suppress MixedArgument */
+        return $this->filter(static fn($key, $value) => !$predicate($key, $value));
     }
 
     /**

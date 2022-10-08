@@ -30,11 +30,13 @@ final class Right implements Implementation
 
     public function map(callable $map): self
     {
+        /** @psalm-suppress ImpureFunctionCall */
         return new self($map($this->value));
     }
 
     public function flatMap(callable $map): Either
     {
+        /** @psalm-suppress ImpureFunctionCall */
         return $map($this->value);
     }
 
@@ -53,6 +55,7 @@ final class Right implements Implementation
 
     public function match(callable $right, callable $left)
     {
+        /** @psalm-suppress ImpureFunctionCall */
         return $right($this->value);
     }
 
@@ -63,10 +66,12 @@ final class Right implements Implementation
 
     public function filter(callable $predicate, callable $otherwise): Implementation
     {
+        /** @psalm-suppress ImpureFunctionCall */
         if ($predicate($this->value) === true) {
             return $this;
         }
 
+        /** @psalm-suppress ImpureFunctionCall */
         return new Left($otherwise());
     }
 

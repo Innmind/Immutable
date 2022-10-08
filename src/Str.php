@@ -104,17 +104,20 @@ final class Str
     /**
      * Returns the position of the first occurence of the string
      *
-     * @return Maybe<int>
+     * @param 0|positive-int $offset
+     *
+     * @return Maybe<0|positive-int>
      */
     public function position(string $needle, int $offset = 0): Maybe
     {
         $position = \mb_strpos($this->value, $needle, $offset, $this->encoding);
 
         if ($position === false) {
-            /** @var Maybe<int> */
+            /** @var Maybe<0|positive-int> */
             return Maybe::nothing();
         }
 
+        /** @var Maybe<0|positive-int> */
         return Maybe::just($position);
     }
 
@@ -152,6 +155,8 @@ final class Str
 
     /**
      * Return the string length
+     *
+     * @return 0|positive-int
      */
     public function length(): int
     {
@@ -327,6 +332,8 @@ final class Str
 
     /**
      * Return part of the string
+     *
+     * @param 0|positive-int $length
      */
     public function substring(int $start, int $length = null): self
     {
@@ -340,7 +347,7 @@ final class Str
     }
 
     /**
-     * @param positive-int $size
+     * @param 0|positive-int $size
      */
     public function take(int $size): self
     {
@@ -348,7 +355,7 @@ final class Str
     }
 
     /**
-     * @param positive-int $size
+     * @param 0|positive-int $size
      */
     public function takeEnd(int $size): self
     {
@@ -356,7 +363,7 @@ final class Str
     }
 
     /**
-     * @param positive-int $size
+     * @param 0|positive-int $size
      */
     public function drop(int $size): self
     {
@@ -364,11 +371,11 @@ final class Str
     }
 
     /**
-     * @param positive-int $size
+     * @param 0|positive-int $size
      */
     public function dropEnd(int $size): self
     {
-        return $this->substring(0, $this->length() - $size);
+        return $this->substring(0, \max(0, $this->length() - $size));
     }
 
     /**
@@ -501,7 +508,6 @@ final class Str
             return true;
         }
 
-        /** @var positive-int */
         $length = self::of($value, $this->encoding)->length();
 
         return $this->takeEnd($length)->toString() === $value;
@@ -520,6 +526,7 @@ final class Str
      */
     public function map(callable $map): self
     {
+        /** @psalm-suppress ImpureFunctionCall */
         return new self($map($this->value, $this->encoding), $this->encoding);
     }
 
@@ -528,6 +535,7 @@ final class Str
      */
     public function flatMap(callable $map): self
     {
+        /** @psalm-suppress ImpureFunctionCall */
         return $map($this->value, $this->encoding);
     }
 

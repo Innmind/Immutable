@@ -8,6 +8,7 @@ use Innmind\Immutable\{
     Map,
     Str,
     Sequence,
+    Predicate,
 };
 use PHPUnit\Framework\TestCase;
 
@@ -225,6 +226,23 @@ class SetTest extends TestCase
         $this->assertInstanceOf(Set::class, $s2);
         $this->assertSame([1, 2, 3, 4], $s->toList());
         $this->assertSame([2, 4], $s2->toList());
+    }
+
+    public function testExclude()
+    {
+        $s = Set::of()
+            ->add(1)
+            ->add(2)
+            ->add(3)
+            ->add(4);
+
+        $s2 = $s->exclude(static function(int $v) {
+            return $v % 2 === 0;
+        });
+        $this->assertNotSame($s, $s2);
+        $this->assertInstanceOf(Set::class, $s2);
+        $this->assertSame([1, 2, 3, 4], $s->toList());
+        $this->assertSame([1, 3], $s2->toList());
     }
 
     public function testForeach()
@@ -521,6 +539,16 @@ class SetTest extends TestCase
         $this->assertSame(1, $started);
         $this->assertFalse($cleanupCalled);
         $this->assertTrue($endReached);
+    }
+
+    public function testKeep()
+    {
+        $this->assertSame(
+            [$this, $this],
+            Sequence::of(null, 1, $this, true, $this, [])
+                ->keep(Predicate\Instance::of(self::class))
+                ->toList(),
+        );
     }
 
     public function get($map, $index)

@@ -6,6 +6,7 @@ namespace Tests\Innmind\Immutable;
 use Innmind\Immutable\{
     Maybe,
     Either,
+    Predicate,
 };
 use PHPUnit\Framework\TestCase;
 use Innmind\BlackBox\{
@@ -212,6 +213,13 @@ class MaybeTest extends TestCase
         }));
     }
 
+    public function testExcludePredicateIsNotCalledWhenNoValue()
+    {
+        $this->assertInstanceOf(Maybe::class, Maybe::nothing()->exclude(static function() {
+            throw new \Exception;
+        }));
+    }
+
     public function testReturnItselfWhenFilterPredicateReturnsTrue()
     {
         $this
@@ -237,6 +245,31 @@ class MaybeTest extends TestCase
             });
     }
 
+    public function testReturnItselfWhenExcludePredicateReturnsFalse()
+    {
+        $this
+            ->forAll(
+                $this->value(),
+                $this->value(),
+            )
+            ->then(function($initial, $nothing) {
+                $maybe = Maybe::just($initial)->exclude(function($value) use ($initial) {
+                    $this->assertSame($initial, $value);
+
+                    return false;
+                });
+
+                $this->assertInstanceOf(Maybe::class, $maybe);
+                $this->assertSame(
+                    $initial,
+                    $maybe->match(
+                        static fn($value) => $value,
+                        static fn() => $nothing,
+                    ),
+                );
+            });
+    }
+
     public function testReturnsANothingWhenFilterPredicateReturnsFalse()
     {
         $this
@@ -249,6 +282,31 @@ class MaybeTest extends TestCase
                     $this->assertSame($initial, $value);
 
                     return false;
+                });
+
+                $this->assertInstanceOf(Maybe::class, $maybe);
+                $this->assertSame(
+                    $nothing,
+                    $maybe->match(
+                        static fn($value) => $value,
+                        static fn() => $nothing,
+                    ),
+                );
+            });
+    }
+
+    public function testReturnsANothingWhenExcludePredicateReturnsTrue()
+    {
+        $this
+            ->forAll(
+                $this->value(),
+                $this->value(),
+            )
+            ->then(function($initial, $nothing) {
+                $maybe = Maybe::just($initial)->exclude(function($value) use ($initial) {
+                    $this->assertSame($initial, $value);
+
+                    return true;
                 });
 
                 $this->assertInstanceOf(Maybe::class, $maybe);
@@ -434,6 +492,39 @@ class MaybeTest extends TestCase
                     static fn() => null,
                 ));
             });
+    }
+
+    public function testKeep()
+    {
+        $this
+            ->forAll(Set\AnyType::any())
+            ->then(function($value) {
+                $this->assertNull(
+                    Maybe::just($value)
+                        ->keep(Predicate\Instance::of(self::class))
+                        ->match(
+                            static fn($value) => $value,
+                            static fn() => null,
+                        ),
+                );
+            });
+        $this->assertSame(
+            $this,
+            Maybe::just($this)
+                ->keep(Predicate\Instance::of(self::class))
+                ->match(
+                    static fn($value) => $value,
+                    static fn() => null,
+                ),
+        );
+        $this->assertNull(
+            Maybe::nothing()
+                ->keep(Predicate\Instance::of(self::class))
+                ->match(
+                    static fn($value) => $value,
+                    static fn() => null,
+                ),
+        );
     }
 
     private function value(): Set

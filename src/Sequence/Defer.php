@@ -24,7 +24,10 @@ final class Defer implements Implementation
 
     public function __construct(\Generator $generator)
     {
-        /** @var \Iterator<int, T> */
+        /**
+         * @psalm-suppress ImpureFunctionCall
+         * @var \Iterator<int, T>
+         */
         $this->values = new Accumulate((static function(\Generator $generator): \Generator {
             /** @var T $value */
             foreach ($generator as $value) {
@@ -40,6 +43,7 @@ final class Defer implements Implementation
      */
     public function __invoke($element): Implementation
     {
+        /** @psalm-suppress ImpureFunctionCall */
         return new self(
             (static function(\Iterator $values, mixed $element): \Generator {
                 /** @var T $value */
@@ -107,6 +111,7 @@ final class Defer implements Implementation
      */
     public function distinct(): Implementation
     {
+        /** @psalm-suppress ImpureFunctionCall */
         return new self(
             (static function(\Iterator $values): \Generator {
                 /** @var list<T> */
@@ -129,6 +134,7 @@ final class Defer implements Implementation
      */
     public function drop(int $size): Implementation
     {
+        /** @psalm-suppress ImpureFunctionCall */
         return new self(
             (static function(\Iterator $values, int $toDrop): \Generator {
                 $dropped = 0;
@@ -148,6 +154,8 @@ final class Defer implements Implementation
     }
 
     /**
+     * @param 0|positive-int $size
+     *
      * @return Implementation<T>
      */
     public function dropEnd(int $size): Implementation
@@ -172,6 +180,7 @@ final class Defer implements Implementation
      */
     public function filter(callable $predicate): Implementation
     {
+        /** @psalm-suppress ImpureFunctionCall */
         return new self(
             (static function(\Iterator $values, callable $predicate): \Generator {
                 /** @var T $value */
@@ -190,6 +199,7 @@ final class Defer implements Implementation
     public function foreach(callable $function): SideEffect
     {
         foreach ($this->values as $value) {
+            /** @psalm-suppress ImpureFunctionCall */
             $function($value);
         }
 
@@ -254,7 +264,7 @@ final class Defer implements Implementation
     /**
      * @param T $element
      *
-     * @return Maybe<int>
+     * @return Maybe<0|positive-int>
      */
     public function indexOf($element): Maybe
     {
@@ -262,24 +272,28 @@ final class Defer implements Implementation
 
         foreach ($this->values as $value) {
             if ($value === $element) {
+                /** @var Maybe<0|positive-int> */
                 return Maybe::just($index);
             }
 
             ++$index;
         }
 
-        /** @var Maybe<int> */
+        /** @var Maybe<0|positive-int> */
         return Maybe::nothing();
     }
 
     /**
      * Return the list of indices
      *
-     * @return Implementation<int>
+     * @return Implementation<0|positive-int>
      */
     public function indices(): Implementation
     {
-        /** @var Implementation<int> */
+        /**
+         * @psalm-suppress ImpureFunctionCall
+         * @var Implementation<0|positive-int>
+         */
         return new self(
             (static function(\Iterator $values): \Generator {
                 $index = 0;
@@ -300,6 +314,7 @@ final class Defer implements Implementation
      */
     public function map(callable $function): Implementation
     {
+        /** @psalm-suppress ImpureFunctionCall */
         return new self(
             (static function(\Iterator $values, callable $map): \Generator {
                 /** @var T $value */
@@ -320,6 +335,7 @@ final class Defer implements Implementation
      */
     public function flatMap(callable $map, callable $exfiltrate): Sequence
     {
+        /** @psalm-suppress ImpureFunctionCall */
         return Sequence::defer(
             (static function(\Iterator $values, callable $map, callable $exfiltrate): \Generator {
                 /** @var T $value */
@@ -343,6 +359,7 @@ final class Defer implements Implementation
      */
     public function pad(int $size, $element): Implementation
     {
+        /** @psalm-suppress ImpureFunctionCall */
         return new self(
             (static function(\Iterator $values, int $toPad, mixed $element): \Generator {
                 /** @var T $value */
@@ -375,6 +392,7 @@ final class Defer implements Implementation
      */
     public function slice(int $from, int $until): Implementation
     {
+        /** @psalm-suppress ImpureFunctionCall */
         return new self(
             (static function(\Iterator $values, int $from, int $until): \Generator {
                 $index = 0;
@@ -395,6 +413,7 @@ final class Defer implements Implementation
      */
     public function take(int $size): Implementation
     {
+        /** @psalm-suppress ImpureFunctionCall */
         return new self(
             (static function(\Iterator $values, int $size): \Generator {
                 $taken = 0;
@@ -412,6 +431,8 @@ final class Defer implements Implementation
     }
 
     /**
+     * @param 0|positive-int $size
+     *
      * @return Implementation<T>
      */
     public function takeEnd(int $size): Implementation
@@ -428,6 +449,7 @@ final class Defer implements Implementation
      */
     public function append(Implementation $sequence): Implementation
     {
+        /** @psalm-suppress ImpureFunctionCall */
         return new self(
             (static function(\Iterator $values, Implementation $sequence): \Generator {
                 /** @var T $value */
@@ -463,6 +485,7 @@ final class Defer implements Implementation
      */
     public function sort(callable $function): Implementation
     {
+        /** @psalm-suppress ImpureFunctionCall */
         return new self(
             (static function(\Iterator $values, callable $function): \Generator {
                 /** @var callable(T, T): int $sorter */
@@ -489,6 +512,7 @@ final class Defer implements Implementation
     public function reduce($carry, callable $reducer)
     {
         foreach ($this->values as $value) {
+            /** @psalm-suppress ImpureFunctionCall */
             $carry = $reducer($carry, $value);
         }
 
@@ -508,6 +532,7 @@ final class Defer implements Implementation
      */
     public function reverse(): Implementation
     {
+        /** @psalm-suppress ImpureFunctionCall */
         return new self(
             (static function(\Iterator $values): \Generator {
                 $values = \iterator_to_array($values);
@@ -531,6 +556,7 @@ final class Defer implements Implementation
      */
     public function toSequence(): Sequence
     {
+        /** @psalm-suppress ImpureFunctionCall */
         return Sequence::defer(
             (static function(\Iterator $values): \Generator {
                 /** @var T $value */
@@ -546,6 +572,7 @@ final class Defer implements Implementation
      */
     public function toSet(): Set
     {
+        /** @psalm-suppress ImpureFunctionCall */
         return Set::defer(
             (static function(\Iterator $values): \Generator {
                 /** @var T $value */
@@ -559,6 +586,7 @@ final class Defer implements Implementation
     public function find(callable $predicate): Maybe
     {
         foreach ($this->values as $value) {
+            /** @psalm-suppress ImpureFunctionCall */
             if ($predicate($value) === true) {
                 return Maybe::just($value);
             }
@@ -587,7 +615,10 @@ final class Defer implements Implementation
      */
     public function zip(Implementation $sequence): Implementation
     {
-        /** @var Implementation<array{T, S}> */
+        /**
+         * @psalm-suppress ImpureFunctionCall
+         * @var Implementation<array{T, S}>
+         */
         return new self(
             (static function(\Iterator $self, \Iterator $other) {
                 /** @var \Iterator<T> $self */

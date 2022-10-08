@@ -1,5 +1,19 @@
 # Changelog
 
+## 4.6.0 - 2022-10-08
+
+## Added
+
+- `Innmind\Immutable\Map::exclude()`
+- `Innmind\Immutable\Maybe::exclude()`
+- `Innmind\Immutable\Maybe::keep()`
+- `Innmind\Immutable\Sequence::exclude()`
+- `Innmind\Immutable\Sequence::keep()`
+- `Innmind\Immutable\Set::exclude()`
+- `Innmind\Immutable\Set::keep()`
+- `Innmind\Immutable\Predicate`
+- `Innmind\Immutable\Predicate\Instance`
+
 ## 4.5.0 - 2022-09-18
 
 ### Added

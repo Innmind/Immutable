@@ -42,7 +42,6 @@ final class Lazy implements Implementation
 
         return new self(
             static function(callable $registerCleanup) use ($values, $element): \Generator {
-                /** @var RegisterCleanup $registerCleanup */
                 foreach ($values($registerCleanup) as $value) {
                     yield $value;
                 }
@@ -77,6 +76,7 @@ final class Lazy implements Implementation
         // will be stopped being iterated over so we can't have a way to notify
         // the generator to cleanup its ressources, so we pass an empty function
         // that does nothing
+        /** @psalm-suppress ImpureFunctionCall */
         return ($this->values)(self::bypassCleanup());
     }
 
@@ -87,6 +87,7 @@ final class Lazy implements Implementation
     {
         $iteration = 0;
         $cleanup = self::noCleanup();
+        /** @psalm-suppress ImpureFunctionCall */
         $generator = ($this->values)(static function(callable $userDefinedCleanup) use (&$cleanup) {
             $cleanup = $userDefinedCleanup;
         });
@@ -131,7 +132,6 @@ final class Lazy implements Implementation
                 /** @var list<T> */
                 $uniques = [];
 
-                /** @var RegisterCleanup $registerCleanup */
                 foreach ($values($registerCleanup) as $value) {
                     if (!\in_array($value, $uniques, true)) {
                         $uniques[] = $value;
@@ -152,7 +152,6 @@ final class Lazy implements Implementation
 
         return new self(
             static function(callable $registerCleanup) use ($values, $size): \Generator {
-                /** @var RegisterCleanup $registerCleanup */
                 $dropped = 0;
 
                 foreach ($values($registerCleanup) as $value) {
@@ -169,6 +168,8 @@ final class Lazy implements Implementation
     }
 
     /**
+     * @param 0|positive-int $size
+     *
      * @return Implementation<T>
      */
     public function dropEnd(int $size): Implementation
@@ -197,7 +198,6 @@ final class Lazy implements Implementation
 
         return new self(
             static function(callable $registerCleanup) use ($values, $predicate): \Generator {
-                /** @var RegisterCleanup $registerCleanup */
                 foreach ($values($registerCleanup) as $value) {
                     if ($predicate($value)) {
                         yield $value;
@@ -213,6 +213,7 @@ final class Lazy implements Implementation
     public function foreach(callable $function): SideEffect
     {
         foreach ($this->iterator() as $value) {
+            /** @psalm-suppress ImpureFunctionCall */
             $function($value);
         }
 
@@ -261,6 +262,7 @@ final class Lazy implements Implementation
     public function contains($element): bool
     {
         $cleanup = self::noCleanup();
+        /** @psalm-suppress ImpureFunctionCall */
         $generator = ($this->values)(static function(callable $userDefinedCleanup) use (&$cleanup) {
             $cleanup = $userDefinedCleanup;
         });
@@ -280,12 +282,13 @@ final class Lazy implements Implementation
     /**
      * @param T $element
      *
-     * @return Maybe<int>
+     * @return Maybe<0|positive-int>
      */
     public function indexOf($element): Maybe
     {
         $index = 0;
         $cleanup = self::noCleanup();
+        /** @psalm-suppress ImpureFunctionCall */
         $generator = ($this->values)(static function(callable $userDefinedCleanup) use (&$cleanup) {
             $cleanup = $userDefinedCleanup;
         });
@@ -295,29 +298,29 @@ final class Lazy implements Implementation
                 /** @psalm-suppress MixedFunctionCall Due to the reference in the closure above */
                 $cleanup();
 
+                /** @var Maybe<0|positive-int> */
                 return Maybe::just($index);
             }
 
             ++$index;
         }
 
-        /** @var Maybe<int> */
+        /** @var Maybe<0|positive-int> */
         return Maybe::nothing();
     }
 
     /**
      * Return the list of indices
      *
-     * @return Implementation<int>
+     * @return Implementation<0|positive-int>
      */
     public function indices(): Implementation
     {
         $values = $this->values;
 
-        /** @var Implementation<int> */
+        /** @var Implementation<0|positive-int> */
         return new self(
             static function(callable $registerCleanup) use ($values): \Generator {
-                /** @var RegisterCleanup $registerCleanup */
                 $index = 0;
 
                 foreach ($values($registerCleanup) as $_) {
@@ -340,7 +343,6 @@ final class Lazy implements Implementation
 
         return new self(
             static function(callable $registerCleanup) use ($values, $function): \Generator {
-                /** @var RegisterCleanup $registerCleanup */
                 foreach ($values($registerCleanup) as $value) {
                     yield $function($value);
                 }
@@ -387,7 +389,6 @@ final class Lazy implements Implementation
 
         return new self(
             static function(callable $registerCleanup) use ($values, $size, $element): \Generator {
-                /** @var RegisterCleanup $registerCleanup */
                 foreach ($values($registerCleanup) as $value) {
                     yield $value;
                     --$size;
@@ -423,7 +424,6 @@ final class Lazy implements Implementation
             static function(callable $registerCleanup) use ($values, $from, $until): \Generator {
                 $index = 0;
 
-                /** @var RegisterCleanup $registerCleanup */
                 foreach ($values($registerCleanup) as $value) {
                     if ($index >= $from && $index < $until) {
                         yield $value;
@@ -453,6 +453,7 @@ final class Lazy implements Implementation
                 // needs to free resources correctly
                 $cleanup = self::noCleanup();
                 $middleware = static function(callable $userDefinedCleanup) use (&$cleanup, $registerCleanup): void {
+                    /** @var callable(): void $userDefinedCleanup */
                     $cleanup = $userDefinedCleanup;
                     $registerCleanup($userDefinedCleanup);
                 };
@@ -473,6 +474,8 @@ final class Lazy implements Implementation
     }
 
     /**
+     * @param 0|positive-int $size
+     *
      * @return Implementation<T>
      */
     public function takeEnd(int $size): Implementation
@@ -493,7 +496,6 @@ final class Lazy implements Implementation
 
         return new self(
             static function(callable $registerCleanup) use ($values, $sequence): \Generator {
-                /** @var RegisterCleanup $registerCleanup */
                 foreach ($values($registerCleanup) as $value) {
                     yield $value;
                 }
@@ -551,6 +553,7 @@ final class Lazy implements Implementation
     public function reduce($carry, callable $reducer)
     {
         foreach ($this->iterator() as $value) {
+            /** @psalm-suppress ImpureFunctionCall */
             $carry = $reducer($carry, $value);
         }
 
@@ -624,11 +627,13 @@ final class Lazy implements Implementation
     public function find(callable $predicate): Maybe
     {
         $cleanup = self::noCleanup();
+        /** @psalm-suppress ImpureFunctionCall */
         $generator = ($this->values)(static function(callable $userDefinedCleanup) use (&$cleanup) {
             $cleanup = $userDefinedCleanup;
         });
 
         foreach ($generator as $value) {
+            /** @psalm-suppress ImpureFunctionCall */
             if ($predicate($value) === true) {
                 /** @psalm-suppress MixedFunctionCall Due to the reference in the closure above */
                 $cleanup();
@@ -643,6 +648,7 @@ final class Lazy implements Implementation
 
     public function match(callable $wrap, callable $match, callable $empty)
     {
+        /** @psalm-suppress ImpureFunctionCall */
         $generator = ($this->values)(self::bypassCleanup());
 
         return (new Defer($generator))->match($wrap, $match, $empty);
@@ -662,7 +668,6 @@ final class Lazy implements Implementation
         /** @var Implementation<array{T, S}> */
         return new self(
             static function(callable $registerCleanup) use ($values, $sequence) {
-                /** @var RegisterCleanup $registerCleanup */
                 $other = self::open($sequence, $registerCleanup);
 
                 foreach ($values($registerCleanup) as $value) {

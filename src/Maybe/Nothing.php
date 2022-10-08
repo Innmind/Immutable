@@ -26,11 +26,13 @@ final class Nothing implements Implementation
 
     public function match(callable $just, callable $nothing)
     {
+        /** @psalm-suppress ImpureFunctionCall */
         return $nothing();
     }
 
     public function otherwise(callable $otherwise): Maybe
     {
+        /** @psalm-suppress ImpureFunctionCall */
         return $otherwise();
     }
 

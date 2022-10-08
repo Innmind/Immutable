@@ -9,6 +9,7 @@ use Innmind\Immutable\{
     Set,
     Map,
     Monoid\Concat,
+    Predicate,
 };
 use PHPUnit\Framework\TestCase;
 
@@ -239,6 +240,23 @@ class SequenceTest extends TestCase
         $this->assertNotSame($a, $b);
         $this->assertSame([1, 2, 3, 4], $a->toList());
         $this->assertSame([2, 4], $b->toList());
+    }
+
+    public function testExclude()
+    {
+        $a = Sequence::of()
+            ->add(1)
+            ->add(2)
+            ->add(3)
+            ->add(4);
+        $b = $a->exclude(static function(int $value): bool {
+            return $value % 2 === 0;
+        });
+
+        $this->assertInstanceOf(Sequence::class, $b);
+        $this->assertNotSame($a, $b);
+        $this->assertSame([1, 2, 3, 4], $a->toList());
+        $this->assertSame([1, 3], $b->toList());
     }
 
     public function testForeach()
@@ -972,6 +990,16 @@ class SequenceTest extends TestCase
         $this->assertSame(
             [[0, 'a'], [1, 'b'], [2, 'c']],
             $zipped->toList(),
+        );
+    }
+
+    public function testKeep()
+    {
+        $this->assertSame(
+            [$this, $this],
+            Sequence::of(null, 1, $this, true, $this, [])
+                ->keep(Predicate\Instance::of(self::class))
+                ->toList(),
         );
     }
 

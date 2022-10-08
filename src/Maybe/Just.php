@@ -29,16 +29,19 @@ final class Just implements Implementation
 
     public function map(callable $map): self
     {
+        /** @psalm-suppress ImpureFunctionCall */
         return new self($map($this->value));
     }
 
     public function flatMap(callable $map): Maybe
     {
+        /** @psalm-suppress ImpureFunctionCall */
         return $map($this->value);
     }
 
     public function match(callable $just, callable $nothing)
     {
+        /** @psalm-suppress ImpureFunctionCall */
         return $just($this->value);
     }
 
@@ -49,6 +52,7 @@ final class Just implements Implementation
 
     public function filter(callable $predicate): Implementation
     {
+        /** @psalm-suppress ImpureFunctionCall */
         if ($predicate($this->value) === true) {
             return $this;
         }

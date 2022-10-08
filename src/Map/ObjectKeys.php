@@ -73,7 +73,10 @@ final class ObjectKeys implements Implementation
 
     public function size(): int
     {
-        /** @psalm-suppress ImpureMethodCall */
+        /**
+         * @psalm-suppress ImpureMethodCall
+         * @var 0|positive-int
+         */
         return $this->values->count();
     }
 
@@ -174,6 +177,7 @@ final class ObjectKeys implements Implementation
             /** @var S $v */
             $v = $this->values[$k];
 
+            /** @psalm-suppress ImpureFunctionCall */
             if ($predicate($key, $v) === true) {
                 $values[$k] = $v;
             }
@@ -197,6 +201,7 @@ final class ObjectKeys implements Implementation
              */
             $v = $this->values[$k];
 
+            /** @psalm-suppress ImpureFunctionCall */
             $function($key, $v);
         }
 
@@ -225,6 +230,7 @@ final class ObjectKeys implements Implementation
              */
             $v = $this->values[$k];
 
+            /** @psalm-suppress ImpureFunctionCall */
             $discriminant = $discriminator($key, $v);
 
             $group = $groups->get($discriminant)->match(
@@ -282,7 +288,7 @@ final class ObjectKeys implements Implementation
              */
             $v = $this->values[$k];
 
-            /** @psalm-suppress ImpureMethodCall */
+            /** @psalm-suppress ImpureFunctionCall */
             $values[$k] = $function($key, $v);
         }
 
@@ -346,6 +352,7 @@ final class ObjectKeys implements Implementation
              */
             $v = $this->values[$k];
 
+            /** @psalm-suppress ImpureFunctionCall */
             $return = $predicate($key, $v);
 
             if ($return === true) {
@@ -377,6 +384,7 @@ final class ObjectKeys implements Implementation
              */
             $v = $this->values[$k];
 
+            /** @psalm-suppress ImpureFunctionCall */
             $carry = $reducer($carry, $key, $v);
         }
 
@@ -404,6 +412,7 @@ final class ObjectKeys implements Implementation
              */
             $v = $this->values[$k];
 
+            /** @psalm-suppress ImpureFunctionCall */
             if ($predicate($key, $v)) {
                 return Maybe::just(new Pair($key, $v));
             }

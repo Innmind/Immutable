@@ -27,6 +27,9 @@ interface Implementation extends \Countable
      */
     public function __invoke($element): self;
 
+    /**
+     * @return 0|positive-int
+     */
     public function size(): int;
 
     /**
@@ -36,6 +39,8 @@ interface Implementation extends \Countable
 
     /**
      * Return the element at the given index
+     *
+     * @param 0|positive-int $index
      *
      * @return Maybe<T>
      */
@@ -60,12 +65,16 @@ interface Implementation extends \Countable
     /**
      * Remove the n first elements
      *
+     * @param 0|positive-int $size
+     *
      * @return self<T>
      */
     public function drop(int $size): self;
 
     /**
      * Remove the n last elements
+     *
+     * @param 0|positive-int $size
      *
      * @return self<T>
      */
@@ -131,14 +140,14 @@ interface Implementation extends \Countable
      *
      * @param T $element
      *
-     * @return Maybe<int>
+     * @return Maybe<0|positive-int>
      */
     public function indexOf($element): Maybe;
 
     /**
      * Return the list of indices
      *
-     * @return self<int>
+     * @return self<0|positive-int>
      */
     public function indices(): self;
 
@@ -166,6 +175,7 @@ interface Implementation extends \Countable
     /**
      * Pad the sequence to a defined size with the given element
      *
+     * @param 0|positive-int $size
      * @param T $element
      *
      * @return self<T>
@@ -184,6 +194,9 @@ interface Implementation extends \Countable
     /**
      * Slice the sequence
      *
+     * @param 0|positive-int $from
+     * @param 0|positive-int $until
+     *
      * @return self<T>
      */
     public function slice(int $from, int $until): self;
@@ -191,12 +204,16 @@ interface Implementation extends \Countable
     /**
      * Return a sequence with the n first elements
      *
+     * @param 0|positive-int $size
+     *
      * @return self<T>
      */
     public function take(int $size): self;
 
     /**
      * Return a sequence with the n last elements
+     *
+     * @param 0|positive-int $size
      *
      * @return self<T>
      */
