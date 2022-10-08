@@ -73,7 +73,10 @@ final class ObjectKeys implements Implementation
 
     public function size(): int
     {
-        /** @psalm-suppress ImpureMethodCall */
+        /**
+         * @psalm-suppress ImpureMethodCall
+         * @var 0|positive-int
+         */
         return $this->values->count();
     }
 
