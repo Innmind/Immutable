@@ -158,6 +158,17 @@ $sequence = Sequence::ints(1, 2, 3, 4)->filter(fn($i) => $i % 2 === 0);
 $sequence->equals(Sequence::ints(2, 4));
 ```
 
+## `->keep()`
+
+This is similar to `->filter()` with the advantage of psalm understanding the type in the new `Sequence`.
+
+```php
+use Innmind\Immutable\Predicate\Instance;
+
+$sequence = Sequence::of(null, new \stdClass, 'foo')->keep(Instance::of('stdClass'));
+$sequence; // Sequence<stdClass>
+```
+
 ## `->exclude()`
 
 Removes elements from the sequence that match the given predicate.

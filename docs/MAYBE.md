@@ -123,6 +123,10 @@ $validDsn = $dsn->filter(fn(string $url): bool => \filter_var($url, \FILTER_VALI
 
 `$validDsn` will contain either a valid url or nothing.
 
+## `->keep()`
+
+This is similar to `->filter()` with the advantage of psalm understanding the type in the new `Maybe`.
+
 ## `->exclude()`
 
 This is the inverse of the `->filter()` method.

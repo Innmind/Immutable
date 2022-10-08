@@ -8,6 +8,7 @@ use Innmind\Immutable\{
     Map,
     Str,
     Sequence,
+    Predicate,
 };
 use PHPUnit\Framework\TestCase;
 
@@ -538,6 +539,16 @@ class SetTest extends TestCase
         $this->assertSame(1, $started);
         $this->assertFalse($cleanupCalled);
         $this->assertTrue($endReached);
+    }
+
+    public function testKeep()
+    {
+        $this->assertSame(
+            [$this, $this],
+            Sequence::of(null, 1, $this, true, $this, [])
+                ->keep(Predicate\Instance::of(self::class))
+                ->toList(),
+        );
     }
 
     public function get($map, $index)

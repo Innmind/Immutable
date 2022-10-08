@@ -148,6 +148,17 @@ $set = Set::ints(1, 2, 3, 4)->filter(fn($i) => $i % 2 === 0);
 $set->equals(Set::ints(2, 4));
 ```
 
+## `->keep()`
+
+This is similar to `->filter()` with the advantage of psalm understanding the type in the new `Set`.
+
+```php
+use Innmind\Immutable\Predicate\Instance;
+
+$set = Set::of(null, new \stdClass, 'foo')->keep(Instance::of('stdClass'));
+$set; // Set<stdClass>
+```
+
 ## `->exclude()`
 
 Removes elements from the set that match the given predicate.

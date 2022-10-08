@@ -246,6 +246,22 @@ final class Sequence implements \Countable
     }
 
     /**
+     * This is the same behaviour as `filter` but it allows Psalm to understand
+     * the type of the values contained in the returned Sequence
+     *
+     * @template S
+     *
+     * @param Predicate<S> $predicate
+     *
+     * @return self<S>
+     */
+    public function keep(Predicate $predicate): self
+    {
+        /** @var self<S> */
+        return $this->filter($predicate);
+    }
+
+    /**
      * Return all elements that satisfy the given predicate
      *
      * @param callable(T): bool $predicate

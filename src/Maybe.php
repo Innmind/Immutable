@@ -125,6 +125,22 @@ final class Maybe
     }
 
     /**
+     * This is the same behaviour as `filter` but it allows Psalm to understand
+     * the type of the values contained in the returned Maybe
+     *
+     * @template S
+     *
+     * @param Predicate<S> $predicate
+     *
+     * @return self<S>
+     */
+    public function keep(Predicate $predicate): self
+    {
+        /** @var self<S> */
+        return $this->filter($predicate);
+    }
+
+    /**
      * @param callable(T): bool $predicate
      *
      * @return self<T>

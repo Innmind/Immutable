@@ -9,6 +9,7 @@ use Innmind\Immutable\{
     Set,
     Map,
     Monoid\Concat,
+    Predicate,
 };
 use PHPUnit\Framework\TestCase;
 
@@ -989,6 +990,16 @@ class SequenceTest extends TestCase
         $this->assertSame(
             [[0, 'a'], [1, 'b'], [2, 'c']],
             $zipped->toList(),
+        );
+    }
+
+    public function testKeep()
+    {
+        $this->assertSame(
+            [$this, $this],
+            Sequence::of(null, 1, $this, true, $this, [])
+                ->keep(Predicate\Instance::of(self::class))
+                ->toList(),
         );
     }
 

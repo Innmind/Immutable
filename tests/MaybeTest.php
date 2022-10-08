@@ -6,6 +6,7 @@ namespace Tests\Innmind\Immutable;
 use Innmind\Immutable\{
     Maybe,
     Either,
+    Predicate,
 };
 use PHPUnit\Framework\TestCase;
 use Innmind\BlackBox\{
@@ -491,6 +492,39 @@ class MaybeTest extends TestCase
                     static fn() => null,
                 ));
             });
+    }
+
+    public function testKeep()
+    {
+        $this
+            ->forAll(Set\AnyType::any())
+            ->then(function($value) {
+                $this->assertNull(
+                    Maybe::just($value)
+                        ->keep(Predicate\Instance::of(self::class))
+                        ->match(
+                            static fn($value) => $value,
+                            static fn() => null,
+                        ),
+                );
+            });
+        $this->assertSame(
+            $this,
+            Maybe::just($this)
+                ->keep(Predicate\Instance::of(self::class))
+                ->match(
+                    static fn($value) => $value,
+                    static fn() => null,
+                ),
+        );
+        $this->assertNull(
+            Maybe::nothing()
+                ->keep(Predicate\Instance::of(self::class))
+                ->match(
+                    static fn($value) => $value,
+                    static fn() => null,
+                ),
+        );
     }
 
     private function value(): Set
