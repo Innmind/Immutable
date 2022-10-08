@@ -450,6 +450,7 @@ final class Lazy implements Implementation
                 // needs to free resources correctly
                 $cleanup = self::noCleanup();
                 $middleware = static function(callable $userDefinedCleanup) use (&$cleanup, $registerCleanup): void {
+                    /** @var callable(): void $userDefinedCleanup */
                     $cleanup = $userDefinedCleanup;
                     $registerCleanup($userDefinedCleanup);
                 };
