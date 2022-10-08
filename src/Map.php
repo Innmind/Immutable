@@ -57,11 +57,17 @@ final class Map implements \Countable
         return $self;
     }
 
+    /**
+     * @return 0|positive-int
+     */
     public function size(): int
     {
         return $this->implementation->size();
     }
 
+    /**
+     * @return 0|positive-int
+     */
     public function count(): int
     {
         return $this->size();

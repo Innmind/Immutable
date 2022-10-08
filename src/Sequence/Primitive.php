@@ -210,17 +210,18 @@ final class Primitive implements Implementation
     /**
      * @param T $element
      *
-     * @return Maybe<int>
+     * @return Maybe<0|positive-int>
      */
     public function indexOf($element): Maybe
     {
         $index = \array_search($element, $this->values, true);
 
         if ($index === false) {
-            /** @var Maybe<int> */
+            /** @var Maybe<0|positive-int> */
             return Maybe::nothing();
         }
 
+        /** @var Maybe<0|positive-int> */
         return Maybe::just($index);
     }
 

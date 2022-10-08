@@ -154,6 +154,8 @@ final class Defer implements Implementation
     }
 
     /**
+     * @param 0|positive-int $size
+     *
      * @return Implementation<T>
      */
     public function dropEnd(int $size): Implementation
@@ -262,7 +264,7 @@ final class Defer implements Implementation
     /**
      * @param T $element
      *
-     * @return Maybe<int>
+     * @return Maybe<0|positive-int>
      */
     public function indexOf($element): Maybe
     {
@@ -270,26 +272,27 @@ final class Defer implements Implementation
 
         foreach ($this->values as $value) {
             if ($value === $element) {
+                /** @var Maybe<0|positive-int> */
                 return Maybe::just($index);
             }
 
             ++$index;
         }
 
-        /** @var Maybe<int> */
+        /** @var Maybe<0|positive-int> */
         return Maybe::nothing();
     }
 
     /**
      * Return the list of indices
      *
-     * @return Implementation<int>
+     * @return Implementation<0|positive-int>
      */
     public function indices(): Implementation
     {
         /**
          * @psalm-suppress ImpureFunctionCall
-         * @var Implementation<int>
+         * @var Implementation<0|positive-int>
          */
         return new self(
             (static function(\Iterator $values): \Generator {
@@ -428,6 +431,8 @@ final class Defer implements Implementation
     }
 
     /**
+     * @param 0|positive-int $size
+     *
      * @return Implementation<T>
      */
     public function takeEnd(int $size): Implementation

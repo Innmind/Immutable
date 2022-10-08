@@ -168,6 +168,8 @@ final class Lazy implements Implementation
     }
 
     /**
+     * @param 0|positive-int $size
+     *
      * @return Implementation<T>
      */
     public function dropEnd(int $size): Implementation
@@ -280,7 +282,7 @@ final class Lazy implements Implementation
     /**
      * @param T $element
      *
-     * @return Maybe<int>
+     * @return Maybe<0|positive-int>
      */
     public function indexOf($element): Maybe
     {
@@ -296,26 +298,27 @@ final class Lazy implements Implementation
                 /** @psalm-suppress MixedFunctionCall Due to the reference in the closure above */
                 $cleanup();
 
+                /** @var Maybe<0|positive-int> */
                 return Maybe::just($index);
             }
 
             ++$index;
         }
 
-        /** @var Maybe<int> */
+        /** @var Maybe<0|positive-int> */
         return Maybe::nothing();
     }
 
     /**
      * Return the list of indices
      *
-     * @return Implementation<int>
+     * @return Implementation<0|positive-int>
      */
     public function indices(): Implementation
     {
         $values = $this->values;
 
-        /** @var Implementation<int> */
+        /** @var Implementation<0|positive-int> */
         return new self(
             static function(callable $registerCleanup) use ($values): \Generator {
                 $index = 0;
@@ -471,6 +474,8 @@ final class Lazy implements Implementation
     }
 
     /**
+     * @param 0|positive-int $size
+     *
      * @return Implementation<T>
      */
     public function takeEnd(int $size): Implementation
