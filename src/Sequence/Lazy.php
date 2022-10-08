@@ -42,7 +42,6 @@ final class Lazy implements Implementation
 
         return new self(
             static function(callable $registerCleanup) use ($values, $element): \Generator {
-                /** @var RegisterCleanup $registerCleanup */
                 foreach ($values($registerCleanup) as $value) {
                     yield $value;
                 }
@@ -133,7 +132,6 @@ final class Lazy implements Implementation
                 /** @var list<T> */
                 $uniques = [];
 
-                /** @var RegisterCleanup $registerCleanup */
                 foreach ($values($registerCleanup) as $value) {
                     if (!\in_array($value, $uniques, true)) {
                         $uniques[] = $value;
@@ -154,7 +152,6 @@ final class Lazy implements Implementation
 
         return new self(
             static function(callable $registerCleanup) use ($values, $size): \Generator {
-                /** @var RegisterCleanup $registerCleanup */
                 $dropped = 0;
 
                 foreach ($values($registerCleanup) as $value) {
@@ -199,7 +196,6 @@ final class Lazy implements Implementation
 
         return new self(
             static function(callable $registerCleanup) use ($values, $predicate): \Generator {
-                /** @var RegisterCleanup $registerCleanup */
                 foreach ($values($registerCleanup) as $value) {
                     if ($predicate($value)) {
                         yield $value;
@@ -322,7 +318,6 @@ final class Lazy implements Implementation
         /** @var Implementation<int> */
         return new self(
             static function(callable $registerCleanup) use ($values): \Generator {
-                /** @var RegisterCleanup $registerCleanup */
                 $index = 0;
 
                 foreach ($values($registerCleanup) as $_) {
@@ -345,7 +340,6 @@ final class Lazy implements Implementation
 
         return new self(
             static function(callable $registerCleanup) use ($values, $function): \Generator {
-                /** @var RegisterCleanup $registerCleanup */
                 foreach ($values($registerCleanup) as $value) {
                     yield $function($value);
                 }
@@ -392,7 +386,6 @@ final class Lazy implements Implementation
 
         return new self(
             static function(callable $registerCleanup) use ($values, $size, $element): \Generator {
-                /** @var RegisterCleanup $registerCleanup */
                 foreach ($values($registerCleanup) as $value) {
                     yield $value;
                     --$size;
@@ -428,7 +421,6 @@ final class Lazy implements Implementation
             static function(callable $registerCleanup) use ($values, $from, $until): \Generator {
                 $index = 0;
 
-                /** @var RegisterCleanup $registerCleanup */
                 foreach ($values($registerCleanup) as $value) {
                     if ($index >= $from && $index < $until) {
                         yield $value;
@@ -498,7 +490,6 @@ final class Lazy implements Implementation
 
         return new self(
             static function(callable $registerCleanup) use ($values, $sequence): \Generator {
-                /** @var RegisterCleanup $registerCleanup */
                 foreach ($values($registerCleanup) as $value) {
                     yield $value;
                 }
@@ -671,7 +662,6 @@ final class Lazy implements Implementation
         /** @var Implementation<array{T, S}> */
         return new self(
             static function(callable $registerCleanup) use ($values, $sequence) {
-                /** @var RegisterCleanup $registerCleanup */
                 $other = self::open($sequence, $registerCleanup);
 
                 foreach ($values($registerCleanup) as $value) {
