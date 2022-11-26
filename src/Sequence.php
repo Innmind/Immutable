@@ -91,6 +91,24 @@ final class Sequence implements \Countable
     }
 
     /**
+     * Same as self::lazy() except you don't have to create the generator manually
+     *
+     * @template V
+     * @no-named-arguments
+     * @psalm-pure
+     *
+     * @param V $values
+     */
+    public static function lazyStartingWith(...$values): self
+    {
+        return self::lazy(function() use ($values) {
+            foreach ($values as $value) {
+                yield $value;
+            }
+        });
+    }
+
+    /**
      * @no-named-arguments
      * @psalm-pure
      *
