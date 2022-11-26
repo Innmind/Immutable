@@ -98,6 +98,8 @@ final class Sequence implements \Countable
      * @psalm-pure
      *
      * @param V $values
+     *
+     * @return self<V>
      */
     public static function lazyStartingWith(...$values): self
     {

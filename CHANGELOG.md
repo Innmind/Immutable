@@ -1,8 +1,14 @@
 # Changelog
 
+## 4.7.1 - 2022-11-27
+
+### Fixed
+
+- Fixed `Sequence::lazyStartingWith()` return type declaration
+
 ## 4.7.0 - 2022-11-26
 
-## Added
+### Added
 
 - `Innmind\Immutable\Sequence::lazyStartingWith()`
 
