@@ -71,7 +71,7 @@ class SequenceTest extends TestCase
     {
         $loaded = false;
         $sequence = Sequence::lazyStartingWith(1, 2, 3)->append(
-            Sequence::lazy(function() use (&$loaded) {
+            Sequence::lazy(static function() use (&$loaded) {
                 yield 4;
                 $loaded = true;
             }),

@@ -101,7 +101,7 @@ final class Sequence implements \Countable
      */
     public static function lazyStartingWith(...$values): self
     {
-        return self::lazy(function() use ($values) {
+        return self::lazy(static function() use ($values) {
             foreach ($values as $value) {
                 yield $value;
             }
