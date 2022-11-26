@@ -41,6 +41,16 @@ $sequence = Sequence::lazy(function() {
 
 **Important**: since the elements are reloaded each time the immutability responsability is up to you because the source may change or if you generate objects it will generate new objects each time (so if you make strict comparison it will fail).
 
+## `::lazyStartingWith()`
+
+Same as `::lazy()` except you don't need to manually build the generator.
+
+```php
+$sequence = Sequence::lazyStartingWith(1, 2, 3);
+```
+
+**Note**: this is useful when you know the first items of the sequence and you'll `append` another lazy sequence at the end.
+
 ## `::mixed()`
 
 This is a shortcut for `::of(mixed ...$mixed)`.

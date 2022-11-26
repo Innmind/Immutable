@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.7.0 - 2022-11-26
+
+## Added
+
+- `Innmind\Immutable\Sequence::lazyStartingWith()`
+
 ## 4.6.0 - 2022-10-08
 
 ## Added
