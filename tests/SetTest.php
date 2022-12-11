@@ -551,6 +551,68 @@ class SetTest extends TestCase
         );
     }
 
+    public function testSafeguard()
+    {
+        $stop = new \Exception;
+
+        try {
+            Set::of(new \ArrayObject([1]), new \ArrayObject([2]), new \ArrayObject([3]), new \ArrayObject([1]))->safeguard(
+                Set::of(),
+                static fn($unique, $value) => match ($unique->contains($value[0])) {
+                    true => throw $stop,
+                    false => ($unique)($value[0]),
+                },
+            );
+            $this->fail('it should throw');
+        } catch (\Exception $e) {
+            $this->assertSame($stop, $e);
+        }
+
+        try {
+            $loaded = false;
+            $set = Set::defer((static function() use (&$loaded) {
+                $loaded = true;
+                yield new \ArrayObject([1]);
+                yield new \ArrayObject([2]);
+                yield new \ArrayObject([3]);
+                yield new \ArrayObject([1]);
+            })())->safeguard(
+                Set::of(),
+                static fn($unique, $value) => match ($unique->contains($value[0])) {
+                    true => throw $stop,
+                    false => ($unique)($value[0]),
+                },
+            );
+            $this->assertFalse($loaded);
+            $set->toList();
+            $this->fail('it should throw');
+        } catch (\Exception $e) {
+            $this->assertSame($stop, $e);
+        }
+
+        try {
+            $loaded = false;
+            $set = Set::lazy(static function() use (&$loaded) {
+                $loaded = true;
+                yield new \ArrayObject([1]);
+                yield new \ArrayObject([2]);
+                yield new \ArrayObject([3]);
+                yield new \ArrayObject([1]);
+            })->safeguard(
+                Set::of(),
+                static fn($unique, $value) => match ($unique->contains($value[0])) {
+                    true => throw $stop,
+                    false => ($unique)($value[0]),
+                },
+            );
+            $this->assertFalse($loaded);
+            $set->toList();
+            $this->fail('it should throw');
+        } catch (\Exception $e) {
+            $this->assertSame($stop, $e);
+        }
+    }
+
     public function get($map, $index)
     {
         return $map->get($index)->match(

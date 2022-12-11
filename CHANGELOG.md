@@ -5,6 +5,7 @@
 ### Added
 
 - `Innmind\Immutable\Sequence::safeguard`
+- `Innmind\Immutable\Set::safeguard`
 
 ## 4.7.1 - 2022-11-27
 

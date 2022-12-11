@@ -339,3 +339,46 @@ Set::ints(1, 3, 5, 7)->any($isOdd); // true
 Set::ints(1, 3, 4, 5, 7)->any($isOdd); // true
 Set::ints(2, 4, 6, 8)->any($isOdd); // false
 ```
+
+## `->safeguard()`
+
+This method allows you to make sure all values conforms to an assertion before continuing using the set.
+
+```php
+$uniqueFiles = Set::of(
+    new \ArrayObject(['name' => 'a']),
+    new \ArrayObject(['name' => 'b']),
+    new \ArrayObject(['name' => 'c']),
+    new \ArrayObject(['name' => 'a']),
+)
+    ->safeguard(
+        Set::strings()
+        static fn(Set $names, string $value) => match ($names->contains($value['name'])) {
+            true => throw new \LogicException("{$value['name']} is already used"),
+            false => $names->add($value['name']),
+        },
+    );
+```
+
+This example will throw because there is the value `a` twice.
+
+This method is especially useful for deferred or lazy sets because it allows to make sure all values conforms after this call whithout unwrapping the whole set first. The downside of this lazy evaluation is that some operations may start before reaching a non conforming value (example below).
+
+```php
+Set::lazy(function() {
+    yield new \ArrayObject(['name' => 'a']);
+    yield new \ArrayObject(['name' => 'b']);
+    yield new \ArrayObject(['name' => 'c']);
+    yield new \ArrayObject(['name' => 'a']);
+})
+    ->safeguard(
+        Set::strings()
+        static fn(Set $names, string $value) => match ($names->contains($value['name'])) {
+            true => throw new \LogicException("{$value['name']} is already used"),
+            false => $names->add($value['name']),
+        },
+    )
+    ->foreach(static fn($value) => print($value['name']));
+```
+
+This example will print `a`, `b` and `c` before throwing an exception because of the second `a`. Use this method carefully.
