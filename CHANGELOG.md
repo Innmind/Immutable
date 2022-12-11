@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## 4.8.0 - 2022-12-11
 
 ### Added
 
