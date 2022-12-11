@@ -374,7 +374,29 @@ $lastnames = Sequence::of('Doe', 'Skywalker', 'Kirk');
 $pairs = $firnames
     ->zip($lastnames)
     ->toList();
-$pairs; // [['John', 'Doe'], ['Luke', 'Skywalker'], ['James', 'Kirk']]</code></pre></main>
+$pairs; // [['John', 'Doe'], ['Luke', 'Skywalker'], ['James', 'Kirk']]</code></pre>
+<h2 id="safeguard"><a href="#safeguard" class="anchor">#</a><code>->safeguard()</code></h2>
+<p>This method allows you to make sure all values conforms to an assertion before continuing using the sequence.</p>
+<pre><code class="language-php">$uniqueFiles = Sequence::of('a', 'b', 'c', 'a')
+    ->safeguard(
+        Set::strings()
+        static fn(Set $names, string $name) => match ($names->contains($name)) {
+            true => throw new \LogicException("$name is already used"),
+            false => $names->add($name),
+        },
+    );</code></pre>
+<p>This example will throw because there is the value <code>a</code> twice.</p>
+<p>This method is especially useful for deferred or lazy sequences because it allows to make sure all values conforms after this call whithout unwrapping the whole sequence first. The downside of this lazy evaluation is that some operations may start before reaching a non conforming value (example below).</p>
+<pre><code class="language-php">Sequence::lazyStartingWith('a', 'b', 'c', 'a')
+    ->safeguard(
+        Set::strings()
+        static fn(Set $names, string $name) => match ($names->contains($name)) {
+            true => throw new \LogicException("$name is already used"),
+            false => $names->add($name),
+        },
+    )
+    ->foreach(static fn($name) => print($name));</code></pre>
+<p>This example will print <code>a</code>, <code>b</code> and <code>c</code> before throwing an exception because of the second <code>a</code>. Use this method carefully.</p></main>
     <footer>
         <a href="https://github.com/innmind/Immutable/" target="_blank">GitHub</a>
     </footer>
