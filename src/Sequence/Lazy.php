@@ -683,6 +683,28 @@ final class Lazy implements Implementation
     }
 
     /**
+     * @template R
+     * @param R $carry
+     * @param callable(R, T): R $assert
+     *
+     * @return self<T>
+     */
+    public function safeguard($carry, callable $assert): self
+    {
+        $values = $this->values;
+
+        return new self(
+            static function(callable $registerCleanup) use ($values, $carry, $assert): \Generator {
+                foreach ($values($registerCleanup) as $value) {
+                    $carry = $assert($carry, $value);
+
+                    yield $value;
+                }
+            },
+        );
+    }
+
+    /**
      * @return Implementation<T>
      */
     private function load(): Implementation

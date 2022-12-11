@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+
+- `Innmind\Immutable\Sequence::safeguard`
+
 ## 4.7.1 - 2022-11-27
 
 ### Fixed

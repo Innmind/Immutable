@@ -1019,6 +1019,68 @@ class SequenceTest extends TestCase
         );
     }
 
+    public function testSafeguard()
+    {
+        $stop = new \Exception;
+
+        try {
+            Sequence::of(1, 2, 3, 1)->safeguard(
+                Set::of(),
+                static fn($unique, $value) => match ($unique->contains($value)) {
+                    true => throw $stop,
+                    false => ($unique)($value),
+                },
+            );
+            $this->fail('it should throw');
+        } catch (\Exception $e) {
+            $this->assertSame($stop, $e);
+        }
+
+        try {
+            $loaded = false;
+            $sequence = Sequence::defer((static function() use (&$loaded) {
+                $loaded = true;
+                yield 1;
+                yield 2;
+                yield 3;
+                yield 1;
+            })())->safeguard(
+                Set::of(),
+                static fn($unique, $value) => match ($unique->contains($value)) {
+                    true => throw $stop,
+                    false => ($unique)($value),
+                },
+            );
+            $this->assertFalse($loaded);
+            $sequence->toList();
+            $this->fail('it should throw');
+        } catch (\Exception $e) {
+            $this->assertSame($stop, $e);
+        }
+
+        try {
+            $loaded = false;
+            $sequence = Sequence::lazy(static function() use (&$loaded) {
+                $loaded = true;
+                yield 1;
+                yield 2;
+                yield 3;
+                yield 1;
+            })->safeguard(
+                Set::of(),
+                static fn($unique, $value) => match ($unique->contains($value)) {
+                    true => throw $stop,
+                    false => ($unique)($value),
+                },
+            );
+            $this->assertFalse($loaded);
+            $sequence->toList();
+            $this->fail('it should throw');
+        } catch (\Exception $e) {
+            $this->assertSame($stop, $e);
+        }
+    }
+
     public function get($map, $index)
     {
         return $map->get($index)->match(

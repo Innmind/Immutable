@@ -500,3 +500,36 @@ $pairs = $firnames
     ->toList();
 $pairs; // [['John', 'Doe'], ['Luke', 'Skywalker'], ['James', 'Kirk']]
 ```
+
+## `->safeguard()`
+
+This method allows you to make sure all values conforms to an assertion before continuing using the sequence.
+
+```php
+$uniqueFiles = Sequence::of('a', 'b', 'c', 'a')
+    ->safeguard(
+        Set::strings()
+        static fn(Set $names, string $name) => match ($names->contains($name)) {
+            true => throw new \LogicException("$name is already used"),
+            false => $names->add($name),
+        },
+    );
+```
+
+This example will throw because there is the value `a` twice.
+
+This method is especially useful for deferred or lazy sequences because it allows to make sure all values conforms after this call whithout unwrapping the whole sequence first. The downside of this lazy evaluation is that some operations may start before reaching a non conforming value (example below).
+
+```php
+Sequence::lazyStartingWith('a', 'b', 'c', 'a')
+    ->safeguard(
+        Set::strings()
+        static fn(Set $names, string $name) => match ($names->contains($name)) {
+            true => throw new \LogicException("$name is already used"),
+            false => $names->add($name),
+        },
+    )
+    ->foreach(static fn($name) => print($name));
+```
+
+This example will print `a`, `b` and `c` before throwing an exception because of the second `a`. Use this method carefully.
