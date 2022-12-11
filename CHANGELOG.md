@@ -10,6 +10,7 @@
 ### Fixed
 
 - `Innmind\Immutable\Set::remove()` no longer unwraps deferred and lazy `Set`s
+- Fix calling unnecessary methods for some `Set` operations
 
 ## 4.7.1 - 2022-11-27
 

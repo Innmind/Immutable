@@ -26,7 +26,7 @@ final class Defer implements Implementation
      */
     public function __construct(Sequence\Implementation $values)
     {
-        $this->values = $values->distinct();
+        $this->values = $values;
     }
 
     /**
@@ -36,7 +36,7 @@ final class Defer implements Implementation
      */
     public function __invoke($element): self
     {
-        return new self(($this->values)($element));
+        return self::distinct(($this->values)($element));
     }
 
     /**
@@ -49,7 +49,7 @@ final class Defer implements Implementation
      */
     public static function of(\Generator $generator): self
     {
-        return new self(new Sequence\Defer($generator));
+        return self::distinct(new Sequence\Defer($generator));
     }
 
     public function size(): int
@@ -170,7 +170,7 @@ final class Defer implements Implementation
      */
     public function map(callable $function): self
     {
-        return new self($this->values->map($function));
+        return self::distinct($this->values->map($function));
     }
 
     /**
@@ -206,7 +206,7 @@ final class Defer implements Implementation
      */
     public function merge(Implementation $set): self
     {
-        return new self($this->values->append($set->sequence()));
+        return self::distinct($this->values->append($set->sequence()));
     }
 
     /**
@@ -257,5 +257,13 @@ final class Defer implements Implementation
     public function sequence(): Sequence\Implementation
     {
         return $this->values;
+    }
+
+    /**
+     * @psalm-pure
+     */
+    private static function distinct(Sequence\Implementation $values): self
+    {
+        return new self($values->distinct());
     }
 }
