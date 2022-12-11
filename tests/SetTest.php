@@ -544,8 +544,8 @@ class SetTest extends TestCase
     public function testKeep()
     {
         $this->assertSame(
-            [$this, $this],
-            Sequence::of(null, 1, $this, true, $this, [])
+            [$this],
+            Set::of(null, 1, $this, true, [])
                 ->keep(Predicate\Instance::of(self::class))
                 ->toList(),
         );
