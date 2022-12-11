@@ -102,10 +102,6 @@ final class Lazy implements Implementation
      */
     public function remove($element): self
     {
-        if (!$this->contains($element)) {
-            return $this;
-        }
-
         return new self($this->values->filter(
             static fn($value) => $value !== $element,
         ));

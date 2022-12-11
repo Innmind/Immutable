@@ -113,7 +113,7 @@ class LazyTest extends TestCase
         $this->assertSame([1, 2, 3, 4], \iterator_to_array($a->iterator()));
         $this->assertInstanceOf(Lazy::class, $b);
         $this->assertSame([1, 2, 4], \iterator_to_array($b->iterator()));
-        $this->assertSame($a, $a->remove(5));
+        $this->assertSame([1, 2, 3, 4], \iterator_to_array($a->remove(5)->iterator()));
     }
 
     public function testDiff()

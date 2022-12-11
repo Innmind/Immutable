@@ -7,6 +7,10 @@
 - `Innmind\Immutable\Sequence::safeguard`
 - `Innmind\Immutable\Set::safeguard`
 
+### Fixed
+
+- `Innmind\Immutable\Set::remove()` no longer unwraps deferred and lazy `Set`s
+
 ## 4.7.1 - 2022-11-27
 
 ### Fixed
