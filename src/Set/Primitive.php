@@ -244,6 +244,18 @@ final class Primitive implements Implementation
     }
 
     /**
+     * @template R
+     * @param R $carry
+     * @param callable(R, T): R $assert
+     *
+     * @return self<T>
+     */
+    public function safeguard($carry, callable $assert): self
+    {
+        return new self($this->values->safeguard($carry, $assert));
+    }
+
+    /**
      * @return Sequence\Implementation<T>
      */
     public function sequence(): Sequence\Implementation

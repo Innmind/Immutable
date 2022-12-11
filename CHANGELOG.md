@@ -1,5 +1,17 @@
 # Changelog
 
+## 4.8.0 - 2022-12-11
+
+### Added
+
+- `Innmind\Immutable\Sequence::safeguard`
+- `Innmind\Immutable\Set::safeguard`
+
+### Fixed
+
+- `Innmind\Immutable\Set::remove()` no longer unwraps deferred and lazy `Set`s
+- Fix calling unnecessary methods for some `Set` operations
+
 ## 4.7.1 - 2022-11-27
 
 ### Fixed

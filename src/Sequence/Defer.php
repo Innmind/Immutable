@@ -635,6 +635,29 @@ final class Defer implements Implementation
     }
 
     /**
+     * @template R
+     * @param R $carry
+     * @param callable(R, T): R $assert
+     *
+     * @return self<T>
+     */
+    public function safeguard($carry, callable $assert): self
+    {
+        /** @psalm-suppress ImpureFunctionCall */
+        return new self(
+            (static function(\Iterator $values, mixed $carry, callable $assert): \Generator {
+                /** @var T $value */
+                foreach ($values as $value) {
+                    /** @var R */
+                    $carry = $assert($carry, $value);
+
+                    yield $value;
+                }
+            })($this->values, $carry, $assert),
+        );
+    }
+
+    /**
      * @return Implementation<T>
      */
     private function load(): Implementation

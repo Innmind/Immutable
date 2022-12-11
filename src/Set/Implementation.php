@@ -171,6 +171,17 @@ interface Implementation extends \Countable
     public function find(callable $predicate): Maybe;
 
     /**
+     * Make sure every value conforms to the assertion
+     *
+     * @template R
+     * @param R $carry
+     * @param callable(R, T): R $assert
+     *
+     * @return self<T>
+     */
+    public function safeguard($carry, callable $assert): self;
+
+    /**
      * @return Sequence\Implementation<T>
      */
     public function sequence(): Sequence\Implementation;

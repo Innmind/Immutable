@@ -310,4 +310,15 @@ interface Implementation extends \Countable
      * @return self<array{T, S}>
      */
     public function zip(self $sequence): self;
+
+    /**
+     * Make sure every value conforms to the assertion
+     *
+     * @template R
+     * @param R $carry
+     * @param callable(R, T): R $assert
+     *
+     * @return self<T>
+     */
+    public function safeguard($carry, callable $assert): self;
 }

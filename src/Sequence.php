@@ -669,4 +669,24 @@ final class Sequence implements \Countable
     {
         return new self($this->implementation->zip($sequence->implementation));
     }
+
+    /**
+     * Make sure every value conforms to the assertion, you must throw an
+     * exception when a value does not conform.
+     *
+     * For deferred and lazy sequences the assertion is called on the go,
+     * meaning subsequent operations may start before reaching a value that
+     * doesn't conform. To be used carefully.
+     *
+     * @template R
+     *
+     * @param R $carry
+     * @param callable(R, T): R $assert
+     *
+     * @return self<T>
+     */
+    public function safeguard($carry, callable $assert)
+    {
+        return new self($this->implementation->safeguard($carry, $assert));
+    }
 }

@@ -485,6 +485,20 @@ final class Primitive implements Implementation
         return new self($values);
     }
 
+    /**
+     * @template R
+     * @param R $carry
+     * @param callable(R, T): R $assert
+     *
+     * @return self<T>
+     */
+    public function safeguard($carry, callable $assert): self
+    {
+        $_ = $this->reduce($carry, $assert);
+
+        return $this;
+    }
+
     private function has(int $index): bool
     {
         return \array_key_exists($index, $this->values);
