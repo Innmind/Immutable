@@ -174,6 +174,19 @@ final class Defer implements Implementation
     }
 
     /**
+     * @template S
+     *
+     * @param callable(T): Set<S> $map
+     * @param callable(Set<S>): Sequence\Implementation<S> $exfiltrate
+     *
+     * @return self<S>
+     */
+    public function flatMap(callable $map, callable $exfiltrate): self
+    {
+        return self::distinct($this->values->flatMap($map, $exfiltrate));
+    }
+
+    /**
      * @param callable(T): bool $predicate
      *
      * @return Map<bool, Set<T>>

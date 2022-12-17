@@ -256,21 +256,24 @@ final class Primitive implements Implementation
 
     /**
      * @template S
+     * @template C of Sequence<S>|Set<S>
      *
-     * @param callable(T): Sequence<S> $map
-     * @param callable(Sequence<S>): Implementation<S> $exfiltrate
+     * @param callable(T): C $map
+     * @param callable(C): Implementation<S> $exfiltrate
      *
-     * @return Sequence<S>
+     * @return Implementation<S>
      */
-    public function flatMap(callable $map, callable $exfiltrate): Sequence
+    public function flatMap(callable $map, callable $exfiltrate): Implementation
     {
         /**
          * @psalm-suppress MixedArgument
-         * @var Sequence<S>
+         * @psalm-suppress InvalidArgument
+         * @psalm-suppress ImpureFunctionCall
+         * @var Implementation<S>
          */
         return $this->reduce(
-            Sequence::of(),
-            static fn(Sequence $carry, $value) => $carry->append($map($value)),
+            new self,
+            static fn(self $carry, $value) => $carry->append($exfiltrate($map($value))),
         );
     }
 
