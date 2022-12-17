@@ -411,7 +411,7 @@ final class Sequence implements \Countable
         /** @var callable(self<S>): Sequence\Implementation<S> */
         $exfiltrate = static fn(self $sequence): Sequence\Implementation => $sequence->implementation;
 
-        return $this->implementation->flatMap($map, $exfiltrate);
+        return new self($this->implementation->flatMap($map, $exfiltrate));
     }
 
     /**
