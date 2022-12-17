@@ -164,9 +164,10 @@ interface Implementation extends \Countable
 
     /**
      * @template S
+     * @template C of Sequence<S>|Set<S>
      *
-     * @param callable(T): Sequence<S> $map
-     * @param callable(Sequence<S>): self<S> $exfiltrate
+     * @param callable(T): C $map
+     * @param callable(C): self<S> $exfiltrate
      *
      * @return self<S>
      */

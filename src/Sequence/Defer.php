@@ -327,9 +327,10 @@ final class Defer implements Implementation
 
     /**
      * @template S
+     * @template C of Sequence<S>|Set<S>
      *
-     * @param callable(T): Sequence<S> $map
-     * @param callable(Sequence<S>): Implementation<S> $exfiltrate
+     * @param callable(T): C $map
+     * @param callable(C): Implementation<S> $exfiltrate
      *
      * @return self<S>
      */
@@ -341,8 +342,8 @@ final class Defer implements Implementation
                 /** @var T $value */
                 foreach ($values as $value) {
                     /**
-                     * @var callable(T): Sequence<S> $map
-                     * @var callable(Sequence<S>): Implementation<S> $exfiltrate
+                     * @var callable(T): C $map
+                     * @var callable(C): Implementation<S> $exfiltrate
                      */
                     foreach ($exfiltrate($map($value))->iterator() as $inner) {
                         yield $inner;

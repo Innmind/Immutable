@@ -256,9 +256,10 @@ final class Primitive implements Implementation
 
     /**
      * @template S
+     * @template C of Sequence<S>|Set<S>
      *
-     * @param callable(T): Sequence<S> $map
-     * @param callable(Sequence<S>): Implementation<S> $exfiltrate
+     * @param callable(T): C $map
+     * @param callable(C): Implementation<S> $exfiltrate
      *
      * @return Implementation<S>
      */
@@ -266,13 +267,14 @@ final class Primitive implements Implementation
     {
         /**
          * @psalm-suppress MixedArgument
+         * @psalm-suppress InvalidArgument
          * @psalm-suppress ImpureFunctionCall
          * @var Implementation<S>
          */
-        return $exfiltrate($this->reduce(
-            Sequence::of(),
-            static fn(Sequence $carry, $value) => $carry->append($map($value)),
-        ));
+        return $this->reduce(
+            new self,
+            static fn(self $carry, $value) => $carry->append($exfiltrate($map($value))),
+        );
     }
 
     /**

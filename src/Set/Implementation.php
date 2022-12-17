@@ -118,6 +118,16 @@ interface Implementation extends \Countable
     public function map(callable $function): self;
 
     /**
+     * @template S
+     *
+     * @param callable(T): Set<S> $map
+     * @param callable(Set<S>): Sequence\Implementation<S> $exfiltrate
+     *
+     * @return self<S>
+     */
+    public function flatMap(callable $map, callable $exfiltrate): self;
+
+    /**
      * Return a sequence of 2 sets partitioned according to the given predicate
      *
      * @param callable(T): bool $predicate

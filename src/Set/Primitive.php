@@ -178,6 +178,24 @@ final class Primitive implements Implementation
     }
 
     /**
+     * @template S
+     *
+     * @param callable(T): Set<S> $map
+     * @param callable(Set<S>): Sequence\Implementation<S> $exfiltrate
+     *
+     * @return Implementation<S>
+     */
+    public function flatMap(callable $map, callable $exfiltrate): Implementation
+    {
+        return new self(
+            $this
+                ->values
+                ->flatMap($map, $exfiltrate)
+                ->distinct(),
+        );
+    }
+
+    /**
      * @param callable(T): bool $predicate
      *
      * @return Map<bool, Set<T>>
