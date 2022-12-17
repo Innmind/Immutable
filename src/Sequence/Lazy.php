@@ -352,17 +352,18 @@ final class Lazy implements Implementation
 
     /**
      * @template S
+     * @template C of Sequence<S>|Set<S>
      *
-     * @param callable(T): Sequence<S> $map
-     * @param callable(Sequence<S>): Implementation<S> $exfiltrate
+     * @param callable(T): C $map
+     * @param callable(C): Implementation<S> $exfiltrate
      *
-     * @return Sequence<S>
+     * @return self<S>
      */
-    public function flatMap(callable $map, callable $exfiltrate): Sequence
+    public function flatMap(callable $map, callable $exfiltrate): self
     {
         $values = $this->values;
 
-        return Sequence::lazy(
+        return new self(
             static function(callable $registerCleanup) use ($values, $map, $exfiltrate): \Generator {
                 foreach ($values($registerCleanup) as $value) {
                     $generator = self::open(

@@ -302,6 +302,32 @@ class SetTest extends TestCase
         $this->assertNotSame($set, $set2);
         $this->assertSame([1, 2, 3, 4], $set->toList());
         $this->assertSame([1, 3, 2, 4, 5, 6], $set2->toList());
+
+        $loaded = false;
+        $set = Set::lazy(static function() use (&$loaded) {
+            yield 1;
+            yield 2;
+            yield 3;
+            $loaded = true;
+        })->flatMap(static fn($i) => Set::of($i, $i + 1));
+
+        $this->assertInstanceOf(Set::class, $set);
+        $this->assertFalse($loaded);
+        $this->assertSame([1, 2, 3, 4], $set->toList());
+        $this->assertTrue($loaded);
+
+        $loaded = false;
+        $set = Set::defer((static function() use (&$loaded) {
+            yield 1;
+            yield 2;
+            yield 3;
+            $loaded = true;
+        })())->flatMap(static fn($i) => Set::of($i, $i + 1));
+
+        $this->assertInstanceOf(Set::class, $set);
+        $this->assertFalse($loaded);
+        $this->assertSame([1, 2, 3, 4], $set->toList());
+        $this->assertTrue($loaded);
     }
 
     public function testPartition()

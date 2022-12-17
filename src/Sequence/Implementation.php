@@ -164,13 +164,14 @@ interface Implementation extends \Countable
 
     /**
      * @template S
+     * @template C of Sequence<S>|Set<S>
      *
-     * @param callable(T): Sequence<S> $map
-     * @param callable(Sequence<S>): self<S> $exfiltrate
+     * @param callable(T): C $map
+     * @param callable(C): self<S> $exfiltrate
      *
-     * @return Sequence<S>
+     * @return self<S>
      */
-    public function flatMap(callable $map, callable $exfiltrate): Sequence;
+    public function flatMap(callable $map, callable $exfiltrate): self;
 
     /**
      * Pad the sequence to a defined size with the given element

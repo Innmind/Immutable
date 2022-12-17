@@ -333,14 +333,10 @@ final class Set implements \Countable
      */
     public function flatMap(callable $map): self
     {
-        /**
-         * @psalm-suppress InvalidArgument
-         * @psalm-suppress MixedArgument
-         */
-        return $this->reduce(
-            self::of(),
-            static fn(self $carry, $value) => $carry->merge($map($value)),
-        );
+        /** @var callable(self<S>): Sequence\Implementation<S> */
+        $exfiltrate = static fn(self $set): Sequence\Implementation => $set->implementation->sequence();
+
+        return new self($this->implementation->flatMap($map, $exfiltrate));
     }
 
     /**

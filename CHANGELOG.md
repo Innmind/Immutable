@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.9.0 - 2022-12-17
+
+### Changed
+
+- Support lazy and deferred `Set::flatMap()`
+
 ## 4.8.0 - 2022-12-11
 
 ### Added
