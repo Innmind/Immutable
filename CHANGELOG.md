@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+
+- `Innmind\Immutable\Str::maybe()`
+
 ## 4.9.0 - 2022-12-17
 
 ### Changed
