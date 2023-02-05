@@ -352,4 +352,41 @@ class EitherTest extends TestCase
                 );
             });
     }
+
+    public function testDefer()
+    {
+        $loaded = 0;
+        $maybe = Either::defer(static function() use (&$loaded) {
+            ++$loaded;
+
+            return Either::right('foo');
+        })
+            ->map(static fn() => 'bar')
+            ->flatMap(static fn() => Either::right('baz'))
+            ->filter(
+                static fn() => false,
+                static fn() => 'unwanted',
+            )
+            ->leftMap(static fn() => 'unwanted bis')
+            ->otherwise(static fn() => Either::right('foobar'))
+            ->maybe();
+
+        $this->assertSame(0, $loaded);
+        $this->assertSame(
+            'foobar',
+            $maybe->match(
+                static fn($value) => $value,
+                static fn() => null,
+            ),
+        );
+        $this->assertSame(1, $loaded);
+        $this->assertSame(
+            'foobar',
+            $maybe->match(
+                static fn($value) => $value,
+                static fn() => null,
+            ),
+        );
+        $this->assertSame(1, $loaded);
+    }
 }

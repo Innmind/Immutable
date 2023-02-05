@@ -7,6 +7,7 @@ use Innmind\Immutable\Maybe\{
     Implementation,
     Just,
     Nothing,
+    Defer,
 };
 
 /**
@@ -62,6 +63,21 @@ final class Maybe
         }
 
         return self::just($value);
+    }
+
+    /**
+     * This method is to be used for IO operations
+     *
+     * @template V
+     * @psalm-pure
+     *
+     * @param callable(): self<V> $deferred
+     *
+     * @return self<V>
+     */
+    public static function defer(callable $deferred): self
+    {
+        return new self(new Defer($deferred));
     }
 
     /**

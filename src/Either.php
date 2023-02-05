@@ -7,6 +7,7 @@ use Innmind\Immutable\Either\{
     Implementation,
     Left,
     Right,
+    Defer,
 };
 
 /**
@@ -53,6 +54,22 @@ final class Either
     public static function right($value): self
     {
         return new self(new Right($value));
+    }
+
+    /**
+     * This method is to be used for IO operations
+     *
+     * @template A
+     * @template B
+     * @psalm-pure
+     *
+     * @param callable(): self<A, B> $deferred
+     *
+     * @return self<A, B>
+     */
+    public static function defer(callable $deferred): self
+    {
+        return new self(new Defer($deferred));
     }
 
     /**

@@ -5,6 +5,8 @@
 ### Added
 
 - `Innmind\Immutable\Str::maybe()`
+- `Innmind\Immutable\Maybe::defer()`
+- `Innmind\Immutable\Either::defer()`
 
 ## 4.9.0 - 2022-12-17
 
