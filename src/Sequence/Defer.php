@@ -79,18 +79,20 @@ final class Defer implements Implementation
      */
     public function get(int $index): Maybe
     {
-        $iteration = 0;
+        return Maybe::defer(function() use ($index) {
+            $iteration = 0;
 
-        foreach ($this->values as $value) {
-            if ($index === $iteration) {
-                return Maybe::just($value);
+            foreach ($this->values as $value) {
+                if ($index === $iteration) {
+                    return Maybe::just($value);
+                }
+
+                ++$iteration;
             }
 
-            ++$iteration;
-        }
-
-        /** @var Maybe<T> */
-        return Maybe::nothing();
+            /** @var Maybe<T> */
+            return Maybe::nothing();
+        });
     }
 
     /**
@@ -223,12 +225,14 @@ final class Defer implements Implementation
      */
     public function first(): Maybe
     {
-        foreach ($this->values as $value) {
-            return Maybe::just($value);
-        }
+        return Maybe::defer(function() {
+            foreach ($this->values as $value) {
+                return Maybe::just($value);
+            }
 
-        /** @var Maybe<T> */
-        return Maybe::nothing();
+            /** @var Maybe<T> */
+            return Maybe::nothing();
+        });
     }
 
     /**
@@ -236,15 +240,18 @@ final class Defer implements Implementation
      */
     public function last(): Maybe
     {
-        foreach ($this->values as $value) {
-        }
+        return Maybe::defer(function() {
+            foreach ($this->values as $value) {
+            }
 
-        if (!isset($value)) {
+            if (!isset($value)) {
+                /** @var Maybe<T> */
+                return Maybe::nothing();
+            }
+
             /** @var Maybe<T> */
-            return Maybe::nothing();
-        }
-
-        return Maybe::just($value);
+            return Maybe::just($value);
+        });
     }
 
     /**
@@ -268,19 +275,21 @@ final class Defer implements Implementation
      */
     public function indexOf($element): Maybe
     {
-        $index = 0;
+        return Maybe::defer(function() use ($element) {
+            $index = 0;
 
-        foreach ($this->values as $value) {
-            if ($value === $element) {
-                /** @var Maybe<0|positive-int> */
-                return Maybe::just($index);
+            foreach ($this->values as $value) {
+                if ($value === $element) {
+                    /** @var Maybe<0|positive-int> */
+                    return Maybe::just($index);
+                }
+
+                ++$index;
             }
 
-            ++$index;
-        }
-
-        /** @var Maybe<0|positive-int> */
-        return Maybe::nothing();
+            /** @var Maybe<0|positive-int> */
+            return Maybe::nothing();
+        });
     }
 
     /**
@@ -586,15 +595,17 @@ final class Defer implements Implementation
 
     public function find(callable $predicate): Maybe
     {
-        foreach ($this->values as $value) {
-            /** @psalm-suppress ImpureFunctionCall */
-            if ($predicate($value) === true) {
-                return Maybe::just($value);
+        return Maybe::defer(function() use ($predicate) {
+            foreach ($this->values as $value) {
+                /** @psalm-suppress ImpureFunctionCall */
+                if ($predicate($value) === true) {
+                    return Maybe::just($value);
+                }
             }
-        }
 
-        /** @var Maybe<T> */
-        return Maybe::nothing();
+            /** @var Maybe<T> */
+            return Maybe::nothing();
+        });
     }
 
     public function match(callable $wrap, callable $match, callable $empty)

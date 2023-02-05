@@ -8,6 +8,10 @@
 - `Innmind\Immutable\Maybe::defer()`
 - `Innmind\Immutable\Either::defer()`
 
+### Changed
+
+- `->get()`, `->first()`, `->last()`, `->indexOf()` and `->find()` calls on a deferred or lazy `Innmind\Immutable\Sequence` will now return a deferred `Innmind\Immutable\Maybe`
+
 ## 4.9.0 - 2022-12-17
 
 ### Changed

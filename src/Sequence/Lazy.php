@@ -85,26 +85,28 @@ final class Lazy implements Implementation
      */
     public function get(int $index): Maybe
     {
-        $iteration = 0;
-        $cleanup = self::noCleanup();
-        /** @psalm-suppress ImpureFunctionCall */
-        $generator = ($this->values)(static function(callable $userDefinedCleanup) use (&$cleanup) {
-            $cleanup = $userDefinedCleanup;
-        });
+        return Maybe::defer(function() use ($index) {
+            $iteration = 0;
+            $cleanup = self::noCleanup();
+            /** @psalm-suppress ImpureFunctionCall */
+            $generator = ($this->values)(static function(callable $userDefinedCleanup) use (&$cleanup) {
+                $cleanup = $userDefinedCleanup;
+            });
 
-        foreach ($generator as $value) {
-            if ($index === $iteration) {
-                /** @psalm-suppress MixedFunctionCall Due to the reference in the closure above */
-                $cleanup();
+            foreach ($generator as $value) {
+                if ($index === $iteration) {
+                    /** @psalm-suppress MixedFunctionCall Due to the reference in the closure above */
+                    $cleanup();
 
-                return Maybe::just($value);
+                    return Maybe::just($value);
+                }
+
+                ++$iteration;
             }
 
-            ++$iteration;
-        }
-
-        /** @var Maybe<T> */
-        return Maybe::nothing();
+            /** @var Maybe<T> */
+            return Maybe::nothing();
+        });
     }
 
     /**
@@ -245,15 +247,18 @@ final class Lazy implements Implementation
      */
     public function last(): Maybe
     {
-        foreach ($this->iterator() as $value) {
-        }
+        return Maybe::defer(function() {
+            foreach ($this->iterator() as $value) {
+            }
 
-        if (!isset($value)) {
+            if (!isset($value)) {
+                /** @var Maybe<T> */
+                return Maybe::nothing();
+            }
+
             /** @var Maybe<T> */
-            return Maybe::nothing();
-        }
-
-        return Maybe::just($value);
+            return Maybe::just($value);
+        });
     }
 
     /**
@@ -286,27 +291,29 @@ final class Lazy implements Implementation
      */
     public function indexOf($element): Maybe
     {
-        $index = 0;
-        $cleanup = self::noCleanup();
-        /** @psalm-suppress ImpureFunctionCall */
-        $generator = ($this->values)(static function(callable $userDefinedCleanup) use (&$cleanup) {
-            $cleanup = $userDefinedCleanup;
-        });
+        return Maybe::defer(function() use ($element) {
+            $index = 0;
+            $cleanup = self::noCleanup();
+            /** @psalm-suppress ImpureFunctionCall */
+            $generator = ($this->values)(static function(callable $userDefinedCleanup) use (&$cleanup) {
+                $cleanup = $userDefinedCleanup;
+            });
 
-        foreach ($generator as $value) {
-            if ($value === $element) {
-                /** @psalm-suppress MixedFunctionCall Due to the reference in the closure above */
-                $cleanup();
+            foreach ($generator as $value) {
+                if ($value === $element) {
+                    /** @psalm-suppress MixedFunctionCall Due to the reference in the closure above */
+                    $cleanup();
 
-                /** @var Maybe<0|positive-int> */
-                return Maybe::just($index);
+                    /** @var Maybe<0|positive-int> */
+                    return Maybe::just($index);
+                }
+
+                ++$index;
             }
 
-            ++$index;
-        }
-
-        /** @var Maybe<0|positive-int> */
-        return Maybe::nothing();
+            /** @var Maybe<0|positive-int> */
+            return Maybe::nothing();
+        });
     }
 
     /**
@@ -627,24 +634,26 @@ final class Lazy implements Implementation
 
     public function find(callable $predicate): Maybe
     {
-        $cleanup = self::noCleanup();
-        /** @psalm-suppress ImpureFunctionCall */
-        $generator = ($this->values)(static function(callable $userDefinedCleanup) use (&$cleanup) {
-            $cleanup = $userDefinedCleanup;
-        });
-
-        foreach ($generator as $value) {
+        return Maybe::defer(function() use ($predicate) {
+            $cleanup = self::noCleanup();
             /** @psalm-suppress ImpureFunctionCall */
-            if ($predicate($value) === true) {
-                /** @psalm-suppress MixedFunctionCall Due to the reference in the closure above */
-                $cleanup();
+            $generator = ($this->values)(static function(callable $userDefinedCleanup) use (&$cleanup) {
+                $cleanup = $userDefinedCleanup;
+            });
 
-                return Maybe::just($value);
+            foreach ($generator as $value) {
+                /** @psalm-suppress ImpureFunctionCall */
+                if ($predicate($value) === true) {
+                    /** @psalm-suppress MixedFunctionCall Due to the reference in the closure above */
+                    $cleanup();
+
+                    return Maybe::just($value);
+                }
             }
-        }
 
-        /** @var Maybe<T> */
-        return Maybe::nothing();
+            /** @var Maybe<T> */
+            return Maybe::nothing();
+        });
     }
 
     public function match(callable $wrap, callable $match, callable $empty)
