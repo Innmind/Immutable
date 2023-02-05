@@ -140,6 +140,19 @@ function accessResource(User $user): Either {
 <p>This builds an <code>Either</code> instance with the given value in the right hand side.</p>
 <pre><code class="language-php">$either = Either::right($anyValue);</code></pre>
 <p><strong>Note</strong>: usually this side is used for valid values.</p>
+<h2 id="defer"><a href="#defer" class="anchor">#</a><code>::defer()</code></h2>
+<p>This is used to return an <code>Either</code> early with known data type but with the value that will be extracted from the callable when calling <code>->match()</code>. The main use case is for IO operations.</p>
+<pre><code class="language-php">$either = Either::defer(static function() {
+    try {
+        $value = /* wait for some IO operation like an http call */;
+
+        return Either::right($value);
+    } catch (\Throwable $e) {
+        return Either::left($e);
+    }
+});</code></pre>
+<p>Methods called (except <code>match</code>) on a deferred <code>Either</code> will not be called immediately but will be composed to be executed once you call <code>match</code>.</p>
+<p><strong>Important</strong>: this means that if you never call <code>match</code> on a deferred <code>Either</code> it will do nothing.</p>
 <h2 id="map"><a href="#map" class="anchor">#</a><code>->map()</code></h2>
 <p>This will apply the map transformation on the right value if there is one, otherwise it's only a type change.</p>
 <pre><code class="language-php">/** @var Either<Error, User> */

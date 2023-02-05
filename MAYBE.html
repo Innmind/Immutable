@@ -133,6 +133,15 @@ $maybe = Maybe::of($value);</code></pre>
         static fn(Kernel $kernel) => $kernel,
         static fn() => throw new \Exception('ENV or DEBUG environment variable is missing (or both)'),
     );</code></pre>
+<h2 id="defer"><a href="#defer" class="anchor">#</a><code>::defer()</code></h2>
+<p>This is used to return a <code>Maybe</code> early with known data type but with the value that will be extracted from the callable when calling <code>->match()</code>. The main use case is for IO operations.</p>
+<pre><code class="language-php">$maybe = Maybe::defer(static function() {
+    $value = /* wait for some IO operation like an http call */;
+
+    return Maybe::of($value);
+});</code></pre>
+<p>Methods called (except <code>match</code>) on a deferred <code>Maybe</code> will not be called immediately but will be composed to be executed once you call <code>match</code>.</p>
+<p><strong>Important</strong>: this means that if you never call <code>match</code> on a deferred <code>Maybe</code> it will do nothing.</p>
 <h2 id="map"><a href="#map" class="anchor">#</a><code>->map()</code></h2>
 <p>This function allows you to transform the value into another value that will be wrapped in a <code>Maybe</code> object.</p>
 <pre><code class="language-php">$dsn = env('LOGGER_DSN');

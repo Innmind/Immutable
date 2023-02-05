@@ -297,7 +297,11 @@ $str->equals(Str::of('foo,bar,baz')); // true</code></pre>
 <pre><code class="language-php">$str = Str::of('foo|bar|baz')->flatMap(
     fn(string $value, string $encoding): Str => Str::of(',')->join(Sequence::of(...\explode('|', $string))),
 );
-$str->equals(Str::of('foo,bar,baz')); // true</code></pre></main>
+$str->equals(Str::of('foo,bar,baz')); // true</code></pre>
+<h2 id="maybe"><a href="#maybe" class="anchor">#</a><code>->maybe()</code></h2>
+<p>The is a shortcut method, the 2 examples below do the same thing.</p>
+<pre><code class="language-php">Str::of('foobar')->maybe(static fn($str) => $str->startsWith('foo')); // Maybe<Str>
+Maybe::of(Str::of('foobar'))->filter(static fn($str) => $str->startsWith('foo')); // Maybe<Str></code></pre></main>
     <footer>
         <a href="https://github.com/innmind/Immutable/" target="_blank">GitHub</a>
     </footer>
