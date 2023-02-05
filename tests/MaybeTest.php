@@ -527,6 +527,39 @@ class MaybeTest extends TestCase
         );
     }
 
+    public function testDefer()
+    {
+        $loaded = 0;
+        $either = Maybe::defer(static function() use (&$loaded) {
+            ++$loaded;
+
+            return Maybe::just('foo');
+        })
+            ->map(static fn() => 'bar')
+            ->flatMap(static fn() => Maybe::just('baz'))
+            ->filter(static fn() => false)
+            ->otherwise(static fn() => Maybe::just('foobar'))
+            ->either();
+
+        $this->assertSame(0, $loaded);
+        $this->assertSame(
+            'foobar',
+            $either->match(
+                static fn($value) => $value,
+                static fn() => null,
+            ),
+        );
+        $this->assertSame(1, $loaded);
+        $this->assertSame(
+            'foobar',
+            $either->match(
+                static fn($value) => $value,
+                static fn() => null,
+            ),
+        );
+        $this->assertSame(1, $loaded);
+    }
+
     private function value(): Set
     {
         return Set\AnyType::any()->filter(static fn($value) => $value !== null);

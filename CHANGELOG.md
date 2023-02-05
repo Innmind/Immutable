@@ -1,5 +1,21 @@
 # Changelog
 
+## 4.10.0 - 2023-02-05
+
+### Added
+
+- `Innmind\Immutable\Str::maybe()`
+- `Innmind\Immutable\Maybe::defer()`
+- `Innmind\Immutable\Either::defer()`
+
+### Changed
+
+- `->get()`, `->first()`, `->last()`, `->indexOf()` and `->find()` calls on a deferred or lazy `Innmind\Immutable\Sequence` will now return a deferred `Innmind\Immutable\Maybe`
+
+### Fixed
+
+- `Innmind\Immutable\Sequence::last()` returned `Innmind\Immutable\Maybe::nothing()` when the last value was `null`, now it returns `Innmind\Immutable\Maybe::just(null)`
+
 ## 4.9.0 - 2022-12-17
 
 ### Changed

@@ -60,6 +60,16 @@ final class Str
     }
 
     /**
+     * @param callable(self): bool $filter
+     *
+     * @return Maybe<self>
+     */
+    public function maybe(callable $filter): Maybe
+    {
+        return Maybe::just($this)->filter($filter);
+    }
+
+    /**
      * Split the string into a collection of ones
      *
      * @return Sequence<self>

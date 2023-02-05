@@ -320,6 +320,23 @@ class LazyTest extends TestCase
         );
     }
 
+    public function testLastWhenNull()
+    {
+        $sequence = new Lazy(static function() {
+            yield 1;
+            yield 2;
+            yield 3;
+            yield null;
+        });
+
+        $this->assertNull(
+            $sequence->last()->match(
+                static fn($value) => $value,
+                static fn() => false,
+            ),
+        );
+    }
+
     public function testContains()
     {
         $sequence = new Lazy(static function() {

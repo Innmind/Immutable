@@ -828,6 +828,29 @@ class StrTest extends TestCase
         $this->assertSame('1|2|3', $str->toString());
     }
 
+    public function testMaybe()
+    {
+        $str = S::of('foobar');
+
+        $this->assertSame(
+            $str,
+            $str
+                ->maybe(static fn($str) => $str->startsWith('foo'))
+                ->match(
+                    static fn($str) => $str,
+                    static fn() => null,
+                ),
+        );
+        $this->assertNull(
+            $str
+                ->maybe(static fn($str) => $str->startsWith('bar'))
+                ->match(
+                    static fn($str) => $str,
+                    static fn() => null,
+                ),
+        );
+    }
+
     public function get($map, $index)
     {
         return $map->get($index)->match(

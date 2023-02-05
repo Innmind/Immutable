@@ -54,6 +54,26 @@ $either = Either::right($anyValue);
 
 **Note**: usually this side is used for valid values.
 
+## `::defer()`
+
+This is used to return an `Either` early with known data type but with the value that will be extracted from the callable when calling `->match()`. The main use case is for IO operations.
+
+```php
+$either = Either::defer(static function() {
+    try {
+        $value = /* wait for some IO operation like an http call */;
+
+        return Either::right($value);
+    } catch (\Throwable $e) {
+        return Either::left($e);
+    }
+});
+```
+
+Methods called (except `match`) on a deferred `Either` will not be called immediately but will be composed to be executed once you call `match`.
+
+**Important**: this means that if you never call `match` on a deferred `Either` it will do nothing.
+
 ## `->map()`
 
 This will apply the map transformation on the right value if there is one, otherwise it's only a type change.

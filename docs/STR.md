@@ -406,3 +406,12 @@ $str = Str::of('foo|bar|baz')->flatMap(
 );
 $str->equals(Str::of('foo,bar,baz')); // true
 ```
+
+## `->maybe()`
+
+The is a shortcut method, the 2 examples below do the same thing.
+
+```php
+Str::of('foobar')->maybe(static fn($str) => $str->startsWith('foo')); // Maybe<Str>
+Maybe::of(Str::of('foobar'))->filter(static fn($str) => $str->startsWith('foo')); // Maybe<Str>
+```
