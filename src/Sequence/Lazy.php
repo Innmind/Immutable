@@ -248,15 +248,21 @@ final class Lazy implements Implementation
     public function last(): Maybe
     {
         return Maybe::defer(function() {
+            $loaded = false;
+
             foreach ($this->iterator() as $value) {
+                $loaded = true;
             }
 
-            if (!isset($value)) {
+            if (!$loaded) {
                 /** @var Maybe<T> */
                 return Maybe::nothing();
             }
 
-            /** @var Maybe<T> */
+            /**
+             * @psalm-suppress PossiblyUndefinedVariable
+             * @var Maybe<T>
+             */
             return Maybe::just($value);
         });
     }
