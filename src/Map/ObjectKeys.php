@@ -16,6 +16,7 @@ use Innmind\Immutable\{
 /**
  * @template T
  * @template S
+ * @implements Implementation<T, S>
  * @psalm-immutable
  */
 final class ObjectKeys implements Implementation
