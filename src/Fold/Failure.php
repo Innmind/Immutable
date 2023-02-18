@@ -49,6 +49,25 @@ final class Failure implements Implementation
     }
 
     /**
+     * @template A
+     *
+     * @param callable(R1): A $map
+     *
+     * @return self<F1, A, C1>
+     */
+    public function mapResult(callable $map): self
+    {
+        /** @var self<F1, A, C1> */
+        return $this;
+    }
+
+    public function mapFailure(callable $map): self
+    {
+        /** @psalm-suppress ImpureFunctionCall */
+        return new self($map($this->failure));
+    }
+
+    /**
      * @return Maybe<Either<F1, R1>>
      */
     public function maybe(): Maybe

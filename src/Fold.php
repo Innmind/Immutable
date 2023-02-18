@@ -100,6 +100,30 @@ final class Fold
     }
 
     /**
+     * @template A
+     *
+     * @param callable(R): A $map
+     *
+     * @return self<F, A, C>
+     */
+    public function mapResult(callable $map): self
+    {
+        return new self($this->fold->mapResult($map));
+    }
+
+    /**
+     * @template A
+     *
+     * @param callable(F): A $map
+     *
+     * @return self<A, R, C>
+     */
+    public function mapFailure(callable $map): self
+    {
+        return new self($this->fold->mapFailure($map));
+    }
+
+    /**
      * @return Maybe<Either<F, R>>
      */
     public function maybe(): Maybe

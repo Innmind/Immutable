@@ -144,4 +144,92 @@ class FoldTest extends TestCase
                 );
             });
     }
+
+    public function testMapResult()
+    {
+        $this
+            ->forAll(
+                Set\AnyType::any(),
+                Set\AnyType::any(),
+            )
+            ->then(function($source, $mapped) {
+                $fold = Fold::with($source)
+                    ->mapResult(static fn() => $mapped)
+                    ->match(
+                        static fn($with) => $with,
+                        static fn() => null,
+                        static fn() => null,
+                    );
+
+                $this->assertSame($source, $fold);
+
+                $fold = Fold::result($source)
+                    ->mapResult(function($in) use ($source, $mapped) {
+                        $this->assertSame($source, $in);
+
+                        return $mapped;
+                    })
+                    ->match(
+                        static fn() => null,
+                        static fn($result) => $result,
+                        static fn() => null,
+                    );
+
+                $this->assertSame($mapped, $fold);
+
+                $fold = Fold::fail($source)
+                    ->mapResult(static fn() => $mapped)
+                    ->match(
+                        static fn() => null,
+                        static fn() => null,
+                        static fn($failure) => $failure,
+                    );
+
+                $this->assertSame($source, $fold);
+            });
+    }
+
+    public function testMapFailure()
+    {
+        $this
+            ->forAll(
+                Set\AnyType::any(),
+                Set\AnyType::any(),
+            )
+            ->then(function($source, $mapped) {
+                $fold = Fold::with($source)
+                    ->mapFailure(static fn() => $mapped)
+                    ->match(
+                        static fn($with) => $with,
+                        static fn() => null,
+                        static fn() => null,
+                    );
+
+                $this->assertSame($source, $fold);
+
+                $fold = Fold::result($source)
+                    ->mapFailure(static fn() => $mapped)
+                    ->match(
+                        static fn() => null,
+                        static fn($result) => $result,
+                        static fn() => null,
+                    );
+
+                $this->assertSame($source, $fold);
+
+                $fold = Fold::fail($source)
+                    ->mapFailure(function($in) use ($source, $mapped) {
+                        $this->assertSame($source, $in);
+
+                        return $mapped;
+                    })
+                    ->match(
+                        static fn() => null,
+                        static fn() => null,
+                        static fn($failure) => $failure,
+                    );
+
+                $this->assertSame($mapped, $fold);
+            });
+    }
 }

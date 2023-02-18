@@ -39,6 +39,24 @@ interface Implementation
     public function flatMap(callable $map): Fold;
 
     /**
+     * @template A
+     *
+     * @param callable(R): A $map
+     *
+     * @return self<F, A, C>
+     */
+    public function mapResult(callable $map): self;
+
+    /**
+     * @template A
+     *
+     * @param callable(F): A $map
+     *
+     * @return self<A, R, C>
+     */
+    public function mapFailure(callable $map): self;
+
+    /**
      * @return Maybe<Either<F, R>>
      */
     public function maybe(): Maybe;

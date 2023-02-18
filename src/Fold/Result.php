@@ -48,6 +48,25 @@ final class Result implements Implementation
         return Fold::result($this->result);
     }
 
+    public function mapResult(callable $map): self
+    {
+        /** @psalm-suppress ImpureFunctionCall */
+        return new self($map($this->result));
+    }
+
+    /**
+     * @template A
+     *
+     * @param callable(F1): A $map
+     *
+     * @return self<A, R1, C1>
+     */
+    public function mapFailure(callable $map): self
+    {
+        /** @var self<A, R1, C1> */
+        return $this;
+    }
+
     /**
      * @return Maybe<Either<F1, R1>>
      */
