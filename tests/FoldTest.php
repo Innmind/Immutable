@@ -67,9 +67,9 @@ class FoldTest extends TestCase
                     static fn($value, $type) => $type($value),
                     Set\AnyType::any(),
                     Set\Elements::of(
-                        Fold::with(...),
-                        Fold::result(...),
-                        Fold::fail(...),
+                        static fn($value) => Fold::with($value),
+                        static fn($value) => Fold::result($value),
+                        static fn($value) => Fold::fail($value),
                     ),
                 ),
             )
