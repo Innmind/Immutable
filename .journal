@@ -52,6 +52,10 @@ return static function(Config $config): Config
                     Path::of('STATE.md'),
                 ),
                 Entry::markdown(
+                    'Fold',
+                    Path::of('FOLD.md'),
+                ),
+                Entry::markdown(
                     'Monoids',
                     Path::of('MONOIDS.md'),
                 ),
