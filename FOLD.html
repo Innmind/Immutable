@@ -65,7 +65,7 @@
                                         State
                                     </a>
                                 </li>
-                                                            <li class="sub-item ">
+                                                            <li class="sub-item current">
                                     <a href="https://innmind.github.io/Immutable/FOLD.html">
                                         Fold
                                     </a>
@@ -97,7 +97,7 @@
                                                     </ul>
                     </details>
                             </li>
-                    <li class="current">
+                    <li>
                                     <a href="https://innmind.github.io/Immutable/BLACKBOX.html">
                         Blackbox
                     </a>
@@ -109,33 +109,96 @@
                             </li>
                 </ul>
     </aside>
-    <main><h1 id="innmindblackbox-sets"><a href="#innmindblackbox-sets" class="anchor">#</a><code>innmind/black-box</code> sets</h1>
-<p>This package provides additional sets for <a href="https://packagist.org/packages/innmind/black-box"><code>innmind/black-box</code></a> so you can more easily generate: <code>Map</code>s, <code>Set</code>s and <code>Sequence</code>s.</p>
-<p>For the 3 <code>::of()</code> method you can pass as last parameter an instance of <code>Innmind\BlackBox\Set\Intergers</code> to specify the range of elements to generate. By default it's between <code>0</code> and <code>100</code>, depending on the values you generate you may to lower the upper bound to reduce the memory footprint and speed up your tests.</p>
-<h2 id="map"><a href="#map" class="anchor">#</a><code>Map</code></h2>
-<pre><code class="language-php">use Fixtures\Innmind\Immutable\Map;
-use Innmind\BlackBox\Set;
+    <main><h1 id="fold"><a href="#fold" class="anchor">#</a><code>Fold</code></h1>
+<p>The <code>Fold</code> monad is intented to work with <em>(infinte) stream of data</em> by folding each element to a single value. This monad distinguishes between the type used to fold and the result type, this allows to inform the <em>stream</em> that it's no longer necessary to extract elements as the folding is done.</p>
+<p>An example is reading from a socket as it's an infinite stream of strings:</p>
+<pre><code class="language-php">$socket = \stream_socket_client(/* args */);
+/** @var Fold<string, list<string>, list<string>> */
+$fold = Fold::with([]);
 
-/** @var Set<Innmind\Immutable\Map<int, string>> */
-$set = Map::of(
-    Set\Integers::any(),
-    Set\Strings::any(),
+do {
+    // production code should wait for the socket to be "ready"
+    $line = \fgets($socket);
+
+    if ($line === false) {
+        $fold = Fold::fail('socket not readable');
+    }
+
+    $fold = $fold
+        ->map(static fn($lines) => \array_merge($lines, [$line]))
+        ->flatMap(static fn($lines) => match (\end($lines)) {
+            "quit\n" => Fold::result($lines),
+            default => Fold::with($lines),
+        });
+    $continue = $fold->match(
+        static fn() => true, // still folding
+        static fn() => false, // got a result so stop
+        static fn() => false, // got a failure so stop
+    );
+} while ($continue);
+
+$fold->match(
+    static fn() => null, // unreachable in this case because no more folding outside the loop
+    static fn($lines) => \var_dump($lines),
+    static fn($failure) => throw new \RuntimeException($failure),
 );</code></pre>
-<h2 id="set"><a href="#set" class="anchor">#</a><code>Set</code></h2>
-<pre><code class="language-php">use Fixtures\Innmind\Immutable\Set;
-use Innmind\BlackBox\Set as BSet;
-
-/** @var BSet<Innmind\Immutable\Set<string>> */
-$set = Set::of(
-    BSet\Strings::any(),
+<p>This example will read all lines from the socket until one line contains <code>quit\n</code> then the loop will stop and either dump all the lines to the output or <code>throw new RuntimeException('socket not reachable')</code>.</p>
+<h2 id="with"><a href="#with" class="anchor">#</a><code>::with()</code></h2>
+<p>This named constructor accepts a value with the notion that more elements are necessary to compute a result</p>
+<h2 id="result"><a href="#result" class="anchor">#</a><code>::result()</code></h2>
+<p>This named constructor accepts a <em>result</em> value meaning that folding is finished.</p>
+<h2 id="fail"><a href="#fail" class="anchor">#</a><code>::fail()</code></h2>
+<p>This named constructor accepts a <em>failure</em> value meaning that the folding operation failed and no <em>result</em> will be reachable.</p>
+<h2 id="map"><a href="#map" class="anchor">#</a><code>->map()</code></h2>
+<p>This method allows to transform the value being folded.</p>
+<pre><code class="language-php">$fold = Fold::with([])->map(static fn(array $folding) => new \ArrayObject($folding));</code></pre>
+<h2 id="flatmap"><a href="#flatmap" class="anchor">#</a><code>->flatMap()</code></h2>
+<p>This method allows to both change the value and the <em>state</em>, for example switching from <em>folding</em> to <em>result</em>.</p>
+<pre><code class="language-php">$someElement = /* some data */;
+$fold = Fold::with([])->flatMap(static fn($elements) => match ($someElement) {
+    'finish' => Fold::result($elements),
+    default => Fold::with(\array_merge($elements, [$someElement])),
+});</code></pre>
+<h2 id="mapresult"><a href="#mapresult" class="anchor">#</a><code>->mapResult()</code></h2>
+<p>Same as <a href="#map"><code>->map()</code></a> except that it will transform the <em>result</em> value when there is one.</p>
+<h2 id="mapfailure"><a href="#mapfailure" class="anchor">#</a><code>->mapFailure()</code></h2>
+<p>Same as <a href="#map"><code>->map()</code></a> except that it will transform the <em>failure</em> value when there is one.</p>
+<h2 id="maybe"><a href="#maybe" class="anchor">#</a><code>->maybe()</code></h2>
+<p>This will return the <em>terminal</em> value of the folding, meaning either a <em>result</em> or a <em>failure</em>.</p>
+<pre><code class="language-php">Fold::with([])->maybe()->match(
+    static fn() => null, // not called as still folding
+    static fn() => doStuff(), // called as it is still folding
+);
+Fold::result([])->maybe()->match(
+    static fn($either) => $either->match(
+        static fn($result) => $result, // the value here is the array passed to ::result() above
+        static fn() => null, // not called as it doesn't contain a failure
+    ),
+    static fn() => null, // not called as we have a result
+);
+Fold::fail('some error')->maybe()->match(
+    static fn($either) => $either->match(
+        static fn() => null, // not called as we have a failure
+        static fn($error) => var_dump($error), // the value here is the string passed to ::fail() above
+    ),
+    static fn() => null, // not called as we have a result
 );</code></pre>
-<h2 id="sequence"><a href="#sequence" class="anchor">#</a><code>Sequence</code></h2>
-<pre><code class="language-php">use Fixtures\Innmind\Immutable\Sequence;
-use Innmind\BlackBox\Sequence;
-
-/** @var Set<Innmind\Immutable\Sequence<string>> */
-$set = Sequence::of(
-    Sequence\Strings::any(),
+<h2 id="match"><a href="#match" class="anchor">#</a><code>->match()</code></h2>
+<p>This method allows to extract the value contained in the object.</p>
+<pre><code class="language-php">Fold::with([])->match(
+    static fn($folding) => doStuf($folding), // value from ::with()
+    static fn() => null, // not called
+    static fn() => null, // not called
+);
+Fold::result([])->match(
+    static fn() => null, // not called
+    static fn($result) => doStuf($result), // value from ::result()
+    static fn() => null, // not called
+);
+Fold::fail('some error')->match(
+    static fn() => null, // not called
+    static fn() => null, // not called
+    static fn($error) => doStuf($error), // value from ::fail()
 );</code></pre></main>
     <footer>
         <a href="https://github.com/innmind/Immutable/" target="_blank">GitHub</a>
