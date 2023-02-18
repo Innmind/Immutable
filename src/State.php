@@ -58,11 +58,10 @@ final class State
 
     /**
      * @template A
-     * @template B
      *
-     * @param callable(T): self<A, B> $map
+     * @param callable(T): self<S, A> $map
      *
-     * @return self<A, B>
+     * @return self<S, A>
      */
     public function flatMap(callable $map): self
     {

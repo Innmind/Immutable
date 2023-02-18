@@ -14,6 +14,7 @@ use Innmind\Immutable\{
 
 /**
  * @template T
+ * @implements Implementation<T>
  * @psalm-immutable
  */
 final class Primitive implements Implementation
@@ -451,6 +452,7 @@ final class Primitive implements Implementation
 
     public function match(callable $wrap, callable $match, callable $empty)
     {
+        /** @psalm-suppress MixedArgument */
         return $this
             ->first()
             ->match(

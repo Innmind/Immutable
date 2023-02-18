@@ -9,6 +9,7 @@ namespace Innmind\Immutable;
  *
  * @template T
  * @template S
+ * @implements \Iterator<T, S>
  * @internal Do not use this in your code
  * @psalm-immutable Not really immutable but to simplify declaring immutability of other structures
  */

@@ -10,6 +10,7 @@ use Innmind\Immutable\{
 
 /**
  * @psalm-immutable
+ * @implements Implementation<empty>
  * @internal
  */
 final class Nothing implements Implementation

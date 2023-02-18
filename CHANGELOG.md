@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.11.0 - 2023-02-18
+
+### Added
+
+- `Innmind\Immutable\Fold`
+
 ## 4.10.0 - 2023-02-05
 
 ### Added

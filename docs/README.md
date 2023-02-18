@@ -20,6 +20,7 @@ This library provides the 7 following structures:
 - [`Maybe`](MAYBE.md)
 - [`Either`](EITHER.md)
 - [`State`](STATE.md)
+- [`Fold`](FOLD.md)
 
 See the documentation for each structure to understand how to use them.
 

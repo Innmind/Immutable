@@ -14,6 +14,7 @@ use Innmind\Immutable\{
 
 /**
  * @template T
+ * @implements Implementation<T>
  * @psalm-immutable
  */
 final class Defer implements Implementation

@@ -14,6 +14,7 @@ use Innmind\Immutable\{
 
 /**
  * @template T
+ * @implements Implementation<T>
  * @psalm-immutable
  * @psalm-type RegisterCleanup = callable(callable(): void): void
  */
@@ -514,7 +515,10 @@ final class Lazy implements Implementation
                     yield $value;
                 }
 
-                foreach (self::open($sequence, $registerCleanup) as $value) {
+                /** @var \Iterator<int, T> */
+                $generator = self::open($sequence, $registerCleanup);
+
+                foreach ($generator as $value) {
                     yield $value;
                 }
             },
@@ -730,9 +734,12 @@ final class Lazy implements Implementation
     }
 
     /**
+     * @template A
+     *
+     * @param Implementation<A> $sequence
      * @param RegisterCleanup $registerCleanup
      *
-     * @return \Iterator<int, T>
+     * @return \Iterator<int, A>
      */
     private static function open(
         Implementation $sequence,
