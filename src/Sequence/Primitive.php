@@ -504,6 +504,24 @@ final class Primitive implements Implementation
         return $this;
     }
 
+    /**
+     * @template A
+     *
+     * @param callable(T|A, T): Sequence<A> $map
+     * @param callable(Sequence<A>): Implementation<A> $exfiltrate
+     *
+     * @return self<T|A>
+     */
+    public function aggregate(callable $map, callable $exfiltrate): self
+    {
+        $aggregate = new Aggregate($this->iterator());
+        /** @psalm-suppress MixedArgument */
+        $values = $aggregate(static fn($a, $b) => $exfiltrate($map($a, $b))->iterator());
+
+        /** @psalm-suppress ImpureFunctionCall */
+        return new self(\array_values(\iterator_to_array($values)));
+    }
+
     private function has(int $index): bool
     {
         return \array_key_exists($index, $this->values);

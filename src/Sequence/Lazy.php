@@ -725,6 +725,32 @@ final class Lazy implements Implementation
     }
 
     /**
+     * @template A
+     *
+     * @param callable(T|A, T): Sequence<A> $map
+     * @param callable(Sequence<A>): Implementation<A> $exfiltrate
+     *
+     * @return self<T|A>
+     */
+    public function aggregate(callable $map, callable $exfiltrate): self
+    {
+        return new self(function(callable $registerCleanup) use ($map, $exfiltrate) {
+            $aggregate = new Aggregate($this->iterator());
+            /** @psalm-suppress MixedArgument */
+            $values = $aggregate(static fn($a, $b) => self::open(
+                $exfiltrate($map($a, $b)),
+                $registerCleanup,
+            ));
+
+            foreach ($values as $value) {
+                yield $value;
+            }
+        });
+
+        return new self(\iterator_to_array($values));
+    }
+
+    /**
      * @return Implementation<T>
      */
     private function load(): Implementation
