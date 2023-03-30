@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.12.0 - 2023-03-30
+
+### Added
+
+- `Innmind\Immutable\Sequence::aggregate()`
+
 ## 4.11.0 - 2023-02-18
 
 ### Added

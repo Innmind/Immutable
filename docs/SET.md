@@ -25,7 +25,7 @@ $set = Set::defer((function() {
 
 The method ask a generator that will provide the elements. Once the elements are loaded they are kept in memory so you can run multiple operations on it without loading the file twice.
 
-**Important**: beware of the case where the source you read the elements is not altered before the first use of the set.
+> **Warning** beware of the case where the source you read the elements is not altered before the first use of the set.
 
 ## `::lazy()`
 
@@ -37,7 +37,7 @@ $set = Set::lazy(function() {
 });
 ```
 
-**Important**: since the elements are reloaded each time the immutability responsability is up to you because the source may change or if you generate objects it will generate new objects each time (so if you make strict comparison it will fail).
+> **Warning** since the elements are reloaded each time the immutability responsability is up to you because the source may change or if you generate objects it will generate new objects each time (so if you make strict comparison it will fail).
 
 ## `::mixed()`
 

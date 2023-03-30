@@ -62,7 +62,7 @@ $maybe = Maybe::defer(static function() {
 
 Methods called (except `match`) on a deferred `Maybe` will not be called immediately but will be composed to be executed once you call `match`.
 
-**Important**: this means that if you never call `match` on a deferred `Maybe` it will do nothing.
+> **Warning** this means that if you never call `match` on a deferred `Maybe` it will do nothing.
 
 ## `->map()`
 
