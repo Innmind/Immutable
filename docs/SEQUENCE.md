@@ -548,7 +548,7 @@ $lines = Sequence::of(...$chunks)
     ->flatMap(static fn($chunk) => $chunk->split("\n"))
     ->map(static fn($line) => $line->toString())
     ->toList();
-$lines; // ['foo', 'bar', 'baz']
+$lines; // ['foo', 'bar', 'baz', '']
 ```
 
 > **Note** The `flatMap` is here in case there is only one chunk in the sequence, in which case the `aggregate` is not called
