@@ -136,15 +136,21 @@ function accessResource(User $user): Either {
 
     return Either::left(new Error('User is not allowed'));
 }</code></pre>
-<p><strong>Note</strong>: <code>ServerRequest</code>, <code>User</code>, <code>Resource</code> and <code>Error</code> are imaginary classes.</p>
+<blockquote>
+<p><strong>Note</strong> <code>ServerRequest</code>, <code>User</code>, <code>Resource</code> and <code>Error</code> are imaginary classes.</p>
+</blockquote>
 <h2 id="left"><a href="#left" class="anchor">#</a><code>::left()</code></h2>
 <p>This builds an <code>Either</code> instance with the given value in the left hand side.</p>
 <pre><code class="language-php">$either = Either::left($anyValue);</code></pre>
-<p><strong>Note</strong>: usually this side is used for errors.</p>
+<blockquote>
+<p><strong>Note</strong> usually this side is used for errors.</p>
+</blockquote>
 <h2 id="right"><a href="#right" class="anchor">#</a><code>::right()</code></h2>
 <p>This builds an <code>Either</code> instance with the given value in the right hand side.</p>
 <pre><code class="language-php">$either = Either::right($anyValue);</code></pre>
-<p><strong>Note</strong>: usually this side is used for valid values.</p>
+<blockquote>
+<p><strong>Note</strong> usually this side is used for valid values.</p>
+</blockquote>
 <h2 id="defer"><a href="#defer" class="anchor">#</a><code>::defer()</code></h2>
 <p>This is used to return an <code>Either</code> early with known data type but with the value that will be extracted from the callable when calling <code>->match()</code>. The main use case is for IO operations.</p>
 <pre><code class="language-php">$either = Either::defer(static function() {
@@ -157,7 +163,9 @@ function accessResource(User $user): Either {
     }
 });</code></pre>
 <p>Methods called (except <code>match</code>) on a deferred <code>Either</code> will not be called immediately but will be composed to be executed once you call <code>match</code>.</p>
-<p><strong>Important</strong>: this means that if you never call <code>match</code> on a deferred <code>Either</code> it will do nothing.</p>
+<blockquote>
+<p><strong>Warning</strong> this means that if you never call <code>match</code> on a deferred <code>Either</code> it will do nothing.</p>
+</blockquote>
 <h2 id="map"><a href="#map" class="anchor">#</a><code>->map()</code></h2>
 <p>This will apply the map transformation on the right value if there is one, otherwise it's only a type change.</p>
 <pre><code class="language-php">/** @var Either<Error, User> */
@@ -179,7 +187,9 @@ $response = identify($serverRequest)
         fn(Resource $resource) => new Response(200, $resource->toString()),
         fn(Error $error) => new Response(400, $error->message()), // here the error can be from identify or from accessResource
     );</code></pre>
-<p><strong>Note</strong>: <code>Response</code> is an imaginary class.</p>
+<blockquote>
+<p><strong>Note</strong> <code>Response</code> is an imaginary class.</p>
+</blockquote>
 <h2 id="otherwise"><a href="#otherwise" class="anchor">#</a><code>->otherwise()</code></h2>
 <p>This is like <code>->flatMap()</code> but is called when the instance contains a left value. The callable must return a new <code>Either</code> object.</p>
 <pre><code class="language-php">/**

@@ -123,13 +123,17 @@ Set::of(1, 2, 3, $etc);</code></pre>
     yield from readSomeFile('apache.log');
 })());</code></pre>
 <p>The method ask a generator that will provide the elements. Once the elements are loaded they are kept in memory so you can run multiple operations on it without loading the file twice.</p>
-<p><strong>Important</strong>: beware of the case where the source you read the elements is not altered before the first use of the set.</p>
+<blockquote>
+<p><strong>Warning</strong> beware of the case where the source you read the elements is not altered before the first use of the set.</p>
+</blockquote>
 <h2 id="lazy"><a href="#lazy" class="anchor">#</a><code>::lazy()</code></h2>
 <p>This is similar to <code>::defer()</code> with the exception that the elements are not kept in memory but reloaded upon each use.</p>
 <pre><code class="language-php">$set = Set::lazy(function() {
     yield from readSomeFile('apache.log');
 });</code></pre>
-<p><strong>Important</strong>: since the elements are reloaded each time the immutability responsability is up to you because the source may change or if you generate objects it will generate new objects each time (so if you make strict comparison it will fail).</p>
+<blockquote>
+<p><strong>Warning</strong> since the elements are reloaded each time the immutability responsability is up to you because the source may change or if you generate objects it will generate new objects each time (so if you make strict comparison it will fail).</p>
+</blockquote>
 <h2 id="mixed"><a href="#mixed" class="anchor">#</a><code>::mixed()</code></h2>
 <p>This is a shortcut for <code>::of(mixed ...$mixed)</code>.</p>
 <h2 id="ints"><a href="#ints" class="anchor">#</a><code>::ints()</code></h2>

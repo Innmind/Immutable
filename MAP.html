@@ -213,7 +213,9 @@ $keys->equals(Set::of(24, 42)); // true</code></pre>
 <p>Return a <a href="SEQUENCE.html"><code>Sequence</code></a> of all the values of the map.</p>
 <pre><code class="language-php">$values = Map::of([24, 1], [42, 2])->values();
 $values->equals(Sequence::of(1, 2)); // true</code></pre>
-<p><strong>Note</strong>: it returns a <code>Sequence</code> because it can contain duplicates, the order is not guaranteed as a map is not ordered.</p>
+<blockquote>
+<p><strong>Note</strong> it returns a <code>Sequence</code> because it can contain duplicates, the order is not guaranteed as a map is not ordered.</p>
+</blockquote>
 <h2 id="map"><a href="#map" class="anchor">#</a><code>->map()</code></h2>
 <p>Create a new map of the same type with the exact same number of pairs but modified by the given function.</p>
 <pre><code class="language-php">$urls = Map::of(
