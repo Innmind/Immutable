@@ -27,7 +27,7 @@ $sequence = Sequence::defer((function() {
 
 The method ask a generator that will provide the elements. Once the elements are loaded they are kept in memory so you can run multiple operations on it without loading the file twice.
 
-**Important**: beware of the case where the source you read the elements is not altered before the first use of the sequence.
+> **Warning** beware of the case where the source you read the elements is not altered before the first use of the sequence.
 
 ## `::lazy()`
 
@@ -39,7 +39,7 @@ $sequence = Sequence::lazy(function() {
 });
 ```
 
-**Important**: since the elements are reloaded each time the immutability responsability is up to you because the source may change or if you generate objects it will generate new objects each time (so if you make strict comparison it will fail).
+> **Warning** since the elements are reloaded each time the immutability responsability is up to you because the source may change or if you generate objects it will generate new objects each time (so if you make strict comparison it will fail).
 
 ## `::lazyStartingWith()`
 
@@ -49,7 +49,7 @@ Same as `::lazy()` except you don't need to manually build the generator.
 $sequence = Sequence::lazyStartingWith(1, 2, 3);
 ```
 
-**Note**: this is useful when you know the first items of the sequence and you'll `append` another lazy sequence at the end.
+> **Note** this is useful when you know the first items of the sequence and you'll `append` another lazy sequence at the end.
 
 ## `::mixed()`
 
@@ -485,7 +485,7 @@ $result = sum(Sequence::of(1, 2, 3, 4));
 $result; // 10
 ```
 
-**Important**: for lasy sequences bear in mind that the values will be kept in memory while the first call to `->match` didn't return.
+> **Warning** for lasy sequences bear in mind that the values will be kept in memory while the first call to `->match` didn't return.
 
 ## `->zip()`
 
