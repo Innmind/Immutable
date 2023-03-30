@@ -322,4 +322,14 @@ interface Implementation extends \Countable
      * @return self<T>
      */
     public function safeguard($carry, callable $assert): self;
+
+    /**
+     * @template A
+     *
+     * @param callable(T|A, T): Sequence<A> $map
+     * @param callable(Sequence<A>): Implementation<A> $exfiltrate
+     *
+     * @return self<T|A>
+     */
+    public function aggregate(callable $map, callable $exfiltrate): self;
 }

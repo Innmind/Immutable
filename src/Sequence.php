@@ -689,4 +689,24 @@ final class Sequence implements \Countable
     {
         return new self($this->implementation->safeguard($carry, $assert));
     }
+
+    /**
+     * This methods allows to regroup consecutive elements of the sequence or
+     * split them in multiple elements
+     *
+     * The Sequence returned by $map must always contain at least one element
+     *
+     * @template A
+     *
+     * @param callable(T|A, T): Sequence<A> $map
+     *
+     * @return self<T|A>
+     */
+    public function aggregate(callable $map): self
+    {
+        /** @var callable(self<A>): Sequence\Implementation<A> */
+        $exfiltrate = static fn(self $sequence): Sequence\Implementation => $sequence->implementation;
+
+        return new self($this->implementation->aggregate($map, $exfiltrate));
+    }
 }

@@ -533,3 +533,22 @@ Sequence::lazyStartingWith('a', 'b', 'c', 'a')
 ```
 
 This example will print `a`, `b` and `c` before throwing an exception because of the second `a`. Use this method carefully.
+
+## `->aggregate()`
+
+This methods allows to rearrange the elements of the Sequence. This is especially useful for parsers.
+
+An example would be to rearrange a list of chunks from a file into lines:
+
+```php
+$chunks = ['fo', "o\n", 'ba', "r\n", 'ba', "z\n"]; // let's pretend this comes from a stream
+$lines = Sequence::of(...$chunks)
+    ->map(Str::of(...))
+    ->aggregate(static fn($a, $b) => $a->append($b->toString())->split("\n"))
+    ->flatMap(static fn($chunk) => $chunk->split("\n"))
+    ->map(static fn($line) => $line->toString())
+    ->toList();
+$lines; // ['foo', 'bar', 'baz']
+```
+
+> **Note** The `flatMap` is here in case there is only one chunk in the sequence, in which case the `aggregate` is not called

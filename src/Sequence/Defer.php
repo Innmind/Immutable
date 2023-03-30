@@ -678,6 +678,22 @@ final class Defer implements Implementation
     }
 
     /**
+     * @template A
+     *
+     * @param callable(T|A, T): Sequence<A> $map
+     * @param callable(Sequence<A>): Implementation<A> $exfiltrate
+     *
+     * @return self<T|A>
+     */
+    public function aggregate(callable $map, callable $exfiltrate): self
+    {
+        $aggregate = new Aggregate($this->iterator());
+
+        /** @psalm-suppress MixedArgument */
+        return new self($aggregate(static fn($a, $b) => $exfiltrate($map($a, $b))->iterator()));
+    }
+
+    /**
      * @return Implementation<T>
      */
     private function load(): Implementation

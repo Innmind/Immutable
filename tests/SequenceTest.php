@@ -10,11 +10,18 @@ use Innmind\Immutable\{
     Map,
     Monoid\Concat,
     Predicate,
+    Exception\LogicException,
+};
+use Innmind\BlackBox\{
+    PHPUnit\BlackBox,
+    Set as DataSet,
 };
 use PHPUnit\Framework\TestCase;
 
 class SequenceTest extends TestCase
 {
+    use BlackBox;
+
     public function testInterface()
     {
         $sequence = Sequence::of();
@@ -1078,6 +1085,81 @@ class SequenceTest extends TestCase
             $this->fail('it should throw');
         } catch (\Exception $e) {
             $this->assertSame($stop, $e);
+        }
+    }
+
+    public function testAggregate()
+    {
+        $this
+            ->forAll(DataSet\Integers::between(1, 9))
+            ->then(function($size) {
+                $lines = Str::of("foo\nbar\nbaz\nwatev")
+                    ->chunk($size)
+                    ->aggregate(static fn($a, $b) => $a->append($b->toString())->split("\n"))
+                    ->map(static fn($chunk) => $chunk->toString())
+                    ->toList();
+
+                $this->assertSame(
+                    ['foo', 'bar', 'baz', 'watev'],
+                    $lines,
+                );
+            });
+        $this
+            ->forAll(DataSet\Integers::between(1, 9))
+            ->then(function($size) {
+                $loaded = false;
+                $sequence = Sequence::defer((static function() use ($size, &$loaded) {
+                    $loaded = true;
+                    yield from Str::of("foo\nbar\nbaz\nwatev")
+                        ->chunk($size)
+                        ->toList();
+                })());
+                $lines = $sequence
+                    ->aggregate(static fn($a, $b) => $a->append($b->toString())->split("\n"))
+                    ->map(static fn($chunk) => $chunk->toString());
+
+                $this->assertFalse($loaded);
+                $this->assertSame(
+                    ['foo', 'bar', 'baz', 'watev'],
+                    $lines->toList(),
+                );
+                $this->assertTrue($loaded);
+            });
+        $this
+            ->forAll(DataSet\Integers::between(1, 9))
+            ->then(function($size) {
+                $loaded = 0;
+                $sequence = Sequence::lazy(static function() use ($size, &$loaded) {
+                    ++$loaded;
+                    yield from Str::of("foo\nbar\nbaz\nwatev")
+                        ->chunk($size)
+                        ->toList();
+                });
+                $lines = $sequence
+                    ->aggregate(static fn($a, $b) => $a->append($b->toString())->split("\n"))
+                    ->map(static fn($chunk) => $chunk->toString());
+
+                $this->assertSame(0, $loaded);
+                $this->assertSame(
+                    ['foo', 'bar', 'baz', 'watev'],
+                    $lines->toList(),
+                );
+                $this->assertSame(1, $loaded);
+                $lines->toList();
+                $this->assertSame(2, $loaded);
+            });
+
+        try {
+            Str::of("foo\nbar\nbaz")
+                ->chunk(1)
+                ->aggregate(static fn() => Sequence::of())
+                ->toList();
+            $this->fail('it should throw');
+        } catch (LogicException $e) {
+            $this->assertSame(
+                'Aggregates must always return at least one element',
+                $e->getMessage(),
+            );
         }
     }
 
