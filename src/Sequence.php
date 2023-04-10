@@ -709,4 +709,14 @@ final class Sequence implements \Countable
 
         return new self($this->implementation->aggregate($map, $exfiltrate));
     }
+
+    /**
+     * Force to load all values into memory (only useful for deferred and lazy Sequence)
+     *
+     * @return self<T>
+     */
+    public function memoize(): self
+    {
+        return new self($this->implementation->memoize());
+    }
 }

@@ -332,4 +332,9 @@ interface Implementation extends \Countable
      * @return self<T|A>
      */
     public function aggregate(callable $map, callable $exfiltrate): self;
+
+    /**
+     * @return self<T>
+     */
+    public function memoize(): self;
 }

@@ -753,6 +753,14 @@ final class Lazy implements Implementation
     /**
      * @return Implementation<T>
      */
+    public function memoize(): Implementation
+    {
+        return $this->load();
+    }
+
+    /**
+     * @return Implementation<T>
+     */
     private function load(): Implementation
     {
         /** @psalm-suppress ImpureFunctionCall */

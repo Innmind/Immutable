@@ -1163,6 +1163,42 @@ class SequenceTest extends TestCase
         }
     }
 
+    public function testMemoize()
+    {
+        $this
+            ->forAll(DataSet\Sequence::of(
+                DataSet\AnyType::any(),
+            ))
+            ->then(function($values) {
+                $sequence = Sequence::of(...$values);
+
+                $this->assertEquals($sequence, $sequence->memoize());
+                $this->assertSame($values, $sequence->memoize()->toList());
+
+                $loaded = false;
+                $sequence = Sequence::defer((static function() use (&$loaded, $values) {
+                    yield from $values;
+                    $loaded = true;
+                })());
+                $this->assertFalse($loaded);
+                $memoized = $sequence->memoize();
+                $this->assertTrue($loaded);
+                $this->assertSame($values, $memoized->toList());
+
+                $loaded = 0;
+                $sequence = Sequence::lazy(static function() use (&$loaded, $values) {
+                    yield from $values;
+                    ++$loaded;
+                });
+                $this->assertSame(0, $loaded);
+                $memoized = $sequence->memoize();
+                $this->assertSame(1, $loaded);
+                $this->assertSame($values, $memoized->toList());
+                $this->assertEquals($memoized, $sequence->memoize());
+                $this->assertSame(2, $loaded);
+            });
+    }
+
     public function get($map, $index)
     {
         return $map->get($index)->match(

@@ -522,6 +522,14 @@ final class Primitive implements Implementation
         return new self(\array_values(\iterator_to_array($values)));
     }
 
+    /**
+     * @return self<T>
+     */
+    public function memoize(): self
+    {
+        return $this;
+    }
+
     private function has(int $index): bool
     {
         return \array_key_exists($index, $this->values);
