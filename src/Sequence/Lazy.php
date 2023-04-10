@@ -753,6 +753,93 @@ final class Lazy implements Implementation
     /**
      * @return Implementation<T>
      */
+    public function memoize(): Implementation
+    {
+        return $this->load();
+    }
+
+    /**
+     * @param callable(T): bool $condition
+     *
+     * @return self<T>
+     */
+    public function dropWhile(callable $condition): self
+    {
+        /** @psalm-suppress ImpureFunctionCall */
+        return new self(function($registerCleanup) use ($condition) {
+            /** @psalm-suppress ImpureFunctionCall */
+            $generator = ($this->values)($registerCleanup);
+
+            /** @psalm-suppress ImpureMethodCall */
+            while ($generator->valid()) {
+                /**
+                 * @psalm-suppress ImpureMethodCall
+                 * @psalm-suppress ImpureFunctionCall
+                 */
+                if (!$condition($generator->current())) {
+                    /** @psalm-suppress ImpureMethodCall */
+                    yield $generator->current();
+                    /** @psalm-suppress ImpureMethodCall */
+                    $generator->next();
+
+                    break;
+                }
+
+                /** @psalm-suppress ImpureMethodCall */
+                $generator->next();
+            }
+
+            /** @psalm-suppress ImpureMethodCall */
+            while ($generator->valid()) {
+                /** @psalm-suppress ImpureMethodCall */
+                yield $generator->current();
+                /** @psalm-suppress ImpureMethodCall */
+                $generator->next();
+            }
+        });
+    }
+
+    /**
+     * @param callable(T): bool $condition
+     *
+     * @return self<T>
+     */
+    public function takeWhile(callable $condition): self
+    {
+        $values = $this->values;
+
+        return new self(
+            static function(callable $registerCleanup) use ($values, $condition): \Generator {
+                // We intercept the registering of the cleanup function here
+                // because this generator can be stopped when we reach the number
+                // of elements to take so we have to cleanup here. In this case
+                // the parent sequence may not need to cleanup as it could
+                // iterate over the whole generator but this inner one still
+                // needs to free resources correctly
+                $cleanup = self::noCleanup();
+                $middleware = static function(callable $userDefinedCleanup) use (&$cleanup, $registerCleanup): void {
+                    /** @var callable(): void $userDefinedCleanup */
+                    $cleanup = $userDefinedCleanup;
+                    $registerCleanup($userDefinedCleanup);
+                };
+
+                foreach ($values($middleware) as $value) {
+                    if (!$condition($value)) {
+                        /** @psalm-suppress MixedFunctionCall Due to the reference in the closure above */
+                        $cleanup();
+
+                        return;
+                    }
+
+                    yield $value;
+                }
+            },
+        );
+    }
+
+    /**
+     * @return Implementation<T>
+     */
     private function load(): Implementation
     {
         /** @psalm-suppress ImpureFunctionCall */

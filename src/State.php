@@ -7,8 +7,8 @@ use Innmind\Immutable\State\Result;
 
 /**
  * @psalm-immutable
- * @template S
- * @template T
+ * @template-covariant S
+ * @template-covariant T
  */
 final class State
 {

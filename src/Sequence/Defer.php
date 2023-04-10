@@ -696,6 +696,74 @@ final class Defer implements Implementation
     /**
      * @return Implementation<T>
      */
+    public function memoize(): Implementation
+    {
+        return $this->load();
+    }
+
+    /**
+     * @param callable(T): bool $condition
+     *
+     * @return self<T>
+     */
+    public function dropWhile(callable $condition): self
+    {
+        /** @psalm-suppress ImpureFunctionCall */
+        return new self((static function(\Iterator $values, callable $condition) {
+            /** @psalm-suppress ImpureMethodCall */
+            while ($values->valid()) {
+                /**
+                 * @psalm-suppress ImpureMethodCall
+                 * @psalm-suppress ImpureFunctionCall
+                 */
+                if (!$condition($values->current())) {
+                    /** @psalm-suppress ImpureMethodCall */
+                    yield $values->current();
+                    /** @psalm-suppress ImpureMethodCall */
+                    $values->next();
+
+                    break;
+                }
+
+                /** @psalm-suppress ImpureMethodCall */
+                $values->next();
+            }
+
+            /** @psalm-suppress ImpureMethodCall */
+            while ($values->valid()) {
+                /** @psalm-suppress ImpureMethodCall */
+                yield $values->current();
+                /** @psalm-suppress ImpureMethodCall */
+                $values->next();
+            }
+        })($this->values, $condition));
+    }
+
+    /**
+     * @param callable(T): bool $condition
+     *
+     * @return self<T>
+     */
+    public function takeWhile(callable $condition): self
+    {
+        /** @psalm-suppress ImpureFunctionCall */
+        return new self(
+            (static function(\Iterator $values, callable $condition): \Generator {
+                /** @var T $value */
+                foreach ($values as $value) {
+                    if (!$condition($value)) {
+                        return;
+                    }
+
+                    yield $value;
+                }
+            })($this->values, $condition),
+        );
+    }
+
+    /**
+     * @return Implementation<T>
+     */
     private function load(): Implementation
     {
         /** @psalm-suppress ImpureFunctionCall */

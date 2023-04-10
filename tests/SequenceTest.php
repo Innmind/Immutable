@@ -1163,6 +1163,132 @@ class SequenceTest extends TestCase
         }
     }
 
+    public function testMemoize()
+    {
+        $this
+            ->forAll(DataSet\Sequence::of(
+                DataSet\AnyType::any(),
+            ))
+            ->then(function($values) {
+                $sequence = Sequence::of(...$values);
+
+                $this->assertEquals($sequence, $sequence->memoize());
+                $this->assertSame($values, $sequence->memoize()->toList());
+
+                $loaded = false;
+                $sequence = Sequence::defer((static function() use (&$loaded, $values) {
+                    yield from $values;
+                    $loaded = true;
+                })());
+                $this->assertFalse($loaded);
+                $memoized = $sequence->memoize();
+                $this->assertTrue($loaded);
+                $this->assertSame($values, $memoized->toList());
+
+                $loaded = 0;
+                $sequence = Sequence::lazy(static function() use (&$loaded, $values) {
+                    yield from $values;
+                    ++$loaded;
+                });
+                $this->assertSame(0, $loaded);
+                $memoized = $sequence->memoize();
+                $this->assertSame(1, $loaded);
+                $this->assertSame($values, $memoized->toList());
+                $this->assertEquals($memoized, $sequence->memoize());
+                $this->assertSame(2, $loaded);
+            });
+    }
+
+    public function testToSet()
+    {
+        $this->assertTrue(
+            Sequence::of(1, 2, 3, 1, 4)->toSet()->equals(
+                Set::of(1, 2, 3, 4),
+            ),
+        );
+    }
+
+    public function testDropWhile()
+    {
+        $this->assertSame(
+            [1, 2, 3, 0],
+            Sequence::of(0, 0, 0, 1, 2, 3, 0)
+                ->dropWhile(static fn($i) => $i === 0)
+                ->toList(),
+        );
+        $this->assertSame(
+            [1, 2, 3, 0],
+            Sequence::defer((static function() {
+                yield 0;
+                yield 0;
+                yield 0;
+                yield 1;
+                yield 2;
+                yield 3;
+                yield 0;
+            })())
+                ->dropWhile(static fn($i) => $i === 0)
+                ->toList(),
+        );
+        $this->assertSame(
+            [1, 2, 3, 0],
+            Sequence::lazy(static function() {
+                yield 0;
+                yield 0;
+                yield 0;
+                yield 1;
+                yield 2;
+                yield 3;
+                yield 0;
+            })
+                ->dropWhile(static fn($i) => $i === 0)
+                ->toList(),
+        );
+    }
+
+    public function testTakeWhile()
+    {
+        $this->assertSame(
+            [1, 2, 3],
+            Sequence::of(1, 2, 3, 4, 5)
+                ->takeWhile(static fn($i) => $i !== 4)
+                ->toList(),
+        );
+        $this->assertSame(
+            [1, 2, 3],
+            Sequence::defer((static function() {
+                yield 1;
+                yield 2;
+                yield 3;
+                yield 4;
+                yield 5;
+            })())
+                ->takeWhile(static fn($i) => $i !== 4)
+                ->toList(),
+        );
+        $cleaned = false;
+        $reachedEnd = false;
+        $this->assertSame(
+            [1, 2, 3],
+            Sequence::lazy(static function($cleanup) use (&$cleaned, &$reachedEnd) {
+                $cleanup(static function() use (&$cleaned) {
+                    $cleaned = true;
+                });
+
+                yield 1;
+                yield 2;
+                yield 3;
+                yield 4;
+                yield 5;
+                $reachedEnd = true;
+            })
+                ->takeWhile(static fn($i) => $i !== 4)
+                ->toList(),
+        );
+        $this->assertTrue($cleaned);
+        $this->assertFalse($reachedEnd);
+    }
+
     public function get($map, $index)
     {
         return $map->get($index)->match(

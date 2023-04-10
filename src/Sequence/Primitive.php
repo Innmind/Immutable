@@ -522,6 +522,75 @@ final class Primitive implements Implementation
         return new self(\array_values(\iterator_to_array($values)));
     }
 
+    /**
+     * @return self<T>
+     */
+    public function memoize(): self
+    {
+        return $this;
+    }
+
+    /**
+     * @param callable(T): bool $condition
+     *
+     * @return self<T>
+     */
+    public function dropWhile(callable $condition): self
+    {
+        $values = [];
+        $iterator = $this->iterator();
+
+        /** @psalm-suppress ImpureMethodCall */
+        while ($iterator->valid()) {
+            /**
+             * @psalm-suppress ImpureMethodCall
+             * @psalm-suppress ImpureFunctionCall
+             */
+            if (!$condition($iterator->current())) {
+                /** @psalm-suppress ImpureMethodCall */
+                $values[] = $iterator->current();
+                /** @psalm-suppress ImpureMethodCall */
+                $iterator->next();
+
+                break;
+            }
+
+            /** @psalm-suppress ImpureMethodCall */
+            $iterator->next();
+        }
+
+        /** @psalm-suppress ImpureMethodCall */
+        while ($iterator->valid()) {
+            /** @psalm-suppress ImpureMethodCall */
+            $values[] = $iterator->current();
+            /** @psalm-suppress ImpureMethodCall */
+            $iterator->next();
+        }
+
+        return new self($values);
+    }
+
+    /**
+     * @param callable(T): bool $condition
+     *
+     * @return self<T>
+     */
+    public function takeWhile(callable $condition): self
+    {
+        $values = [];
+
+        foreach ($this->iterator() as $current) {
+            /** @psalm-suppress ImpureFunctionCall */
+            if (!$condition($current)) {
+                break;
+            }
+
+            $values[] = $current;
+        }
+
+        return new self($values);
+    }
+
     private function has(int $index): bool
     {
         return \array_key_exists($index, $this->values);

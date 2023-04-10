@@ -11,8 +11,8 @@ use Innmind\Immutable\Either\{
 };
 
 /**
- * @template L
- * @template R
+ * @template-covariant L
+ * @template-covariant R
  * @psalm-immutable
  */
 final class Either
@@ -154,5 +154,15 @@ final class Either
     public function maybe(): Maybe
     {
         return $this->either->maybe();
+    }
+
+    /**
+     * Force loading the value in memory (only useful for a deferred Either)
+     *
+     * @return self<L, R>
+     */
+    public function memoize(): self
+    {
+        return $this->either->memoize();
     }
 }

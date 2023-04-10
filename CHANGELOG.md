@@ -1,5 +1,21 @@
 # Changelog
 
+## 4.13.0 - 2023-04-10
+
+### Added
+
+- `Innmind\Immutable\Maybe::memoize()`
+- `Innmind\Immutable\Either::memoize()`
+- `Innmind\Immutable\Sequence::memoize()`
+- `Innmind\Immutable\Set::memoize()`
+- `Innmind\Immutable\Sequence::toSet()`
+- `Innmind\Immutable\Sequence::dropWhile()`
+- `Innmind\Immutable\Sequence::takeWhile()`
+
+### Changed
+
+- Monads templates are now covariant
+
 ## 4.12.0 - 2023-03-30
 
 ### Added

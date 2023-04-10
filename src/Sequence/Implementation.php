@@ -332,4 +332,23 @@ interface Implementation extends \Countable
      * @return self<T|A>
      */
     public function aggregate(callable $map, callable $exfiltrate): self;
+
+    /**
+     * @return self<T>
+     */
+    public function memoize(): self;
+
+    /**
+     * @param callable(T): bool $condition
+     *
+     * @return self<T>
+     */
+    public function dropWhile(callable $condition): self;
+
+    /**
+     * @param callable(T): bool $condition
+     *
+     * @return self<T>
+     */
+    public function takeWhile(callable $condition): self;
 }

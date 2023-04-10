@@ -275,6 +275,14 @@ final class Lazy implements Implementation
     }
 
     /**
+     * @return Implementation<T>
+     */
+    public function memoize(): Implementation
+    {
+        return new Primitive($this->values->memoize());
+    }
+
+    /**
      * @psalm-pure
      */
     private static function distinct(Sequence\Implementation $values): self

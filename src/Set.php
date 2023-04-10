@@ -4,7 +4,7 @@ declare(strict_types = 1);
 namespace Innmind\Immutable;
 
 /**
- * @template T
+ * @template-covariant T
  * @psalm-immutable
  */
 final class Set implements \Countable
@@ -477,5 +477,15 @@ final class Set implements \Countable
     public function safeguard($carry, callable $assert)
     {
         return new self($this->implementation->safeguard($carry, $assert));
+    }
+
+    /**
+     * Force to load all values into memory (only useful for deferred and lazy Set)
+     *
+     * @return self<T>
+     */
+    public function memoize(): self
+    {
+        return new self($this->implementation->memoize());
     }
 }

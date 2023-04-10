@@ -11,7 +11,7 @@ use Innmind\Immutable\Maybe\{
 };
 
 /**
- * @template T
+ * @template-covariant T
  * @psalm-immutable
  */
 final class Maybe
@@ -183,5 +183,15 @@ final class Maybe
     public function either(): Either
     {
         return $this->maybe->either();
+    }
+
+    /**
+     * Force loading the value in memory (only useful for a deferred Maybe)
+     *
+     * @return self<T>
+     */
+    public function memoize(): self
+    {
+        return $this->maybe->memoize();
     }
 }

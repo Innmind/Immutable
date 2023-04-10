@@ -164,3 +164,19 @@ Maybe::nothing()
         static fn($left) => $left,
     ); // return 'something'
 ```
+
+## `->memoize()`
+
+This method force to load the contained value into memory. This is only useful for a deferred `Maybe`, this will do nothing for other maybe as the value is already known.
+
+```php
+Maybe::defer(function() {
+    return Maybe::just(\rand());
+})
+    ->map(static fn($i) => $i * 2) // value still not loaded here
+    ->memoize() // call the rand function and then apply the map and store it in memory
+    ->match(
+        static fn($i) => doStuff($i),
+        static fn() => null,
+    );
+```

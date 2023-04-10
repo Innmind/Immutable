@@ -79,4 +79,12 @@ final class Right implements Implementation
     {
         return Maybe::just($this->value);
     }
+
+    /**
+     * @return Either<L1, R1>
+     */
+    public function memoize(): Either
+    {
+        return Either::right($this->value);
+    }
 }

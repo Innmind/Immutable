@@ -382,3 +382,18 @@ Set::lazy(function() {
 ```
 
 This example will print `a`, `b` and `c` before throwing an exception because of the second `a`. Use this method carefully.
+
+## `->memoize()`
+
+This method will load all the values in memory. This is useful only for a deferred or lazy `Set`, the other set will be unaffected.
+
+```php
+$set = Set::lazy(function() {
+    $stream = \fopen('some-file', 'r');
+    while (!\feof($stream)) {
+        yield \fgets($stream);
+    }
+})
+    ->map(static fn($line) => \strtoupper($line)) // still no line loaded here
+    ->memoize(); // load all lines and apply strtoupper on each
+```

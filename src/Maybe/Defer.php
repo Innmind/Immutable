@@ -62,6 +62,14 @@ final class Defer implements Implementation
     /**
      * @return Maybe<V>
      */
+    public function memoize(): Maybe
+    {
+        return $this->unwrap();
+    }
+
+    /**
+     * @return Maybe<V>
+     */
     private function unwrap(): Maybe
     {
         /**

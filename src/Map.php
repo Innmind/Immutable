@@ -4,8 +4,8 @@ declare(strict_types = 1);
 namespace Innmind\Immutable;
 
 /**
- * @template T
- * @template S
+ * @template-covariant T
+ * @template-covariant S
  * @psalm-immutable
  */
 final class Map implements \Countable

@@ -4,7 +4,7 @@ declare(strict_types = 1);
 namespace Innmind\Immutable;
 
 /**
- * @template T
+ * @template-covariant T
  * @psalm-immutable
  */
 final class Sequence implements \Countable
@@ -587,6 +587,14 @@ final class Sequence implements \Countable
     }
 
     /**
+     * @return Set<T>
+     */
+    public function toSet(): Set
+    {
+        return $this->implementation->toSet();
+    }
+
+    /**
      * @return list<T>
      */
     public function toList(): array
@@ -708,5 +716,35 @@ final class Sequence implements \Countable
         $exfiltrate = static fn(self $sequence): Sequence\Implementation => $sequence->implementation;
 
         return new self($this->implementation->aggregate($map, $exfiltrate));
+    }
+
+    /**
+     * Force to load all values into memory (only useful for deferred and lazy Sequence)
+     *
+     * @return self<T>
+     */
+    public function memoize(): self
+    {
+        return new self($this->implementation->memoize());
+    }
+
+    /**
+     * @param callable(T): bool $condition
+     *
+     * @return self<T>
+     */
+    public function dropWhile(callable $condition): self
+    {
+        return new self($this->implementation->dropWhile($condition));
+    }
+
+    /**
+     * @param callable(T): bool $condition
+     *
+     * @return self<T>
+     */
+    public function takeWhile(callable $condition): self
+    {
+        return new self($this->implementation->takeWhile($condition));
     }
 }

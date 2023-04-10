@@ -552,3 +552,40 @@ $lines; // ['foo', 'bar', 'baz', '']
 ```
 
 > **Note** The `flatMap` is here in case there is only one chunk in the sequence, in which case the `aggregate` is not called
+
+## `->memoize()`
+
+This method will load all the values in memory. This is useful only for a deferred or lazy `Sequence`, the other sequence will be unaffected.
+
+```php
+$sequence = Sequence::lazy(function() {
+    $stream = \fopen('some-file', 'r');
+    while (!\feof($stream)) {
+        yield \fgets($stream);
+    }
+})
+    ->map(static fn($line) => \strtoupper($line)) // still no line loaded here
+    ->memoize(); // load all lines and apply strtoupper on each
+```
+
+## `->dropWhile()`
+
+This removes all the elements from the start of the sequence while the condition returns `true`.
+
+```php
+$values = Sequence::of(0, 0, 0, 1, 2, 3, 0)
+    ->dropWhile(static fn($i) => $i === 0)
+    ->toList();
+$values === [1, 2, 3, 0];
+```
+
+## `->takeWhile()`
+
+This keeps all the elements from the start of the sequence while the condition returns `true`.
+
+```php
+$values = Sequence::of(1, 2, 3, 0, 4, 5, 6, 0)
+    ->takeWhile(static fn($i) => $i === 0)
+    ->toList();
+$values === [1, 2, 3];
+```

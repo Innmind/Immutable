@@ -560,6 +560,50 @@ class MaybeTest extends TestCase
         $this->assertSame(1, $loaded);
     }
 
+    public function testMemoize()
+    {
+        $this
+            ->forAll(Set\AnyType::any())
+            ->then(function($value) {
+                $this->assertEquals(
+                    Maybe::just($value),
+                    Maybe::just($value)->memoize(),
+                );
+
+                $maybe = Maybe::defer(static function() use ($value) {
+                    return Maybe::just($value);
+                });
+                $this->assertSame(
+                    $value,
+                    $maybe->memoize()->match(
+                        static fn($value) => $value,
+                        static fn() => null,
+                    ),
+                );
+            });
+
+        $this->assertEquals(
+            Maybe::nothing(),
+            Maybe::nothing()->memoize(),
+        );
+
+        $this
+            ->forAll(new Set\Either(
+                Set\AnyType::any(),
+                Set\Elements::of(null),
+            ))
+            ->then(function($value) {
+                $maybe = Maybe::defer(static function() use ($value) {
+                    return Maybe::of($value);
+                });
+
+                $this->assertSame(
+                    $maybe->memoize(),
+                    $maybe->memoize(),
+                );
+            });
+    }
+
     private function value(): Set
     {
         return Set\AnyType::any()->filter(static fn($value) => $value !== null);

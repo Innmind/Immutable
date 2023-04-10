@@ -64,4 +64,12 @@ final class Just implements Implementation
     {
         return Either::right($this->value);
     }
+
+    /**
+     * @return Maybe<V>
+     */
+    public function memoize(): Maybe
+    {
+        return Maybe::just($this->value);
+    }
 }
