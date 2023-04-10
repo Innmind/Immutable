@@ -1199,6 +1199,15 @@ class SequenceTest extends TestCase
             });
     }
 
+    public function testToSet()
+    {
+        $this->assertTrue(
+            Sequence::of(1, 2, 3, 1, 4)->toSet()->equals(
+                Set::of(1, 2, 3, 4),
+            ),
+        );
+    }
+
     public function get($map, $index)
     {
         return $map->get($index)->match(

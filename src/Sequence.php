@@ -587,6 +587,14 @@ final class Sequence implements \Countable
     }
 
     /**
+     * @return Set<T>
+     */
+    public function toSet(): Set
+    {
+        return $this->implementation->toSet();
+    }
+
+    /**
      * @return list<T>
      */
     public function toList(): array
