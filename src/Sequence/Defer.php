@@ -740,6 +740,28 @@ final class Defer implements Implementation
     }
 
     /**
+     * @param callable(T): bool $condition
+     *
+     * @return self<T>
+     */
+    public function takeWhile(callable $condition): self
+    {
+        /** @psalm-suppress ImpureFunctionCall */
+        return new self(
+            (static function(\Iterator $values, callable $condition): \Generator {
+                /** @var T $value */
+                foreach ($values as $value) {
+                    if (!$condition($value)) {
+                        return;
+                    }
+
+                    yield $value;
+                }
+            })($this->values, $condition),
+        );
+    }
+
+    /**
      * @return Implementation<T>
      */
     private function load(): Implementation

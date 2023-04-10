@@ -10,6 +10,7 @@
 - `Innmind\Immutable\Set::memoize()`
 - `Innmind\Immutable\Sequence::toSet()`
 - `Innmind\Immutable\Sequence::dropWhile()`
+- `Innmind\Immutable\Sequence::takeWhile()`
 
 ### Changed
 

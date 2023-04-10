@@ -578,3 +578,14 @@ $values = Sequence::of(0, 0, 0, 1, 2, 3, 0)
     ->toList();
 $values === [1, 2, 3, 0];
 ```
+
+## `->takeWhile()`
+
+This keeps all the elements from the start of the sequence while the condition returns `true`.
+
+```php
+$values = Sequence::of(1, 2, 3, 0, 4, 5, 6, 0)
+    ->takeWhile(static fn($i) => $i === 0)
+    ->toList();
+$values === [1, 2, 3];
+```

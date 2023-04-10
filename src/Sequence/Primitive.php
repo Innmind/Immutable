@@ -570,6 +570,27 @@ final class Primitive implements Implementation
         return new self($values);
     }
 
+    /**
+     * @param callable(T): bool $condition
+     *
+     * @return self<T>
+     */
+    public function takeWhile(callable $condition): self
+    {
+        $values = [];
+
+        foreach ($this->iterator() as $current) {
+            /** @psalm-suppress ImpureFunctionCall */
+            if (!$condition($current)) {
+                break;
+            }
+
+            $values[] = $current;
+        }
+
+        return new self($values);
+    }
+
     private function has(int $index): bool
     {
         return \array_key_exists($index, $this->values);

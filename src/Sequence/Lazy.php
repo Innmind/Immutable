@@ -800,6 +800,44 @@ final class Lazy implements Implementation
     }
 
     /**
+     * @param callable(T): bool $condition
+     *
+     * @return self<T>
+     */
+    public function takeWhile(callable $condition): self
+    {
+        $values = $this->values;
+
+        return new self(
+            static function(callable $registerCleanup) use ($values, $condition): \Generator {
+                // We intercept the registering of the cleanup function here
+                // because this generator can be stopped when we reach the number
+                // of elements to take so we have to cleanup here. In this case
+                // the parent sequence may not need to cleanup as it could
+                // iterate over the whole generator but this inner one still
+                // needs to free resources correctly
+                $cleanup = self::noCleanup();
+                $middleware = static function(callable $userDefinedCleanup) use (&$cleanup, $registerCleanup): void {
+                    /** @var callable(): void $userDefinedCleanup */
+                    $cleanup = $userDefinedCleanup;
+                    $registerCleanup($userDefinedCleanup);
+                };
+
+                foreach ($values($middleware) as $value) {
+                    if (!$condition($value)) {
+                        /** @psalm-suppress MixedFunctionCall Due to the reference in the closure above */
+                        $cleanup();
+
+                        return;
+                    }
+
+                    yield $value;
+                }
+            },
+        );
+    }
+
+    /**
      * @return Implementation<T>
      */
     private function load(): Implementation

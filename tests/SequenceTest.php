@@ -1246,6 +1246,49 @@ class SequenceTest extends TestCase
         );
     }
 
+    public function testTakeWhile()
+    {
+        $this->assertSame(
+            [1, 2, 3],
+            Sequence::of(1, 2, 3, 4, 5)
+                ->takeWhile(static fn($i) => $i !== 4)
+                ->toList(),
+        );
+        $this->assertSame(
+            [1, 2, 3],
+            Sequence::defer((static function() {
+                yield 1;
+                yield 2;
+                yield 3;
+                yield 4;
+                yield 5;
+            })())
+                ->takeWhile(static fn($i) => $i !== 4)
+                ->toList(),
+        );
+        $cleaned = false;
+        $reachedEnd = false;
+        $this->assertSame(
+            [1, 2, 3],
+            Sequence::lazy(static function($cleanup) use (&$cleaned, &$reachedEnd) {
+                $cleanup(static function() use (&$cleaned) {
+                    $cleaned = true;
+                });
+
+                yield 1;
+                yield 2;
+                yield 3;
+                yield 4;
+                yield 5;
+                $reachedEnd = true;
+            })
+                ->takeWhile(static fn($i) => $i !== 4)
+                ->toList(),
+        );
+        $this->assertTrue($cleaned);
+        $this->assertFalse($reachedEnd);
+    }
+
     public function get($map, $index)
     {
         return $map->get($index)->match(
