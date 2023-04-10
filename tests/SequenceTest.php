@@ -1208,6 +1208,44 @@ class SequenceTest extends TestCase
         );
     }
 
+    public function testDropWhile()
+    {
+        $this->assertSame(
+            [1, 2, 3, 0],
+            Sequence::of(0, 0, 0, 1, 2, 3, 0)
+                ->dropWhile(static fn($i) => $i === 0)
+                ->toList(),
+        );
+        $this->assertSame(
+            [1, 2, 3, 0],
+            Sequence::defer((static function() {
+                yield 0;
+                yield 0;
+                yield 0;
+                yield 1;
+                yield 2;
+                yield 3;
+                yield 0;
+            })())
+                ->dropWhile(static fn($i) => $i === 0)
+                ->toList(),
+        );
+        $this->assertSame(
+            [1, 2, 3, 0],
+            Sequence::lazy(static function() {
+                yield 0;
+                yield 0;
+                yield 0;
+                yield 1;
+                yield 2;
+                yield 3;
+                yield 0;
+            })
+                ->dropWhile(static fn($i) => $i === 0)
+                ->toList(),
+        );
+    }
+
     public function get($map, $index)
     {
         return $map->get($index)->match(

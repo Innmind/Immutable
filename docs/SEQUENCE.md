@@ -567,3 +567,14 @@ $sequence = Sequence::lazy(function() {
     ->map(static fn($line) => \strtoupper($line)) // still no line loaded here
     ->memoize(); // load all lines and apply strtoupper on each
 ```
+
+## `->dropWhile()`
+
+This removes all the elements from the start of the sequence while the condition returns `true`.
+
+```php
+$values = Sequence::of(0, 0, 0, 1, 2, 3, 0)
+    ->dropWhile(static fn($i) => $i === 0)
+    ->toList();
+$values === [1, 2, 3, 0];
+```

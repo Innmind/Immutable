@@ -530,6 +530,46 @@ final class Primitive implements Implementation
         return $this;
     }
 
+    /**
+     * @param callable(T): bool $condition
+     *
+     * @return self<T>
+     */
+    public function dropWhile(callable $condition): self
+    {
+        $values = [];
+        $iterator = $this->iterator();
+
+        /** @psalm-suppress ImpureMethodCall */
+        while ($iterator->valid()) {
+            /**
+             * @psalm-suppress ImpureMethodCall
+             * @psalm-suppress ImpureFunctionCall
+             */
+            if (!$condition($iterator->current())) {
+                /** @psalm-suppress ImpureMethodCall */
+                $values[] = $iterator->current();
+                /** @psalm-suppress ImpureMethodCall */
+                $iterator->next();
+
+                break;
+            }
+
+            /** @psalm-suppress ImpureMethodCall */
+            $iterator->next();
+        }
+
+        /** @psalm-suppress ImpureMethodCall */
+        while ($iterator->valid()) {
+            /** @psalm-suppress ImpureMethodCall */
+            $values[] = $iterator->current();
+            /** @psalm-suppress ImpureMethodCall */
+            $iterator->next();
+        }
+
+        return new self($values);
+    }
+
     private function has(int $index): bool
     {
         return \array_key_exists($index, $this->values);

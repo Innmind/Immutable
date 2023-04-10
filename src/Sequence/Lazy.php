@@ -759,6 +759,47 @@ final class Lazy implements Implementation
     }
 
     /**
+     * @param callable(T): bool $condition
+     *
+     * @return self<T>
+     */
+    public function dropWhile(callable $condition): self
+    {
+        /** @psalm-suppress ImpureFunctionCall */
+        return new self(function($registerCleanup) use ($condition) {
+            /** @psalm-suppress ImpureFunctionCall */
+            $generator = ($this->values)($registerCleanup);
+
+            /** @psalm-suppress ImpureMethodCall */
+            while ($generator->valid()) {
+                /**
+                 * @psalm-suppress ImpureMethodCall
+                 * @psalm-suppress ImpureFunctionCall
+                 */
+                if (!$condition($generator->current())) {
+                    /** @psalm-suppress ImpureMethodCall */
+                    yield $generator->current();
+                    /** @psalm-suppress ImpureMethodCall */
+                    $generator->next();
+
+                    break;
+                }
+
+                /** @psalm-suppress ImpureMethodCall */
+                $generator->next();
+            }
+
+            /** @psalm-suppress ImpureMethodCall */
+            while ($generator->valid()) {
+                /** @psalm-suppress ImpureMethodCall */
+                yield $generator->current();
+                /** @psalm-suppress ImpureMethodCall */
+                $generator->next();
+            }
+        });
+    }
+
+    /**
      * @return Implementation<T>
      */
     private function load(): Implementation

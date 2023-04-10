@@ -727,4 +727,14 @@ final class Sequence implements \Countable
     {
         return new self($this->implementation->memoize());
     }
+
+    /**
+     * @param callable(T): bool $condition
+     *
+     * @return self<T>
+     */
+    public function dropWhile(callable $condition): self
+    {
+        return new self($this->implementation->dropWhile($condition));
+    }
 }

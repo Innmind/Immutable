@@ -337,4 +337,11 @@ interface Implementation extends \Countable
      * @return self<T>
      */
     public function memoize(): self;
+
+    /**
+     * @param callable(T): bool $condition
+     *
+     * @return self<T>
+     */
+    public function dropWhile(callable $condition): self;
 }
