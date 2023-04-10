@@ -639,6 +639,44 @@ class SetTest extends TestCase
         }
     }
 
+    public function testMemoize()
+    {
+        $set = Set::of(1, 2, 3, 4);
+        $this->assertEquals(
+            $set,
+            $set->memoize(),
+        );
+        $this->assertSame([1, 2, 3, 4], $set->memoize()->toList());
+
+        $loaded = false;
+        $set = Set::defer((static function() use (&$loaded) {
+            yield 1;
+            yield 2;
+            yield 3;
+            yield 4;
+            $loaded = true;
+        })());
+        $this->assertFalse($loaded);
+        $memoized = $set->memoize();
+        $this->assertTrue($loaded);
+        $this->assertSame([1, 2, 3, 4], $memoized->toList());
+
+        $loaded = 0;
+        $set = Set::lazy(static function() use (&$loaded) {
+            yield 1;
+            yield 2;
+            yield 3;
+            yield 4;
+            ++$loaded;
+        });
+        $this->assertSame(0, $loaded);
+        $memoized = $set->memoize();
+        $this->assertSame(1, $loaded);
+        $this->assertSame([1, 2, 3, 4], $memoized->toList());
+        $this->assertEquals($memoized, $set->memoize());
+        $this->assertSame(2, $loaded);
+    }
+
     public function get($map, $index)
     {
         return $map->get($index)->match(

@@ -195,4 +195,9 @@ interface Implementation extends \Countable
      * @return Sequence\Implementation<T>
      */
     public function sequence(): Sequence\Implementation;
+
+    /**
+     * @return self<T>
+     */
+    public function memoize(): self;
 }

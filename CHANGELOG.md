@@ -7,6 +7,7 @@
 - `Innmind\Immutable\Maybe::memoize()`
 - `Innmind\Immutable\Either::memoize()`
 - `Innmind\Immutable\Sequence::memoize()`
+- `Innmind\Immutable\Set::memoize()`
 
 ## 4.12.0 - 2023-03-30
 

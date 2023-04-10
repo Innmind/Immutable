@@ -478,4 +478,14 @@ final class Set implements \Countable
     {
         return new self($this->implementation->safeguard($carry, $assert));
     }
+
+    /**
+     * Force to load all values into memory (only useful for deferred and lazy Set)
+     *
+     * @return self<T>
+     */
+    public function memoize(): self
+    {
+        return new self($this->implementation->memoize());
+    }
 }

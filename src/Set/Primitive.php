@@ -281,4 +281,12 @@ final class Primitive implements Implementation
     {
         return $this->values;
     }
+
+    /**
+     * @return self<T>
+     */
+    public function memoize(): self
+    {
+        return $this;
+    }
 }
