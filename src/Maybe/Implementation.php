@@ -63,4 +63,9 @@ interface Implementation
      * @return Either<null, T>
      */
     public function either(): Either;
+
+    /**
+     * @return Maybe<T>
+     */
+    public function memoize(): Maybe;
 }

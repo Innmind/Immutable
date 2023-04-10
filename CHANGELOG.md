@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+
+- `Innmind\Immutable\Maybe::memoize()`
+
 ## 4.12.0 - 2023-03-30
 
 ### Added

@@ -46,4 +46,13 @@ final class Nothing implements Implementation
     {
         return Either::left(null);
     }
+
+    /**
+     * @return Maybe<empty>
+     */
+    public function memoize(): Maybe
+    {
+        /** @var Maybe<empty> */
+        return Maybe::nothing();
+    }
 }
