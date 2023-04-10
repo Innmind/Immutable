@@ -4,7 +4,7 @@ declare(strict_types = 1);
 namespace Innmind\Immutable;
 
 /**
- * @template T
+ * @template-covariant T
  * @psalm-immutable
  */
 final class Set implements \Countable

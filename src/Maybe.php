@@ -11,7 +11,7 @@ use Innmind\Immutable\Maybe\{
 };
 
 /**
- * @template T
+ * @template-covariant T
  * @psalm-immutable
  */
 final class Maybe

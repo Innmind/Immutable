@@ -10,6 +10,10 @@
 - `Innmind\Immutable\Set::memoize()`
 - `Innmind\Immutable\Sequence::toSet()`
 
+### Changed
+
+- Monads templates are now covariant
+
 ## 4.12.0 - 2023-03-30
 
 ### Added

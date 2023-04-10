@@ -11,8 +11,8 @@ use Innmind\Immutable\Either\{
 };
 
 /**
- * @template L
- * @template R
+ * @template-covariant L
+ * @template-covariant R
  * @psalm-immutable
  */
 final class Either
