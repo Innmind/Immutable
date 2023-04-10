@@ -231,7 +231,18 @@ $either = identify($request)
 Either::left('something')->maybe()->match(
     static fn($value) => $value,
     static fn() => null,
-); // returns null</code></pre></main>
+); // returns null</code></pre>
+<h2 id="memoize"><a href="#memoize" class="anchor">#</a><code>->memoize()</code></h2>
+<p>This method force to load the contained value into memory. This is only useful for a deferred <code>Either</code>, this will do nothing for other either as the value is already known.</p>
+<pre><code class="language-php">Either::defer(function() {
+    return Either::right(\rand());
+})
+    ->map(static fn($i) => $i * 2) // value still not loaded here
+    ->memoize() // call the rand function and then apply the map and store it in memory
+    ->match(
+        static fn($i) => doStuff($i),
+        static fn() => null,
+    );</code></pre></main>
     <footer>
         <a href="https://github.com/innmind/Immutable/" target="_blank">GitHub</a>
     </footer>

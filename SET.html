@@ -332,7 +332,17 @@ Set::ints(2, 4, 6, 8)->any($isOdd); // false</code></pre>
         },
     )
     ->foreach(static fn($value) => print($value['name']));</code></pre>
-<p>This example will print <code>a</code>, <code>b</code> and <code>c</code> before throwing an exception because of the second <code>a</code>. Use this method carefully.</p></main>
+<p>This example will print <code>a</code>, <code>b</code> and <code>c</code> before throwing an exception because of the second <code>a</code>. Use this method carefully.</p>
+<h2 id="memoize"><a href="#memoize" class="anchor">#</a><code>->memoize()</code></h2>
+<p>This method will load all the values in memory. This is useful only for a deferred or lazy <code>Set</code>, the other set will be unaffected.</p>
+<pre><code class="language-php">$set = Set::lazy(function() {
+    $stream = \fopen('some-file', 'r');
+    while (!\feof($stream)) {
+        yield \fgets($stream);
+    }
+})
+    ->map(static fn($line) => \strtoupper($line)) // still no line loaded here
+    ->memoize(); // load all lines and apply strtoupper on each</code></pre></main>
     <footer>
         <a href="https://github.com/innmind/Immutable/" target="_blank">GitHub</a>
     </footer>
