@@ -155,4 +155,14 @@ final class Either
     {
         return $this->either->maybe();
     }
+
+    /**
+     * Force loading the value in memory (only useful for a deferred Either)
+     *
+     * @return self<L, R>
+     */
+    public function memoize(): self
+    {
+        return $this->either->memoize();
+    }
 }

@@ -78,4 +78,9 @@ interface Implementation
      * @return Maybe<R>
      */
     public function maybe(): Maybe;
+
+    /**
+     * @return Either<L, R>
+     */
+    public function memoize(): Either;
 }

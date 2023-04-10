@@ -173,3 +173,19 @@ Either::left('something')->maybe()->match(
     static fn() => null,
 ); // returns null
 ```
+
+## `->memoize()`
+
+This method force to load the contained value into memory. This is only useful for a deferred `Either`, this will do nothing for other either as the value is already known.
+
+```php
+Either::defer(function() {
+    return Either::right(\rand());
+})
+    ->map(static fn($i) => $i * 2) // value still not loaded here
+    ->memoize() // call the rand function and then apply the map and store it in memory
+    ->match(
+        static fn($i) => doStuff($i),
+        static fn() => null,
+    );
+```

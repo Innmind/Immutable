@@ -68,6 +68,14 @@ final class Defer implements Implementation
     /**
      * @return Either<L1, R1>
      */
+    public function memoize(): Either
+    {
+        return $this->unwrap();
+    }
+
+    /**
+     * @return Either<L1, R1>
+     */
     private function unwrap(): Either
     {
         /**

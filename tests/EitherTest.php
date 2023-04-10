@@ -389,4 +389,50 @@ class EitherTest extends TestCase
         );
         $this->assertSame(1, $loaded);
     }
+
+    public function testMemoize()
+    {
+        $this
+            ->forAll(Set\AnyType::any())
+            ->then(function($value) {
+                $this->assertEquals(
+                    Either::right($value),
+                    Either::right($value)->memoize(),
+                );
+                $this->assertEquals(
+                    Either::left($value),
+                    Either::left($value)->memoize(),
+                );
+
+                $either = Either::defer(static function() use ($value) {
+                    return Either::right($value);
+                });
+                $this->assertSame(
+                    $value,
+                    $either->memoize()->match(
+                        static fn($value) => $value,
+                        static fn() => null,
+                    ),
+                );
+                $this->assertSame(
+                    $either->memoize(),
+                    $either->memoize(),
+                );
+
+                $either = Either::defer(static function() use ($value) {
+                    return Either::left($value);
+                });
+                $this->assertSame(
+                    $value,
+                    $either->memoize()->match(
+                        static fn() => null,
+                        static fn($value) => $value,
+                    ),
+                );
+                $this->assertSame(
+                    $either->memoize(),
+                    $either->memoize(),
+                );
+            });
+    }
 }

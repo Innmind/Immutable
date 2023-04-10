@@ -73,4 +73,12 @@ final class Left implements Implementation
     {
         return Maybe::nothing();
     }
+
+    /**
+     * @return Either<L1, R1>
+     */
+    public function memoize(): Either
+    {
+        return Either::left($this->value);
+    }
 }
