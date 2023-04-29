@@ -6,6 +6,7 @@ namespace Innmind\Immutable\Maybe;
 use Innmind\Immutable\{
     Maybe,
     Either,
+    Sequence,
 };
 
 /**
@@ -54,5 +55,16 @@ final class Nothing implements Implementation
     {
         /** @var Maybe<empty> */
         return Maybe::nothing();
+    }
+
+    public function toSequence(): Sequence
+    {
+        return Sequence::of();
+    }
+
+    public function eitherWay(callable $just, callable $nothing): Maybe
+    {
+        /** @psalm-suppress ImpureFunctionCall */
+        return $nothing();
     }
 }

@@ -435,4 +435,134 @@ class EitherTest extends TestCase
                 );
             });
     }
+
+    public function testFlip()
+    {
+        $this
+            ->forAll(Set\AnyType::any())
+            ->then(function($data) {
+                $left = Either::left($data);
+
+                $this->assertSame(
+                    $data,
+                    $left
+                        ->flip()
+                        ->match(
+                            static fn($data) => $data,
+                            static fn() => null,
+                        ),
+                );
+
+                $right = Either::right($data);
+
+                $this->assertSame(
+                    $data,
+                    $right
+                        ->flip()
+                        ->match(
+                            static fn() => null,
+                            static fn($data) => $data,
+                        ),
+                );
+
+                $left = Either::defer(static fn() => Either::left($data));
+
+                $this->assertSame(
+                    $data,
+                    $left
+                        ->flip()
+                        ->match(
+                            static fn($data) => $data,
+                            static fn() => null,
+                        ),
+                );
+
+                $right = Either::defer(static fn() => Either::right($data));
+
+                $this->assertSame(
+                    $data,
+                    $right
+                        ->flip()
+                        ->match(
+                            static fn() => null,
+                            static fn($data) => $data,
+                        ),
+                );
+            });
+    }
+
+    public function testEitherWay()
+    {
+        $this
+            ->forAll(
+                Set\AnyType::any(),
+                Set\AnyType::any(),
+            )
+            ->then(function($initial, $new) {
+                $this->assertSame(
+                    $new,
+                    Either::left($initial)
+                        ->eitherWay(
+                            static fn() => Either::left($initial),
+                            function($value) use ($initial, $new) {
+                                $this->assertSame($initial, $value);
+
+                                return Either::right($new);
+                            },
+                        )
+                        ->match(
+                            static fn($value) => $value,
+                            static fn() => null,
+                        ),
+                );
+                $this->assertSame(
+                    $new,
+                    Either::defer(static fn() => Either::left($initial))
+                        ->eitherWay(
+                            static fn() => Either::left($initial),
+                            function($value) use ($initial, $new) {
+                                $this->assertSame($initial, $value);
+
+                                return Either::right($new);
+                            },
+                        )
+                        ->match(
+                            static fn($value) => $value,
+                            static fn() => null,
+                        ),
+                );
+                $this->assertSame(
+                    $new,
+                    Either::right($initial)
+                        ->eitherWay(
+                            function($value) use ($initial, $new) {
+                                $this->assertSame($initial, $value);
+
+                                return Either::right($new);
+                            },
+                            static fn() => Either::left($initial),
+                        )
+                        ->match(
+                            static fn($value) => $value,
+                            static fn() => null,
+                        ),
+                );
+                $this->assertSame(
+                    $new,
+                    Either::defer(static fn() => Either::right($initial))
+                        ->eitherWay(
+                            function($value) use ($initial, $new) {
+                                $this->assertSame($initial, $value);
+
+                                return Either::right($new);
+                            },
+                            static fn() => Either::left($initial),
+                        )
+                        ->match(
+                            static fn($value) => $value,
+                            static fn() => null,
+                        ),
+                );
+            });
+    }
 }

@@ -189,3 +189,41 @@ Either::defer(function() {
         static fn() => null,
     );
 ```
+
+## `->flip()`
+
+This method changes the side of the value contained in the `Either`. This is useful when you want to only keep the error and discard the right value you would use like this:
+
+```php
+/**
+ * @return Either<SomeError, SomeData>
+ */
+function foo() { /*...*/}
+
+$error = foo() // returns type Either<SomeError, SomeData>
+    ->flip() // returns type Either<SomeData, SomeError>
+    ->maybe(); // returns type Maybe<SomeError>
+```
+
+## `->eitherWay()`
+
+This method is kind of combines both `flatMap` and `otherwise` in a single call. This is useful when you can't call `otherwise` after `flatMap` because you don't want to override the left value returned by `flatMap`.
+
+```php
+/**
+ * @return Either<SomeError, SideEffect> SideEffect when on macOS
+ */
+function isMac(): Either { /* ... */}
+/**
+ * @return Either<SomeError, SideEffect>
+ */
+function runMac(): Either { /* ... */ }
+/**
+ * @return Either<SomeError, SideEffect>
+ */
+function runLinux(): Either { /* ... */ }
+
+$_ = isMac()->eitherWay(runMac(...), runLinux(...));
+```
+
+In this case we want to run `runLinux` only when `isMac` returns a `SideEffect` which is possible thanks to `->eitherWay()`. Contrary to `isMac()->flatMap(runMac(...))->otherwise(runLinux(...))` that could lead to `runLinux` to be called if `runMac` returns an error.

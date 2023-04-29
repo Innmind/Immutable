@@ -604,6 +604,96 @@ class MaybeTest extends TestCase
             });
     }
 
+    public function testToSequence()
+    {
+        $this->assertCount(0, Maybe::nothing()->toSequence());
+        $this->assertCount(0, Maybe::defer(static fn() => Maybe::nothing())->toSequence());
+
+        $this
+            ->forAll($this->value())
+            ->then(function($data) {
+                $this->assertSame(
+                    [$data],
+                    Maybe::just($data)->toSequence()->toList(),
+                );
+                $this->assertSame(
+                    [$data],
+                    Maybe::defer(static fn() => Maybe::just($data))->toSequence()->toList(),
+                );
+            });
+    }
+
+    public function testEitherWay()
+    {
+        $this
+            ->forAll($this->value())
+            ->then(function($data) {
+                $this->assertSame(
+                    $data,
+                    Maybe::nothing()
+                        ->eitherWay(
+                            static fn() => Maybe::nothing(),
+                            static fn() => Maybe::just($data),
+                        )
+                        ->match(
+                            static fn($value) => $value,
+                            static fn() => null,
+                        ),
+                );
+                $this->assertSame(
+                    $data,
+                    Maybe::defer(static fn() => Maybe::nothing())
+                        ->eitherWay(
+                            static fn() => Maybe::nothing(),
+                            static fn() => Maybe::just($data),
+                        )
+                        ->match(
+                            static fn($value) => $value,
+                            static fn() => null,
+                        ),
+                );
+            });
+        $this
+            ->forAll(
+                $this->value(),
+                $this->value(),
+            )
+            ->then(function($initial, $new) {
+                $this->assertSame(
+                    $new,
+                    Maybe::just($initial)
+                        ->eitherWay(
+                            function($value) use ($initial, $new) {
+                                $this->assertSame($initial, $value);
+
+                                return Maybe::just($new);
+                            },
+                            static fn() => Maybe::nothing(),
+                        )
+                        ->match(
+                            static fn($value) => $value,
+                            static fn() => null,
+                        ),
+                );
+                $this->assertSame(
+                    $new,
+                    Maybe::defer(static fn() => Maybe::just($initial))
+                        ->eitherWay(
+                            function($value) use ($initial, $new) {
+                                $this->assertSame($initial, $value);
+
+                                return Maybe::just($new);
+                            },
+                            static fn() => Maybe::nothing(),
+                        )
+                        ->match(
+                            static fn($value) => $value,
+                            static fn() => null,
+                        ),
+                );
+            });
+    }
+
     private function value(): Set
     {
         return Set\AnyType::any()->filter(static fn($value) => $value !== null);

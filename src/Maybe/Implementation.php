@@ -6,6 +6,7 @@ namespace Innmind\Immutable\Maybe;
 use Innmind\Immutable\{
     Maybe,
     Either,
+    Sequence,
 };
 
 /**
@@ -68,4 +69,19 @@ interface Implementation
      * @return Maybe<T>
      */
     public function memoize(): Maybe;
+
+    /**
+     * @return Sequence<T>
+     */
+    public function toSequence(): Sequence;
+
+    /**
+     * @template V
+     *
+     * @param callable(T): Maybe<V> $just
+     * @param callable(): Maybe<V> $nothing
+     *
+     * @return Maybe<V>
+     */
+    public function eitherWay(callable $just, callable $nothing): Maybe;
 }

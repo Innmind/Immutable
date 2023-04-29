@@ -194,4 +194,25 @@ final class Maybe
     {
         return $this->maybe->memoize();
     }
+
+    /**
+     * @return Sequence<T>
+     */
+    public function toSequence(): Sequence
+    {
+        return $this->maybe->toSequence();
+    }
+
+    /**
+     * @template V
+     *
+     * @param callable(T): self<V> $just
+     * @param callable(): self<V> $nothing
+     *
+     * @return self<V>
+     */
+    public function eitherWay(callable $just, callable $nothing): self
+    {
+        return $this->maybe->eitherWay($just, $nothing);
+    }
 }

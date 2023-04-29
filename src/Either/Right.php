@@ -87,4 +87,15 @@ final class Right implements Implementation
     {
         return Either::right($this->value);
     }
+
+    public function flip(): Implementation
+    {
+        return new Left($this->value);
+    }
+
+    public function eitherWay(callable $right, callable $left): Either
+    {
+        /** @psalm-suppress ImpureFunctionCall */
+        return $right($this->value);
+    }
 }

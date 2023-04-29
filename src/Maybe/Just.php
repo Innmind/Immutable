@@ -6,6 +6,7 @@ namespace Innmind\Immutable\Maybe;
 use Innmind\Immutable\{
     Maybe,
     Either,
+    Sequence,
 };
 
 /**
@@ -71,5 +72,16 @@ final class Just implements Implementation
     public function memoize(): Maybe
     {
         return Maybe::just($this->value);
+    }
+
+    public function toSequence(): Sequence
+    {
+        return Sequence::of($this->value);
+    }
+
+    public function eitherWay(callable $just, callable $nothing): Maybe
+    {
+        /** @psalm-suppress ImpureFunctionCall */
+        return $just($this->value);
     }
 }

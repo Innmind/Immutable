@@ -180,3 +180,47 @@ Maybe::defer(function() {
         static fn() => null,
     );
 ```
+
+## `->toSequence()`
+
+This method will return a `Sequence` with one or no value. This can be useful when "`flatMap`ping" a `Sequence` like this:
+
+```php
+$vars = Sequence::of('DB_URL', 'MAILER_URL', /* and so on */)
+    ->flatMap(static fn($var) => env($var)->toSequence());
+```
+
+> **Note** this example uses the `env` function defined at the start of this documentation.
+
+This is equivalent to:
+
+```php
+$vars = Sequence::of('DB_URL', 'MAILER_URL', /* and so on */)
+    ->flatMap(static fn($var) => env($var)->match(
+        static fn($value) => Sequence::of($value),
+        static fn() => Sequence::of(),
+    ));
+```
+
+## `->eitherWay()`
+
+This method is kind of combines both `flatMap` and `otherwise` in a single call. This is useful when you can't call `otherwise` after `flatMap` because you don't want to override the _nothingness_ returned by `flatMap`.
+
+```php
+/**
+ * @return Maybe<SideEffect> SideEffect when on macOS
+ */
+function isMac(): Maybe { /* ... */}
+/**
+ * @return Maybe<SideEffect>
+ */
+function runMac(): Maybe { /* ... */ }
+/**
+ * @return Maybe<SideEffect>
+ */
+function runLinux(): Maybe { /* ... */ }
+
+$_ = isMac()->eitherWay(runMac(...), runLinux(...));
+```
+
+In this case we want to run `runLinux` only when `isMac` returns nothing which is possible thanks to `->eitherWay()`. Contrary to `isMac()->flatMap(runMac(...))->otherwise(runLinux(...))` that could lead to `runLinux` to be called if `runMac` returns nothing.
