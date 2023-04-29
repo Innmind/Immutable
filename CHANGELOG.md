@@ -7,6 +7,7 @@
 - `Innmind\Immutable\Either::flip()`
 - `Innmind\Immutable\Maybe::toSequence()`
 - `Innmind\Immutable\Maybe::eitherWay()`
+- `Innmind\Immutable\Either::eitherWay()`
 
 ## 4.13.0 - 2023-04-10
 

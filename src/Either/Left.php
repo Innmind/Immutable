@@ -86,4 +86,10 @@ final class Left implements Implementation
     {
         return new Right($this->value);
     }
+
+    public function eitherWay(callable $right, callable $left): Either
+    {
+        /** @psalm-suppress ImpureFunctionCall */
+        return $left($this->value);
+    }
 }

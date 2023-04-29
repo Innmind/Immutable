@@ -78,6 +78,11 @@ final class Defer implements Implementation
         return new self(fn() => $this->unwrap()->flip());
     }
 
+    public function eitherWay(callable $right, callable $left): Either
+    {
+        return Either::defer(fn() => $this->unwrap()->eitherWay($right, $left));
+    }
+
     /**
      * @return Either<L1, R1>
      */

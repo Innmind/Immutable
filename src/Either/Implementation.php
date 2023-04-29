@@ -88,4 +88,15 @@ interface Implementation
      * @return self<R, L>
      */
     public function flip(): self;
+
+    /**
+     * @template A
+     * @template B
+     *
+     * @param callable(R): Either<A, B> $right
+     * @param callable(L): Either<A, B> $left
+     *
+     * @return Either<A, B>
+     */
+    public function eitherWay(callable $right, callable $left): Either;
 }

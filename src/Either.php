@@ -175,4 +175,18 @@ final class Either
     {
         return new self($this->either->flip());
     }
+
+    /**
+     * @template A
+     * @template B
+     *
+     * @param callable(R): self<A, B> $right
+     * @param callable(L): self<A, B> $left
+     *
+     * @return self<A, B>
+     */
+    public function eitherWay(callable $right, callable $left): self
+    {
+        return $this->either->eitherWay($right, $left);
+    }
 }
