@@ -6,6 +6,7 @@ namespace Innmind\Immutable\Maybe;
 use Innmind\Immutable\{
     Maybe,
     Either,
+    Sequence,
 };
 
 /**
@@ -65,6 +66,14 @@ final class Defer implements Implementation
     public function memoize(): Maybe
     {
         return $this->unwrap();
+    }
+
+    public function toSequence(): Sequence
+    {
+        /** @psalm-suppress ImpureFunctionCall */
+        return Sequence::defer((function() {
+            yield from $this->unwrap()->toSequence()->toList();
+        })());
     }
 
     /**

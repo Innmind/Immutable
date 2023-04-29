@@ -194,4 +194,12 @@ final class Maybe
     {
         return $this->maybe->memoize();
     }
+
+    /**
+     * @return Sequence<T>
+     */
+    public function toSequence(): Sequence
+    {
+        return $this->maybe->toSequence();
+    }
 }

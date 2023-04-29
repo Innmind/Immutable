@@ -180,3 +180,24 @@ Maybe::defer(function() {
         static fn() => null,
     );
 ```
+
+## `->toSequence()`
+
+This method will return a `Sequence` with one or no value. This can be useful when "`flatMap`ping" a `Sequence` like this:
+
+```php
+$vars = Sequence::of('DB_URL', 'MAILER_URL', /* and so on */)
+    ->flatMap(static fn($var) => env($var)->toSequence());
+```
+
+> **Note** this example uses the `env` function defined at the start of this documentation.
+
+This is equivalent to:
+
+```php
+$vars = Sequence::of('DB_URL', 'MAILER_URL', /* and so on */)
+    ->flatMap(static fn($var) => env($var)->match(
+        static fn($value) => Sequence::of($value),
+        static fn() => Sequence::of(),
+    ));
+```

@@ -5,6 +5,7 @@
 ### Added
 
 - `Innmind\Immutable\Either::flip()`
+- `Innmind\Immutable\Maybe::toSequence()`
 
 ## 4.13.0 - 2023-04-10
 

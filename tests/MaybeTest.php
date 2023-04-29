@@ -604,6 +604,25 @@ class MaybeTest extends TestCase
             });
     }
 
+    public function testToSequence()
+    {
+        $this->assertCount(0, Maybe::nothing()->toSequence());
+        $this->assertCount(0, Maybe::defer(static fn() => Maybe::nothing())->toSequence());
+
+        $this
+            ->forAll($this->value())
+            ->then(function($data) {
+                $this->assertSame(
+                    [$data],
+                    Maybe::just($data)->toSequence()->toList(),
+                );
+                $this->assertSame(
+                    [$data],
+                    Maybe::defer(static fn() => Maybe::just($data))->toSequence()->toList(),
+                );
+            });
+    }
+
     private function value(): Set
     {
         return Set\AnyType::any()->filter(static fn($value) => $value !== null);
