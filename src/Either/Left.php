@@ -81,4 +81,9 @@ final class Left implements Implementation
     {
         return Either::left($this->value);
     }
+
+    public function flip(): Implementation
+    {
+        return new Right($this->value);
+    }
 }

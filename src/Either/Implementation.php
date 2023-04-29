@@ -83,4 +83,9 @@ interface Implementation
      * @return Either<L, R>
      */
     public function memoize(): Either;
+
+    /**
+     * @return self<R, L>
+     */
+    public function flip(): self;
 }

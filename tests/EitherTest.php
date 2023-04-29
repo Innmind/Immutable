@@ -435,4 +435,59 @@ class EitherTest extends TestCase
                 );
             });
     }
+
+    public function testFlip()
+    {
+        $this
+            ->forAll(Set\AnyType::any())
+            ->then(function($data) {
+                $left = Either::left($data);
+
+                $this->assertSame(
+                    $data,
+                    $left
+                        ->flip()
+                        ->match(
+                            static fn($data) => $data,
+                            static fn() => null,
+                        ),
+                );
+
+                $right = Either::right($data);
+
+                $this->assertSame(
+                    $data,
+                    $right
+                        ->flip()
+                        ->match(
+                            static fn() => null,
+                            static fn($data) => $data,
+                        ),
+                );
+
+                $left = Either::defer(static fn() => Either::left($data));
+
+                $this->assertSame(
+                    $data,
+                    $left
+                        ->flip()
+                        ->match(
+                            static fn($data) => $data,
+                            static fn() => null,
+                        ),
+                );
+
+                $right = Either::defer(static fn() => Either::right($data));
+
+                $this->assertSame(
+                    $data,
+                    $right
+                        ->flip()
+                        ->match(
+                            static fn() => null,
+                            static fn($data) => $data,
+                        ),
+                );
+            });
+    }
 }

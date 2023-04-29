@@ -73,6 +73,11 @@ final class Defer implements Implementation
         return $this->unwrap();
     }
 
+    public function flip(): self
+    {
+        return new self(fn() => $this->unwrap()->flip());
+    }
+
     /**
      * @return Either<L1, R1>
      */

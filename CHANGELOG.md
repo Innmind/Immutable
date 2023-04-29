@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+
+- `Innmind\Immutable\Either::flip()`
+
 ## 4.13.0 - 2023-04-10
 
 ### Added

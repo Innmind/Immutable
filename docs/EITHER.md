@@ -189,3 +189,18 @@ Either::defer(function() {
         static fn() => null,
     );
 ```
+
+## `->flip()`
+
+This method changes the side of the value contained in the `Either`. This is useful when you want to only keep the error and discard the right value you would use like this:
+
+```php
+/**
+ * @return Either<SomeError, SomeData>
+ */
+function foo() { /*...*/}
+
+$error = foo() // returns type Either<SomeError, SomeData>
+    ->flip() // returns type Either<SomeData, SomeError>
+    ->maybe(); // returns type Maybe<SomeError>
+```

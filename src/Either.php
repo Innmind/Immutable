@@ -165,4 +165,14 @@ final class Either
     {
         return $this->either->memoize();
     }
+
+    /**
+     * Switch the sides of the values, left becomes right and right left
+     *
+     * @return self<R, L>
+     */
+    public function flip(): self
+    {
+        return new self($this->either->flip());
+    }
 }
