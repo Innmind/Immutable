@@ -242,7 +242,34 @@ Either::left('something')->maybe()->match(
     ->match(
         static fn($i) => doStuff($i),
         static fn() => null,
-    );</code></pre></main>
+    );</code></pre>
+<h2 id="flip"><a href="#flip" class="anchor">#</a><code>->flip()</code></h2>
+<p>This method changes the side of the value contained in the <code>Either</code>. This is useful when you want to only keep the error and discard the right value you would use like this:</p>
+<pre><code class="language-php">/**
+ * @return Either<SomeError, SomeData>
+ */
+function foo() { /*...*/}
+
+$error = foo() // returns type Either<SomeError, SomeData>
+    ->flip() // returns type Either<SomeData, SomeError>
+    ->maybe(); // returns type Maybe<SomeError></code></pre>
+<h2 id="eitherway"><a href="#eitherway" class="anchor">#</a><code>->eitherWay()</code></h2>
+<p>This method is kind of combines both <code>flatMap</code> and <code>otherwise</code> in a single call. This is useful when you can't call <code>otherwise</code> after <code>flatMap</code> because you don't want to override the left value returned by <code>flatMap</code>.</p>
+<pre><code class="language-php">/**
+ * @return Either<SomeError, SideEffect> SideEffect when on macOS
+ */
+function isMac(): Either { /* ... */}
+/**
+ * @return Either<SomeError, SideEffect>
+ */
+function runMac(): Either { /* ... */ }
+/**
+ * @return Either<SomeError, SideEffect>
+ */
+function runLinux(): Either { /* ... */ }
+
+$_ = isMac()->eitherWay(runMac(...), runLinux(...));</code></pre>
+<p>In this case we want to run <code>runLinux</code> only when <code>isMac</code> returns a <code>SideEffect</code> which is possible thanks to <code>->eitherWay()</code>. Contrary to <code>isMac()->flatMap(runMac(...))->otherwise(runLinux(...))</code> that could lead to <code>runLinux</code> to be called if <code>runMac</code> returns an error.</p></main>
     <footer>
         <a href="https://github.com/innmind/Immutable/" target="_blank">GitHub</a>
     </footer>

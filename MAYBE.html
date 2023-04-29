@@ -221,7 +221,37 @@ Maybe::nothing()
     ->match(
         static fn($i) => doStuff($i),
         static fn() => null,
-    );</code></pre></main>
+    );</code></pre>
+<h2 id="tosequence"><a href="#tosequence" class="anchor">#</a><code>->toSequence()</code></h2>
+<p>This method will return a <code>Sequence</code> with one or no value. This can be useful when "<code>flatMap</code>ping" a <code>Sequence</code> like this:</p>
+<pre><code class="language-php">$vars = Sequence::of('DB_URL', 'MAILER_URL', /* and so on */)
+    ->flatMap(static fn($var) => env($var)->toSequence());</code></pre>
+<blockquote>
+<p><strong>Note</strong> this example uses the <code>env</code> function defined at the start of this documentation.</p>
+</blockquote>
+<p>This is equivalent to:</p>
+<pre><code class="language-php">$vars = Sequence::of('DB_URL', 'MAILER_URL', /* and so on */)
+    ->flatMap(static fn($var) => env($var)->match(
+        static fn($value) => Sequence::of($value),
+        static fn() => Sequence::of(),
+    ));</code></pre>
+<h2 id="eitherway"><a href="#eitherway" class="anchor">#</a><code>->eitherWay()</code></h2>
+<p>This method is kind of combines both <code>flatMap</code> and <code>otherwise</code> in a single call. This is useful when you can't call <code>otherwise</code> after <code>flatMap</code> because you don't want to override the <em>nothingness</em> returned by <code>flatMap</code>.</p>
+<pre><code class="language-php">/**
+ * @return Maybe<SideEffect> SideEffect when on macOS
+ */
+function isMac(): Maybe { /* ... */}
+/**
+ * @return Maybe<SideEffect>
+ */
+function runMac(): Maybe { /* ... */ }
+/**
+ * @return Maybe<SideEffect>
+ */
+function runLinux(): Maybe { /* ... */ }
+
+$_ = isMac()->eitherWay(runMac(...), runLinux(...));</code></pre>
+<p>In this case we want to run <code>runLinux</code> only when <code>isMac</code> returns nothing which is possible thanks to <code>->eitherWay()</code>. Contrary to <code>isMac()->flatMap(runMac(...))->otherwise(runLinux(...))</code> that could lead to <code>runLinux</code> to be called if <code>runMac</code> returns nothing.</p></main>
     <footer>
         <a href="https://github.com/innmind/Immutable/" target="_blank">GitHub</a>
     </footer>
