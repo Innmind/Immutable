@@ -61,4 +61,10 @@ final class Nothing implements Implementation
     {
         return Sequence::of();
     }
+
+    public function eitherWay(callable $just, callable $nothing): Maybe
+    {
+        /** @psalm-suppress ImpureFunctionCall */
+        return $nothing();
+    }
 }

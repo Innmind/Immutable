@@ -78,4 +78,10 @@ final class Just implements Implementation
     {
         return Sequence::of($this->value);
     }
+
+    public function eitherWay(callable $just, callable $nothing): Maybe
+    {
+        /** @psalm-suppress ImpureFunctionCall */
+        return $just($this->value);
+    }
 }

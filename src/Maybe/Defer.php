@@ -76,6 +76,11 @@ final class Defer implements Implementation
         })());
     }
 
+    public function eitherWay(callable $just, callable $nothing): Maybe
+    {
+        return Maybe::defer(fn() => $this->unwrap()->eitherWay($just, $nothing));
+    }
+
     /**
      * @return Maybe<V>
      */

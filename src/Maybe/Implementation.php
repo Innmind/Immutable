@@ -74,4 +74,14 @@ interface Implementation
      * @return Sequence<T>
      */
     public function toSequence(): Sequence;
+
+    /**
+     * @template V
+     *
+     * @param callable(T): Maybe<V> $just
+     * @param callable(): Maybe<V> $nothing
+     *
+     * @return Maybe<V>
+     */
+    public function eitherWay(callable $just, callable $nothing): Maybe;
 }
