@@ -671,16 +671,14 @@ class LazyTest extends TestCase
     {
         $loaded = false;
         $a = new Lazy(static function() use (&$loaded) {
-            yield 1;
-            yield 2;
-            yield 3;
-            yield 4;
+            yield from [1, 2];
+            yield from [3, 4];
             $loaded = true;
         });
         $b = $a->reverse();
 
         $this->assertFalse($loaded);
-        $this->assertSame([1, 2, 3, 4], \iterator_to_array($a->iterator()));
+        $this->assertSame([1, 2, 3, 4], $a->toSequence()->toList());
         $this->assertInstanceOf(Lazy::class, $b);
         $this->assertSame([4, 3, 2, 1], \iterator_to_array($b->iterator()));
         $this->assertTrue($loaded);
