@@ -433,25 +433,10 @@ final class Lazy implements Implementation
      */
     public function slice(int $from, int $until): Implementation
     {
-        $values = $this->values;
-
-        return new self(
-            static function(callable $registerCleanup) use ($values, $from, $until): \Generator {
-                $index = 0;
-
-                foreach ($values($registerCleanup) as $value) {
-                    if ($index >= $from && $index < $until) {
-                        yield $value;
-                    }
-
-                    if ($index >= $until) {
-                        return;
-                    }
-
-                    ++$index;
-                }
-            },
-        );
+        /** @psalm-suppress ArgumentTypeCoercion */
+        return $this
+            ->drop($from)
+            ->take($until - $from);
     }
 
     /**

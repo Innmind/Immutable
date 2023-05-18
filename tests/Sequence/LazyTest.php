@@ -492,6 +492,18 @@ class LazyTest extends TestCase
         $this->assertInstanceOf(Lazy::class, $b);
         $this->assertSame([3, 4], \iterator_to_array($b->iterator()));
         $this->assertTrue($loaded);
+        $this->assertSame(
+            [],
+            \iterator_to_array($a->slice(0, 0)->iterator()),
+        );
+        $this->assertSame(
+            [2],
+            \iterator_to_array($a->slice(0, 1)->iterator()),
+        );
+        $this->assertSame(
+            [5],
+            \iterator_to_array($a->slice(3, 6)->iterator()),
+        );
     }
 
     public function testTake()
