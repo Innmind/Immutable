@@ -523,6 +523,20 @@ class SequenceTest extends TestCase
         $this->assertSame([2, 3], $b->toList());
     }
 
+    public function testLazySliceDoesntLoadTheWholeSequence()
+    {
+        $loaded = false;
+        $values = Sequence::lazy(static function() use (&$loaded) {
+            yield from \range(0, 100);
+            $loaded = true;
+        })
+            ->slice(10, 20)
+            ->toList();
+
+        $this->assertSame(\range(10, 19), $values);
+        $this->assertFalse($loaded);
+    }
+
     public function testTake()
     {
         $a = Sequence::of()

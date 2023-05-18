@@ -444,6 +444,10 @@ final class Lazy implements Implementation
                         yield $value;
                     }
 
+                    if ($index >= $until) {
+                        return;
+                    }
+
                     ++$index;
                 }
             },

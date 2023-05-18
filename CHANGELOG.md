@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Fixed
+
+- A lazy `Sequence::slice()` no longer loads the whole underlying `Generator`
+
 ## 4.14.0 - 2023-04-29
 
 ### Added
