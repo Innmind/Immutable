@@ -126,8 +126,13 @@ final class Primitive implements Implementation
      */
     public function equals(Implementation $sequence): bool
     {
-        /** @psalm-suppress ImpureFunctionCall */
-        return $this->values === \iterator_to_array($sequence->iterator());
+        $other = [];
+
+        foreach ($sequence->iterator() as $value) {
+            $other[] = $value;
+        }
+
+        return $this->values === $other;
     }
 
     /**
@@ -350,11 +355,13 @@ final class Primitive implements Implementation
      */
     public function append(Implementation $sequence): self
     {
-        /** @psalm-suppress ImpureFunctionCall */
-        return new self(\array_merge(
-            $this->values,
-            \iterator_to_array($sequence->iterator()),
-        ));
+        $other = [];
+
+        foreach ($sequence->iterator() as $value) {
+            $other[] = $value;
+        }
+
+        return new self(\array_merge($this->values, $other));
     }
 
     /**
@@ -385,11 +392,13 @@ final class Primitive implements Implementation
     }
 
     /**
+     * @template I
      * @template R
-     * @param R $carry
-     * @param callable(R, T): R $reducer
      *
-     * @return R
+     * @param I $carry
+     * @param callable(I|R, T): R $reducer
+     *
+     * @return I|R
      */
     public function reduce($carry, callable $reducer)
     {
@@ -517,9 +526,13 @@ final class Primitive implements Implementation
         $aggregate = new Aggregate($this->iterator());
         /** @psalm-suppress MixedArgument */
         $values = $aggregate(static fn($a, $b) => $exfiltrate($map($a, $b))->iterator());
+        $aggregated = [];
 
-        /** @psalm-suppress ImpureFunctionCall */
-        return new self(\array_values(\iterator_to_array($values)));
+        foreach ($values as $value) {
+            $aggregated[] = $value;
+        }
+
+        return new self($aggregated);
     }
 
     /**

@@ -72,7 +72,9 @@ final class Defer implements Implementation
     {
         /** @psalm-suppress ImpureFunctionCall */
         return Sequence::defer((function() {
-            yield from $this->unwrap()->toSequence()->toList();
+            foreach ($this->unwrap()->toSequence()->toList() as $value) {
+                yield $value;
+            }
         })());
     }
 

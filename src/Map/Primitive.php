@@ -308,11 +308,13 @@ final class Primitive implements Implementation
     }
 
     /**
+     * @template I
      * @template R
-     * @param R $carry
-     * @param callable(R, T, S): R $reducer
      *
-     * @return R
+     * @param I $carry
+     * @param callable(I|R, T, S): R $reducer
+     *
+     * @return I|R
      */
     public function reduce($carry, callable $reducer)
     {

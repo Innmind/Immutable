@@ -507,12 +507,16 @@ final class Defer implements Implementation
             (static function(\Iterator $values, callable $function): \Generator {
                 /** @var callable(T, T): int $sorter */
                 $sorter = $function;
+                $loaded = [];
 
-                /** @var list<T> */
-                $values = \iterator_to_array($values);
-                \usort($values, $sorter);
-
+                /** @var T $value */
                 foreach ($values as $value) {
+                    $loaded[] = $value;
+                }
+
+                \usort($loaded, $sorter);
+
+                foreach ($loaded as $value) {
                     yield $value;
                 }
             })($this->values, $function),
@@ -520,11 +524,13 @@ final class Defer implements Implementation
     }
 
     /**
+     * @template I
      * @template R
-     * @param R $carry
-     * @param callable(R, T): R $reducer
      *
-     * @return R
+     * @param I $carry
+     * @param callable(I|R, T): R $reducer
+     *
+     * @return I|R
      */
     public function reduce($carry, callable $reducer)
     {
@@ -552,9 +558,16 @@ final class Defer implements Implementation
         /** @psalm-suppress ImpureFunctionCall */
         return new self(
             (static function(\Iterator $values): \Generator {
-                $values = \iterator_to_array($values);
+                $reversed = [];
 
-                yield from \array_reverse($values);
+                /** @var T $value */
+                foreach ($values as $value) {
+                    \array_unshift($reversed, $value);
+                }
+
+                foreach ($reversed as $value) {
+                    yield $value;
+                }
             })($this->values),
         );
     }
@@ -766,7 +779,12 @@ final class Defer implements Implementation
      */
     private function load(): Implementation
     {
-        /** @psalm-suppress ImpureFunctionCall */
-        return new Primitive(\array_values(\iterator_to_array($this->values)));
+        $values = [];
+
+        foreach ($this->values as $value) {
+            $values[] = $value;
+        }
+
+        return new Primitive($values);
     }
 }

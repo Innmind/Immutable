@@ -224,12 +224,15 @@ final class Map implements \Countable
      */
     public function flatMap(callable $map): self
     {
+        /** @var self<A, B> */
+        $all = self::of();
+
         /**
          * @psalm-suppress InvalidArgument
          * @psalm-suppress MixedArgument
          */
         return $this->reduce(
-            self::of(),
+            $all,
             static fn(self $carry, $key, $value) => $carry->merge($map($key, $value)),
         );
     }
@@ -273,11 +276,13 @@ final class Map implements \Countable
     /**
      * Reduce the map to a single value
      *
+     * @template I
      * @template R
-     * @param R $carry
-     * @param callable(R, T, S): R $reducer
      *
-     * @return R
+     * @param I $carry
+     * @param callable(I|R, T, S): R $reducer
+     *
+     * @return I|R
      */
     public function reduce($carry, callable $reducer)
     {
@@ -304,11 +309,13 @@ final class Map implements \Countable
      */
     public function matches(callable $predicate): bool
     {
-        /** @psalm-suppress MixedArgument */
-        return $this->reduce(
-            true,
-            static fn(bool $matches, $key, $value): bool => $matches && $predicate($key, $value),
-        );
+        /** @psalm-suppress MixedArgument For some reason Psalm no longer recognize the type in `find` */
+        return $this
+            ->find(static fn($key, $value) => !$predicate($key, $value))
+            ->match(
+                static fn() => false,
+                static fn() => true,
+            );
     }
 
     /**

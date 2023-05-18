@@ -433,21 +433,10 @@ final class Lazy implements Implementation
      */
     public function slice(int $from, int $until): Implementation
     {
-        $values = $this->values;
-
-        return new self(
-            static function(callable $registerCleanup) use ($values, $from, $until): \Generator {
-                $index = 0;
-
-                foreach ($values($registerCleanup) as $value) {
-                    if ($index >= $from && $index < $until) {
-                        yield $value;
-                    }
-
-                    ++$index;
-                }
-            },
-        );
+        /** @psalm-suppress ArgumentTypeCoercion */
+        return $this
+            ->drop($from)
+            ->take($until - $from);
     }
 
     /**
@@ -549,12 +538,17 @@ final class Lazy implements Implementation
 
         return new self(
             static function() use ($values, $function): \Generator {
+                $loaded = [];
+
                 // bypass the registering of cleanup function as we iterate over
                 // the whole generator
-                $values = \iterator_to_array($values(self::bypassCleanup()));
-                \usort($values, $function);
+                foreach ($values(self::bypassCleanup()) as $value) {
+                    $loaded[] = $value;
+                }
 
-                foreach ($values as $value) {
+                \usort($loaded, $function);
+
+                foreach ($loaded as $value) {
                     yield $value;
                 }
             },
@@ -562,11 +556,13 @@ final class Lazy implements Implementation
     }
 
     /**
+     * @template I
      * @template R
-     * @param R $carry
-     * @param callable(R, T): R $reducer
      *
-     * @return R
+     * @param I $carry
+     * @param callable(I|R, T): R $reducer
+     *
+     * @return I|R
      */
     public function reduce($carry, callable $reducer)
     {
@@ -595,11 +591,17 @@ final class Lazy implements Implementation
 
         return new self(
             static function() use ($values): \Generator {
+                $reversed = [];
+
                 // bypass the registering of cleanup function as we iterate over
                 // the whole generator
-                $values = \iterator_to_array($values(self::bypassCleanup()));
+                foreach ($values(self::bypassCleanup()) as $value) {
+                    \array_unshift($reversed, $value);
+                }
 
-                yield from \array_reverse($values);
+                foreach ($reversed as $value) {
+                    yield $value;
+                }
             },
         );
     }
@@ -746,8 +748,6 @@ final class Lazy implements Implementation
                 yield $value;
             }
         });
-
-        return new self(\iterator_to_array($values));
     }
 
     /**
@@ -842,8 +842,13 @@ final class Lazy implements Implementation
      */
     private function load(): Implementation
     {
-        /** @psalm-suppress ImpureFunctionCall */
-        return new Primitive(\array_values(\iterator_to_array($this->iterator())));
+        $values = [];
+
+        foreach ($this->iterator() as $value) {
+            $values[] = $value;
+        }
+
+        return new Primitive($values);
     }
 
     /**

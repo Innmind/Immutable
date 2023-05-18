@@ -1,5 +1,17 @@
 # Changelog
 
+## 4.14.1 - 2023-05-18
+
+### Changed
+
+- All `reduce` methods now explicit the fact that the callable may not be called when the structure is empty
+
+### Fixed
+
+- A lazy `Sequence::slice()` no longer loads the whole underlying `Generator`
+- `Innmind\Immutable\Set::matches()`, `Innmind\Immutable\Sequence::matches()` and `Innmind\Immutable\Map::matches()` no longer iterates over all elements when one value doesn't match the predicate
+- When using `yield from` in the `Generator` passed to `Sequence::lazy()` values may be lost on certain operations
+
 ## 4.14.0 - 2023-04-29
 
 ### Added

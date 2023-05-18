@@ -251,11 +251,13 @@ interface Implementation extends \Countable
     /**
      * Reduce the sequence to a single value
      *
+     * @template I
      * @template R
-     * @param R $carry
-     * @param callable(R, T): R $reducer
      *
-     * @return R
+     * @param I $carry
+     * @param callable(I|R, T): R $reducer
+     *
+     * @return I|R
      */
     public function reduce($carry, callable $reducer);
 

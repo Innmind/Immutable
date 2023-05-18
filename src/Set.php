@@ -380,12 +380,13 @@ final class Set implements \Countable
     /**
      * Reduce the set to a single value
      *
+     * @template I
      * @template R
      *
-     * @param R $carry
-     * @param callable(R, T): R $reducer
+     * @param I $carry
+     * @param callable(I|R, T): R $reducer
      *
-     * @return R
+     * @return I|R
      */
     public function reduce($carry, callable $reducer)
     {
@@ -422,11 +423,13 @@ final class Set implements \Countable
      */
     public function matches(callable $predicate): bool
     {
-        /** @psalm-suppress MixedArgument */
-        return $this->reduce(
-            true,
-            static fn(bool $matches, $value): bool => $matches && $predicate($value),
-        );
+        /** @psalm-suppress MixedArgument For some reason Psalm no longer recognize the type in `find` */
+        return $this
+            ->find(static fn($value) => !$predicate($value))
+            ->match(
+                static fn() => false,
+                static fn() => true,
+            );
     }
 
     /**
@@ -445,13 +448,14 @@ final class Set implements \Countable
      */
     public function toList(): array
     {
-        /**
-         * @psalm-suppress MixedAssignment
-         * @var list<T>
-         */
+        /** @var list<T> */
+        $all = [];
+
+        /** @var list<T> */
         return $this->reduce(
-            [],
+            $all,
             static function(array $carry, $value): array {
+                /** @var T $value */
                 $carry[] = $value;
 
                 return $carry;

@@ -250,8 +250,11 @@ final class ObjectKeys implements Implementation
      */
     public function keys(): Set
     {
+        /** @var Set<T> */
+        $keys = Set::of();
+
         return $this->reduce(
-            Set::of(),
+            $keys,
             static fn(Set $keys, $key): Set => ($keys)($key),
         );
     }
@@ -261,8 +264,11 @@ final class ObjectKeys implements Implementation
      */
     public function values(): Sequence
     {
+        /** @var Sequence<S> */
+        $values = Sequence::of();
+
         return $this->reduce(
-            Sequence::of(),
+            $values,
             static fn(Sequence $values, $_, $value): Sequence => ($values)($value),
         );
     }
@@ -367,11 +373,13 @@ final class ObjectKeys implements Implementation
     }
 
     /**
+     * @template I
      * @template R
-     * @param R $carry
-     * @param callable(R, T, S): R $reducer
      *
-     * @return R
+     * @param I $carry
+     * @param callable(I|R, T, S): R $reducer
+     *
+     * @return I|R
      */
     public function reduce($carry, callable $reducer)
     {
