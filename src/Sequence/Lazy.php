@@ -752,8 +752,6 @@ final class Lazy implements Implementation
                 yield $value;
             }
         });
-
-        return new self(\iterator_to_array($values));
     }
 
     /**
