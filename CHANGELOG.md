@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Changed
+
+- All `reduce` methods now explicit the fact that the callable may not be called when the structure is empty
+
 ### Fixed
 
 - A lazy `Sequence::slice()` no longer loads the whole underlying `Generator`

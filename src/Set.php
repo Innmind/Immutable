@@ -380,12 +380,13 @@ final class Set implements \Countable
     /**
      * Reduce the set to a single value
      *
+     * @template I
      * @template R
      *
-     * @param R $carry
-     * @param callable(R, T): R $reducer
+     * @param I $carry
+     * @param callable(I|R, T): R $reducer
      *
-     * @return R
+     * @return I|R
      */
     public function reduce($carry, callable $reducer)
     {
@@ -450,10 +451,11 @@ final class Set implements \Countable
         /** @var list<T> */
         $all = [];
 
+        /** @var list<T> */
         return $this->reduce(
             $all,
             static function(array $carry, $value): array {
-                /** @psalm-suppress MixedAssignment */
+                /** @var T $value */
                 $carry[] = $value;
 
                 return $carry;

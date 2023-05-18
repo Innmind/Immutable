@@ -536,10 +536,7 @@ final class Sequence implements \Countable
      */
     public function fold(Monoid $monoid)
     {
-        /**
-         * @psalm-suppress MissingClosureParamType
-         * @psalm-suppress MixedArgument
-         */
+        /** @psalm-suppress MixedArgument */
         return $this->reduce(
             $monoid->identity(),
             static fn($a, $b) => $monoid->combine($a, $b),
@@ -549,12 +546,13 @@ final class Sequence implements \Countable
     /**
      * Reduce the sequence to a single value
      *
+     * @template I
      * @template R
      *
-     * @param R $carry
-     * @param callable(R, T): R $reducer
+     * @param I $carry
+     * @param callable(I|R, T): R $reducer
      *
-     * @return R
+     * @return I|R
      */
     public function reduce($carry, callable $reducer)
     {
@@ -602,10 +600,11 @@ final class Sequence implements \Countable
         /** @var list<T> */
         $all = [];
 
+        /** @var list<T> */
         return $this->reduce(
             $all,
             static function(array $carry, $value): array {
-                /** @psalm-suppress MixedAssignment */
+                /** @var T $value */
                 $carry[] = $value;
 
                 return $carry;
