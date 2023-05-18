@@ -5,6 +5,7 @@
 ### Fixed
 
 - A lazy `Sequence::slice()` no longer loads the whole underlying `Generator`
+- `Innmind\Immutable\Set::matches()`, `Innmind\Immutable\Sequence::matches()` and `Innmind\Immutable\Map::matches()` no longer iterates over all elements when one value doesn't match the predicate
 
 ## 4.14.0 - 2023-04-29
 

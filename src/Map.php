@@ -304,11 +304,13 @@ final class Map implements \Countable
      */
     public function matches(callable $predicate): bool
     {
-        /** @psalm-suppress MixedArgument */
-        return $this->reduce(
-            true,
-            static fn(bool $matches, $key, $value): bool => $matches && $predicate($key, $value),
-        );
+        /** @psalm-suppress MixedArgument For some reason Psalm no longer recognize the type in `find` */
+        return $this
+            ->find(static fn($key, $value) => !$predicate($key, $value))
+            ->match(
+                static fn() => false,
+                static fn() => true,
+            );
     }
 
     /**

@@ -422,11 +422,13 @@ final class Set implements \Countable
      */
     public function matches(callable $predicate): bool
     {
-        /** @psalm-suppress MixedArgument */
-        return $this->reduce(
-            true,
-            static fn(bool $matches, $value): bool => $matches && $predicate($value),
-        );
+        /** @psalm-suppress MixedArgument For some reason Psalm no longer recognize the type in `find` */
+        return $this
+            ->find(static fn($value) => !$predicate($value))
+            ->match(
+                static fn() => false,
+                static fn() => true,
+            );
     }
 
     /**
