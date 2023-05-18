@@ -599,13 +599,13 @@ final class Sequence implements \Countable
      */
     public function toList(): array
     {
-        /**
-         * @psalm-suppress MixedAssignment
-         * @var list<T>
-         */
+        /** @var list<T> */
+        $all = [];
+
         return $this->reduce(
-            [],
+            $all,
             static function(array $carry, $value): array {
+                /** @psalm-suppress MixedAssignment */
                 $carry[] = $value;
 
                 return $carry;

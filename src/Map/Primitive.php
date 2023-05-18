@@ -277,6 +277,7 @@ final class Primitive implements Implementation
      */
     public function merge(Implementation $map): Implementation
     {
+        /** @psalm-suppress ArgumentTypeCoercion */
         return $map->reduce(
             $this,
             static fn(Implementation $carry, $key, $value): Implementation => ($carry)($key, $value),

@@ -250,8 +250,11 @@ final class ObjectKeys implements Implementation
      */
     public function keys(): Set
     {
+        /** @var Set<T> */
+        $keys = Set::of();
+
         return $this->reduce(
-            Set::of(),
+            $keys,
             static fn(Set $keys, $key): Set => ($keys)($key),
         );
     }
@@ -261,8 +264,11 @@ final class ObjectKeys implements Implementation
      */
     public function values(): Sequence
     {
+        /** @var Sequence<S> */
+        $values = Sequence::of();
+
         return $this->reduce(
-            Sequence::of(),
+            $values,
             static fn(Sequence $values, $_, $value): Sequence => ($values)($value),
         );
     }
@@ -327,6 +333,7 @@ final class ObjectKeys implements Implementation
      */
     public function merge(Implementation $map): Implementation
     {
+        /** @psalm-suppress ArgumentTypeCoercion */
         return $map->reduce(
             $this,
             static fn(Implementation $carry, $key, $value): Implementation => ($carry)($key, $value),

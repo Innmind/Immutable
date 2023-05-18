@@ -224,12 +224,15 @@ final class Map implements \Countable
      */
     public function flatMap(callable $map): self
     {
+        /** @var self<A, B> */
+        $all = self::of();
+
         /**
          * @psalm-suppress InvalidArgument
          * @psalm-suppress MixedArgument
          */
         return $this->reduce(
-            self::of(),
+            $all,
             static fn(self $carry, $key, $value) => $carry->merge($map($key, $value)),
         );
     }
