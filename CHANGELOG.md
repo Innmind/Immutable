@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- `Innmind\Immutable\Str\Encoding`
+
 ### Changed
 
 - `innmind/black-box` updated to version `5`

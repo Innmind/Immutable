@@ -25,9 +25,15 @@ final class Str
 
     /**
      * @psalm-pure
+     *
+     * @param string|Str\Encoding|null $encoding $encoding Strings will no longer be accepted in the next major release
      */
-    public static function of(string $value, string $encoding = null): self
+    public static function of(string $value, string|Str\Encoding $encoding = null): self
     {
+        if ($encoding instanceof Str\Encoding) {
+            $encoding = $encoding->toString();
+        }
+
         return new self($value, $encoding);
     }
 
@@ -54,9 +60,12 @@ final class Str
         return new self($this->encoding);
     }
 
-    public function toEncoding(string $encoding): self
+    /**
+     * @param string|Str\Encoding $encoding $encoding Strings will no longer be accepted in the next major release
+     */
+    public function toEncoding(string|Str\Encoding $encoding): self
     {
-        return new self($this->value, $encoding);
+        return self::of($this->value, $encoding);
     }
 
     /**

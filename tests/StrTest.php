@@ -51,13 +51,16 @@ class StrTest extends TestCase
     {
         $str = S::of('foo🙏bar');
         $str2 = $str->toEncoding('ASCII');
+        $str3 = $str->toEncoding(S\Encoding::ascii);
 
         $this->assertInstanceOf(S::class, $str2);
         $this->assertNotSame($str, $str2);
         $this->assertSame('UTF-8', $str->encoding()->toString());
         $this->assertSame('ASCII', $str2->encoding()->toString());
+        $this->assertSame('ASCII', $str3->encoding()->toString());
         $this->assertSame(7, $str->length());
         $this->assertSame(10, $str2->length());
+        $this->assertSame(10, $str3->length());
     }
 
     public function testSplit()
