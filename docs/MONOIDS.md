@@ -12,58 +12,29 @@ This library comes with a few monoids:
 
 ## Create your own
 
-To make sure your own monoid follows the laws this library comes with properties you can use in your test like so:
+To make sure your own monoid follows the laws this library comes with properties you can use (via [`innmind/black-box`](https://github.com/Innmind/BlackBox/)) in your test like so:
 
 ```php
-use PHPUnit\Framework\TestCase;
-use Innmind\BlackBox\{
-    PHPUnit\BlackBox,
-    Set,
-};
+use Innmind\BlackBox\Set;
 use Properties\Innmind\Immutable\Monoid;
 
-class YourMonoidTest extends TestCase
-{
-    use BlackBox;
+return static function() {
+    $equals = static fn($a, $b) => /* this callable is the way to check that 2 values are equal */;
+    // this Set must generate values that are of the type your monoid understands
+    $set = /* an instance of Set */;
 
-    /**
-     * @dataProvider properties
-     */
-    public function testHoldProperty($property)
-    {
-        $this
-            ->forAll($property)
-            ->then(static function($property) {
-                $property->ensureHeldBy(new YourMonoid);
-            });
+    yield properties(
+        'YourMonoid properties',
+        Monoid::properties($set, $equals),
+        Set\Elements::of(new YourMonoid),
+    );
+
+    foreach (Monoid::list($set, $equals) as $property) {
+        yield proof(
+            'YourMonoid property',
+            given($property),
+            static fn($assert, $property) => $property->ensureHeldBy($assert, new YourMonoid),
+        );
     }
-
-    public function testHoldProperties()
-    {
-        $this
-            ->forAll(Monoid::properties($this->set(), $this->equals()))
-            ->then(static function($properties) {
-                $properties->ensureHeldBy(new YourMonoid);
-            });
-    }
-
-    public function properties(): iterable
-    {
-        foreach (Monoid::list($this->set(), $this->equals()) as $property) {
-            yield [$property];
-        }
-    }
-
-    public function equals(): callable
-    {
-        return static fn($a, $b) => /* this callable is the way to check that 2 values are equal */;
-    }
-
-    private function set(): Set
-    {
-        // this Set must generate values that are of the type your monoid understands
-        return /* an instance of Set */
-    }
-}
-
+};
 ```

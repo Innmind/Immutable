@@ -30,17 +30,6 @@ class StrTest extends TestCase
         $this->assertSame('ASCII', $str->encoding()->toString());
     }
 
-    public function testThrowWhenInvalidType()
-    {
-        $this->expectException(\TypeError::class);
-        // message tested with 2 assertions as the message contains a "the"
-        // between the 2 strings in PHP 7.4 but no longer is there in 8.0
-        $this->expectExceptionMessage('must be of');
-        $this->expectExceptionMessage('type string, int given');
-
-        S::of(42);
-    }
-
     public function testEncoding()
     {
         $this->assertInstanceOf(S::class, S::of('')->encoding());
@@ -51,13 +40,16 @@ class StrTest extends TestCase
     {
         $str = S::of('foo🙏bar');
         $str2 = $str->toEncoding('ASCII');
+        $str3 = $str->toEncoding(S\Encoding::ascii);
 
         $this->assertInstanceOf(S::class, $str2);
         $this->assertNotSame($str, $str2);
         $this->assertSame('UTF-8', $str->encoding()->toString());
         $this->assertSame('ASCII', $str2->encoding()->toString());
+        $this->assertSame('ASCII', $str3->encoding()->toString());
         $this->assertSame(7, $str->length());
         $this->assertSame(10, $str2->length());
+        $this->assertSame(10, $str3->length());
     }
 
     public function testSplit()
@@ -232,6 +224,13 @@ class StrTest extends TestCase
             ),
         );
         $this->assertSame(
+            1,
+            $str->position(S::of('o'))->match(
+                static fn($value) => $value,
+                static fn() => null,
+            ),
+        );
+        $this->assertSame(
             2,
             $str->position('o', 2)->match(
                 static fn($value) => $value,
@@ -279,6 +278,12 @@ class StrTest extends TestCase
 
         $this->assertSame('foo', S::of('foo')->replace('.', '/')->toString());
         $this->assertSame('foo/bar', S::of('foo.bar')->replace('.', '/')->toString());
+        $this->assertSame(
+            'foo/bar',
+            S::of('foo.bar')
+                ->replace(S::of('.'), S::of('/'))
+                ->toString(),
+        );
     }
 
     public function testReplaceWithDifferentEncoding()
@@ -381,18 +386,21 @@ class StrTest extends TestCase
         $this->assertNotSame($str, $str2);
         $this->assertSame('foo000', $str2->toString());
         $this->assertSame('foo', $str->toString());
+        $this->assertSame('foo000', $str->rightPad(6, S::of('0'))->toString());
 
         $str2 = $str->leftPad(6, '0');
         $this->assertInstanceOf(S::class, $str2);
         $this->assertNotSame($str, $str2);
         $this->assertSame('000foo', $str2->toString());
         $this->assertSame('foo', $str->toString());
+        $this->assertSame('000foo', $str->leftPad(6, S::of('0'))->toString());
 
         $str2 = $str->uniPad(6, '0');
         $this->assertInstanceOf(S::class, $str2);
         $this->assertNotSame($str, $str2);
         $this->assertSame('0foo00', $str2->toString());
         $this->assertSame('foo', $str->toString());
+        $this->assertSame('0foo00', $str->uniPad(6, S::of('0'))->toString());
     }
 
     public function testRepeat()
@@ -487,6 +495,12 @@ class StrTest extends TestCase
         $this->assertSame('hypertext', $this->get($c, 0)->toString());
         $this->assertSame('language', $this->get($c, 1)->toString());
         $this->assertSame('programming', $this->get($c, 2)->toString());
+
+        $c = $str->pregSplit(S::of('/[\s,]+/'));
+        $this->assertInstanceOf(Sequence::class, $c);
+        $this->assertSame('hypertext', $this->get($c, 0)->toString());
+        $this->assertSame('language', $this->get($c, 1)->toString());
+        $this->assertSame('programming', $this->get($c, 2)->toString());
     }
 
     public function testMatches()
@@ -498,6 +512,7 @@ class StrTest extends TestCase
 
         $this->assertTrue(S::of('foo🙏bar')->matches('/🙏/'));
         $this->assertTrue(S::of('foo🙏bar')->toEncoding('ASCII')->matches('/🙏/'));
+        $this->assertTrue(S::of('foo🙏bar')->matches(S::of('/🙏/')));
     }
 
     public function testCapture()
@@ -510,6 +525,9 @@ class StrTest extends TestCase
         $this->assertSame('http://www.php.net', $this->get($map, 0)->toString());
         $this->assertSame('www.php.net', $this->get($map, 1)->toString());
         $this->assertSame('www.php.net', $this->get($map, 'host')->toString());
+
+        $map = $str->capture(S::of('@^(?:http://)?(?P<host>[^/]+)@i'));
+        $this->assertCount(3, $map);
     }
 
     public function testCastNullValuesWhenCapturing()
@@ -539,6 +557,12 @@ class StrTest extends TestCase
         $this->assertNotSame($str, $str2);
         $this->assertSame('April1,2003', $str2->toString());
         $this->assertSame('April 15, 2003', $str->toString());
+        $this->assertSame(
+            'April1,2003',
+            $str
+                ->pregReplace(S::of('/(\w+) (\d+), (\d+)/i'), S::of('${1}1,$3'))
+                ->toString(),
+        );
     }
 
     public function testSubstring()
@@ -678,6 +702,7 @@ class StrTest extends TestCase
         $this->assertNotSame($str, $str2);
         $this->assertSame('foo', $str->toString());
         $this->assertSame('foo bar', $str2->toString());
+        $this->assertSame('foo bar', $str->append(S::of(' bar'))->toString());
     }
 
     public function testPrepend()
@@ -688,6 +713,7 @@ class StrTest extends TestCase
         $this->assertNotSame($str, $str2);
         $this->assertSame('foo', $str->toString());
         $this->assertSame('baz foo', $str2->toString());
+        $this->assertSame('baz foo', $str->prepend(S::of('baz '))->toString());
     }
 
     public function testEquals()
@@ -739,6 +765,8 @@ class StrTest extends TestCase
         $this->assertTrue($str->contains('foo'));
         $this->assertTrue($str->contains('bar'));
         $this->assertFalse($str->contains('baz'));
+        $this->assertTrue($str->contains(S::of('foo')));
+        $this->assertFalse($str->contains(S::of('baz')));
     }
 
     public function testStartsWith()
@@ -752,6 +780,8 @@ class StrTest extends TestCase
         $this->assertFalse($str->startsWith('bar'));
         $this->assertFalse($str->startsWith('oobar'));
         $this->assertFalse($str->startsWith('foobar '));
+        $this->assertTrue($str->startsWith(S::of('foobar')));
+        $this->assertFalse($str->startsWith(S::of('bar')));
     }
 
     public function testEndsWith()
@@ -765,6 +795,8 @@ class StrTest extends TestCase
         $this->assertFalse($str->endsWith('foo'));
         $this->assertFalse($str->endsWith('fooba'));
         $this->assertFalse($str->endsWith('xfoobar'));
+        $this->assertTrue($str->endsWith(S::of('foobar')));
+        $this->assertFalse($str->endsWith(S::of('foo')));
     }
 
     public function testPregQuote()
@@ -818,11 +850,21 @@ class StrTest extends TestCase
 
         $this->assertInstanceOf(S::class, $str);
         $this->assertSame('1|2|3', $str->toString());
+
+        $str = S::of('|')->join(Set::of('1', '2', '3')->map(S::of(...)));
+
+        $this->assertInstanceOf(S::class, $str);
+        $this->assertSame('1|2|3', $str->toString());
     }
 
     public function testJoinSequence()
     {
         $str = S::of('|')->join(Sequence::of('1', '2', '3'));
+
+        $this->assertInstanceOf(S::class, $str);
+        $this->assertSame('1|2|3', $str->toString());
+
+        $str = S::of('|')->join(Sequence::of('1', '2', '3')->map(S::of(...)));
 
         $this->assertInstanceOf(S::class, $str);
         $this->assertSame('1|2|3', $str->toString());

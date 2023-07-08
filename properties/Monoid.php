@@ -20,10 +20,7 @@ final class Monoid
      */
     public static function properties(Set $values, callable $equals): Set
     {
-        return Set\Properties::chooseFrom(
-            new Set\Either(...self::list($values, $equals)),
-            Set\Integers::between(1, 10),
-        );
+        return Set\Properties::any(...self::list($values, $equals))->atMost(10);
     }
 
     /**
@@ -32,13 +29,13 @@ final class Monoid
      * @param Set<T> $values
      * @param callable(T, T): bool $equals
      *
-     * @return list<Property>
+     * @return non-empty-list<Property>
      */
     public static function list(Set $values, callable $equals): array
     {
         return [
-            Monoid\Identity::any($values, $equals),
-            Monoid\Associativity::any($values, $equals),
+            Monoid\Identity::of($values, $equals),
+            Monoid\Associativity::of($values, $equals),
         ];
     }
 }

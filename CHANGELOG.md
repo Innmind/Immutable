@@ -1,5 +1,21 @@
 # Changelog
 
+## 4.15.0 - 2023-07-08
+
+### Added
+
+- `Innmind\Immutable\Str\Encoding`
+- `Innmind\Immutable\Str` now implements `\Stringable`
+- Most `Innmind\Immutable\Str` methods now also accept `\Stringable`
+
+### Changed
+
+- `innmind/black-box` updated to version `5`
+
+### Removed
+
+- Support for PHP `8.0` and `8.1`
+
 ## 4.14.1 - 2023-05-18
 
 ### Changed

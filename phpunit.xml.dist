@@ -1,6 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" colors="true" bootstrap="vendor/autoload.php" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd" printerClass="Innmind\BlackBox\PHPUnit\ResultPrinterV9">
-  <coverage>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" colors="true" bootstrap="vendor/autoload.php" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.2/phpunit.xsd">
+  <extensions>
+    <bootstrap class="Innmind\BlackBox\PHPUnit\Extension">
+    </bootstrap>
+  </extensions>
+  <coverage/>
+  <testsuites>
+    <testsuite name="Immutable primitive wrappers test suite">
+      <directory>./tests</directory>
+    </testsuite>
+  </testsuites>
+  <source>
     <include>
       <directory>.</directory>
     </include>
@@ -9,10 +19,5 @@
       <directory>./vendor</directory>
       <directory>./benchmarks</directory>
     </exclude>
-  </coverage>
-  <testsuites>
-    <testsuite name="Immutable primitive wrappers test suite">
-      <directory>./tests</directory>
-    </testsuite>
-  </testsuites>
+  </source>
 </phpunit>

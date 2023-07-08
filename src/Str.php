@@ -8,7 +8,7 @@ use Innmind\Immutable\Exception\InvalidRegex;
 /**
  * @psalm-immutable
  */
-final class Str
+final class Str implements \Stringable
 {
     private string $value;
     private string $encoding;
@@ -23,18 +23,29 @@ final class Str
         $this->encoding = $encoding ?? \mb_internal_encoding();
     }
 
+    public function __toString(): string
+    {
+        return $this->value;
+    }
+
     /**
      * @psalm-pure
+     *
+     * @param string|Str\Encoding|null $encoding $encoding Strings will no longer be accepted in the next major release
      */
-    public static function of(string $value, string $encoding = null): self
+    public static function of(string $value, string|Str\Encoding $encoding = null): self
     {
+        if ($encoding instanceof Str\Encoding) {
+            $encoding = $encoding->toString();
+        }
+
         return new self($value, $encoding);
     }
 
     /**
      * Concatenate all elements with the given separator
      *
-     * @param Set<string>|Sequence<string> $structure
+     * @param Set<string|\Stringable>|Sequence<string|\Stringable> $structure
      */
     public function join(Set|Sequence $structure): self
     {
@@ -54,9 +65,12 @@ final class Str
         return new self($this->encoding);
     }
 
-    public function toEncoding(string $encoding): self
+    /**
+     * @param string|Str\Encoding $encoding $encoding Strings will no longer be accepted in the next major release
+     */
+    public function toEncoding(string|Str\Encoding $encoding): self
     {
-        return new self($this->value, $encoding);
+        return self::of($this->value, $encoding);
     }
 
     /**
@@ -118,9 +132,9 @@ final class Str
      *
      * @return Maybe<0|positive-int>
      */
-    public function position(string $needle, int $offset = 0): Maybe
+    public function position(string|\Stringable $needle, int $offset = 0): Maybe
     {
-        $position = \mb_strpos($this->value, $needle, $offset, $this->encoding);
+        $position = \mb_strpos($this->value, (string) $needle, $offset, $this->encoding);
 
         if ($position === false) {
             /** @var Maybe<0|positive-int> */
@@ -134,17 +148,17 @@ final class Str
     /**
      * Replace all occurences of the search string with the replacement one
      */
-    public function replace(string $search, string $replacement): self
+    public function replace(string|\Stringable $search, string|\Stringable $replacement): self
     {
         if (!$this->contains($search)) {
             return $this;
         }
 
         $parts = $this
-            ->split($search)
+            ->split((string) $search)
             ->map(static fn($v) => $v->toString());
 
-        return self::of($replacement, $this->encoding)->join($parts);
+        return self::of((string) $replacement, $this->encoding)->join($parts);
     }
 
     /**
@@ -196,7 +210,7 @@ final class Str
      *
      * @param positive-int $length
      */
-    public function rightPad(int $length, string $character = ' '): self
+    public function rightPad(int $length, string|\Stringable $character = ' '): self
     {
         return $this->pad($length, $character, \STR_PAD_RIGHT);
     }
@@ -206,7 +220,7 @@ final class Str
      *
      * @param positive-int $length
      */
-    public function leftPad(int $length, string $character = ' '): self
+    public function leftPad(int $length, string|\Stringable $character = ' '): self
     {
         return $this->pad($length, $character, \STR_PAD_LEFT);
     }
@@ -216,7 +230,7 @@ final class Str
      *
      * @param positive-int $length
      */
-    public function uniPad(int $length, string $character = ' '): self
+    public function uniPad(int $length, string|\Stringable $character = ' '): self
     {
         return $this->pad($length, $character, \STR_PAD_BOTH);
     }
@@ -247,12 +261,12 @@ final class Str
     /**
      * Return the word count
      */
-    public function wordCount(string $charlist = ''): int
+    public function wordCount(string|\Stringable $charlist = ''): int
     {
         return \str_word_count(
             $this->value,
             0,
-            $charlist,
+            (string) $charlist,
         );
     }
 
@@ -261,10 +275,10 @@ final class Str
      *
      * @return Map<int, self>
      */
-    public function words(string $charlist = ''): Map
+    public function words(string|\Stringable $charlist = ''): Map
     {
         /** @var list<string> */
-        $words = \str_word_count($this->value, 2, $charlist);
+        $words = \str_word_count($this->value, 2, (string) $charlist);
         /** @var Map<int, self> */
         $map = Map::of();
 
@@ -280,9 +294,9 @@ final class Str
      *
      * @return Sequence<self>
      */
-    public function pregSplit(string $regex, int $limit = -1): Sequence
+    public function pregSplit(string|\Stringable $regex, int $limit = -1): Sequence
     {
-        $strings = \preg_split($regex, $this->value, $limit);
+        $strings = \preg_split((string) $regex, $this->value, $limit);
         /** @var Sequence<self> */
         $sequence = Sequence::of();
 
@@ -298,9 +312,9 @@ final class Str
      *
      * @throws InvalidRegex If the regex failed
      */
-    public function matches(string $regex): bool
+    public function matches(string|\Stringable $regex): bool
     {
-        return RegExp::of($regex)->matches($this);
+        return RegExp::of((string) $regex)->matches($this);
     }
 
     /**
@@ -310,9 +324,9 @@ final class Str
      *
      * @return Map<int|string, self>
      */
-    public function capture(string $regex): Map
+    public function capture(string|\Stringable $regex): Map
     {
-        return RegExp::of($regex)->capture($this);
+        return RegExp::of((string) $regex)->capture($this);
     }
 
     /**
@@ -321,13 +335,13 @@ final class Str
      * @throws InvalidRegex If the regex failed
      */
     public function pregReplace(
-        string $regex,
-        string $replacement,
+        string|\Stringable $regex,
+        string|\Stringable $replacement,
         int $limit = -1,
     ): self {
         $value = \preg_replace(
-            $regex,
-            $replacement,
+            (string) $regex,
+            (string) $replacement,
             $this->value,
             $limit,
         );
@@ -435,17 +449,17 @@ final class Str
     /**
      * Append a string at the end of the current one
      */
-    public function append(string $string): self
+    public function append(string|\Stringable $string): self
     {
-        return new self($this->value.$string, $this->encoding);
+        return new self($this->value.((string) $string), $this->encoding);
     }
 
     /**
      * Prepend a string at the beginning of the current one
      */
-    public function prepend(string $string): self
+    public function prepend(string|\Stringable $string): self
     {
-        return new self($string.$this->value, $this->encoding);
+        return new self(((string) $string).$this->value, $this->encoding);
     }
 
     /**
@@ -492,28 +506,30 @@ final class Str
     /**
      * Check if the given string is present in the current one
      */
-    public function contains(string $value): bool
+    public function contains(string|\Stringable $value): bool
     {
-        return \mb_strpos($this->value, $value, 0, $this->encoding) !== false;
+        return \mb_strpos($this->value, (string) $value, 0, $this->encoding) !== false;
     }
 
     /**
      * Check if the current string starts with the given string
      */
-    public function startsWith(string $value): bool
+    public function startsWith(string|\Stringable $value): bool
     {
         if ($value === '') {
             return true;
         }
 
-        return \mb_strpos($this->value, $value, 0, $this->encoding) === 0;
+        return \mb_strpos($this->value, (string) $value, 0, $this->encoding) === 0;
     }
 
     /**
      * Check if the current string ends with the given string
      */
-    public function endsWith(string $value): bool
+    public function endsWith(string|\Stringable $value): bool
     {
+        $value = (string) $value;
+
         if ($value === '') {
             return true;
         }
@@ -526,9 +542,9 @@ final class Str
     /**
      * Quote regular expression characters
      */
-    public function pregQuote(string $delimiter = ''): self
+    public function pregQuote(string|\Stringable $delimiter = ''): self
     {
-        return new self(\preg_quote($this->value, $delimiter), $this->encoding);
+        return new self(\preg_quote($this->value, (string) $delimiter), $this->encoding);
     }
 
     /**
@@ -552,12 +568,12 @@ final class Str
     /**
      * Pad the string
      */
-    private function pad(int $length, string $character, int $direction): self
+    private function pad(int $length, string|\Stringable $character, int $direction): self
     {
         return new self(\str_pad(
             $this->value,
             $length,
-            $character,
+            (string) $character,
             $direction,
         ), $this->encoding);
     }
