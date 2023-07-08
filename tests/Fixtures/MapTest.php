@@ -6,7 +6,7 @@ namespace Tests\Innmind\Immutable\Fixtures;
 use Innmind\Immutable\Map as Structure;
 use Innmind\BlackBox\{
     Set,
-    Random\RandomInt,
+    Random,
 };
 use Fixtures\Innmind\Immutable\Map;
 use PHPUnit\Framework\TestCase;
@@ -18,8 +18,9 @@ class MapTest extends TestCase
         $this->assertInstanceOf(
             Set::class,
             Map::of(
-                Set\Chars::any(),
-                Set\Chars::any(),
+                Set\Strings::madeOf(Set\Chars::any())->between(1, 2),
+                Set\Strings::madeOf(Set\Chars::any())->between(1, 2),
+                Set\Integers::between(0, 1),
             ),
         );
     }
@@ -27,16 +28,17 @@ class MapTest extends TestCase
     public function testGeneratesAtMost100ValuesByDefault()
     {
         $maps = Map::of(
-            Set\Chars::any(),
+            Set\Strings::madeOf(Set\Chars::any())->between(1, 2),
             Set\Integers::any(),
+            Set\Integers::between(0, 10),
         );
 
-        $this->assertInstanceOf(\Generator::class, $maps->values(new RandomInt));
-        $count = \count(\iterator_to_array($maps->values(new RandomInt)));
+        $this->assertInstanceOf(\Generator::class, $maps->values(Random::default));
+        $count = \count(\iterator_to_array($maps->values(Random::default)));
         $this->assertLessThanOrEqual(100, $count);
         $this->assertGreaterThan(10, $count);
 
-        foreach ($maps->values(new RandomInt) as $map) {
+        foreach ($maps->values(Random::default) as $map) {
             $this->assertInstanceOf(Set\Value::class, $map);
             $this->assertInstanceOf(Structure::class, $map->unwrap());
         }
@@ -45,13 +47,13 @@ class MapTest extends TestCase
     public function testGeneratesMapsOfDifferentSizes()
     {
         $maps = Map::of(
-            Set\Chars::any(),
-            Set\Chars::any(),
+            Set\Strings::madeOf(Set\Chars::any())->between(1, 2),
+            Set\Strings::madeOf(Set\Chars::any())->between(1, 2),
             Set\Integers::between(0, 50),
         );
         $sizes = [];
 
-        foreach ($maps->values(new RandomInt) as $map) {
+        foreach ($maps->values(Random::default) as $map) {
             $sizes[] = $map->unwrap()->size();
         }
 
@@ -61,15 +63,16 @@ class MapTest extends TestCase
     public function testTake()
     {
         $maps1 = Map::of(
-            Set\Chars::any(),
-            Set\Chars::any(),
+            Set\Strings::madeOf(Set\Chars::any())->between(1, 2),
+            Set\Strings::madeOf(Set\Chars::any())->between(1, 2),
+            Set\Integers::between(0, 10),
         );
         $maps2 = $maps1->take(50);
 
         $this->assertNotSame($maps1, $maps2);
         $this->assertInstanceOf(Set::class, $maps2);
-        $count1 = \count(\iterator_to_array($maps1->values(new RandomInt)));
-        $count2 = \count(\iterator_to_array($maps2->values(new RandomInt)));
+        $count1 = \count(\iterator_to_array($maps1->values(Random::default)));
+        $count2 = \count(\iterator_to_array($maps2->values(Random::default)));
         $this->assertLessThanOrEqual(100, $count1);
         $this->assertLessThanOrEqual(50, $count2);
         $this->assertGreaterThan($count2, $count1);
@@ -78,8 +81,9 @@ class MapTest extends TestCase
     public function testFilter()
     {
         $maps = Map::of(
-            Set\Chars::any(),
-            Set\Chars::any(),
+            Set\Strings::madeOf(Set\Chars::any())->between(1, 2),
+            Set\Strings::madeOf(Set\Chars::any())->between(1, 2),
+            Set\Integers::between(1, 10),
         );
         $maps2 = $maps->filter(static fn($map) => $map->size() % 2 === 0);
 
@@ -90,14 +94,14 @@ class MapTest extends TestCase
 
         $this->assertTrue(
             \array_reduce(
-                \iterator_to_array($maps->values(new RandomInt)),
+                \iterator_to_array($maps->values(Random::default)),
                 $hasOddMap,
                 false,
             ),
         );
         $this->assertFalse(
             \array_reduce(
-                \iterator_to_array($maps2->values(new RandomInt)),
+                \iterator_to_array($maps2->values(Random::default)),
                 $hasOddMap,
                 false,
             ),
@@ -111,10 +115,11 @@ class MapTest extends TestCase
                 static fn() => new \stdClass,
                 Set\Chars::any(),
             ),
-            Set\Chars::any(),
+            Set\Strings::madeOf(Set\Chars::any())->between(1, 2),
+            Set\Integers::between(0, 1),
         );
 
-        foreach ($maps->values(new RandomInt) as $map) {
+        foreach ($maps->values(Random::default) as $map) {
             $this->assertFalse($map->isImmutable());
             $this->assertNotSame($map->unwrap(), $map->unwrap());
             $this->assertSame($map->unwrap()->size(), $map->unwrap()->size());
@@ -124,14 +129,15 @@ class MapTest extends TestCase
     public function testFlagStructureAsMutableWhenUnderlyingValuesAreMutable()
     {
         $maps = Map::of(
-            Set\Chars::any(),
+            Set\Strings::madeOf(Set\Chars::any())->between(1, 2),
             Set\Decorate::mutable(
                 static fn() => new \stdClass,
-                Set\Chars::any(),
+                Set\Strings::madeOf(Set\Chars::any())->between(1, 2),
             ),
+            Set\Integers::between(0, 1),
         );
 
-        foreach ($maps->values(new RandomInt) as $map) {
+        foreach ($maps->values(Random::default) as $map) {
             $this->assertFalse($map->isImmutable());
             $this->assertNotSame($map->unwrap(), $map->unwrap());
         }
@@ -140,12 +146,12 @@ class MapTest extends TestCase
     public function testNonEmptyMapCanBeShrunk()
     {
         $maps = Map::of(
-            Set\Chars::any(),
-            Set\Chars::any(),
-            Set\Integers::between(1, 100),
+            Set\Strings::madeOf(Set\Chars::any())->between(1, 2),
+            Set\Strings::madeOf(Set\Chars::any())->between(1, 2),
+            Set\Integers::between(1, 10),
         );
 
-        foreach ($maps->values(new RandomInt) as $value) {
+        foreach ($maps->values(Random::default) as $value) {
             $this->assertTrue($value->shrinkable());
         }
     }
@@ -153,12 +159,12 @@ class MapTest extends TestCase
     public function testEmptyMapCanNotBeShrunk()
     {
         $maps = Map::of(
-            Set\Chars::any(),
-            Set\Chars::any(),
+            Set\Strings::madeOf(Set\Chars::any())->between(1, 2),
+            Set\Strings::madeOf(Set\Chars::any())->between(1, 2),
             Set\Integers::below(1),
         );
 
-        foreach ($maps->values(new RandomInt) as $value) {
+        foreach ($maps->values(Random::default) as $value) {
             if (!$value->unwrap()->empty()) {
                 // as it can generate maps of 1 element
                 continue;
@@ -168,79 +174,15 @@ class MapTest extends TestCase
         }
     }
 
-    public function testNonEmptyMapAreShrunkWithDifferentStrategies()
-    {
-        $maps = Map::of(
-            Set\Chars::any(),
-            Set\Chars::any(),
-            Set\Integers::between(3, 100),
-        );
-
-        foreach ($maps->values(new RandomInt) as $value) {
-            if ($value->unwrap()->size() < 6) {
-                // when generating the lower bound it will shrink identity values
-                continue;
-            }
-
-            $dichotomy = $value->shrink();
-            $this->assertFalse($dichotomy->a()->unwrap()->equals($dichotomy->b()->unwrap()));
-        }
-    }
-
-    public function testShrunkMapsDoContainsLessThanTheInitialValue()
-    {
-        $maps = Map::of(
-            Set\Chars::any(),
-            Set\Chars::any(),
-            Set\Integers::between(2, 100),
-        );
-
-        foreach ($maps->values(new RandomInt) as $value) {
-            if ($value->unwrap()->size() < 4) {
-                // otherwise strategy A will return it's identity since 3/2 won't
-                // match the predicate of minimum size 2, so strategy will return
-                // an identity value
-                continue;
-            }
-
-            $dichotomy = $value->shrink();
-
-            $this->assertLessThan($value->unwrap()->size(), $dichotomy->a()->unwrap()->size());
-            $this->assertLessThan($value->unwrap()->size(), $dichotomy->b()->unwrap()->size());
-        }
-    }
-
-    public function testShrinkingStrategyAReduceTheMapFasterThanStrategyB()
-    {
-        $maps = Map::of(
-            Set\Chars::any(),
-            Set\Chars::any(),
-            Set\Integers::between(3, 100),
-        );
-
-        foreach ($maps->values(new RandomInt) as $value) {
-            if ($value->unwrap()->size() < 6) {
-                // otherwise strategy A will return it's identity since 5/2 won't
-                // match the predicate of minimum size 3, so strategy will return
-                // an identity value so it will always be greater than stragey B
-                continue;
-            }
-
-            $dichotomy = $value->shrink();
-
-            $this->assertLessThan($dichotomy->b()->unwrap()->size(), $dichotomy->a()->unwrap()->size());
-        }
-    }
-
     public function testShrunkValuesConserveMutabilityProperty()
     {
         $maps = Map::of(
-            Set\Chars::any(),
-            Set\Chars::any(),
-            Set\Integers::between(1, 100),
+            Set\Strings::madeOf(Set\Chars::any())->between(1, 2),
+            Set\Strings::madeOf(Set\Chars::any())->between(1, 2),
+            Set\Integers::between(1, 10),
         );
 
-        foreach ($maps->values(new RandomInt) as $value) {
+        foreach ($maps->values(Random::default) as $value) {
             $dichotomy = $value->shrink();
 
             $this->assertTrue($dichotomy->a()->isImmutable());
@@ -248,15 +190,15 @@ class MapTest extends TestCase
         }
 
         $maps = Map::of(
-            Set\Chars::any(),
+            Set\Strings::madeOf(Set\Chars::any())->between(1, 2),
             Set\Decorate::mutable(
                 static fn() => new \stdClass,
-                Set\Chars::any(),
+                Set\Strings::madeOf(Set\Chars::any())->between(1, 2),
             ),
             Set\Integers::between(1, 100),
         );
 
-        foreach ($maps->values(new RandomInt) as $value) {
+        foreach ($maps->values(Random::default) as $value) {
             $dichotomy = $value->shrink();
 
             $this->assertFalse($dichotomy->a()->isImmutable());

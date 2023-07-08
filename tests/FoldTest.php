@@ -18,8 +18,8 @@ class FoldTest extends TestCase
     {
         $this
             ->forAll(
-                Set\AnyType::any(),
-                Set\AnyType::any(),
+                Set\Type::any(),
+                Set\Type::any(),
             )
             ->then(function($source, $mapped) {
                 $fold = Fold::with($source)
@@ -62,10 +62,10 @@ class FoldTest extends TestCase
     {
         $this
             ->forAll(
-                Set\AnyType::any(),
+                Set\Type::any(),
                 Set\Composite::immutable(
                     static fn($value, $type) => $type($value),
-                    Set\AnyType::any(),
+                    Set\Type::any(),
                     Set\Elements::of(
                         static fn($value) => Fold::with($value),
                         static fn($value) => Fold::result($value),
@@ -108,7 +108,7 @@ class FoldTest extends TestCase
     public function testMaybe()
     {
         $this
-            ->forAll(Set\AnyType::any())
+            ->forAll(Set\Type::any())
             ->then(function($source) {
                 $this->assertFalse(
                     Fold::with($source)
@@ -149,8 +149,8 @@ class FoldTest extends TestCase
     {
         $this
             ->forAll(
-                Set\AnyType::any(),
-                Set\AnyType::any(),
+                Set\Type::any(),
+                Set\Type::any(),
             )
             ->then(function($source, $mapped) {
                 $fold = Fold::with($source)
@@ -193,8 +193,8 @@ class FoldTest extends TestCase
     {
         $this
             ->forAll(
-                Set\AnyType::any(),
-                Set\AnyType::any(),
+                Set\Type::any(),
+                Set\Type::any(),
             )
             ->then(function($source, $mapped) {
                 $fold = Fold::with($source)

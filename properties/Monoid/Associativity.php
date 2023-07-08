@@ -3,14 +3,16 @@ declare(strict_types = 1);
 
 namespace Properties\Innmind\Immutable\Monoid;
 
+use Innmind\Immutable\Monoid;
 use Innmind\BlackBox\{
     Set,
     Property,
+    Runner\Assert,
 };
-use PHPUnit\Framework\Assert;
 
 /**
- * @template T
+ * @template T of Monoid
+ * @implements Property<T>
  */
 final class Associativity implements Property
 {
@@ -37,6 +39,11 @@ final class Associativity implements Property
         $this->equals = $equals;
     }
 
+    public static function any(): Set
+    {
+        throw new \LogicException('Use ::of() instead');
+    }
+
     /**
      * @template A
      *
@@ -45,7 +52,7 @@ final class Associativity implements Property
      *
      * @return Set<self<A>>
      */
-    public static function any(Set $values, callable $equals): Set
+    public static function of(Set $values, callable $equals): Set
     {
         return Set\Composite::immutable(
             static fn($a, $b, $c) => new self($a, $b, $c, $equals),
@@ -55,19 +62,14 @@ final class Associativity implements Property
         );
     }
 
-    public function name(): string
-    {
-        return 'Identity value has no effect on the combined value';
-    }
-
     public function applicableTo(object $monoid): bool
     {
         return true;
     }
 
-    public function ensureHeldBy(object $monoid): object
+    public function ensureHeldBy(Assert $assert, object $monoid): object
     {
-        Assert::assertTrue(($this->equals)(
+        $assert->true(($this->equals)(
             $monoid->combine($this->a, $monoid->combine($this->b, $this->c)),
             $monoid->combine($monoid->combine($this->a, $this->b), $this->c),
         ));

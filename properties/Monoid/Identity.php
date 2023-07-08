@@ -3,14 +3,16 @@ declare(strict_types = 1);
 
 namespace Properties\Innmind\Immutable\Monoid;
 
+use Innmind\Immutable\Monoid;
 use Innmind\BlackBox\{
     Set,
     Property,
+    Runner\Assert,
 };
-use PHPUnit\Framework\Assert;
 
 /**
- * @template T
+ * @template T of Monoid
+ * @implements Property<T>
  */
 final class Identity implements Property
 {
@@ -29,6 +31,11 @@ final class Identity implements Property
         $this->equals = $equals;
     }
 
+    public static function any(): Set
+    {
+        throw new \LogicException('Use ::of() instead');
+    }
+
     /**
      * @template A
      *
@@ -37,7 +44,7 @@ final class Identity implements Property
      *
      * @return Set<self<A>>
      */
-    public static function any(Set $values, callable $equals): Set
+    public static function of(Set $values, callable $equals): Set
     {
         return Set\Decorate::immutable(
             static fn($value) => new self($value, $equals),
@@ -45,32 +52,27 @@ final class Identity implements Property
         );
     }
 
-    public function name(): string
-    {
-        return 'Identity value has no effect on the combined value';
-    }
-
     public function applicableTo(object $monoid): bool
     {
         return true;
     }
 
-    public function ensureHeldBy(object $monoid): object
+    public function ensureHeldBy(Assert $assert, object $monoid): object
     {
-        Assert::assertTrue(($this->equals)(
+        $assert->true(($this->equals)(
             $monoid->identity(),
             $monoid->identity(),
         ));
-        Assert::assertTrue(($this->equals)(
+        $assert->true(($this->equals)(
             $this->value,
             $monoid->combine($monoid->identity(), $this->value),
         ));
-        Assert::assertTrue(($this->equals)(
+        $assert->true(($this->equals)(
             $this->value,
             $monoid->combine($this->value, $monoid->identity()),
         ));
         // make sure the identiy is not altered after using a concrete value
-        Assert::assertTrue(($this->equals)(
+        $assert->true(($this->equals)(
             $monoid->identity(),
             $monoid->identity(),
         ));

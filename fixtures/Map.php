@@ -3,7 +3,10 @@ declare(strict_types = 1);
 
 namespace Fixtures\Innmind\Immutable;
 
-use Innmind\BlackBox\Set;
+use Innmind\BlackBox\{
+    Set,
+    Random,
+};
 use Innmind\Immutable\{
     Map as Structure,
     Set as ISet,
@@ -13,6 +16,8 @@ use Innmind\Immutable\{
 final class Map
 {
     /**
+     * @deprecated Will be removed in the next major release
+     *
      * @template I
      * @template J
      *
@@ -26,6 +31,15 @@ final class Map
         Set $values,
         Set\Integers $sizes = null,
     ): Set {
+        // this is not optimal but it allows to avoid a BC break
+        $sizes ??= Set\Integers::between(0, 100);
+        $range = [
+            $sizes->values(Random::default)->current()->unwrap(),
+            $sizes->values(Random::default)->current()->unwrap(),
+        ];
+        $min = \min($range);
+        $max = \max($range);
+
         return Set\Decorate::immutable(
             static fn(array $pairs): Structure => \array_reduce(
                 $pairs,
@@ -33,20 +47,21 @@ final class Map
                 Structure::of(),
             ),
             Set\Sequence::of(
-                new Set\Randomize( // forced to randomize as the composite will try to reuse the same key
+                Set\Randomize::of( // forced to randomize as the composite will try to reuse the same key
                     Set\Composite::immutable(
                         static fn($key, $value): array => [$key, $value],
                         $keys,
                         $values,
                     ),
                 ),
-                $sizes,
-            )->filter(static function(array $pairs): bool {
-                $keys = \array_column($pairs, 0);
+            )
+                ->between($min, $max)
+                ->filter(static function(array $pairs): bool {
+                    $keys = \array_column($pairs, 0);
 
-                // checks unicity of values
-                return ISequence::mixed(...$keys)->size() === ISet::mixed(...$keys)->size();
-            }),
+                    // checks unicity of values
+                    return ISequence::mixed(...$keys)->size() === ISet::mixed(...$keys)->size();
+                }),
         );
     }
 }

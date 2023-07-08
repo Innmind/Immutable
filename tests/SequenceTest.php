@@ -1181,7 +1181,7 @@ class SequenceTest extends TestCase
     {
         $this
             ->forAll(DataSet\Sequence::of(
-                DataSet\AnyType::any(),
+                DataSet\Type::any(),
             ))
             ->then(function($values) {
                 $sequence = Sequence::of(...$values);
