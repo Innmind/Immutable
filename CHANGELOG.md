@@ -5,6 +5,8 @@
 ### Added
 
 - `Innmind\Immutable\Str\Encoding`
+- `Innmind\Immutable\Str` now implements `\Stringable`
+- Most `Innmind\Immutable\Str` methods now also accept `\Stringable`
 
 ### Changed
 
