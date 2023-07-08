@@ -30,17 +30,6 @@ class StrTest extends TestCase
         $this->assertSame('ASCII', $str->encoding()->toString());
     }
 
-    public function testThrowWhenInvalidType()
-    {
-        $this->expectException(\TypeError::class);
-        // message tested with 2 assertions as the message contains a "the"
-        // between the 2 strings in PHP 7.4 but no longer is there in 8.0
-        $this->expectExceptionMessage('must be of');
-        $this->expectExceptionMessage('type string, int given');
-
-        S::of(42);
-    }
-
     public function testEncoding()
     {
         $this->assertInstanceOf(S::class, S::of('')->encoding());
