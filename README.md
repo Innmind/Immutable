@@ -121,10 +121,6 @@ class SomeTest extends \PHPUnit\Framework\TestCase
     {
         $this
             ->forAll(
-                Immutable\Map::of(
-                    Set\Integers::any(),
-                    Set\Strings::any(),
-                ),
                 Immutable\Set::of(
                     Set\RealNumbers::any(),
                 ),
@@ -132,8 +128,7 @@ class SomeTest extends \PHPUnit\Framework\TestCase
                     Set\Uuid::any(),
                 ),
             )
-            ->then(function($map, $set, $sequence) {
-                // $map is an instance of \Innmind\Immutable\Map<int, string>
+            ->then(function($set, $sequence) {
                 // $set is an instance of \Innmind\Immutable\Set<float>
                 // $sequence is an instance of \Innmind\Immutable\Sequence<string>
 

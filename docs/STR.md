@@ -16,10 +16,13 @@ $str instanceof Str; // true
 You can also specify the encoding to use for manupilating the string.
 
 ```php
-$str = Str::of('👋', 'UTF-8');
+$str = Str::of('👋', Str\Encoding::utf8);
 $str->length(); // 1
 Str::of('👋')->length(); // 4
 ```
+
+> **Note**
+> `Str\Encoding::utf8` is the default value when not specified
 
 ## `->toString()`
 
@@ -34,7 +37,7 @@ Str::of('whataver')->toString(); // 'whatever'
 This will return the encoding used to manipulate the string.
 
 ```php
-Str::of('', 'UTF-8')->encoding()->equals(Str::of('UTF-8')); // true
+Str::of('', 'UTF-8')->encoding() === Str\Encoding::utf8; // true
 ```
 
 ## `->toEncoding()`
@@ -42,7 +45,7 @@ Str::of('', 'UTF-8')->encoding()->equals(Str::of('UTF-8')); // true
 Use this method to change the encoding used to manipulate the string.
 
 ```php
-Str::of('👋')->toEncoding('UTF-8');
+Str::of('👋')->toEncoding(Str\Encoding::utf8);
 ```
 
 ## `->split()`
@@ -112,7 +115,7 @@ Str::of('FOOBAR')->toUpper()->equals(Str::of('foobar'));
 Returns the length of the string depending on the used encoding.
 
 ```php
-Str::of('👋', 'UTF-8')->length(); // 1
+Str::of('👋', Str\Encoding::utf8)->length(); // 1
 Str::of('👋')->length(); // 4
 ```
 
@@ -122,7 +125,7 @@ Check if the string is an empty string.
 
 ```php
 Str::of('')->empty(); // true
-Str::of('', 'UTF-8')->empty(); // true
+Str::of('', Str\Encoding::utf8)->empty(); // true
 Str::of('null')->empty(); // false
 Str::of('0')->empty(); // false
 Str::of('false')->empty(); // false
@@ -336,7 +339,7 @@ Check if the 2 strings are equal.
 
 ```php
 Str::of('foo')->equals(Str::of('foo')); // true
-Str::of('foo')->equals(Str::of('foo', 'UTF-8')); // true
+Str::of('foo')->equals(Str::of('foo', Str\Encoding::utf8)); // true
 Str::of('foo')->equals(Str::of('bar')); // false
 ```
 
