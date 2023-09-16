@@ -8,7 +8,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macOS-latest]
-        php-version: ['8.2']
+        php-version: ['8.2', '8.3']
         dependency-versions: ['lowest', 'highest']
     name: 'BlackBox'
     steps:
@@ -33,7 +33,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macOS-latest]
-        php-version: ['8.2']
+        php-version: ['8.2', '8.3']
         dependency-versions: ['lowest', 'highest']
     name: 'BlackBox Coverage'
     steps:
@@ -61,7 +61,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        php-version: ['8.2']
+        php-version: ['8.2', '8.3']
     name: 'Psalm'
     steps:
       - name: Checkout
