@@ -75,7 +75,7 @@ final class RegExp
                 $key,
                 Str::of(
                     (string) $match,
-                    $string->encoding()->toString(),
+                    $string->encoding(),
                 ),
             );
         }

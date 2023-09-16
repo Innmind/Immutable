@@ -23,7 +23,7 @@ class StrTest extends TestCase
 
     public function testOf()
     {
-        $str = S::of('foo', 'ASCII');
+        $str = S::of('foo', S\Encoding::ascii);
 
         $this->assertInstanceOf(S::class, $str);
         $this->assertSame('foo', $str->toString());
@@ -32,24 +32,20 @@ class StrTest extends TestCase
 
     public function testEncoding()
     {
-        $this->assertInstanceOf(S::class, S::of('')->encoding());
-        $this->assertSame('UTF-8', S::of('')->encoding()->toString());
+        $this->assertSame(S\Encoding::utf8, S::of('')->encoding());
     }
 
     public function testToEncoding()
     {
         $str = S::of('foo🙏bar');
-        $str2 = $str->toEncoding('ASCII');
-        $str3 = $str->toEncoding(S\Encoding::ascii);
+        $str2 = $str->toEncoding(S\Encoding::ascii);
 
         $this->assertInstanceOf(S::class, $str2);
         $this->assertNotSame($str, $str2);
-        $this->assertSame('UTF-8', $str->encoding()->toString());
-        $this->assertSame('ASCII', $str2->encoding()->toString());
-        $this->assertSame('ASCII', $str3->encoding()->toString());
+        $this->assertSame(S\Encoding::utf8, $str->encoding());
+        $this->assertSame(S\Encoding::ascii, $str2->encoding());
         $this->assertSame(7, $str->length());
         $this->assertSame(10, $str2->length());
-        $this->assertSame(10, $str3->length());
     }
 
     public function testSplit()
@@ -68,14 +64,14 @@ class StrTest extends TestCase
         $this->assertSame('o', $this->get($sequence, 1)->toString());
         $this->assertSame('o', $this->get($sequence, 2)->toString());
 
-        $parts = S::of('🤩👍🤔', 'UTF-8')->split();
+        $parts = S::of('🤩👍🤔', S\Encoding::utf8)->split();
 
         $this->assertSame('🤩', $this->get($parts, 0)->toString());
         $this->assertSame('👍', $this->get($parts, 1)->toString());
         $this->assertSame('🤔', $this->get($parts, 2)->toString());
         $this->assertNotSame(
             '🤩',
-            $this->get(S::of('🤩👍🤔', 'ASCII')->split(), 0)->toString(),
+            $this->get(S::of('🤩👍🤔', S\Encoding::ascii)->split(), 0)->toString(),
         );
 
         $sequence = $str->split('');
@@ -127,7 +123,7 @@ class StrTest extends TestCase
         $this->assertSame('a', $this->get($splits, 5)->toString());
         $this->assertSame('r', $this->get($splits, 6)->toString());
 
-        $splits = $str->toEncoding('ASCII')->split();
+        $splits = $str->toEncoding(S\Encoding::ascii)->split();
 
         $this->assertSame('f', $this->get($splits, 0)->toString());
         $this->assertSame('o', $this->get($splits, 1)->toString());
@@ -149,12 +145,12 @@ class StrTest extends TestCase
         $this->assertSame('foo', $this->get($splits, 0)->toString());
         $this->assertSame('bar', $this->get($splits, 1)->toString());
 
-        $splits = $str->toEncoding('ASCII')->split('🙏');
+        $splits = $str->toEncoding(S\Encoding::ascii)->split('🙏');
 
         $this->assertSame('foo', $this->get($splits, 0)->toString());
         $this->assertSame('bar', $this->get($splits, 1)->toString());
 
-        $splits = $str->toEncoding('ASCII')->split(
+        $splits = $str->toEncoding(S\Encoding::ascii)->split(
             \mb_substr('🙏', 0, 1, 'ASCII'),
         );
 
@@ -182,7 +178,7 @@ class StrTest extends TestCase
     public function testChunkUtf8ManipulatedAsAscii()
     {
         $splits = S::of('foo🙏bar')
-            ->toEncoding('ASCII')
+            ->toEncoding(S\Encoding::ascii)
             ->chunk();
 
         $this->assertSame('f', $this->get($splits, 0)->toString());
@@ -197,7 +193,7 @@ class StrTest extends TestCase
         $this->assertSame('r', $this->get($splits, 9)->toString());
 
         $splits = S::of('foo🙏bar')
-            ->toEncoding('ASCII')
+            ->toEncoding(S\Encoding::ascii)
             ->chunk(3);
 
         $this->assertSame('foo', $this->get($splits, 0)->toString());
@@ -249,7 +245,7 @@ class StrTest extends TestCase
         );
         $this->assertSame(
             7,
-            $emoji->toEncoding('ASCII')->position('bar')->match(
+            $emoji->toEncoding(S\Encoding::ascii)->position('bar')->match(
                 static fn($value) => $value,
                 static fn() => null,
             ),
@@ -301,7 +297,7 @@ class StrTest extends TestCase
             $str2->toString(),
         );
 
-        $str3 = $str->toEncoding('ASCII')->replace(
+        $str3 = $str->toEncoding(S\Encoding::ascii)->replace(
             \mb_substr('🙏', 0, 1, 'ASCII'),
             'baz',
         );
@@ -340,14 +336,14 @@ class StrTest extends TestCase
     public function testLength()
     {
         $this->assertSame(4, S::of('foo🙏')->length());
-        $this->assertSame(7, S::of('foo🙏')->toEncoding('ASCII')->length());
+        $this->assertSame(7, S::of('foo🙏')->toEncoding(S\Encoding::ascii)->length());
     }
 
     public function testEmpty()
     {
         $this->assertTrue(S::of('')->empty());
         $this->assertFalse(S::of('🙏')->empty());
-        $this->assertFalse(S::of('🙏', 'ASCII')->substring(0, 1)->empty());
+        $this->assertFalse(S::of('🙏', S\Encoding::ascii)->substring(0, 1)->empty());
     }
 
     public function testReverse()
@@ -361,7 +357,7 @@ class StrTest extends TestCase
         $this->assertSame('foo🙏', $str->toString());
         $this->assertSame(
             \strrev('🙏').'oof',
-            $str->toEncoding('ASCII')->reverse()->toString(),
+            $str->toEncoding(S\Encoding::ascii)->reverse()->toString(),
         );
     }
 
@@ -373,7 +369,7 @@ class StrTest extends TestCase
         );
         $this->assertSame(
             'ASCII',
-            S::of('foo', 'ASCII')->reverse()->encoding()->toString(),
+            S::of('foo', S\Encoding::ascii)->reverse()->encoding()->toString(),
         );
     }
 
@@ -413,7 +409,7 @@ class StrTest extends TestCase
         $this->assertSame('foofoofoo', $str2->toString());
         $this->assertSame('foo', $str->toString());
         $this->assertSame('🙏🙏', S::of('🙏')->repeat(2)->toString());
-        $this->assertSame('🙏🙏', S::of('🙏')->toEncoding('ASCII')->repeat(2)->toString());
+        $this->assertSame('🙏🙏', S::of('🙏')->toEncoding(S\Encoding::ascii)->repeat(2)->toString());
     }
 
     public function testStripSlashes()
@@ -511,7 +507,7 @@ class StrTest extends TestCase
         $this->assertTrue($str->matches('/^abc/'));
 
         $this->assertTrue(S::of('foo🙏bar')->matches('/🙏/'));
-        $this->assertTrue(S::of('foo🙏bar')->toEncoding('ASCII')->matches('/🙏/'));
+        $this->assertTrue(S::of('foo🙏bar')->toEncoding(S\Encoding::ascii)->matches('/🙏/'));
         $this->assertTrue(S::of('foo🙏bar')->matches(S::of('/🙏/')));
     }
 
@@ -636,7 +632,7 @@ class StrTest extends TestCase
 
     public function testSubstringUtf8ManipulatedAsAscii()
     {
-        $str = S::of('foo🙏bar')->toEncoding('ASCII');
+        $str = S::of('foo🙏bar')->toEncoding(S\Encoding::ascii);
 
         $this->assertSame('🙏bar', $str->substring(3)->toString());
         $this->assertSame('🙏', $str->substring(3, 4)->toString());
@@ -817,7 +813,7 @@ class StrTest extends TestCase
         $a = S::of('foo');
         $b = $a->map(function($string, $encoding) use ($a) {
             $this->assertSame('foo', $string);
-            $this->assertSame($a->encoding()->toString(), $encoding);
+            $this->assertSame($a->encoding(), $encoding);
 
             return 'bar';
         });
@@ -833,7 +829,7 @@ class StrTest extends TestCase
         $a = S::of('foo');
         $b = $a->flatMap(function($string, $encoding) use ($a, $expected) {
             $this->assertSame('foo', $string);
-            $this->assertSame($a->encoding()->toString(), $encoding);
+            $this->assertSame($a->encoding(), $encoding);
 
             return $expected;
         });

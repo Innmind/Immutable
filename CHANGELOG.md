@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Changed
+
+- `Innmind\Immutable\Str` only use `Innmind\Immutable\Str\Encoding` to represent the encoding to work with
+
 ## 4.15.0 - 2023-07-08
 
 ### Added
