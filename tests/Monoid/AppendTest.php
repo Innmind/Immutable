@@ -8,7 +8,7 @@ use Innmind\Immutable\{
     Monoid,
     Sequence,
 };
-use PHPUnit\Framework\TestCase;
+use Innmind\BlackBox\PHPUnit\Framework\TestCase;
 
 class AppendTest extends TestCase
 {

@@ -6,10 +6,10 @@ namespace Tests\Innmind\Immutable\Fixtures;
 use Innmind\Immutable\Set as Structure;
 use Innmind\BlackBox\{
     PHPUnit\BlackBox,
+    PHPUnit\Framework\TestCase,
     Set as DataSet,
 };
 use Fixtures\Innmind\Immutable\Set;
-use PHPUnit\Framework\TestCase;
 
 class SetTest extends TestCase
 {

@@ -8,7 +8,7 @@ use Innmind\Immutable\{
     Monoid,
     Map,
 };
-use PHPUnit\Framework\TestCase;
+use Innmind\BlackBox\PHPUnit\Framework\TestCase;
 
 class MergeMapTest extends TestCase
 {

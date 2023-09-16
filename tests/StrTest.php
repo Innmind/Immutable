@@ -10,7 +10,7 @@ use Innmind\Immutable\{
     Set,
     Exception\InvalidRegex,
 };
-use PHPUnit\Framework\TestCase;
+use Innmind\BlackBox\PHPUnit\Framework\TestCase;
 
 class StrTest extends TestCase
 {

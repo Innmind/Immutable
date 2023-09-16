@@ -10,7 +10,7 @@ use Innmind\Immutable\{
     Sequence,
     Predicate,
 };
-use PHPUnit\Framework\TestCase;
+use Innmind\BlackBox\PHPUnit\Framework\TestCase;
 
 class SetTest extends TestCase
 {

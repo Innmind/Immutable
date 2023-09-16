@@ -12,7 +12,7 @@ use Innmind\Immutable\{
     Set,
     SideEffect,
 };
-use PHPUnit\Framework\TestCase;
+use Innmind\BlackBox\PHPUnit\Framework\TestCase;
 
 class PrimitiveTest extends TestCase
 {

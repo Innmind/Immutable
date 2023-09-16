@@ -6,10 +6,10 @@ namespace Tests\Innmind\Immutable\Fixtures;
 use Innmind\Immutable\Map as Structure;
 use Innmind\BlackBox\{
     PHPUnit\BlackBox,
+    PHPUnit\Framework\TestCase,
     Set,
 };
 use Fixtures\Innmind\Immutable\Map;
-use PHPUnit\Framework\TestCase;
 
 class MapTest extends TestCase
 {

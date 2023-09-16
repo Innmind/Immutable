@@ -6,10 +6,10 @@ namespace Tests\Innmind\Immutable\Fixtures;
 use Innmind\Immutable\Sequence as Structure;
 use Innmind\BlackBox\{
     PHPUnit\BlackBox,
+    PHPUnit\Framework\TestCase,
     Set,
 };
 use Fixtures\Innmind\Immutable\Sequence;
-use PHPUnit\Framework\TestCase;
 
 class SequenceTest extends TestCase
 {

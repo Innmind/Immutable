@@ -4,7 +4,7 @@ declare(strict_types = 1);
 namespace Tests\Innmind\Immutable;
 
 use Innmind\Immutable\Pair;
-use PHPUnit\Framework\TestCase;
+use Innmind\BlackBox\PHPUnit\Framework\TestCase;
 
 class PairTest extends TestCase
 {

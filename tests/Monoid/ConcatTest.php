@@ -8,7 +8,7 @@ use Innmind\Immutable\{
     Monoid,
     Str,
 };
-use PHPUnit\Framework\TestCase;
+use Innmind\BlackBox\PHPUnit\Framework\TestCase;
 
 class ConcatTest extends TestCase
 {

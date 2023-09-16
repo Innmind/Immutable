@@ -8,7 +8,7 @@ use Innmind\Immutable\{
     Monoid,
     Set,
 };
-use PHPUnit\Framework\TestCase;
+use Innmind\BlackBox\PHPUnit\Framework\TestCase;
 
 class MergeSetTest extends TestCase
 {
