@@ -32,7 +32,8 @@ function accessResource(User $user): Either {
 }
 ```
 
-> **Note** `ServerRequest`, `User`, `Resource` and `Error` are imaginary classes.
+> **Note**
+> `ServerRequest`, `User`, `Resource` and `Error` are imaginary classes.
 
 ## `::left()`
 
@@ -42,7 +43,8 @@ This builds an `Either` instance with the given value in the left hand side.
 $either = Either::left($anyValue);
 ```
 
-> **Note** usually this side is used for errors.
+> **Note**
+> usually this side is used for errors.
 
 ## `::right()`
 
@@ -52,7 +54,8 @@ This builds an `Either` instance with the given value in the right hand side.
 $either = Either::right($anyValue);
 ```
 
-> **Note** usually this side is used for valid values.
+> **Note**
+> usually this side is used for valid values.
 
 ## `::defer()`
 
@@ -110,7 +113,8 @@ $response = identify($serverRequest)
     );
 ```
 
-> **Note** `Response` is an imaginary class.
+> **Note**
+> `Response` is an imaginary class.
 
 ## `->otherwise()`
 
