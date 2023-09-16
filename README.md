@@ -6,9 +6,19 @@
 
 A set of classes to wrap PHP primitives to build immutable data.
 
+[Documentation](docs/)
+
+## Installation
+
+```sh
+composer require innmind/immutable
+```
+
+## Usage
+
 Here are some examples of what you can do:
 
-## Sequence
+### Sequence
 
 To be used to wrap an ordered list of elements (elements can be of mixed types).
 
@@ -38,7 +48,7 @@ $lines->foreach(fn($line) => echo($line));
 
 For a complete list of methods check [`Sequence`](src/Sequence.php).
 
-## Set
+### Set
 
 To be used as a collection of unordered elements (elements must be of the same type).
 
@@ -52,7 +62,7 @@ $set->add(42.0); // psalm will raise an error
 
 For a complete list of methods check [`Set`](src/Set.php).
 
-## Map
+### Map
 
 To be used as a collection of key/value pairs (both keys and values must be of the same type).
 
@@ -72,7 +82,7 @@ $map->values()->toList(); // [42, 66]
 
 For a complete list of methods check [`Map`](src/Map.php).
 
-## Strings
+### Strings
 
 ```php
 use Innmind\Immutable\Str;
@@ -100,7 +110,7 @@ $regexp->matches(Str::of('foobar')); // false
 $regexp->capture(Str::of('foo123bar')); // Map<int|string, Str> with index `i` set to Str::of('123')
 ```
 
-## [BlackBox](https://github.com/innmind/blackbox/)
+### [BlackBox](https://github.com/innmind/blackbox/)
 
 This library provides 2 `Set`s that can be used with [`innmind/black-box`](https://packagist.org/packages/innmind/black-box).
 
