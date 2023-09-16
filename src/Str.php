@@ -296,6 +296,7 @@ final class Str implements \Stringable
      */
     public function pregSplit(string|\Stringable $regex, int $limit = -1): Sequence
     {
+        /** @psalm-suppress ArgumentTypeCoercion */
         $strings = \preg_split((string) $regex, $this->value, $limit);
         /** @var Sequence<self> */
         $sequence = Sequence::of();
@@ -339,6 +340,7 @@ final class Str implements \Stringable
         string|\Stringable $replacement,
         int $limit = -1,
     ): self {
+        /** @psalm-suppress ArgumentTypeCoercion */
         $value = \preg_replace(
             (string) $regex,
             (string) $replacement,
