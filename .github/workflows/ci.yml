@@ -3,34 +3,12 @@ name: CI
 on: [push]
 
 jobs:
-  phpunit:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macOS-latest]
-        php-version: ['8.2']
-    name: 'PHPUnit'
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: ${{ matrix.php-version }}
-          extensions: mbstring, intl
-          coverage: none
-      - name: Composer
-        uses: "ramsey/composer-install@v2"
-      - name: PHPUnit
-        run: vendor/bin/phpunit
-        env:
-          BLACKBOX_SET_SIZE: 20
   blackbox:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [ubuntu-latest, macOS-latest]
-        php-version: ['8.2']
+        php-version: ['8.2', '8.3']
         dependency-versions: ['lowest', 'highest']
     name: 'BlackBox'
     steps:
@@ -48,14 +26,16 @@ jobs:
           dependency-versions: ${{ matrix.dependencies }}
       - name: BlackBox
         run: php blackbox.php
-  blackbox_coverage:
+        env:
+          BLACKBOX_SET_SIZE: 20
+  coverage:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [ubuntu-latest, macOS-latest]
-        php-version: ['8.2']
+        php-version: ['8.2', '8.3']
         dependency-versions: ['lowest', 'highest']
-    name: 'BlackBox Coverage'
+    name: 'Coverage'
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -73,30 +53,6 @@ jobs:
         run: php blackbox.php
         env:
           ENABLE_COVERAGE: 'true'
-      - uses: codecov/codecov-action@v1
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-  coverage:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macOS-latest]
-        php-version: ['8.2']
-    name: 'Coverage'
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: ${{ matrix.php-version }}
-          extensions: mbstring, intl
-          coverage: xdebug
-      - name: Composer
-        uses: "ramsey/composer-install@v2"
-      - name: PHPUnit
-        run: vendor/bin/phpunit --coverage-clover=coverage.clover
-        env:
           BLACKBOX_SET_SIZE: 1
       - uses: codecov/codecov-action@v1
         with:
@@ -105,7 +61,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        php-version: ['8.2']
+        php-version: ['8.2', '8.3']
     name: 'Psalm'
     steps:
       - name: Checkout

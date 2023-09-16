@@ -11,16 +11,12 @@ use Innmind\Immutable\Exception\InvalidRegex;
 final class Str implements \Stringable
 {
     private string $value;
-    private string $encoding;
+    private Str\Encoding $encoding;
 
-    private function __construct(string $value, string $encoding = null)
+    private function __construct(string $value, Str\Encoding $encoding = null)
     {
         $this->value = $value;
-        /**
-         * @psalm-suppress ImpureFunctionCall
-         * @var string
-         */
-        $this->encoding = $encoding ?? \mb_internal_encoding();
+        $this->encoding = $encoding ?? Str\Encoding::utf8;
     }
 
     public function __toString(): string
@@ -30,15 +26,9 @@ final class Str implements \Stringable
 
     /**
      * @psalm-pure
-     *
-     * @param string|Str\Encoding|null $encoding $encoding Strings will no longer be accepted in the next major release
      */
-    public static function of(string $value, string|Str\Encoding $encoding = null): self
+    public static function of(string $value, Str\Encoding $encoding = null): self
     {
-        if ($encoding instanceof Str\Encoding) {
-            $encoding = $encoding->toString();
-        }
-
         return new self($value, $encoding);
     }
 
@@ -60,15 +50,12 @@ final class Str implements \Stringable
         return $this->value;
     }
 
-    public function encoding(): self
+    public function encoding(): Str\Encoding
     {
-        return new self($this->encoding);
+        return $this->encoding;
     }
 
-    /**
-     * @param string|Str\Encoding $encoding $encoding Strings will no longer be accepted in the next major release
-     */
-    public function toEncoding(string|Str\Encoding $encoding): self
+    public function toEncoding(Str\Encoding $encoding): self
     {
         return self::of($this->value, $encoding);
     }
@@ -116,7 +103,7 @@ final class Str implements \Stringable
     {
         /** @var Sequence<self> */
         $sequence = Sequence::of();
-        $parts = \mb_str_split($this->value, $size, $this->encoding);
+        $parts = \mb_str_split($this->value, $size, $this->encoding->toString());
 
         foreach ($parts as $value) {
             $sequence = ($sequence)(new self($value, $this->encoding));
@@ -134,7 +121,7 @@ final class Str implements \Stringable
      */
     public function position(string|\Stringable $needle, int $offset = 0): Maybe
     {
-        $position = \mb_strpos($this->value, (string) $needle, $offset, $this->encoding);
+        $position = \mb_strpos($this->value, (string) $needle, $offset, $this->encoding->toString());
 
         if ($position === false) {
             /** @var Maybe<0|positive-int> */
@@ -184,7 +171,7 @@ final class Str implements \Stringable
      */
     public function length(): int
     {
-        return \mb_strlen($this->value, $this->encoding);
+        return \mb_strlen($this->value, $this->encoding->toString());
     }
 
     public function empty(): bool
@@ -296,6 +283,7 @@ final class Str implements \Stringable
      */
     public function pregSplit(string|\Stringable $regex, int $limit = -1): Sequence
     {
+        /** @psalm-suppress ArgumentTypeCoercion */
         $strings = \preg_split((string) $regex, $this->value, $limit);
         /** @var Sequence<self> */
         $sequence = Sequence::of();
@@ -339,6 +327,7 @@ final class Str implements \Stringable
         string|\Stringable $replacement,
         int $limit = -1,
     ): self {
+        /** @psalm-suppress ArgumentTypeCoercion */
         $value = \preg_replace(
             (string) $regex,
             (string) $replacement,
@@ -365,7 +354,7 @@ final class Str implements \Stringable
             return $this;
         }
 
-        $sub = \mb_substr($this->value, $start, $length, $this->encoding);
+        $sub = \mb_substr($this->value, $start, $length, $this->encoding->toString());
 
         return new self($sub, $this->encoding);
     }
@@ -508,7 +497,7 @@ final class Str implements \Stringable
      */
     public function contains(string|\Stringable $value): bool
     {
-        return \mb_strpos($this->value, (string) $value, 0, $this->encoding) !== false;
+        return \mb_strpos($this->value, (string) $value, 0, $this->encoding->toString()) !== false;
     }
 
     /**
@@ -520,7 +509,7 @@ final class Str implements \Stringable
             return true;
         }
 
-        return \mb_strpos($this->value, (string) $value, 0, $this->encoding) === 0;
+        return \mb_strpos($this->value, (string) $value, 0, $this->encoding->toString()) === 0;
     }
 
     /**
@@ -548,7 +537,7 @@ final class Str implements \Stringable
     }
 
     /**
-     * @param callable(string, string): string $map Second string is the encoding
+     * @param callable(string, Str\Encoding): string $map Second string is the encoding
      */
     public function map(callable $map): self
     {
@@ -557,7 +546,7 @@ final class Str implements \Stringable
     }
 
     /**
-     * @param callable(string, string): self $map Second string is the encoding
+     * @param callable(string, Str\Encoding): self $map Second string is the encoding
      */
     public function flatMap(callable $map): self
     {

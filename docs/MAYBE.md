@@ -190,7 +190,8 @@ $vars = Sequence::of('DB_URL', 'MAILER_URL', /* and so on */)
     ->flatMap(static fn($var) => env($var)->toSequence());
 ```
 
-> **Note** this example uses the `env` function defined at the start of this documentation.
+> **Note**
+> this example uses the `env` function defined at the start of this documentation.
 
 This is equivalent to:
 

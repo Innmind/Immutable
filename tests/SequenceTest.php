@@ -14,9 +14,9 @@ use Innmind\Immutable\{
 };
 use Innmind\BlackBox\{
     PHPUnit\BlackBox,
+    PHPUnit\Framework\TestCase,
     Set as DataSet,
 };
-use PHPUnit\Framework\TestCase;
 
 class SequenceTest extends TestCase
 {

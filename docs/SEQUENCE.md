@@ -49,7 +49,8 @@ Same as `::lazy()` except you don't need to manually build the generator.
 $sequence = Sequence::lazyStartingWith(1, 2, 3);
 ```
 
-> **Note** this is useful when you know the first items of the sequence and you'll `append` another lazy sequence at the end.
+> **Note**
+> this is useful when you know the first items of the sequence and you'll `append` another lazy sequence at the end.
 
 ## `::mixed()`
 
@@ -551,7 +552,8 @@ $lines = Sequence::of(...$chunks)
 $lines; // ['foo', 'bar', 'baz', '']
 ```
 
-> **Note** The `flatMap` is here in case there is only one chunk in the sequence, in which case the `aggregate` is not called
+> **Note**
+> The `flatMap` is here in case there is only one chunk in the sequence, in which case the `aggregate` is not called
 
 ## `->memoize()`
 

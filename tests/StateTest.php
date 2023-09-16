@@ -7,9 +7,9 @@ use Innmind\Immutable\{
     State,
     State\Result,
 };
-use PHPUnit\Framework\TestCase;
 use Innmind\BlackBox\{
     PHPUnit\BlackBox,
+    PHPUnit\Framework\TestCase,
     Set,
 };
 

@@ -17,6 +17,7 @@ final class RegExp
 
     private function __construct(string $pattern)
     {
+        /** @psalm-suppress ArgumentTypeCoercion */
         if (@\preg_match($pattern, '') === false) {
             /** @psalm-suppress ImpureFunctionCall */
             throw new LogicException($pattern, \preg_last_error());
@@ -38,6 +39,7 @@ final class RegExp
      */
     public function matches(Str $string): bool
     {
+        /** @psalm-suppress ArgumentTypeCoercion */
         $value = \preg_match($this->pattern, $string->toString());
 
         if ($value === false) {
@@ -56,6 +58,7 @@ final class RegExp
     public function capture(Str $string): Map
     {
         $matches = [];
+        /** @psalm-suppress ArgumentTypeCoercion */
         $value = \preg_match($this->pattern, $string->toString(), $matches);
 
         if ($value === false) {
@@ -72,7 +75,7 @@ final class RegExp
                 $key,
                 Str::of(
                     (string) $match,
-                    $string->encoding()->toString(),
+                    $string->encoding(),
                 ),
             );
         }

@@ -13,7 +13,7 @@ use Innmind\Immutable\{
     Set,
     Sequence,
 };
-use PHPUnit\Framework\TestCase;
+use Innmind\BlackBox\PHPUnit\Framework\TestCase;
 
 class ObjectKeysTest extends TestCase
 {

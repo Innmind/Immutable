@@ -1,5 +1,15 @@
 # Changelog
 
+## 5.0.0 - 2023-09-16
+
+### Changed
+
+- `Innmind\Immutable\Str` only use `Innmind\Immutable\Str\Encoding` to represent the encoding to work with
+
+### Removed
+
+- `Fixtures\Innmind\Immutable\Map`
+
 ## 4.15.0 - 2023-07-08
 
 ### Added

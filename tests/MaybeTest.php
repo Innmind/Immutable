@@ -8,9 +8,9 @@ use Innmind\Immutable\{
     Either,
     Predicate,
 };
-use PHPUnit\Framework\TestCase;
 use Innmind\BlackBox\{
     PHPUnit\BlackBox,
+    PHPUnit\Framework\TestCase,
     Set,
 };
 

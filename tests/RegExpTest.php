@@ -7,9 +7,9 @@ use Innmind\Immutable\{
     RegExp,
     Str,
     Map,
-    Exception\LogicException
+    Exception\LogicException,
 };
-use PHPUnit\Framework\TestCase;
+use Innmind\BlackBox\PHPUnit\Framework\TestCase;
 
 class RegExpTest extends TestCase
 {

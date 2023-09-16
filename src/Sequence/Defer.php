@@ -413,6 +413,7 @@ final class Defer implements Implementation
         return new self(
             (static function(\Iterator $values, int $from, int $until): \Generator {
                 $index = 0;
+
                 /** @var T $value */
                 foreach ($values as $value) {
                     if ($index >= $from && $index < $until) {
@@ -434,6 +435,7 @@ final class Defer implements Implementation
         return new self(
             (static function(\Iterator $values, int $size): \Generator {
                 $taken = 0;
+
                 /** @var T $value */
                 foreach ($values as $value) {
                     if ($taken >= $size) {
