@@ -6,7 +6,7 @@
 
 A set of classes to wrap PHP primitives to build immutable data.
 
-[Documentation](docs/)
+[Documentation](docs/README.md)
 
 ## Installation
 
