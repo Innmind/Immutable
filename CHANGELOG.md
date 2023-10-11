@@ -1,5 +1,11 @@
 # Changelog
 
+## 5.1.0 - 2023-10-11
+
+### Changed
+
+- Registered cleanup callbacks for lazy `Sequence`s and `Set`s are all called now for composed structures, instead of the last one
+
 ## 5.0.0 - 2023-09-16
 
 ### Changed

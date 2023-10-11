@@ -10,13 +10,13 @@ use Innmind\Immutable\{
     Str,
     Maybe,
     SideEffect,
+    RegisterCleanup,
 };
 
 /**
  * @template T
  * @implements Implementation<T>
  * @psalm-immutable
- * @psalm-type RegisterCleanup = callable(callable(): void): void
  */
 final class Lazy implements Implementation
 {

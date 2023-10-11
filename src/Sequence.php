@@ -79,7 +79,6 @@ final class Sequence implements \Countable
      *
      * @template V
      * @psalm-pure
-     * @psalm-type RegisterCleanup = callable(callable(): void): void
      *
      * @param callable(RegisterCleanup): \Generator<V> $generator
      *
