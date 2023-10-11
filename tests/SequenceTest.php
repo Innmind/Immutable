@@ -1303,6 +1303,143 @@ class SequenceTest extends TestCase
         $this->assertFalse($reachedEnd);
     }
 
+    public function testCallAllCleanupsWhenFlatMappingComposedLazySequences()
+    {
+        $cleanups = [];
+        $sequence = Sequence::lazy(static function($register) use (&$cleanups) {
+            $register(static function() use (&$cleanups) {
+                $cleanups[] = 'parent';
+            });
+
+            yield Sequence::lazy(static function($register) use (&$cleanups) {
+                $register(static function() use (&$cleanups) {
+                    $cleanups = ['child1'];
+                });
+
+                yield 1;
+                yield 2;
+            });
+            yield Sequence::lazy(static function($register) use (&$cleanups) {
+                $register(static function() use (&$cleanups) {
+                    $cleanups = ['child2'];
+                });
+
+                yield 3;
+                yield 4;
+            });
+        })
+            ->flatMap(static fn($sequence) => $sequence);
+
+        $this->assertSame([1], $sequence->take(1)->toList());
+        $this->assertSame(['child1', 'parent'], $cleanups);
+
+        $cleanups = [];
+
+        $this->assertSame([1, 2], $sequence->take(2)->toList());
+        $this->assertSame(['child2', 'parent'], $cleanups);
+
+        $cleanups = [];
+
+        $this->assertSame([1, 2, 3], $sequence->take(3)->toList());
+        $this->assertSame(['child2', 'parent'], $cleanups);
+
+        $cleanups = [];
+
+        $this->assertSame([1, 2, 3, 4], $sequence->toList());
+        $this->assertSame([], $cleanups);
+    }
+
+    public function testCallCleanupWhenAppendingLazySequences()
+    {
+        $cleanups = [];
+        $sequence1 = Sequence::lazy(static function($register) use (&$cleanups) {
+            $register(static function() use (&$cleanups) {
+                $cleanups[] = 1;
+            });
+
+            yield 1;
+            yield 2;
+        });
+        $sequence2 = Sequence::lazy(static function($register) use (&$cleanups) {
+            $register(static function() use (&$cleanups) {
+                $cleanups[] = 2;
+            });
+
+            yield 3;
+            yield 4;
+        });
+        $sequence = $sequence1->append($sequence2);
+
+        $this->assertSame([1], $sequence->take(1)->toList());
+        $this->assertSame([1], $cleanups);
+
+        $cleanups = [];
+
+        $this->assertSame([1, 2, 3], $sequence->take(3)->toList());
+        $this->assertSame([2], $cleanups);
+
+        $cleanups = [];
+
+        $this->assertSame([1, 2, 3, 4], $sequence->toList());
+        $this->assertSame([], $cleanups);
+    }
+
+    public function testCallCleanupWhenZippingLazySequences()
+    {
+        $cleanups = [];
+        $sequence1 = Sequence::lazy(static function($register) use (&$cleanups) {
+            $register(static function() use (&$cleanups) {
+                $cleanups[] = 1;
+            });
+
+            yield 1;
+            yield 2;
+            yield 3;
+        });
+        $sequence2 = Sequence::lazy(static function($register) use (&$cleanups) {
+            $register(static function() use (&$cleanups) {
+                $cleanups[] = 2;
+            });
+
+            yield 3;
+            yield 4;
+            yield 5;
+            yield 6;
+        });
+        $sequence = $sequence1->zip($sequence2);
+
+        $this->assertSame([[1, 3], [2, 4], [3, 5]], $sequence->toList());
+        $this->assertSame([2], $cleanups);
+
+        $cleanups = [];
+
+        $this->assertSame([[1, 3], [2, 4]], $sequence->take(2)->toList());
+        $this->assertSame([2, 1], $cleanups);
+
+        $cleanups = [];
+        $sequence1 = Sequence::lazy(static function($register) use (&$cleanups) {
+            $register(static function() use (&$cleanups) {
+                $cleanups[] = 1;
+            });
+
+            yield 1;
+            yield 2;
+            yield 3;
+        });
+        $sequence2 = Sequence::lazy(static function($register) use (&$cleanups) {
+            $register(static function() use (&$cleanups) {
+                $cleanups[] = 2;
+            });
+
+            yield 3;
+            yield 4;
+        });
+        $sequence = $sequence1->zip($sequence2);
+
+        $this->assertSame([[1, 3], [2, 4]], $sequence->toList());
+        $this->assertSame([1], $cleanups);
+    }
+
     public function get($map, $index)
     {
         return $map->get($index)->match(
