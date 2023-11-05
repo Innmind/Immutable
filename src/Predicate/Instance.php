@@ -40,4 +40,28 @@ final class Instance implements Predicate
     {
         return new self($class);
     }
+
+    /**
+     * @template T
+     *
+     * @param Predicate<T> $predicate
+     *
+     * @return OrPredicate<A, T>
+     */
+    public function or(Predicate $predicate): OrPredicate
+    {
+        return OrPredicate::of($this, $predicate);
+    }
+
+    /**
+     * @template T
+     *
+     * @param Predicate<T> $predicate
+     *
+     * @return AndPredicate<A, T>
+     */
+    public function and(Predicate $predicate): AndPredicate
+    {
+        return AndPredicate::of($this, $predicate);
+    }
 }

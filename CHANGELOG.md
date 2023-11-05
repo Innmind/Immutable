@@ -1,5 +1,15 @@
 # Changelog
 
+## 5.2.0 - 2023-11-05
+
+### Added
+
+- `Innmind\Immutable\Set::match()`
+- `Innmind\Immutable\Predicate\OrPredicate`
+- `Innmind\Immutable\Predicate\AndPredicate`
+- `Innmind\Immutable\Predicate\Instance::or()`
+- `Innmind\Immutable\Predicate\Instance::and()`
+
 ## 5.1.0 - 2023-10-11
 
 ### Changed

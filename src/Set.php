@@ -418,6 +418,24 @@ final class Set implements \Countable
     }
 
     /**
+     * @template R
+     *
+     * @param callable(T, self<T>): R $match
+     * @param callable(): R $empty
+     *
+     * @return R
+     */
+    public function match(callable $match, callable $empty)
+    {
+        /** @psalm-suppress MixedArgument For some reason Psalm no longer recognize the type of $first */
+        return $this->implementation->sequence()->match(
+            static fn($sequence) => new self(new Set\Primitive($sequence)),
+            static fn($first, $rest) => $match($first, $rest),
+            $empty,
+        );
+    }
+
+    /**
      * @param callable(T): bool $predicate
      */
     public function matches(callable $predicate): bool

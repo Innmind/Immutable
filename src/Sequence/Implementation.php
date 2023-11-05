@@ -296,9 +296,10 @@ interface Implementation extends \Countable
 
     /**
      * @template R
+     * @template C of Sequence<T>|Set<T>
      *
-     * @param callable(self<T>): Sequence<T> $wrap
-     * @param callable(T, Sequence<T>): R $match
+     * @param callable(self<T>): C $wrap
+     * @param callable(T, C): R $match
      * @param callable(): R $empty
      *
      * @return R
