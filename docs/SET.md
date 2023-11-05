@@ -319,6 +319,25 @@ $firstOdd = $set->find(fn($i) => $i % 2 === 1);
 $firstOdd; // could contain 9 or 11, because there is no ordering
 ```
 
+## `->match()`
+
+This is a similar approach to pattern matching allowing you to decompose a set by accessing the first element and the rest of the set.
+
+```php
+function sum(Set $ints): int
+{
+    return $ints->match(
+        fn(int $head, Set $tail) => $head + sum($tail),
+        fn() => 0,
+    );
+}
+
+$result = sum(Set::of(1, 2, 3, 4));
+$result; // 10
+```
+
+> **Warning** for lazy sets bear in mind that the values will be kept in memory while the first call to `->match` didn't return.
+
 ## `->matches()`
 
 Check if all the elements of the set matches the given predicate.
