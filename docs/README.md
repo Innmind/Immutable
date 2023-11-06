@@ -12,7 +12,7 @@ composer require innmind/immutable
 
 ## Structures
 
-This library provides the 7 following structures:
+This library provides the 10 following structures:
 
 - [`Sequence`](SEQUENCE.md)
 - [`Set`](SET.md)
@@ -21,6 +21,7 @@ This library provides the 7 following structures:
 - [`RegExp`](REGEXP.md)
 - [`Maybe`](MAYBE.md)
 - [`Either`](EITHER.md)
+- [`Validation`](VALIDATION.md)
 - [`State`](STATE.md)
 - [`Fold`](FOLD.md)
 
