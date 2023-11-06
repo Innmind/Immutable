@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## 5.3.0 - 2023-11-06
 
 ### Added
 
