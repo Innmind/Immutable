@@ -1,5 +1,11 @@
 # Changelog
 
+## 5.3.0 - 2023-11-06
+
+### Added
+
+- `Innmind\Immutable\Validation`
+
 ## 5.2.0 - 2023-11-05
 
 ### Added

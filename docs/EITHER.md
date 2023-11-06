@@ -17,7 +17,7 @@ function identify(ServerRequest $request): Either {
         return Either::right($theUser);
     }
 
-    Either::left(new Error('User not found'));
+    return Either::left(new Error('User not found'));
 }
 
 /**
@@ -83,7 +83,7 @@ This will apply the map transformation on the right value if there is one, other
 
 ```php
 /** @var Either<Error, User> */
-$either = identify($serverRequest)
+$either = identify($serverRequest);
 /** @var Either<Error, Impersonated> */
 $impersonated = $either->map(fn(User $user): Impersonated => $user->impersonateAdmin());
 ```
