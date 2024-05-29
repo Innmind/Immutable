@@ -6,9 +6,7 @@ namespace Tests\Innmind\Immutable\Set;
 use Innmind\Immutable\{
     Set\Primitive,
     Set\Implementation,
-    Set,
     Map,
-    Str,
     Sequence,
     SideEffect,
 };

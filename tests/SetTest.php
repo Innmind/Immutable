@@ -6,7 +6,6 @@ namespace Tests\Innmind\Immutable;
 use Innmind\Immutable\{
     Set,
     Map,
-    Str,
     Sequence,
     Predicate,
 };

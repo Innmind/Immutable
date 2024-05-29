@@ -6,7 +6,6 @@ namespace Innmind\Immutable\Sequence;
 use Innmind\Immutable\{
     Map,
     Sequence,
-    Str,
     Set,
     Maybe,
     SideEffect,

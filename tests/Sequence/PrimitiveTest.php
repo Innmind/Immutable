@@ -7,9 +7,6 @@ use Innmind\Immutable\{
     Sequence\Primitive,
     Sequence\Implementation,
     Map,
-    Sequence,
-    Str,
-    Set,
     SideEffect,
 };
 use Innmind\BlackBox\PHPUnit\Framework\TestCase;
