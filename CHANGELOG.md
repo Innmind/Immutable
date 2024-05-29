@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+
+- `Innmind\Immutable\Set::unsorted()`
+
 ## 5.3.0 - 2023-11-06
 
 ### Added
