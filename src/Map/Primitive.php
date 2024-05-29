@@ -327,7 +327,10 @@ final class Primitive implements Implementation
 
     public function empty(): bool
     {
-        /** @psalm-suppress MixedArgumentTypeCoercion */
+        /**
+         * @psalm-suppress InaccessibleProperty
+         * @psalm-suppress MixedArgumentTypeCoercion
+         */
         \reset($this->values);
 
         /** @psalm-suppress MixedArgumentTypeCoercion */

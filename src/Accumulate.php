@@ -54,7 +54,9 @@ final class Accumulate implements \Iterator
 
     public function next(): void
     {
+        /** @psalm-suppress InaccessibleProperty */
         \next($this->keys);
+        /** @psalm-suppress InaccessibleProperty */
         \next($this->values);
 
         if ($this->reachedCacheEnd()) {
@@ -65,7 +67,9 @@ final class Accumulate implements \Iterator
 
     public function rewind(): void
     {
+        /** @psalm-suppress InaccessibleProperty */
         \reset($this->keys);
+        /** @psalm-suppress InaccessibleProperty */
         \reset($this->values);
     }
 
