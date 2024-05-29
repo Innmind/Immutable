@@ -5,8 +5,6 @@ namespace Tests\Innmind\Immutable;
 
 use Innmind\Immutable\{
     Map,
-    Pair,
-    Str,
     Set,
     Sequence,
 };

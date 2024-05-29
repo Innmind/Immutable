@@ -363,6 +363,19 @@ final class Set implements \Countable
     }
 
     /**
+     * Return an unsorted sequence
+     *
+     * @return Sequence<T>
+     */
+    public function unsorted(): Sequence
+    {
+        return $this
+            ->implementation
+            ->sequence()
+            ->toSequence();
+    }
+
+    /**
      * Create a new set with elements of both sets
      *
      * @param self<T> $set

@@ -6,7 +6,6 @@ namespace Innmind\Immutable\Sequence;
 use Innmind\Immutable\{
     Map,
     Sequence,
-    Str,
     Set,
     Maybe,
     SideEffect,
@@ -273,6 +272,7 @@ final class Lazy implements Implementation
         /** @psalm-suppress ImpureFunctionCall */
         $generator = ($this->values)($register);
 
+        /** @psalm-suppress ImpureMethodCall */
         foreach ($generator as $value) {
             if ($value === $element) {
                 /** @psalm-suppress ImpureMethodCall */

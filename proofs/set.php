@@ -34,4 +34,22 @@ return static function() {
             $assert->same($rest, $packed[1]->toList());
         },
     );
+
+    yield proof(
+        'Set::unsorted()',
+        given(
+            DataSet\Sequence::of(DataSet\Type::any()),
+        ),
+        static function($assert, $values) {
+            $set = Set::of(...$values);
+            $sequence = $set->unsorted();
+
+            $assert->true(
+                $sequence->matches($set->contains(...)),
+            );
+            $assert->true(
+                $set->matches($sequence->contains(...)),
+            );
+        },
+    );
 };

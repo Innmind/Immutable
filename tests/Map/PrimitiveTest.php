@@ -7,8 +7,6 @@ use Innmind\Immutable\{
     Map\Primitive,
     Map\Implementation,
     Map,
-    Pair,
-    Str,
     Set,
     Sequence,
 };
@@ -20,7 +18,7 @@ class PrimitiveTest extends TestCase
     {
         $m = new Primitive;
 
-        $this->assertInstanceOf(Map\Implementation::class, $m);
+        $this->assertInstanceOf(Implementation::class, $m);
         $this->assertInstanceOf(\Countable::class, $m);
     }
 

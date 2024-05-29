@@ -267,6 +267,16 @@ $sequence = Set::ints(1, 4, 2, 3)->sort(fn($a, $b) => $a <=> $b);
 $sequence->equals(Sequence::ints(1, 2, 3, 4));
 ```
 
+## `->unsorted()`
+
+It will transform the set into an unordered sequence.
+
+```php
+$sequence = Set::ints(1, 4, 2, 3)->unsorted();
+// is the same as
+$sequence = Sequence::of(...Set::of(1, 4, 2, 3)->toList());
+```
+
 ## `->merge()`
 
 Create a new set with all the elements from both sets.

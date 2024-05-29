@@ -6,7 +6,6 @@ namespace Innmind\Immutable\Sequence;
 use Innmind\Immutable\{
     Map,
     Sequence,
-    Str,
     Set,
     Maybe,
     SideEffect,
@@ -385,7 +384,10 @@ final class Primitive implements Implementation
     public function sort(callable $function): self
     {
         $self = clone $this;
-        /** @psalm-suppress ImpureFunctionCall */
+        /**
+         * @psalm-suppress InaccessibleProperty
+         * @psalm-suppress ImpureFunctionCall
+         */
         \usort($self->values, $function);
 
         return $self;
@@ -528,6 +530,7 @@ final class Primitive implements Implementation
         $values = $aggregate(static fn($a, $b) => $exfiltrate($map($a, $b))->iterator());
         $aggregated = [];
 
+        /** @psalm-suppress ImpureMethodCall */
         foreach ($values as $value) {
             $aggregated[] = $value;
         }

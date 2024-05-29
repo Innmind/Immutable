@@ -8,7 +8,6 @@ use Innmind\Immutable\{
     Sequence,
     Map,
     Set,
-    Exception\InvalidRegex,
 };
 use Innmind\BlackBox\PHPUnit\Framework\TestCase;
 

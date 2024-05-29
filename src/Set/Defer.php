@@ -7,7 +7,6 @@ use Innmind\Immutable\{
     Map,
     Sequence,
     Set,
-    Str,
     Maybe,
     SideEffect,
 };

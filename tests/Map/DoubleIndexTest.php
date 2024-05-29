@@ -7,8 +7,6 @@ use Innmind\Immutable\{
     Map\DoubleIndex,
     Map\Implementation,
     Map,
-    Pair,
-    Str,
     Set,
     Sequence,
 };
@@ -20,7 +18,7 @@ class DoubleIndexTest extends TestCase
     {
         $m = new DoubleIndex;
 
-        $this->assertInstanceOf(Map\Implementation::class, $m);
+        $this->assertInstanceOf(Implementation::class, $m);
         $this->assertInstanceOf(\Countable::class, $m);
     }
 
