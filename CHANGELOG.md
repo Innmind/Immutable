@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Changed
+
+- A lazy `Sequence::takeEnd()` no longer loads the whole sequence in memory, only the number of elements taken + 1.
+
 ## 5.4.0 - 2024-05-29
 
 ### Added

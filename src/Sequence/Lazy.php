@@ -469,9 +469,27 @@ final class Lazy implements Implementation
      */
     public function takeEnd(int $size): Implementation
     {
-        // this cannot be optimised as the whole generator needs to be loaded
-        // in order to know the elements to drop
-        return $this->load()->takeEnd($size);
+        $values = $this->values;
+
+        return new self(
+            static function(RegisterCleanup $register) use ($values, $size): \Generator {
+                $buffer = [];
+                $count = 0;
+
+                foreach ($values($register) as $value) {
+                    $buffer[] = $value;
+                    ++$count;
+
+                    if ($count > $size) {
+                        \array_shift($buffer);
+                    }
+                }
+
+                foreach ($buffer as $value) {
+                    yield $value;
+                }
+            },
+        );
     }
 
     /**
