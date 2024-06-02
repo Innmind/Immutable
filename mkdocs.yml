@@ -10,7 +10,7 @@ nav:
     - Set: structures/set.md
     - Map: structures/map.md
     - Str: structures/str.md
-    - RegExp: structures/regExp.md
+    - RegExp: structures/regexp.md
     - Maybe: structures/maybe.md
     - Either: structures/either.md
     - Validation: structures/validation.md
