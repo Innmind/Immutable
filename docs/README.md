@@ -1,3 +1,9 @@
+---
+hide:
+    - navigation
+    - toc
+---
+
 # Getting Started
 
 This project brings a set of immutable data structure to bring a uniformity on how to handle data.
