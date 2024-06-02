@@ -1,5 +1,5 @@
-site_name: Innmind
-repo_name: innmind/immutable
+site_name: Innmind/Immutable
+repo_name: Innmind/Immutable
 
 nav:
   - Getting Started: README.md
