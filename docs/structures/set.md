@@ -2,7 +2,9 @@
 
 A set is an unordered list of unique elements.
 
-## `::of()`
+## Named constructors
+
+### `::of()`
 
 ```php
 use Innmind\Immutable\Set;
@@ -11,7 +13,7 @@ use Innmind\Immutable\Set;
 Set::of(1, 2, 3, $etc);
 ```
 
-## `::defer()`
+### `::defer()`
 
 This named constructor is for advanced use cases where you want the data of your set to be loaded upon use only and not initialisation.
 
@@ -28,7 +30,7 @@ The method ask a generator that will provide the elements. Once the elements are
 !!! warning ""
     Beware of the case where the source you read the elements is not altered before the first use of the set.
 
-## `::lazy()`
+### `::lazy()`
 
 This is similar to `::defer()` with the exception that the elements are not kept in memory but reloaded upon each use.
 
@@ -41,27 +43,29 @@ $set = Set::lazy(function() {
 !!! warning ""
     Since the elements are reloaded each time the immutability responsability is up to you because the source may change or if you generate objects it will generate new objects each time (so if you make strict comparison it will fail).
 
-## `::mixed()`
+### `::mixed()`
 
 This is a shortcut for `::of(mixed ...$mixed)`.
 
-## `::ints()`
+### `::ints()`
 
 This is a shortcut for `::of(int ...$ints)`.
 
-## `::floats()`
+### `::floats()`
 
 This is a shortcut for `::of(float ...$floats)`.
 
-## `::strings()`
+### `::strings()`
 
 This is a shortcut for `::of(string ...$strings)`.
 
-## `::objects()`
+### `::objects()`
 
 This is a shortcut for `::of(object ...$objects)`.
 
-## `->__invoke()`
+## Add values
+
+### `->__invoke()`
 
 Augment the set with a new element. If the element is already in the set nothing changes.
 
@@ -71,11 +75,22 @@ $set = ($set)(2)(1);
 $set->equals(Set::ints(1, 2));
 ```
 
-## `->add()`
+### `->add()`
 
 This is an alias for `->__invoke()`.
 
-## `->size()`
+### `->merge()`
+
+Create a new set with all the elements from both sets.
+
+```php
+$set = Set::ints(1, 2, 3)->merge(Set::ints(4, 2, 3));
+$set->equals(Set::ints(1, 2, 3, 4));
+```
+
+## Access values
+
+### `->size()`
 
 This returns the number of elements in the set.
 
@@ -84,7 +99,7 @@ $set = Set::ints(1, 4, 6);
 $set->size(); // 3
 ```
 
-## `->count()`
+### `->count()`
 
 This is an alias for `->size()`, but you can also use the PHP function `\count` if you prefer.
 
@@ -94,16 +109,7 @@ $set->count(); // 3
 \count($set); // 3
 ```
 
-## `->intersect()`
-
-Create a new set with the elements that are also in the other set.
-
-```php
-$set = Set::ints(1, 2, 3)->intersect(Set::ints(2, 3, 4));
-$set->equals(Set::ints(2, 3)); // true
-```
-
-## `->contains()`
+### `->contains()`
 
 Check if the element is present in the set.
 
@@ -114,7 +120,72 @@ $set->contains(42); // true
 $set->contains('42'); // false but psalm will raise an error
 ```
 
-## `->remove()`
+### `->find()`
+
+Returns the first element that matches the predicate.
+
+```php
+$set = Set::ints(2, 4, 6, 8, 9, 10, 11);
+/** @var Maybe<int> $firstOdd */
+$firstOdd = $set->find(fn($i) => $i % 2 === 1);
+$firstOdd; // could contain 9 or 11, because there is no ordering
+```
+
+### `->matches()`
+
+Check if all the elements of the set matches the given predicate.
+
+```php
+$isOdd = fn($i) => $i % 2 === 1;
+Set::ints(1, 3, 5, 7)->matches($isOdd); // true
+Set::ints(1, 3, 4, 5, 7)->matches($isOdd); // false
+```
+
+### `->any()`
+
+Check if at least one element of the set matches the given predicate.
+
+```php
+$isOdd = fn($i) => $i % 2 === 1;
+Set::ints(1, 3, 5, 7)->any($isOdd); // true
+Set::ints(1, 3, 4, 5, 7)->any($isOdd); // true
+Set::ints(2, 4, 6, 8)->any($isOdd); // false
+```
+
+### `->empty()`
+
+Tells whether there is at least one element or not.
+
+```php
+Set::ints()->empty(); // true
+Set::ints(1)->empty(); // false
+```
+
+## Transform values
+
+### `->map()`
+
+Create a new set with the exact same number of elements but modified by the given function.
+
+```php
+$ints = Set::ints(1, 2, 3);
+$squares = $ints->map(fn($i) => $i**2);
+$squares->equals(Set::ints(1, 4, 9)); // true
+```
+
+### `->flatMap()`
+
+This is similar to `->map()` except that instead of returning a new value it returns a new set for each value, and each new set is merged together.
+
+```php
+$ints = Set::ints(1, 2, 3);
+$squares = $ints->flatMap(fn($i) => Set::of($i, $i**2));
+$squares->equals(Set::ints(1, 2, 4, 3, 9)); // true
+```
+
+## Filter values
+
+### `->remove()`
 
 Create a new set without the specified element.
 
@@ -123,25 +194,7 @@ $set = Set::ints(1, 2, 3);
 $set->remove(2)->equals(Set::ints(1, 3)); // true
 ```
 
-## `->diff()`
-
-This method will return a new set containing the elements that are not present in the other set.
-
-```php
-$set = Set::ints(1, 4, 6)->diff(Set::ints(1, 3, 6));
-$set->equals(Set::ints(4)); // true
-```
-
-## `->equals()`
-
-Check if two sets are identical.
-
-```php
-Set::ints(1, 2)->equals(Set::ints(2, 1)); // true
-Set::ints()->equals(Set::strings()); // false but psalm will raise an error
-```
-
-## `->filter()`
+### `->filter()`
 
 Removes elements from the set that don't match the given predicate.
 
@@ -150,7 +203,7 @@ $set = Set::ints(1, 2, 3, 4)->filter(fn($i) => $i % 2 === 0);
 $set->equals(Set::ints(2, 4));
 ```
 
-## `->keep()`
+### `->keep()`
 
 This is similar to `->filter()` with the advantage of psalm understanding the type in the new `Set`.
 
@@ -161,7 +214,7 @@ $set = Set::of(null, new \stdClass, 'foo')->keep(Instance::of('stdClass'));
 $set; // Set<stdClass>
 ```
 
-## `->exclude()`
+### `->exclude()`
 
 Removes elements from the set that match the given predicate.
 
@@ -170,7 +223,72 @@ $set = Set::ints(1, 2, 3, 4)->filter(fn($i) => $i % 2 === 0);
 $set->equals(Set::ints(1, 3));
 ```
 
-## `->foreach()`
+### `->diff()`
+
+This method will return a new set containing the elements that are not present in the other set.
+
+```php
+$set = Set::ints(1, 4, 6)->diff(Set::ints(1, 3, 6));
+$set->equals(Set::ints(4)); // true
+```
+
+### `->intersect()`
+
+Create a new set with the elements that are also in the other set.
+
+```php
+$set = Set::ints(1, 2, 3)->intersect(Set::ints(2, 3, 4));
+$set->equals(Set::ints(2, 3)); // true
+```
+
+## Extract values
+
+### `->toList()`
+
+It returns a new `array` containing all the elements of the set.
+
+### `->match()`
+
+This is a similar approach to pattern matching allowing you to decompose a set by accessing the first element and the rest of the set.
+
+```php
+function sum(Set $ints): int
+{
+    return $ints->match(
+        fn(int $head, Set $tail) => $head + sum($tail),
+        fn() => 0,
+    );
+}
+
+$result = sum(Set::of(1, 2, 3, 4));
+$result; // 10
+```
+
+!!! warning ""
+    For lazy sets bear in mind that the values will be kept in memory while the first call to `->match` didn't return.
+
+### `->reduce()`
+
+Iteratively compute a value for all the elements in the set.
+
+```php
+$set = Set::ints(1, 2, 3, 4);
+$sum = $set->reduce(0, fn($sum, $int) => $sum + $int);
+$sum; // 10
+```
+
+## Misc.
+
+### `->equals()`
+
+Check if two sets are identical.
+
+```php
+Set::ints(1, 2)->equals(Set::ints(2, 1)); // true
+Set::ints()->equals(Set::strings()); // false but psalm will raise an error
+```
+
+### `->foreach()`
 
 Use this method to call a function for each element of the set. Since this structure is immutable it returns a `SideEffect` object, as its name suggest it is the only place acceptable to create side effects.
 
@@ -182,7 +300,7 @@ $sideEffect = Set::strings('hello', 'world')->foreach(
 );
 ```
 
-## `->groupBy()`
+### `->groupBy()`
 
 This will create multiples sets with elements regrouped under the same key computed by the given function.
 
@@ -218,27 +336,7 @@ $map
     ->equals(Set::strings('ftp://example.com')); // true
 ```
 
-## `->map()`
-
-Create a new set with the exact same number of elements but modified by the given function.
-
-```php
-$ints = Set::ints(1, 2, 3);
-$squares = $ints->map(fn($i) => $i**2);
-$squares->equals(Set::ints(1, 4, 9)); // true
-```
-
-## `->flatMap()`
-
-This is similar to `->map()` except that instead of returning a new value it returns a new set for each value, and each new set is merged together.
-
-```php
-$ints = Set::ints(1, 2, 3);
-$squares = $ints->flatMap(fn($i) => Set::of($i, $i**2));
-$squares->equals(Set::ints(1, 2, 4, 3, 9)); // true
-```
-
-## `->partition()`
+### `->partition()`
 
 This method is similar to `->groupBy()` method but the map keys are always booleans. The difference is that here the 2 keys are always present whereas with `->groupBy()` it will depend on the original set.
 
@@ -262,7 +360,7 @@ $map
     ->equals(Set::ints(1, 3)); // true
 ```
 
-## `->sort()`
+### `->sort()`
 
 It will transform the set into an ordered sequence.
 
@@ -271,7 +369,7 @@ $sequence = Set::ints(1, 4, 2, 3)->sort(fn($a, $b) => $a <=> $b);
 $sequence->equals(Sequence::ints(1, 2, 3, 4));
 ```
 
-## `->unsorted()`
+### `->unsorted()`
 
 It will transform the set into an unordered sequence.
 
@@ -281,26 +379,7 @@ $sequence = Set::ints(1, 4, 2, 3)->unsorted();
 $sequence = Sequence::of(...Set::of(1, 4, 2, 3)->toList());
 ```
 
-## `->merge()`
-
-Create a new set with all the elements from both sets.
-
-```php
-$set = Set::ints(1, 2, 3)->merge(Set::ints(4, 2, 3));
-$set->equals(Set::ints(1, 2, 3, 4));
-```
-
-## `->reduce()`
-
-Iteratively compute a value for all the elements in the set.
-
-```php
-$set = Set::ints(1, 2, 3, 4);
-$sum = $set->reduce(0, fn($sum, $int) => $sum + $int);
-$sum; // 10
-```
-
-## `->clear()`
+### `->clear()`
 
 Create an empty new set of the same type. (To avoid to redeclare the types manually in a docblock)
 
@@ -309,72 +388,7 @@ $set = Set::ints(1);
 $set->clear()->size(); // 0
 ```
 
-## `->empty()`
-
-Tells whether there is at least one element or not.
-
-```php
-Set::ints()->empty(); // true
-Set::ints(1)->empty(); // false
-```
-
-## `->toList()`
-
-It returns a new `array` containing all the elements of the set.
-
-## `->find()`
-
-Returns the first element that matches the predicate.
-
-```php
-$set = Set::ints(2, 4, 6, 8, 9, 10, 11);
-/** @var Maybe<int> $firstOdd */
-$firstOdd = $set->find(fn($i) => $i % 2 === 1);
-$firstOdd; // could contain 9 or 11, because there is no ordering
-```
-
-## `->match()`
-
-This is a similar approach to pattern matching allowing you to decompose a set by accessing the first element and the rest of the set.
-
-```php
-function sum(Set $ints): int
-{
-    return $ints->match(
-        fn(int $head, Set $tail) => $head + sum($tail),
-        fn() => 0,
-    );
-}
-
-$result = sum(Set::of(1, 2, 3, 4));
-$result; // 10
-```
-
-!!! warning ""
-    For lazy sets bear in mind that the values will be kept in memory while the first call to `->match` didn't return.
-
-## `->matches()`
-
-Check if all the elements of the set matches the given predicate.
-
-```php
-$isOdd = fn($i) => $i % 2 === 1;
-Set::ints(1, 3, 5, 7)->matches($isOdd); // true
-Set::ints(1, 3, 4, 5, 7)->matches($isOdd); // false
-```
-
-## `->any()`
-
-Check if at least one element of the set matches the given predicate.
-
-```php
-$isOdd = fn($i) => $i % 2 === 1;
-Set::ints(1, 3, 5, 7)->any($isOdd); // true
-Set::ints(1, 3, 4, 5, 7)->any($isOdd); // true
-Set::ints(2, 4, 6, 8)->any($isOdd); // false
-```
-
-## `->safeguard()`
+### `->safeguard()`
 
 This method allows you to make sure all values conforms to an assertion before continuing using the set.
 
@@ -417,7 +431,7 @@ Set::lazy(function() {
 
 This example will print `a`, `b` and `c` before throwing an exception because of the second `a`. Use this method carefully.
 
-## `->memoize()`
+### `->memoize()`
 
 This method will load all the values in memory. This is useful only for a deferred or lazy `Set`, the other set will be unaffected.
 
