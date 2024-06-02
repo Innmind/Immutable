@@ -27,7 +27,8 @@ $sequence = Sequence::defer((function() {
 
 The method ask a generator that will provide the elements. Once the elements are loaded they are kept in memory so you can run multiple operations on it without loading the file twice.
 
-> **Warning** beware of the case where the source you read the elements is not altered before the first use of the sequence.
+!!! warning ""
+    Beware of the case where the source you read the elements is not altered before the first use of the sequence.
 
 ## `::lazy()`
 
@@ -39,7 +40,8 @@ $sequence = Sequence::lazy(function() {
 });
 ```
 
-> **Warning** since the elements are reloaded each time the immutability responsability is up to you because the source may change or if you generate objects it will generate new objects each time (so if you make strict comparison it will fail).
+!!! warning ""
+    Since the elements are reloaded each time the immutability responsability is up to you because the source may change or if you generate objects it will generate new objects each time (so if you make strict comparison it will fail).
 
 ## `::lazyStartingWith()`
 
@@ -49,8 +51,8 @@ Same as `::lazy()` except you don't need to manually build the generator.
 $sequence = Sequence::lazyStartingWith(1, 2, 3);
 ```
 
-> **Note**
-> this is useful when you know the first items of the sequence and you'll `append` another lazy sequence at the end.
+!!! note ""
+    This is useful when you know the first items of the sequence and you'll `append` another lazy sequence at the end.
 
 ## `::mixed()`
 
@@ -176,7 +178,9 @@ This is similar to `->filter()` with the advantage of psalm understanding the ty
 ```php
 use Innmind\Immutable\Predicate\Instance;
 
-$sequence = Sequence::of(null, new \stdClass, 'foo')->keep(Instance::of('stdClass'));
+$sequence = Sequence::of(null, new \stdClass, 'foo')->keep(
+    Instance::of('stdClass'),
+);
 $sequence; // Sequence<stdClass>
 ```
 
@@ -194,9 +198,11 @@ $sequence->equals(Sequence::ints(1, 3));
 Use this method to call a function for each element of the sequence. Since this structure is immutable it returns a `SideEffect` object, as its name suggest it is the only place acceptable to create side effects.
 
 ```php
-$sideEffect = Sequence::strings('hello', 'world')->foreach(function(string $string): void {
-    echo $string.' ';
-});
+$sideEffect = Sequence::strings('hello', 'world')->foreach(
+    function(string $string): void {
+        echo $string.' ';
+    },
+);
 ```
 
 In itself the `SideEffect` object has no use except to avoid psalm complaining that the `foreach` method is not used.
@@ -220,7 +226,10 @@ $map
         static fn($group) => $group,
         static fn() => Sequence::strings(),
     )
-    ->equals(Sequence::strings('http://example.com', 'http://example.com/foo')); // true
+    ->equals(Sequence::strings(
+        'http://example.com',
+        'http://example.com/foo',
+    )); // true
 $map
     ->get('https')
     ->match(
@@ -384,7 +393,7 @@ $sequence->equals(Sequence::ints(1, 2, 3, 4));
 
 ## `->fold()`
 
-This is similar to the `reduce` method but only takes a [`Monoid`](MONOIDS.md) as an argument.
+This is similar to the `reduce` method but only takes a [`Monoid`](../MONOIDS.md) as an argument.
 
 ```php
 use Innmind\Immutable\Monoid\Concat;
@@ -486,7 +495,8 @@ $result = sum(Sequence::of(1, 2, 3, 4));
 $result; // 10
 ```
 
-> **Warning** for lasy sequences bear in mind that the values will be kept in memory while the first call to `->match` didn't return.
+!!! warning ""
+    For lazy sequences bear in mind that the values will be kept in memory while the first call to `->match` didn't return.
 
 ## `->zip()`
 
@@ -542,7 +552,8 @@ This methods allows to rearrange the elements of the Sequence. This is especiall
 An example would be to rearrange a list of chunks from a file into lines:
 
 ```php
-$chunks = ['fo', "o\n", 'ba', "r\n", 'ba', "z\n"]; // let's pretend this comes from a stream
+// let's pretend this comes from a stream
+$chunks = ['fo', "o\n", 'ba', "r\n", 'ba', "z\n"];
 $lines = Sequence::of(...$chunks)
     ->map(Str::of(...))
     ->aggregate(static fn($a, $b) => $a->append($b->toString())->split("\n"))
@@ -552,8 +563,8 @@ $lines = Sequence::of(...$chunks)
 $lines; // ['foo', 'bar', 'baz', '']
 ```
 
-> **Note**
-> The `flatMap` is here in case there is only one chunk in the sequence, in which case the `aggregate` is not called
+!!! note ""
+    The `flatMap` is here in case there is only one chunk in the sequence, in which case the `aggregate` is not called
 
 ## `->memoize()`
 
