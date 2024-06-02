@@ -2,7 +2,9 @@
 
 A sequence is an ordered list of elements, think of it like an array such as `[1, 'a', new stdClass]` or a `list<T>` in the [Psalm](http://psalm.dev) nomenclature.
 
-## `::of()`
+## Named constructors
+
+### `::of()`
 
 The `of` static method allows you to create a new sequence with all the elements passed as arguments.
 
@@ -13,7 +15,7 @@ use Innmind\Immutable\Sequence;
 Sequence::of(1, 2, 3, $etc);
 ```
 
-## `::defer()`
+### `::defer()`
 
 This named constructor is for advanced use cases where you want the data of your sequence to be loaded upon use only and not initialisation.
 
@@ -30,7 +32,7 @@ The method ask a generator that will provide the elements. Once the elements are
 !!! warning ""
     Beware of the case where the source you read the elements is not altered before the first use of the sequence.
 
-## `::lazy()`
+### `::lazy()`
 
 This is similar to `::defer()` with the exception that the elements are not kept in memory but reloaded upon each use.
 
@@ -43,7 +45,7 @@ $sequence = Sequence::lazy(function() {
 !!! warning ""
     Since the elements are reloaded each time the immutability responsability is up to you because the source may change or if you generate objects it will generate new objects each time (so if you make strict comparison it will fail).
 
-## `::lazyStartingWith()`
+### `::lazyStartingWith()`
 
 Same as `::lazy()` except you don't need to manually build the generator.
 
@@ -54,27 +56,29 @@ $sequence = Sequence::lazyStartingWith(1, 2, 3);
 !!! note ""
     This is useful when you know the first items of the sequence and you'll `append` another lazy sequence at the end.
 
-## `::mixed()`
+### `::mixed()`
 
 This is a shortcut for `::of(mixed ...$mixed)`.
 
-## `::ints()`
+### `::ints()`
 
 This is a shortcut for `::of(int ...$ints)`.
 
-## `::floats()`
+### `::floats()`
 
 This is a shortcut for `::of(float ...$floats)`.
 
-## `::strings()`
+### `::strings()`
 
 This is a shortcut for `::of(string ...$strings)`.
 
-## `::objects()`
+### `::objects()`
 
 This is a shortcut for `::of(object ...$objects)`.
 
-## `->__invoke()`
+## Add values
+
+### `->__invoke()`
 
 Augment the sequence with a new element.
 
@@ -84,11 +88,22 @@ $sequence = ($sequence)(2);
 $sequence->equals(Sequence::ints(1, 2));
 ```
 
-## `->add()`
+### `->add()`
 
 This is an alias for `->__invoke()`.
 
-## `->size()`
+### `->append()`
+
+Add all elements of a sequence at the end of another.
+
+```php
+$sequence = Sequence::ints(1, 2)->append(Sequence::ints(3, 4));
+$sequence->equals(Sequence::ints(1, 2, 3, 4)); // true
+```
+
+## Access values
+
+### `->size()`
 
 This returns the number of elements in the sequence.
 
@@ -97,7 +112,7 @@ $sequence = Sequence::ints(1, 4, 6);
 $sequence->size(); // 3
 ```
 
-## `->count()`
+### `->count()`
 
 This is an alias for `->size()`, but you can also use the PHP function `\count` if you prefer.
 
@@ -107,7 +122,7 @@ $sequence->count(); // 3
 \count($sequence); // 3
 ```
 
-## `->get()`
+### `->get()`
 
 This method will return a [`Maybe`](maybe.md) object containing the element at the given index in the sequence. If the index doesn't exist it will an empty `Maybe` object.
 
@@ -117,52 +132,145 @@ $sequence->get(1); // Maybe::just(4)
 $sequence->get(3); // Maybe::nothing()
 ```
 
-## `->diff()`
+### `->first()`
 
-This method will return a new sequence containing the elements that are not present in the other sequence.
+This is an alias for `->get(0)`.
 
-```php
-$sequence = Sequence::ints(1, 4, 6)->diff(Sequence::ints(1, 3, 6));
-$sequence->equals(Sequence::ints(4)); // true
-```
+### `->last()`
 
-## `->distinct()`
+This is an alias for `->get(->size() - 1)`.
 
-This removes any duplicates in the sequence.
+### `->contains()`
 
-```php
-$sequence = Sequence::ints(1, 2, 1, 3)->distinct();
-$sequence->equals(Sequence::ints(1, 2, 3)); // true
-```
-
-## `->drop()`
-
-This removes the number of elements from the end of the sequence.
+Check if the element is present in the sequence.
 
 ```php
-$sequence = Sequence::ints(5, 4, 3, 2, 1)->drop(2);
-$sequence->equals(Sequence::ints(3, 2, 1)); // true
+$sequence = Sequence::ints(1, 42, 3);
+$sequence->contains(2); // false
+$sequence->contains(42); // true
+$sequence->contains('42'); // false but psalm will raise an error
 ```
 
-## `->dropEnd()`
+### `->indexOf()`
 
-This removes the number of elements from the end of the sequence.
+This will return a [`Maybe`](maybe.md) object containing the index number at which the first occurence of the element was found.
 
 ```php
-$sequence = Sequence::ints(1, 2, 3, 4, 5)->drop(2);
-$sequence->equals(Sequence::ints(1, 2, 3)); // true
+$sequence = Sequence::ints(1, 2, 3, 2);
+$sequence->indexOf(2); // Maybe::just(1)
+$sequence->indexOf(4); // Maybe::nothing()
 ```
 
-## `->equals()`
+### `->find()`
 
-Check if two sequences are identical.
+Returns a [`Maybe`](maybe.md) object containing the first element that matches the predicate.
 
 ```php
-Sequence::ints(1, 2)->equals(Sequence::ints(1, 2)); // true
-Sequence::ints()->equals(Sequence::strings()); // false but psalm will raise an error
+$sequence = Sequence::ints(2, 4, 6, 8, 9, 10, 11);
+$firstOdd = $sequence->find(fn($i) => $i % 2 === 1);
+$firstOdd; // Maybe::just(9)
+$sequence->find(static fn() => false); // Maybe::nothing()
 ```
 
-## `->filter()`
+### `->matches()`
+
+Check if all the elements of the sequence matches the given predicate.
+
+```php
+$isOdd = fn($i) => $i % 2 === 1;
+Sequence::ints(1, 3, 5, 7)->matches($isOdd); // true
+Sequence::ints(1, 3, 4, 5, 7)->matches($isOdd); // false
+```
+
+### `->any()`
+
+Check if at least one element of the sequence matches the given predicate.
+
+```php
+$isOdd = fn($i) => $i % 2 === 1;
+Sequence::ints(1, 3, 5, 7)->any($isOdd); // true
+Sequence::ints(1, 3, 4, 5, 7)->any($isOdd); // true
+Sequence::ints(2, 4, 6, 8)->any($isOdd); // false
+```
+
+### `->empty()`
+
+Tells whether there is at least one element or not.
+
+```php
+Sequence::ints()->empty(); // true
+Sequence::ints(1)->empty(); // false
+```
+
+## Transform values
+
+### `->map()`
+
+Create a new sequence with the exact same number of elements but modified by the given function.
+
+```php
+$ints = Sequence::ints(1, 2, 3);
+$squares = $ints->map(fn($i) => $i**2);
+$squares->equals(Sequence::ints(1, 4, 9)); // true
+```
+
+### `->flatMap()`
+
+This is similar to `->map()` except that instead of returning a new value it returns a new sequence for each value, and each new sequence is appended together.
+
+```php
+$ints = Sequence::ints(1, 2, 3);
+$squares = $ints->flatMap(fn($i) => Sequence::of($i, $i**2));
+$squares->equals(Sequence::ints(1, 1, 2, 4, 3, 9)); // true
+```
+
+### `->zip()`
+
+This method allows to merge 2 sequences into a new one by combining the values of the 2 into pairs.
+
+```php
+$firnames = Sequence::of('John', 'Luke', 'James');
+$lastnames = Sequence::of('Doe', 'Skywalker', 'Kirk');
+
+$pairs = $firnames
+    ->zip($lastnames)
+    ->toList();
+$pairs; // [['John', 'Doe'], ['Luke', 'Skywalker'], ['James', 'Kirk']]
+```
+
+### `->aggregate()`
+
+This methods allows to rearrange the elements of the Sequence. This is especially useful for parsers.
+
+An example would be to rearrange a list of chunks from a file into lines:
+
+```php
+// let's pretend this comes from a stream
+$chunks = ['fo', "o\n", 'ba', "r\n", 'ba', "z\n"];
+$lines = Sequence::of(...$chunks)
+    ->map(Str::of(...))
+    ->aggregate(static fn($a, $b) => $a->append($b->toString())->split("\n"))
+    ->flatMap(static fn($chunk) => $chunk->split("\n"))
+    ->map(static fn($line) => $line->toString())
+    ->toList();
+$lines; // ['foo', 'bar', 'baz', '']
+```
+
+!!! note ""
+    The `flatMap` is here in case there is only one chunk in the sequence, in which case the `aggregate` is not called
+
+### `->indices()`
+
+Create a new sequence of integers representing the indices of the original sequence.
+
+```php
+$sequence = Sequence::ints(1, 2, 3);
+$sequence->indices()->equals(Sequence::ints(...\range(0, $sequence->size() - 1)));
+```
+
+## Filter values
+
+### `->filter()`
 
 Removes elements from the sequence that don't match the given predicate.
 
@@ -171,7 +279,7 @@ $sequence = Sequence::ints(1, 2, 3, 4)->filter(fn($i) => $i % 2 === 0);
 $sequence->equals(Sequence::ints(2, 4));
 ```
 
-## `->keep()`
+### `->keep()`
 
 This is similar to `->filter()` with the advantage of psalm understanding the type in the new `Sequence`.
 
@@ -184,7 +292,7 @@ $sequence = Sequence::of(null, new \stdClass, 'foo')->keep(
 $sequence; // Sequence<stdClass>
 ```
 
-## `->exclude()`
+### `->exclude()`
 
 Removes elements from the sequence that match the given predicate.
 
@@ -193,7 +301,160 @@ $sequence = Sequence::ints(1, 2, 3, 4)->filter(fn($i) => $i % 2 === 0);
 $sequence->equals(Sequence::ints(1, 3));
 ```
 
-## `->foreach()`
+### `->take()`
+
+Create a new sequence with only the given number of elements from the start of the sequence.
+
+```php
+Sequence::ints(4, 3, 1, 0)->take(2)->equals(Sequence::ints(4, 3)); // true
+```
+
+### `->takeEnd()`
+
+Similar to `->take()` but it starts from the end of the sequence
+
+```php
+Sequence::ints(4, 3, 1, 0)->takeEnd(2)->equals(Sequence::ints(1, 0)); // true
+```
+
+### `->takeWhile()`
+
+This keeps all the elements from the start of the sequence while the condition returns `true`.
+
+```php
+$values = Sequence::of(1, 2, 3, 0, 4, 5, 6, 0)
+    ->takeWhile(static fn($i) => $i === 0)
+    ->toList();
+$values === [1, 2, 3];
+```
+
+### `->drop()`
+
+This removes the number of elements from the end of the sequence.
+
+```php
+$sequence = Sequence::ints(5, 4, 3, 2, 1)->drop(2);
+$sequence->equals(Sequence::ints(3, 2, 1)); // true
+```
+
+### `->dropEnd()`
+
+This removes the number of elements from the end of the sequence.
+
+```php
+$sequence = Sequence::ints(1, 2, 3, 4, 5)->drop(2);
+$sequence->equals(Sequence::ints(1, 2, 3)); // true
+```
+
+### `->dropWhile()`
+
+This removes all the elements from the start of the sequence while the condition returns `true`.
+
+```php
+$values = Sequence::of(0, 0, 0, 1, 2, 3, 0)
+    ->dropWhile(static fn($i) => $i === 0)
+    ->toList();
+$values === [1, 2, 3, 0];
+```
+
+### `->slice()`
+
+Return a new sequence with only the elements that were between the given indices. (The upper bound is not included)
+
+```php
+$sequence = Sequence::ints(4, 3, 2, 1);
+$sequence->slice(1, 4)->equals(Sequence::ints(3, 2)); // true
+```
+
+### `->diff()`
+
+This method will return a new sequence containing the elements that are not present in the other sequence.
+
+```php
+$sequence = Sequence::ints(1, 4, 6)->diff(Sequence::ints(1, 3, 6));
+$sequence->equals(Sequence::ints(4)); // true
+```
+
+### `->intersect()`
+
+Create a new sequence with the elements that are also in the other sequence.
+
+```php
+$sequence = Sequence::ints(1, 2, 3)->intersect(Sequence::ints(2, 3, 4));
+$sequence->equals(Sequence::ints(2, 3)); // true
+```
+
+### `->distinct()`
+
+This removes any duplicates in the sequence.
+
+```php
+$sequence = Sequence::ints(1, 2, 1, 3)->distinct();
+$sequence->equals(Sequence::ints(1, 2, 3)); // true
+```
+
+## Extract values
+
+### `->toList()`
+
+It returns a new `array` containing all the elements of the sequence.
+
+### `->match()`
+
+This is a similar approach to pattern matching allowing you to decompose a sequence by accessing the first element and the rest of the sequence.
+
+```php
+function sum(Sequence $ints): int
+{
+    return $ints->match(
+        fn(int $head, Sequence $tail) => $head + sum($tail),
+        fn() => 0,
+    );
+}
+
+$result = sum(Sequence::of(1, 2, 3, 4));
+$result; // 10
+```
+
+!!! warning ""
+    For lazy sequences bear in mind that the values will be kept in memory while the first call to `->match` didn't return.
+
+### `->fold()`
+
+This is similar to the `reduce` method but only takes a [`Monoid`](../MONOIDS.md) as an argument.
+
+```php
+use Innmind\Immutable\Monoid\Concat;
+
+$lines = Sequence::of("foo\n", "bar\n", 'baz')
+    ->map(fn($line) => Str::of($line))
+    ->fold(new Concat);
+
+$lines->equals("foo\nbar\nbaz"); // true
+```
+
+### `->reduce()`
+
+Iteratively compute a value for all the elements in the sequence.
+
+```php
+$sequence = Sequence::ints(1, 2, 3, 4);
+$sum = $sequence->reduce(0, fn($sum, $int) => $sum + $int);
+$sum; // 10
+```
+
+## Misc.
+
+### `->equals()`
+
+Check if two sequences are identical.
+
+```php
+Sequence::ints(1, 2)->equals(Sequence::ints(1, 2)); // true
+Sequence::ints()->equals(Sequence::strings()); // false but psalm will raise an error
+```
+
+### `->foreach()`
 
 Use this method to call a function for each element of the sequence. Since this structure is immutable it returns a `SideEffect` object, as its name suggest it is the only place acceptable to create side effects.
 
@@ -207,7 +468,7 @@ $sideEffect = Sequence::strings('hello', 'world')->foreach(
 
 In itself the `SideEffect` object has no use except to avoid psalm complaining that the `foreach` method is not used.
 
-## `->groupBy()`
+### `->groupBy()`
 
 This will create multiples sequences with elements regrouped under the same key computed by the given function.
 
@@ -246,65 +507,7 @@ $map
     ->equals(Sequence::strings('ftp://example.com')); // true
 ```
 
-## `->first()`
-
-This is an alias for `->get(0)`.
-
-## `->last()`
-
-This is an alias for `->get(->size() - 1)`.
-
-## `->contains()`
-
-Check if the element is present in the sequence.
-
-```php
-$sequence = Sequence::ints(1, 42, 3);
-$sequence->contains(2); // false
-$sequence->contains(42); // true
-$sequence->contains('42'); // false but psalm will raise an error
-```
-
-## `->indexOf()`
-
-This will return a [`Maybe`](maybe.md) object containing the index number at which the first occurence of the element was found.
-
-```php
-$sequence = Sequence::ints(1, 2, 3, 2);
-$sequence->indexOf(2); // Maybe::just(1)
-$sequence->indexOf(4); // Maybe::nothing()
-```
-
-## `->indices()`
-
-Create a new sequence of integers representing the indices of the original sequence.
-
-```php
-$sequence = Sequence::ints(1, 2, 3);
-$sequence->indices()->equals(Sequence::ints(...\range(0, $sequence->size() - 1)));
-```
-
-## `->map()`
-
-Create a new sequence with the exact same number of elements but modified by the given function.
-
-```php
-$ints = Sequence::ints(1, 2, 3);
-$squares = $ints->map(fn($i) => $i**2);
-$squares->equals(Sequence::ints(1, 4, 9)); // true
-```
-
-## `->flatMap()`
-
-This is similar to `->map()` except that instead of returning a new value it returns a new sequence for each value, and each new sequence is appended together.
-
-```php
-$ints = Sequence::ints(1, 2, 3);
-$squares = $ints->flatMap(fn($i) => Sequence::of($i, $i**2));
-$squares->equals(Sequence::ints(1, 1, 2, 4, 3, 9)); // true
-```
-
-## `->pad()`
+### `->pad()`
 
 Add the same element to a new sequence in order that its size is at least the given one.
 
@@ -314,7 +517,7 @@ $sequence->pad(2, 0)->equals(Sequence::ints(1, 2, 3)); // true
 $sequence->pad(5, 0)->equals(Sequence::ints(1, 2, 3, 0, 0)); // true
 ```
 
-## `->partition()`
+### `->partition()`
 
 This method is similar to `->groupBy()` method but the map keys are always booleans. The difference is that here the 2 keys are always present whereas with `->groupBy()` it will depend on the original sequence.
 
@@ -338,50 +541,7 @@ $map
     ->equals(Sequence::ints(1, 3)); // true
 ```
 
-## `->slice()`
-
-Return a new sequence with only the elements that were between the given indices. (The upper bound is not included)
-
-```php
-$sequence = Sequence::ints(4, 3, 2, 1);
-$sequence->slice(1, 4)->equals(Sequence::ints(3, 2)); // true
-```
-
-## `->take()`
-
-Create a new sequence with only the given number of elements from the start of the sequence.
-
-```php
-Sequence::ints(4, 3, 1, 0)->take(2)->equals(Sequence::ints(4, 3)); // true
-```
-
-## `->takeEnd()`
-
-Similar to `->take()` but it starts from the end of the sequence
-
-```php
-Sequence::ints(4, 3, 1, 0)->takeEnd(2)->equals(Sequence::ints(1, 0)); // true
-```
-
-## `->append()`
-
-Add all elements of a sequence at the end of another.
-
-```php
-$sequence = Sequence::ints(1, 2)->append(Sequence::ints(3, 4));
-$sequence->equals(Sequence::ints(1, 2, 3, 4)); // true
-```
-
-## `->intersect()`
-
-Create a new sequence with the elements that are also in the other sequence.
-
-```php
-$sequence = Sequence::ints(1, 2, 3)->intersect(Sequence::ints(2, 3, 4));
-$sequence->equals(Sequence::ints(2, 3)); // true
-```
-
-## `->sort()`
+### `->sort()`
 
 Reorder the elements within the sequence.
 
@@ -391,31 +551,7 @@ $sequence = $sequence->sort(fn($a, $b) => $a <=> $b);
 $sequence->equals(Sequence::ints(1, 2, 3, 4));
 ```
 
-## `->fold()`
-
-This is similar to the `reduce` method but only takes a [`Monoid`](../MONOIDS.md) as an argument.
-
-```php
-use Innmind\Immutable\Monoid\Concat;
-
-$lines = Sequence::of("foo\n", "bar\n", 'baz')
-    ->map(fn($line) => Str::of($line))
-    ->fold(new Concat);
-
-$lines->equals("foo\nbar\nbaz"); // true
-```
-
-## `->reduce()`
-
-Iteratively compute a value for all the elements in the sequence.
-
-```php
-$sequence = Sequence::ints(1, 2, 3, 4);
-$sum = $sequence->reduce(0, fn($sum, $int) => $sum + $int);
-$sum; // 10
-```
-
-## `->clear()`
+### `->clear()`
 
 Create an empty new sequence of the same type. (To avoid to redeclare the types manually in a docblock)
 
@@ -424,7 +560,7 @@ $sequence = Sequence::ints(1);
 $sequence->clear()->size(); // 0
 ```
 
-## `->reverse()`
+### `->reverse()`
 
 Create a new sequence where the last element become the first one and so on.
 
@@ -433,86 +569,7 @@ $sequence = Sequence::ints(1, 2, 3, 4);
 $sequence->reverse()->equals(Sequence::ints(4, 3, 2, 1));
 ```
 
-## `->empty()`
-
-Tells whether there is at least one element or not.
-
-```php
-Sequence::ints()->empty(); // true
-Sequence::ints(1)->empty(); // false
-```
-
-## `->toList()`
-
-It returns a new `array` containing all the elements of the sequence.
-
-## `->find()`
-
-Returns a [`Maybe`](maybe.md) object containing the first element that matches the predicate.
-
-```php
-$sequence = Sequence::ints(2, 4, 6, 8, 9, 10, 11);
-$firstOdd = $sequence->find(fn($i) => $i % 2 === 1);
-$firstOdd; // Maybe::just(9)
-$sequence->find(static fn() => false); // Maybe::nothing()
-```
-
-## `->matches()`
-
-Check if all the elements of the sequence matches the given predicate.
-
-```php
-$isOdd = fn($i) => $i % 2 === 1;
-Sequence::ints(1, 3, 5, 7)->matches($isOdd); // true
-Sequence::ints(1, 3, 4, 5, 7)->matches($isOdd); // false
-```
-
-## `->any()`
-
-Check if at least one element of the sequence matches the given predicate.
-
-```php
-$isOdd = fn($i) => $i % 2 === 1;
-Sequence::ints(1, 3, 5, 7)->any($isOdd); // true
-Sequence::ints(1, 3, 4, 5, 7)->any($isOdd); // true
-Sequence::ints(2, 4, 6, 8)->any($isOdd); // false
-```
-
-## `->match()`
-
-This is a similar approach to pattern matching allowing you to decompose a sequence by accessing the first element and the rest of the sequence.
-
-```php
-function sum(Sequence $ints): int
-{
-    return $ints->match(
-        fn(int $head, Sequence $tail) => $head + sum($tail),
-        fn() => 0,
-    );
-}
-
-$result = sum(Sequence::of(1, 2, 3, 4));
-$result; // 10
-```
-
-!!! warning ""
-    For lazy sequences bear in mind that the values will be kept in memory while the first call to `->match` didn't return.
-
-## `->zip()`
-
-This method allows to merge 2 sequences into a new one by combining the values of the 2 into pairs.
-
-```php
-$firnames = Sequence::of('John', 'Luke', 'James');
-$lastnames = Sequence::of('Doe', 'Skywalker', 'Kirk');
-
-$pairs = $firnames
-    ->zip($lastnames)
-    ->toList();
-$pairs; // [['John', 'Doe'], ['Luke', 'Skywalker'], ['James', 'Kirk']]
-```
-
-## `->safeguard()`
+### `->safeguard()`
 
 This method allows you to make sure all values conforms to an assertion before continuing using the sequence.
 
@@ -545,28 +602,7 @@ Sequence::lazyStartingWith('a', 'b', 'c', 'a')
 
 This example will print `a`, `b` and `c` before throwing an exception because of the second `a`. Use this method carefully.
 
-## `->aggregate()`
-
-This methods allows to rearrange the elements of the Sequence. This is especially useful for parsers.
-
-An example would be to rearrange a list of chunks from a file into lines:
-
-```php
-// let's pretend this comes from a stream
-$chunks = ['fo', "o\n", 'ba', "r\n", 'ba', "z\n"];
-$lines = Sequence::of(...$chunks)
-    ->map(Str::of(...))
-    ->aggregate(static fn($a, $b) => $a->append($b->toString())->split("\n"))
-    ->flatMap(static fn($chunk) => $chunk->split("\n"))
-    ->map(static fn($line) => $line->toString())
-    ->toList();
-$lines; // ['foo', 'bar', 'baz', '']
-```
-
-!!! note ""
-    The `flatMap` is here in case there is only one chunk in the sequence, in which case the `aggregate` is not called
-
-## `->memoize()`
+### `->memoize()`
 
 This method will load all the values in memory. This is useful only for a deferred or lazy `Sequence`, the other sequence will be unaffected.
 
@@ -579,26 +615,4 @@ $sequence = Sequence::lazy(function() {
 })
     ->map(static fn($line) => \strtoupper($line)) // still no line loaded here
     ->memoize(); // load all lines and apply strtoupper on each
-```
-
-## `->dropWhile()`
-
-This removes all the elements from the start of the sequence while the condition returns `true`.
-
-```php
-$values = Sequence::of(0, 0, 0, 1, 2, 3, 0)
-    ->dropWhile(static fn($i) => $i === 0)
-    ->toList();
-$values === [1, 2, 3, 0];
-```
-
-## `->takeWhile()`
-
-This keeps all the elements from the start of the sequence while the condition returns `true`.
-
-```php
-$values = Sequence::of(1, 2, 3, 0, 4, 5, 6, 0)
-    ->takeWhile(static fn($i) => $i === 0)
-    ->toList();
-$values === [1, 2, 3];
 ```
