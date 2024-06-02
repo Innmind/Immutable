@@ -21,7 +21,7 @@ nav:
     - use-cases/index.md
     - How to read a file: use-cases/lazy-file.md
     - Parsing strings: use-cases/parsing.md
-  - Testing: BLACKBOX.md
+  - Testing: testing.md
 
 theme:
   name: material
