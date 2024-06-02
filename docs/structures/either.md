@@ -32,8 +32,8 @@ function accessResource(User $user): Either {
 }
 ```
 
-> **Note**
-> `ServerRequest`, `User`, `Resource` and `Error` are imaginary classes.
+!!! note ""
+    `ServerRequest`, `User`, `Resource` and `Error` are imaginary classes.
 
 ## `::left()`
 
@@ -43,8 +43,8 @@ This builds an `Either` instance with the given value in the left hand side.
 $either = Either::left($anyValue);
 ```
 
-> **Note**
-> usually this side is used for errors.
+!!! note ""
+    Usually this side is used for errors.
 
 ## `::right()`
 
@@ -54,8 +54,8 @@ This builds an `Either` instance with the given value in the right hand side.
 $either = Either::right($anyValue);
 ```
 
-> **Note**
-> usually this side is used for valid values.
+!!! note ""
+    Usually this side is used for valid values.
 
 ## `::defer()`
 
@@ -75,7 +75,8 @@ $either = Either::defer(static function() {
 
 Methods called (except `match`) on a deferred `Either` will not be called immediately but will be composed to be executed once you call `match`.
 
-> **Warning** this means that if you never call `match` on a deferred `Either` it will do nothing.
+!!! warning ""
+    This means that if you never call `match` on a deferred `Either` it will do nothing.
 
 ## `->map()`
 
@@ -85,7 +86,9 @@ This will apply the map transformation on the right value if there is one, other
 /** @var Either<Error, User> */
 $either = identify($serverRequest);
 /** @var Either<Error, Impersonated> */
-$impersonated = $either->map(fn(User $user): Impersonated => $user->impersonateAdmin());
+$impersonated = $either->map(
+    fn(User $user): Impersonated => $user->impersonateAdmin(),
+);
 ```
 
 ## `->flatMap()`
@@ -109,12 +112,14 @@ $response = identify($serverRequest)
     ->flatMap(fn(User $user): Either => accessResource($user))
     ->match(
         fn(Resource $resource) => new Response(200, $resource->toString()),
-        fn(Error $error) => new Response(400, $error->message()), // here the error can be from identify or from accessResource
+        fn(Error $error) => new Response(400, $error->message()), //(1)
     );
 ```
 
-> **Note**
-> `Response` is an imaginary class.
+1. Here the error can be from `identify` or from `accessResource`.
+
+!!! note ""
+    `Response` is an imaginary class.
 
 ## `->otherwise()`
 
@@ -148,10 +153,13 @@ identify($request)
         fn() => new Error('User is not allowed'),
     )
     ->match(
-        fn(User $user) => doSomething($user), // here we know the user is allowed
-        fn(Error $error) => print($error->message()), // can be "User not found" or "User is not allowed"
+        fn(User $user) => doSomething($user), //(1)
+        fn(Error $error) => print($error->message()), //(2)
     );
 ```
+
+1. Here we know the user is allowed.
+2. Can be "User not found" or "User is not allowed".
 
 ## `->leftMap()`
 
@@ -165,7 +173,7 @@ $either = identify($request)
 
 ## `->maybe()`
 
-This returns a [`Maybe`](MAYBE.md) containing the right value, in case of a left value it returns a `Maybe` with nothing inside.
+This returns a [`Maybe`](maybe.md) containing the right value, in case of a left value it returns a `Maybe` with nothing inside.
 
 ```php
 Either::right('something')->maybe()->match(
