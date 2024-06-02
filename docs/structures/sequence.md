@@ -2,6 +2,9 @@
 
 A sequence is an ordered list of elements, think of it like an array such as `[1, 'a', new stdClass]` or a `list<T>` in the [Psalm](http://psalm.dev) nomenclature.
 
+!!! info ""
+    Methods with the :material-memory-arrow-down: symbol indicates that they will trigger loading the generator for deferred and lazy sequences.
+
 ## Named constructors
 
 ### `::of()`
@@ -103,7 +106,7 @@ $sequence->equals(Sequence::ints(1, 2, 3, 4)); // true
 
 ## Access values
 
-### `->size()`
+### `->size()` :material-memory-arrow-down:
 
 This returns the number of elements in the sequence.
 
@@ -112,7 +115,7 @@ $sequence = Sequence::ints(1, 4, 6);
 $sequence->size(); // 3
 ```
 
-### `->count()`
+### `->count()` :material-memory-arrow-down:
 
 This is an alias for `->size()`, but you can also use the PHP function `\count` if you prefer.
 
@@ -140,7 +143,7 @@ This is an alias for `->get(0)`.
 
 This is an alias for `->get(->size() - 1)`.
 
-### `->contains()`
+### `->contains()` :material-memory-arrow-down:
 
 Check if the element is present in the sequence.
 
@@ -172,7 +175,7 @@ $firstOdd; // Maybe::just(9)
 $sequence->find(static fn() => false); // Maybe::nothing()
 ```
 
-### `->matches()`
+### `->matches()` :material-memory-arrow-down:
 
 Check if all the elements of the sequence matches the given predicate.
 
@@ -182,7 +185,7 @@ Sequence::ints(1, 3, 5, 7)->matches($isOdd); // true
 Sequence::ints(1, 3, 4, 5, 7)->matches($isOdd); // false
 ```
 
-### `->any()`
+### `->any()` :material-memory-arrow-down:
 
 Check if at least one element of the sequence matches the given predicate.
 
@@ -193,7 +196,7 @@ Sequence::ints(1, 3, 4, 5, 7)->any($isOdd); // true
 Sequence::ints(2, 4, 6, 8)->any($isOdd); // false
 ```
 
-### `->empty()`
+### `->empty()` :material-memory-arrow-down:
 
 Tells whether there is at least one element or not.
 
@@ -337,7 +340,7 @@ $sequence = Sequence::ints(5, 4, 3, 2, 1)->drop(2);
 $sequence->equals(Sequence::ints(3, 2, 1)); // true
 ```
 
-### `->dropEnd()`
+### `->dropEnd()` :material-memory-arrow-down:
 
 This removes the number of elements from the end of the sequence.
 
@@ -395,11 +398,11 @@ $sequence->equals(Sequence::ints(1, 2, 3)); // true
 
 ## Extract values
 
-### `->toList()`
+### `->toList()` :material-memory-arrow-down:
 
 It returns a new `array` containing all the elements of the sequence.
 
-### `->match()`
+### `->match()` :material-memory-arrow-down:
 
 This is a similar approach to pattern matching allowing you to decompose a sequence by accessing the first element and the rest of the sequence.
 
@@ -419,7 +422,7 @@ $result; // 10
 !!! warning ""
     For lazy sequences bear in mind that the values will be kept in memory while the first call to `->match` didn't return.
 
-### `->fold()`
+### `->fold()` :material-memory-arrow-down:
 
 This is similar to the `reduce` method but only takes a [`Monoid`](../MONOIDS.md) as an argument.
 
@@ -433,7 +436,7 @@ $lines = Sequence::of("foo\n", "bar\n", 'baz')
 $lines->equals("foo\nbar\nbaz"); // true
 ```
 
-### `->reduce()`
+### `->reduce()` :material-memory-arrow-down:
 
 Iteratively compute a value for all the elements in the sequence.
 
@@ -445,7 +448,7 @@ $sum; // 10
 
 ## Misc.
 
-### `->equals()`
+### `->equals()` :material-memory-arrow-down:
 
 Check if two sequences are identical.
 
@@ -454,7 +457,7 @@ Sequence::ints(1, 2)->equals(Sequence::ints(1, 2)); // true
 Sequence::ints()->equals(Sequence::strings()); // false but psalm will raise an error
 ```
 
-### `->foreach()`
+### `->foreach()` :material-memory-arrow-down:
 
 Use this method to call a function for each element of the sequence. Since this structure is immutable it returns a `SideEffect` object, as its name suggest it is the only place acceptable to create side effects.
 
@@ -468,7 +471,7 @@ $sideEffect = Sequence::strings('hello', 'world')->foreach(
 
 In itself the `SideEffect` object has no use except to avoid psalm complaining that the `foreach` method is not used.
 
-### `->groupBy()`
+### `->groupBy()` :material-memory-arrow-down:
 
 This will create multiples sequences with elements regrouped under the same key computed by the given function.
 
@@ -517,7 +520,7 @@ $sequence->pad(2, 0)->equals(Sequence::ints(1, 2, 3)); // true
 $sequence->pad(5, 0)->equals(Sequence::ints(1, 2, 3, 0, 0)); // true
 ```
 
-### `->partition()`
+### `->partition()` :material-memory-arrow-down:
 
 This method is similar to `->groupBy()` method but the map keys are always booleans. The difference is that here the 2 keys are always present whereas with `->groupBy()` it will depend on the original sequence.
 
@@ -602,7 +605,7 @@ Sequence::lazyStartingWith('a', 'b', 'c', 'a')
 
 This example will print `a`, `b` and `c` before throwing an exception because of the second `a`. Use this method carefully.
 
-### `->memoize()`
+### `->memoize()` :material-memory-arrow-down:
 
 This method will load all the values in memory. This is useful only for a deferred or lazy `Sequence`, the other sequence will be unaffected.
 
