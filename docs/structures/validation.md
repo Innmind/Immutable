@@ -1,6 +1,6 @@
 # `Validation`
 
-This structure is similar to [`Either`](EITHER.md) except that the right side is called success and left fail. The difference is that `Validation` allows to accumulate failures.
+This structure is similar to [`Either`](either.md) except that the right side is called success and left fail. The difference is that `Validation` allows to accumulate failures.
 
 For the examples below we will use the given imaginary functions:
 
@@ -30,8 +30,8 @@ function isLocal(string $value): Validation {
 }
 ```
 
-> **Note**
-> `Error` is imaginary class.
+!!! note ""
+    `Error` is imaginary class.
 
 ## `::fail()`
 
@@ -82,7 +82,9 @@ $localEmail = isEmail($serverRequest)
     ->map(static fn(string $email) => new Email($email))
     ->match(
         fn(Email $email) => $email,
-        fn(Sequence $failures) => throw new \Exception(\implode(', ', $failure->toList())),
+        fn(Sequence $failures) => throw new \Exception(
+            \implode(', ', $failure->toList()),
+        ),
     );
 ```
 
@@ -147,7 +149,7 @@ $foobar
 
 ## `->maybe()`
 
-This returns a [`Maybe`](MAYBE.md) containing the success value, in case of failures it returns a `Maybe` with nothing inside.
+This returns a [`Maybe`](maybe.md) containing the success value, in case of failures it returns a `Maybe` with nothing inside.
 
 ```php
 Validation::success('something')->maybe()->match(
@@ -162,7 +164,7 @@ Validation::fail('something')->maybe()->match(
 
 ## `->either()`
 
-This returns an [`Either`](EITHER.md) containing the success value as the right side, in case of failures it returns an `Either` with failures as the left side.
+This returns an [`Either`](either.md) containing the success value as the right side, in case of failures it returns an `Either` with failures as the left side.
 
 ```php
 Validation::success('something')->either()->match(
