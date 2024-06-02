@@ -173,7 +173,7 @@ $either = identify($request)
 
 ## `->maybe()`
 
-This returns a [`Maybe`](MAYBE.md) containing the right value, in case of a left value it returns a `Maybe` with nothing inside.
+This returns a [`Maybe`](maybe.md) containing the right value, in case of a left value it returns a `Maybe` with nothing inside.
 
 ```php
 Either::right('something')->maybe()->match(

@@ -150,7 +150,7 @@ This is the inverse of the `->filter()` method.
 
 ## `->either()`
 
-This returns an [`Either`](EITHER.md) containing the value on the right side and `null` on the left side.
+This returns an [`Either`](either.md) containing the value on the right side and `null` on the left side.
 
 ```php
 Maybe::just('something')->either()->match(

@@ -92,7 +92,7 @@ $map->contains(2); // false
 
 ### `->keys()`
 
-Return a [`Set`](SET.md) of all the keys of the map.
+Return a [`Set`](set.md) of all the keys of the map.
 
 ```php
 $keys = Map::of([24, 1], [42, 2])->keys();
@@ -101,7 +101,7 @@ $keys->equals(Set::of(24, 42)); // true
 
 ### `->values()`
 
-Return a [`Sequence`](SEQUENCE.md) of all the values of the map.
+Return a [`Sequence`](sequence.md) of all the values of the map.
 
 ```php
 $values = Map::of([24, 1], [42, 2])->values();
