@@ -6,7 +6,7 @@
 
 A set of classes to wrap PHP primitives to build immutable data.
 
-[Documentation](docs/README.md)
+[Documentation](https://innmind.github.io/Immutable/)
 
 ## Installation
 

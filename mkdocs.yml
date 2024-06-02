@@ -1,0 +1,109 @@
+site_name: Innmind
+repo_name: innmind/immutable
+
+nav:
+  - Getting Started: README.md
+  - Philosophy: PHILOSOPHY.md
+  - Structures:
+    - structures/index.md
+    - Sequence: structures/sequence.md
+    - Set: structures/set.md
+    - Map: structures/map.md
+    - Str: structures/str.md
+    - RegExp: structures/regexp.md
+    - Maybe: structures/maybe.md
+    - Either: structures/either.md
+    - Validation: structures/validation.md
+    - State: structures/state.md
+    - Fold: structures/fold.md
+  - Monoids: MONOIDS.md
+  - Use cases:
+    - use-cases/index.md
+    - How to read a file: use-cases/lazy-file.md
+    - Parsing strings: use-cases/parsing.md
+  - Testing: testing.md
+
+theme:
+  name: material
+  logo: assets/logo.svg
+  favicon: assets/favicon.png
+  font: false
+  features:
+    - content.code.copy
+    - content.code.annotate
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.expand
+    - navigation.indexes
+    - navigation.top
+    - navigation.footer
+    - search.suggest
+    - search.highlight
+    - content.action.edit
+  palette:
+    # Palette toggle for automatic mode
+    - media: "(prefers-color-scheme)"
+      toggle:
+        icon: material/brightness-auto
+        name: Switch to light mode
+      primary: blue
+      accent: deep orange
+    # Palette toggle for light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+      primary: blue
+      accent: deep orange
+    # Palette toggle for dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      toggle:
+        icon: material/brightness-4
+        name: Switch to system preference
+      primary: blue
+      accent: deep orange
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+      extend_pygments_lang:
+        - name: php
+          lang: php
+          options:
+            startinline: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - attr_list
+  - md_in_html
+  - pymdownx.superfences
+  - abbr
+  - admonition
+  - pymdownx.details:
+  - pymdownx.tabbed:
+      alternate_style: true
+  - toc:
+      permalink: true
+  - footnotes
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+
+extra_css:
+  - assets/stylesheets/extra.css
+
+plugins:
+  - search
+  - privacy
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/Innmind/immutable
+    - icon: fontawesome/brands/x-twitter
+      link: https://twitter.com/Baptouuuu

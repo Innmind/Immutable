@@ -21,8 +21,8 @@ $str->length(); // 1
 Str::of('👋')->length(); // 4
 ```
 
-> **Note**
-> `Str\Encoding::utf8` is the default value when not specified
+!!! note ""
+    `Str\Encoding::utf8` is the default value when not specified
 
 ## `->toString()`
 
@@ -233,13 +233,15 @@ Str::of('abcdef')->matches('/^b/'); // false
 Return a map of the elements matching the regular expression.
 
 ```php
-Str::of('http://www.php.net/index.html')->capture('@^(?:http://)?(?P<host>[^/]+)@i')->equals(
-    Map::of(
-        [0, Str::of('http://www.php.net')],
-        [1, Str::of('www.php.net')],
-        ['host', Str::of('www.php.net')],
-    ),
-);
+Str::of('http://www.php.net/index.html')
+    ->capture('@^(?:http://)?(?P<host>[^/]+)@i')
+    ->equals(
+        Map::of(
+            [0, Str::of('http://www.php.net')],
+            [1, Str::of('www.php.net')],
+            ['host', Str::of('www.php.net')],
+        ),
+    );
 ```
 
 ## `->pregReplace()`
@@ -247,9 +249,9 @@ Str::of('http://www.php.net/index.html')->capture('@^(?:http://)?(?P<host>[^/]+)
 Replace part of the string by using a regular expression.
 
 ```php
-Str::of('April 15, 2003')->pregReplace('/(\w+) (\d+), (\d+)/i', '${1}1,$3')->equals(
-    Str::of('April1,2003'),
-);
+Str::of('April 15, 2003')
+    ->pregReplace('/(\w+) (\d+), (\d+)/i', '${1}1,$3')
+    ->equals(Str::of('April1,2003'));
 ```
 
 ## `->substring()`
@@ -298,7 +300,9 @@ Str::of('foobar')->dropEnd(3)->equals(Str::of('foo')); // true
 Return a formatted string.
 
 ```php
-Str::of('%s %s')->sprintf('hello', 'world')->equals(Str::of('hello world')); // true
+Str::of('%s %s')
+    ->sprintf('hello', 'world')
+    ->equals(Str::of('hello world')); // true
 ```
 
 ## `->ucfirst()`
@@ -394,7 +398,10 @@ This function will create a new `Str` object with the value modified by the give
 
 ```php
 $str = Str::of('foo|bar|baz')->map(
-    fn(string $value, string $encoding): string => \implode(',', \explode('|', $string)),
+    fn(string $value, string $encoding): string => \implode(
+        ',',
+        \explode('|', $string),
+    ),
 );
 $str->equals(Str::of('foo,bar,baz')); // true
 ```
@@ -405,7 +412,9 @@ This is similar to `->map()` but instead of the function returning a value it mu
 
 ```php
 $str = Str::of('foo|bar|baz')->flatMap(
-    fn(string $value, string $encoding): Str => Str::of(',')->join(Sequence::of(...\explode('|', $string))),
+    fn(string $value, string $encoding): Str => Str::of(',')->join(
+        Sequence::of(...\explode('|', $string)),
+    ),
 );
 $str->equals(Str::of('foo,bar,baz')); // true
 ```
@@ -415,6 +424,13 @@ $str->equals(Str::of('foo,bar,baz')); // true
 The is a shortcut method, the 2 examples below do the same thing.
 
 ```php
-Str::of('foobar')->maybe(static fn($str) => $str->startsWith('foo')); // Maybe<Str>
-Maybe::of(Str::of('foobar'))->filter(static fn($str) => $str->startsWith('foo')); // Maybe<Str>
+Str::of('foobar')->maybe(
+    static fn($str) => $str->startsWith('foo'),
+); // Maybe<Str>
+
+// is the same as
+
+Maybe::of(Str::of('foobar'))->filter(
+    static fn($str) => $str->startsWith('foo'),
+); // Maybe<Str>
 ```

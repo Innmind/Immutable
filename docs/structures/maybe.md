@@ -62,7 +62,8 @@ $maybe = Maybe::defer(static function() {
 
 Methods called (except `match`) on a deferred `Maybe` will not be called immediately but will be composed to be executed once you call `match`.
 
-> **Warning** this means that if you never call `match` on a deferred `Maybe` it will do nothing.
+!!! warning ""
+    This means that if you never call `match` on a deferred `Maybe` it will do nothing.
 
 ## `->map()`
 
@@ -149,7 +150,7 @@ This is the inverse of the `->filter()` method.
 
 ## `->either()`
 
-This returns an [`Either`](EITHER.md) containing the value on the right side and `null` on the left side.
+This returns an [`Either`](either.md) containing the value on the right side and `null` on the left side.
 
 ```php
 Maybe::just('something')->either()->match(
@@ -190,8 +191,8 @@ $vars = Sequence::of('DB_URL', 'MAILER_URL', /* and so on */)
     ->flatMap(static fn($var) => env($var)->toSequence());
 ```
 
-> **Note**
-> this example uses the `env` function defined at the start of this documentation.
+!!! note ""
+    This example uses the `env` function defined at the start of this documentation.
 
 This is equivalent to:
 
