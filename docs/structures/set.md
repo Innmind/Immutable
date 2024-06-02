@@ -25,7 +25,8 @@ $set = Set::defer((function() {
 
 The method ask a generator that will provide the elements. Once the elements are loaded they are kept in memory so you can run multiple operations on it without loading the file twice.
 
-> **Warning** beware of the case where the source you read the elements is not altered before the first use of the set.
+!!! warning ""
+    Beware of the case where the source you read the elements is not altered before the first use of the set.
 
 ## `::lazy()`
 
@@ -37,7 +38,8 @@ $set = Set::lazy(function() {
 });
 ```
 
-> **Warning** since the elements are reloaded each time the immutability responsability is up to you because the source may change or if you generate objects it will generate new objects each time (so if you make strict comparison it will fail).
+!!! warning ""
+    Since the elements are reloaded each time the immutability responsability is up to you because the source may change or if you generate objects it will generate new objects each time (so if you make strict comparison it will fail).
 
 ## `::mixed()`
 
@@ -173,9 +175,11 @@ $set->equals(Set::ints(1, 3));
 Use this method to call a function for each element of the set. Since this structure is immutable it returns a `SideEffect` object, as its name suggest it is the only place acceptable to create side effects.
 
 ```php
-$sideEffect = Set::strings('hello', 'world')->foreach(function(string $string): void {
-    echo $string.' ';
-});
+$sideEffect = Set::strings('hello', 'world')->foreach(
+    function(string $string): void {
+        echo $string.' ';
+    },
+);
 ```
 
 ## `->groupBy()`
@@ -346,7 +350,8 @@ $result = sum(Set::of(1, 2, 3, 4));
 $result; // 10
 ```
 
-> **Warning** for lazy sets bear in mind that the values will be kept in memory while the first call to `->match` didn't return.
+!!! warning ""
+    For lazy sets bear in mind that the values will be kept in memory while the first call to `->match` didn't return.
 
 ## `->matches()`
 
