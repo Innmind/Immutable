@@ -1,6 +1,6 @@
 # Structures
 
-This library provides the 10 following structures:
+This library provides the following structures:
 
 - [`Sequence`](sequence.md)
 - [`Set`](set.md)
@@ -10,6 +10,7 @@ This library provides the 10 following structures:
 - [`Maybe`](maybe.md)
 - [`Either`](either.md)
 - [`Validation`](validation.md)
+- [`Identity`](identity.md)
 - [`State`](state.md)
 - [`Fold`](fold.md)
 

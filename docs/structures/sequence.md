@@ -572,6 +572,34 @@ $sequence = Sequence::ints(1, 2, 3, 4);
 $sequence->reverse()->equals(Sequence::ints(4, 3, 2, 1));
 ```
 
+### `->toIdentity()`
+
+This method wraps the sequence in an [`Identity` monad](identity.md).
+
+Let's say you have a sequence of strings representing the parts of a file and you want to build a file object:
+
+=== "Do"
+    ```php
+    $file = Sequence::of('a', 'b', 'c', 'etc...')
+        ->toIdentity()
+        ->map(Content::ofChunks(...))
+        ->map(static fn($content) => File::named('foo', $content))
+        ->unwrap();
+    ```
+
+=== "Instead of..."
+    ```php
+    $file = File::named(
+        'foo',
+        Content::ofChunks(
+            Sequence::of('a', 'b', 'c', 'etc...'),
+        ),
+    );
+    ```
+
+??? note
+    Here `Content` and `File` are imaginary classes, but you can find equivalent classes in [`innmind/filesystem`](https://packagist.org/packages/innmind/filesystem).
+
 ### `->safeguard()`
 
 This method allows you to make sure all values conforms to an assertion before continuing using the sequence.

@@ -14,6 +14,7 @@ nav:
     - Maybe: structures/maybe.md
     - Either: structures/either.md
     - Validation: structures/validation.md
+    - Identity: structures/identity.md
     - State: structures/state.md
     - Fold: structures/fold.md
   - Monoids: MONOIDS.md
