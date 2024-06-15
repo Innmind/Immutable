@@ -592,6 +592,14 @@ final class Sequence implements \Countable
     }
 
     /**
+     * @return Identity<self<T>>
+     */
+    public function toIdentity(): Identity
+    {
+        return Identity::of($this);
+    }
+
+    /**
      * @return list<T>
      */
     public function toList(): array
