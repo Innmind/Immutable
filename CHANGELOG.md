@@ -1,5 +1,12 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+
+- `Innmind\Immutable\Identity`
+- `Innmind\Immutable\Sequence::toIdentity()`
+
 ## 5.5.0 - 2024-06-02
 
 ### Changed
