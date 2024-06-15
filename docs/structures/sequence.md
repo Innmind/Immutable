@@ -572,6 +572,10 @@ $sequence = Sequence::ints(1, 2, 3, 4);
 $sequence->reverse()->equals(Sequence::ints(4, 3, 2, 1));
 ```
 
+### `->toSet()`
+
+It's like [`->distinct()`](#-distinct) except it returns a [`Set`](set.md) instead of a `Sequence`.
+
 ### `->toIdentity()`
 
 This method wraps the sequence in an [`Identity` monad](identity.md).
