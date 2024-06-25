@@ -490,6 +490,20 @@ final class Sequence implements \Countable
     }
 
     /**
+     * Prepend the given sequence to the current one
+     *
+     * @param self<T> $sequence
+     *
+     * @return self<T>
+     */
+    public function prepend(self $sequence): self
+    {
+        return new self($this->implementation->prepend(
+            $sequence->implementation,
+        ));
+    }
+
+    /**
      * Return a sequence with all elements from the current one that exist
      * in the given one
      *

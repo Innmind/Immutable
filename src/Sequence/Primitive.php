@@ -368,6 +368,22 @@ final class Primitive implements Implementation
      *
      * @return self<T>
      */
+    public function prepend(Implementation $sequence): self
+    {
+        $other = [];
+
+        foreach ($sequence->iterator() as $value) {
+            $other[] = $value;
+        }
+
+        return new self(\array_merge($other, $this->values));
+    }
+
+    /**
+     * @param Implementation<T> $sequence
+     *
+     * @return self<T>
+     */
     public function intersect(Implementation $sequence): self
     {
         return $this->filter(static function(mixed $value) use ($sequence): bool {

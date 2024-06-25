@@ -1,5 +1,11 @@
 # Changelog
 
+## 5.7.0 - 2024-06-25
+
+### Added
+
+- `Innmind\Immutable\Sequence::prepend()`
+
 ## 5.6.0 - 2024-06-15
 
 ### Added
