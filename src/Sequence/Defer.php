@@ -488,6 +488,29 @@ final class Defer implements Implementation
      *
      * @return Implementation<T>
      */
+    public function prepend(Implementation $sequence): Implementation
+    {
+        /** @psalm-suppress ImpureFunctionCall */
+        return new self(
+            (static function(\Iterator $values, Implementation $sequence): \Generator {
+                /** @var T $value */
+                foreach ($sequence->iterator() as $value) {
+                    yield $value;
+                }
+
+                /** @var T $value */
+                foreach ($values as $value) {
+                    yield $value;
+                }
+            })($this->values, $sequence),
+        );
+    }
+
+    /**
+     * @param Implementation<T> $sequence
+     *
+     * @return Implementation<T>
+     */
     public function intersect(Implementation $sequence): Implementation
     {
         return $this->filter(static function(mixed $value) use ($sequence): bool {
