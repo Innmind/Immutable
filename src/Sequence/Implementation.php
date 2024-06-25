@@ -229,6 +229,15 @@ interface Implementation extends \Countable
     public function append(self $sequence): self;
 
     /**
+     * Prepend the given sequence to the current one
+     *
+     * @param self<T> $sequence
+     *
+     * @return self<T>
+     */
+    public function prepend(self $sequence): self;
+
+    /**
      * Return a sequence with all elements from the current one that exist
      * in the given one
      *

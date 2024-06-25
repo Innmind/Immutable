@@ -522,6 +522,31 @@ final class Lazy implements Implementation
      *
      * @return Implementation<T>
      */
+    public function prepend(Implementation $sequence): Implementation
+    {
+        $values = $this->values;
+
+        return new self(
+            static function(RegisterCleanup $registerCleanup) use ($values, $sequence): \Generator {
+                /** @var \Iterator<int, T> */
+                $generator = self::open($sequence, $registerCleanup);
+
+                foreach ($generator as $value) {
+                    yield $value;
+                }
+
+                foreach ($values($registerCleanup) as $value) {
+                    yield $value;
+                }
+            },
+        );
+    }
+
+    /**
+     * @param Implementation<T> $sequence
+     *
+     * @return Implementation<T>
+     */
     public function intersect(Implementation $sequence): Implementation
     {
         return $this->filter(static function(mixed $value) use ($sequence): bool {

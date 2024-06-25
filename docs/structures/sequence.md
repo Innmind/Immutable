@@ -104,6 +104,15 @@ $sequence = Sequence::ints(1, 2)->append(Sequence::ints(3, 4));
 $sequence->equals(Sequence::ints(1, 2, 3, 4)); // true
 ```
 
+### `->prepend()`
+
+This is similar to `->append()` except the order is switched.
+
+!!! success ""
+    The main advantage of this method is when using lazy sequences. If you want to add elements at the beginning of a sequence but the rest may be lazy then you need to create a lazy sequence with your values and then append the other lazy sequence; but this reveals the underlying lazyness of the call and you need to be aware that it could be lazy.
+
+    Instead by using this method you no longer have to be aware that the other sequence is lazy or not.
+
 ## Access values
 
 ### `->size()` :material-memory-arrow-down:
