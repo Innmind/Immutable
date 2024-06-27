@@ -1,5 +1,12 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+
+- `Innmind\Immutable\Identity::lazy()`
+- `Innmind\Immutable\Identity::defer()`
+
 ## 5.7.0 - 2024-06-25
 
 ### Added
