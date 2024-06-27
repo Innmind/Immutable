@@ -41,16 +41,62 @@ return static function() {
             Set\Type::any(),
             Set\Type::any(),
         ),
-        static fn($assert, $initial, $expected) => $assert->same(
-            $expected,
-            Identity::of($initial)
-                ->flatMap(static function($value) use ($assert, $initial, $expected) {
-                    $assert->same($initial, $value);
+        static function($assert, $initial, $expected) {
+            $assert->same(
+                $expected,
+                Identity::of($initial)
+                    ->flatMap(static function($value) use ($assert, $initial, $expected) {
+                        $assert->same($initial, $value);
 
-                    return Identity::of($expected);
-                })
-                ->unwrap(),
-        ),
+                        return Identity::of($expected);
+                    })
+                    ->unwrap(),
+            );
+
+            $loaded = 0;
+            $identity = Identity::defer(static function() use (&$loaded, $initial) {
+                $loaded++;
+
+                return $initial;
+            })->flatMap(static function($value) use ($assert, $initial, $expected) {
+                $assert->same($initial, $value);
+
+                return Identity::of($expected);
+            });
+            $assert->same(0, $loaded);
+            $assert->same(
+                $expected,
+                $identity->unwrap(),
+            );
+            $assert->same(1, $loaded);
+            $assert->same(
+                $expected,
+                $identity->unwrap(),
+            );
+            $assert->same(1, $loaded);
+
+            $loaded = 0;
+            $identity = Identity::lazy(static function() use (&$loaded, $initial) {
+                $loaded++;
+
+                return $initial;
+            })->flatMap(static function($value) use ($assert, $initial, $expected) {
+                $assert->same($initial, $value);
+
+                return Identity::of($expected);
+            });
+            $assert->same(0, $loaded);
+            $assert->same(
+                $expected,
+                $identity->unwrap(),
+            );
+            $assert->same(1, $loaded);
+            $assert->same(
+                $expected,
+                $identity->unwrap(),
+            );
+            $assert->same(2, $loaded);
+        },
     );
 
     yield proof(
