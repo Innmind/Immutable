@@ -32,30 +32,22 @@ final class Defer implements Implementation
     public function map(callable $map): self
     {
         /** @psalm-suppress ImpureFunctionCall */
-        return new self(fn() => $map($this->load()));
+        return new self(fn() => $map($this->unwrap()));
     }
 
     public function flatMap(callable $map): Identity
     {
         /** @psalm-suppress ImpureFunctionCall */
-        return Identity::lazy(fn() => $map($this->load())->unwrap());
+        return Identity::lazy(fn() => $map($this->unwrap())->unwrap());
     }
 
     public function toSequence(): Sequence
     {
         /** @psalm-suppress ImpureFunctionCall */
-        return Sequence::defer((fn() => yield $this->load())());
+        return Sequence::defer((fn() => yield $this->unwrap())());
     }
 
     public function unwrap(): mixed
-    {
-        return $this->load();
-    }
-
-    /**
-     * @return T
-     */
-    private function load(): mixed
     {
         if ($this->loaded) {
             /** @var T */
