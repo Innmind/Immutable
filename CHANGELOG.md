@@ -1,5 +1,17 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+
+- `Innmind\Immutable\Identity::lazy()`
+- `Innmind\Immutable\Identity::defer()`
+- `Innmind\Immutable\Identity::toSequence()`
+
+### Changed
+
+- `Innmind\Immutable\Sequence::toIdentity()` returns a lazy, deferred or in memory `Identity` based on the kind of `Sequence`
+
 ## 5.7.0 - 2024-06-25
 
 ### Added

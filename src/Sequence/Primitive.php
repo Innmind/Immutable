@@ -9,6 +9,7 @@ use Innmind\Immutable\{
     Set,
     Maybe,
     SideEffect,
+    Identity,
 };
 
 /**
@@ -446,6 +447,12 @@ final class Primitive implements Implementation
     public function empty(): bool
     {
         return !$this->has(0);
+    }
+
+    public function toIdentity(): Identity
+    {
+        /** @var Identity<Implementation<T>> */
+        return Identity::of($this);
     }
 
     /**
