@@ -10,6 +10,7 @@ use Innmind\Immutable\{
     Maybe,
     SideEffect,
     RegisterCleanup,
+    Identity,
 };
 
 /**
@@ -638,6 +639,12 @@ final class Lazy implements Implementation
     {
         /** @psalm-suppress ImpureMethodCall */
         return !$this->iterator()->valid();
+    }
+
+    public function toIdentity(): Identity
+    {
+        /** @var Identity<Implementation<T>> */
+        return Identity::lazy(fn() => $this);
     }
 
     /**

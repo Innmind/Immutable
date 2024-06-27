@@ -5,14 +5,18 @@ use Innmind\Immutable\Sequence;
 use Innmind\BlackBox\Set;
 
 return static function() {
-    yield test(
+    yield proof(
         'Sequence::toIdentity()',
-        static function($assert) {
-            $sequence = Sequence::of();
+        given(Set\Sequence::of(Set\Type::any())),
+        static function($assert, $values) {
+            $sequence = Sequence::of(...$values);
 
             $assert->same(
-                $sequence,
-                $sequence->toIdentity()->unwrap(),
+                $sequence->toList(),
+                $sequence
+                    ->toIdentity()
+                    ->unwrap()
+                    ->toList(),
             );
         },
     );

@@ -610,7 +610,10 @@ final class Sequence implements \Countable
      */
     public function toIdentity(): Identity
     {
-        return Identity::of($this);
+        return $this
+            ->implementation
+            ->toIdentity()
+            ->map(static fn($implementation) => new self($implementation));
     }
 
     /**

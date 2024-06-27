@@ -9,6 +9,7 @@ use Innmind\Immutable\{
     Set,
     Maybe,
     SideEffect,
+    Identity,
 };
 
 /**
@@ -284,6 +285,11 @@ interface Implementation extends \Countable
     public function reverse(): self;
 
     public function empty(): bool;
+
+    /**
+     * @return Identity<self<T>>
+     */
+    public function toIdentity(): Identity;
 
     /**
      * @return Sequence<T>
