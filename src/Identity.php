@@ -99,6 +99,14 @@ final class Identity
     }
 
     /**
+     * @return Sequence<T>
+     */
+    public function toSequence(): Sequence
+    {
+        return $this->implementation->toSequence();
+    }
+
+    /**
      * @return T
      */
     public function unwrap(): mixed

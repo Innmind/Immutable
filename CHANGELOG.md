@@ -6,6 +6,7 @@
 
 - `Innmind\Immutable\Identity::lazy()`
 - `Innmind\Immutable\Identity::defer()`
+- `Innmind\Immutable\Identity::toSequence()`
 
 ### Changed
 

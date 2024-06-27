@@ -3,7 +3,10 @@ declare(strict_types = 1);
 
 namespace Innmind\Immutable\Identity;
 
-use Innmind\Immutable\Identity;
+use Innmind\Immutable\{
+    Identity,
+    Sequence,
+};
 
 /**
  * @psalm-immutable
@@ -28,6 +31,11 @@ interface Implementation
      * @return Identity<U>
      */
     public function flatMap(callable $map): Identity;
+
+    /**
+     * @return Sequence<T>
+     */
+    public function toSequence(): Sequence;
 
     /**
      * @return T

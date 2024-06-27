@@ -4,6 +4,7 @@ declare(strict_types = 1);
 namespace Innmind\Immutable\Identity;
 
 use Innmind\Immutable\Identity;
+use Innmind\Immutable\Sequence;
 
 /**
  * @psalm-immutable
@@ -33,6 +34,11 @@ final class InMemory implements Implementation
     {
         /** @psalm-suppress ImpureFunctionCall */
         return $map($this->value);
+    }
+
+    public function toSequence(): Sequence
+    {
+        return Sequence::of($this->value);
     }
 
     public function unwrap(): mixed

@@ -3,7 +3,10 @@ declare(strict_types = 1);
 
 namespace Innmind\Immutable\Identity;
 
-use Innmind\Immutable\Identity;
+use Innmind\Immutable\{
+    Identity,
+    Sequence,
+};
 
 /**
  * @psalm-immutable
@@ -36,6 +39,12 @@ final class Defer implements Implementation
     {
         /** @psalm-suppress ImpureFunctionCall */
         return Identity::lazy(fn() => $map($this->load())->unwrap());
+    }
+
+    public function toSequence(): Sequence
+    {
+        /** @psalm-suppress ImpureFunctionCall */
+        return Sequence::defer((fn() => yield $this->load())());
     }
 
     public function unwrap(): mixed
