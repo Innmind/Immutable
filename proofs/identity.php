@@ -1,7 +1,10 @@
 <?php
 declare(strict_types = 1);
 
-use Innmind\Immutable\Identity;
+use Innmind\Immutable\{
+    Identity,
+    Sequence,
+};
 use Innmind\BlackBox\Set;
 
 return static function() {
@@ -38,16 +41,62 @@ return static function() {
             Set\Type::any(),
             Set\Type::any(),
         ),
-        static fn($assert, $initial, $expected) => $assert->same(
-            $expected,
-            Identity::of($initial)
-                ->flatMap(static function($value) use ($assert, $initial, $expected) {
-                    $assert->same($initial, $value);
+        static function($assert, $initial, $expected) {
+            $assert->same(
+                $expected,
+                Identity::of($initial)
+                    ->flatMap(static function($value) use ($assert, $initial, $expected) {
+                        $assert->same($initial, $value);
 
-                    return Identity::of($expected);
-                })
-                ->unwrap(),
-        ),
+                        return Identity::of($expected);
+                    })
+                    ->unwrap(),
+            );
+
+            $loaded = 0;
+            $identity = Identity::defer(static function() use (&$loaded, $initial) {
+                $loaded++;
+
+                return $initial;
+            })->flatMap(static function($value) use ($assert, $initial, $expected) {
+                $assert->same($initial, $value);
+
+                return Identity::of($expected);
+            });
+            $assert->same(0, $loaded);
+            $assert->same(
+                $expected,
+                $identity->unwrap(),
+            );
+            $assert->same(1, $loaded);
+            $assert->same(
+                $expected,
+                $identity->unwrap(),
+            );
+            $assert->same(1, $loaded);
+
+            $loaded = 0;
+            $identity = Identity::lazy(static function() use (&$loaded, $initial) {
+                $loaded++;
+
+                return $initial;
+            })->flatMap(static function($value) use ($assert, $initial, $expected) {
+                $assert->same($initial, $value);
+
+                return Identity::of($expected);
+            });
+            $assert->same(0, $loaded);
+            $assert->same(
+                $expected,
+                $identity->unwrap(),
+            );
+            $assert->same(1, $loaded);
+            $assert->same(
+                $expected,
+                $identity->unwrap(),
+            );
+            $assert->same(2, $loaded);
+        },
     );
 
     yield proof(
@@ -70,5 +119,66 @@ return static function() {
                 )
                 ->unwrap(),
         ),
+    );
+
+    yield proof(
+        'Identity::toSequence()',
+        given(Set\Sequence::of(Set\Type::any())),
+        static function($assert, $values) {
+            $inMemory = Sequence::of(...$values);
+
+            $assert->same(
+                $values,
+                $inMemory
+                    ->toIdentity()
+                    ->toSequence()
+                    ->flatMap(static fn($sequence) => $sequence)
+                    ->toList(),
+            );
+
+            $loaded = 0;
+            $deferred = Sequence::defer((static function() use (&$loaded, $values) {
+                yield from $values;
+                $loaded++;
+            })());
+            $sequence = $deferred
+                ->toIdentity()
+                ->toSequence()
+                ->flatMap(static fn($sequence) => $sequence);
+
+            $assert->same(0, $loaded);
+            $assert->same(
+                $values,
+                $sequence->toList(),
+            );
+            $assert->same(1, $loaded);
+            $assert->same(
+                $values,
+                $sequence->toList(),
+            );
+            $assert->same(1, $loaded);
+
+            $loaded = 0;
+            $lazy = Sequence::lazy(static function() use (&$loaded, $values) {
+                yield from $values;
+                $loaded++;
+            });
+            $sequence = $lazy
+                ->toIdentity()
+                ->toSequence()
+                ->flatMap(static fn($sequence) => $sequence);
+
+            $assert->same(0, $loaded);
+            $assert->same(
+                $values,
+                $sequence->toList(),
+            );
+            $assert->same(1, $loaded);
+            $assert->same(
+                $values,
+                $sequence->toList(),
+            );
+            $assert->same(2, $loaded);
+        },
     );
 };

@@ -10,6 +10,7 @@ use Innmind\Immutable\{
     Maybe,
     Accumulate,
     SideEffect,
+    Identity,
 };
 
 /**
@@ -603,6 +604,12 @@ final class Defer implements Implementation
 
         /** @psalm-suppress ImpureMethodCall */
         return !$this->values->valid();
+    }
+
+    public function toIdentity(): Identity
+    {
+        /** @var Identity<Implementation<T>> */
+        return Identity::defer(fn() => $this);
     }
 
     /**
