@@ -613,6 +613,37 @@ Let's say you have a sequence of strings representing the parts of a file and yo
 ??? note
     Here `Content` and `File` are imaginary classes, but you can find equivalent classes in [`innmind/filesystem`](https://packagist.org/packages/innmind/filesystem).
 
+??? tip
+    The [`Identity`](identity.md) returned carries the lazyness of the sequence. This allows composing sequences without having to be aware if the source is lazy or not.
+
+    === "Lazy"
+        ```php
+        $value = Sequence::lazy(static fn() => yield from \range(0, 100))
+            ->toIdentity()
+            ->toSequence();
+        // does the same as
+        $value = Sequence::lazy(
+            static fn() => yield Sequence::lazy(
+                static fn() => yield from \range(0, 100),
+            ),
+        );
+        ```
+
+    === "InMemory"
+        ```php
+        $value = Sequence::of(...\range(0, 100))
+            ->toIdentity()
+            ->toSequence();
+        // does the same as
+        $value = Sequence::of(
+            Sequence::of(
+                ...\range(0, 100),
+            ),
+        );
+        ```
+
+    In both cases thanks to the `Identity` you only need to specify once if the whole thing is lazy or not.
+
 ### `->safeguard()`
 
 This method allows you to make sure all values conforms to an assertion before continuing using the sequence.
