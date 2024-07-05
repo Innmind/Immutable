@@ -1,7 +1,11 @@
 <?php
 declare(strict_types = 1);
 
-use Innmind\Immutable\Sequence;
+use Innmind\Immutable\{
+    Sequence,
+    Str,
+    Monoid\Concat,
+};
 use Innmind\BlackBox\Set;
 
 return static function() {
@@ -55,6 +59,41 @@ return static function() {
                         yield from $first;
                     }))
                     ->toList(),
+            );
+        },
+    );
+
+    yield proof(
+        'Sequence::chunk()',
+        given(
+            Set\Strings::atLeast(100),
+            Set\Integers::between(1, 50),
+        ),
+        static function($assert, $string, $chunk) {
+            $chunks = Str::of($string, Str\Encoding::ascii)
+                ->split()
+                ->chunk($chunk);
+
+            $chunks->foreach(
+                static fn($chars) => $assert
+                    ->number($chars->size())
+                    ->lessThanOrEqual($chunk),
+            );
+            $chunks
+                ->dropEnd(1)
+                ->foreach(
+                    static fn($chars) => $assert->same(
+                        $chunk,
+                        $chars->size(),
+                    ),
+                );
+
+            $assert->same(
+                $string,
+                $chunks
+                    ->flatMap(static fn($chars) => $chars)
+                    ->fold(new Concat)
+                    ->toString(),
             );
         },
     );

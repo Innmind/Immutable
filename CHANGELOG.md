@@ -1,5 +1,11 @@
 # Changelog
 
+## 5.9.0 - 2024-07-05
+
+### Added
+
+- `Innmind\Immutable\Sequence::chunk()`
+
 ## 5.8.0 - 2024-06-27
 
 ### Added

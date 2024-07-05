@@ -271,6 +271,30 @@ $lines; // ['foo', 'bar', 'baz', '']
 !!! note ""
     The `flatMap` is here in case there is only one chunk in the sequence, in which case the `aggregate` is not called
 
+### `->chunk()`
+
+This is a shortcut over [`aggregate`](#-aggregate). The same example can be shortened:
+
+```php
+// let's pretend this comes from a stream
+$chunks = ['fo', "o\n", 'ba', "r\n", 'ba', "z\n"];
+$lines = Sequence::of(...$chunks)
+    ->map(Str::of(...))
+    ->map(
+        static fn($chunk) => $chunk
+            ->toEncoding(Str\Encoding::ascii)
+            ->split(),
+    )
+    ->chunk(4)
+    ->map(static fn($chars) => $chars->dropEnd(1)) // to remove "\n"
+    ->map(Str::of('')->join(...))
+    ->map(static fn($line) => $line->toString())
+    ->toList();
+$lines; // ['foo', 'bar', 'baz', '']
+```
+
+This better accomodates to the case where the initial `Sequence` only contains a single value.
+
 ### `->indices()`
 
 Create a new sequence of integers representing the indices of the original sequence.
