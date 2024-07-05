@@ -744,6 +744,21 @@ final class Sequence implements \Countable
     }
 
     /**
+     * @param positive-int $size
+     *
+     * @return self<self<T>>
+     */
+    public function chunk(int $size): self
+    {
+        return $this
+            ->map(static fn($value) => self::of($value))
+            ->aggregate(static fn(Sequence $a, $b) => match ($a->size()) {
+                $size => self::of($a, $b),
+                default => self::of($a->append($b)),
+            });
+    }
+
+    /**
      * Force to load all values into memory (only useful for deferred and lazy Sequence)
      *
      * @return self<T>
