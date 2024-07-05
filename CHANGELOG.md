@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## 5.9.0 - 2024-07-05
 
 ### Added
 
