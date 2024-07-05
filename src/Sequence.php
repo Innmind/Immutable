@@ -751,8 +751,8 @@ final class Sequence implements \Countable
     public function chunk(int $size): self
     {
         return $this
-            ->map(self::of(...))
-            ->aggregate(static fn($a, $b) => match ($a->size()) {
+            ->map(static fn($value) => self::of($value))
+            ->aggregate(static fn(Sequence $a, $b) => match ($a->size()) {
                 $size => self::of($a, $b),
                 default => self::of($a->append($b)),
             });
