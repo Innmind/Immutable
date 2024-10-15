@@ -759,6 +759,30 @@ final class Sequence implements \Countable
     }
 
     /**
+     * Returns a `Sequence` of all contigous `Sequence` windows of length `$size` .
+     * The windows overlap. If the `Sequence` is shorter than `$size`, an empty `Sequence` is returned.
+     * 
+     * @param positive-int $size
+     *
+     * @return self<self<T>>
+     */
+    public function windows(int $size): self
+    {
+        /** @psalm-suppress MixedArgumentTypeCoercion */
+        return $this
+            ->map(static fn($value) => self::of($value))
+            ->aggregate(
+                static fn(self $a, $b) => match ($a->size()) {
+                    $size => self::of($a, $a->drop(1)->append($b)),
+                    default => self::of($a->append($b)),
+                }
+            )
+            ->filter(
+                static fn(self $sequence) => $sequence->size() === $size
+            );
+    }
+
+    /**
      * Force to load all values into memory (only useful for deferred and lazy Sequence)
      *
      * @return self<T>

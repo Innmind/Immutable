@@ -295,6 +295,30 @@ $lines; // ['foo', 'bar', 'baz', '']
 
 This better accomodates to the case where the initial `Sequence` only contains a single value.
 
+### `->windows()`
+
+Returns a `Sequence` of all contigous windows of length `$size`. The windows overlap. If the `Sequence` is shorter than `$size`, an empty `Sequence` is returned.
+
+```php
+$sequence = Sequence::of('l', 'o', 'r', 'e', 'm');
+
+$windows = $sequence->windows(3);
+
+$actual = $windows
+    ->map(
+        fn($window) => $window->toList()
+    )
+    ->toList();
+
+$expected = [
+    ['l', 'o', 'r'],
+    ['o', 'r', 'e'],
+    ['r', 'e', 'm'],
+];
+
+assert($actual === $expected);
+```
+
 ### `->indices()`
 
 Create a new sequence of integers representing the indices of the original sequence.
