@@ -9,6 +9,7 @@
 ### Changed
 
 - Use `static` closures as much as possible to reduce the probability of creating circular references by capturing `$this` as it can lead to memory root buffer exhaustion.
+- Remove keeping intermediary values of a deferred `Sequence` that is referenced by no one.
 
 ### Fixed
 
