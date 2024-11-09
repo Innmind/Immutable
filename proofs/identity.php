@@ -181,4 +181,37 @@ return static function() {
             $assert->same(2, $loaded);
         },
     );
+
+    yield proof(
+        'Identity::defer() holds intermediary values',
+        given(
+            Set\Type::any(),
+            Set\Type::any(),
+        ),
+        static function($assert, $value1, $value2) {
+            $m1 = Identity::defer(static function() use ($value1) {
+                static $loaded = false;
+
+                if ($loaded) {
+                    throw new Exception;
+                }
+
+                $loaded = true;
+
+                return $value1;
+            });
+            $m2 = $m1->map(static fn() => $value2);
+
+            $assert->same(
+                $value2,
+                $m2->unwrap(),
+            );
+            $assert->not()->throws(
+                static fn() => $assert->same(
+                    $value1,
+                    $m1->unwrap(),
+                ),
+            );
+        },
+    );
 };

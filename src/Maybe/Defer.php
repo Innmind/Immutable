@@ -32,12 +32,16 @@ final class Defer implements Implementation
 
     public function map(callable $map): self
     {
-        return new self(fn() => $this->unwrap()->map($map));
+        $captured = $this->capture();
+
+        return new self(static fn() => self::detonate($captured)->map($map));
     }
 
     public function flatMap(callable $map): Maybe
     {
-        return Maybe::defer(fn() => $this->unwrap()->flatMap($map));
+        $captured = $this->capture();
+
+        return Maybe::defer(static fn() => self::detonate($captured)->flatMap($map));
     }
 
     public function match(callable $just, callable $nothing)
@@ -47,17 +51,23 @@ final class Defer implements Implementation
 
     public function otherwise(callable $otherwise): Maybe
     {
-        return Maybe::defer(fn() => $this->unwrap()->otherwise($otherwise));
+        $captured = $this->capture();
+
+        return Maybe::defer(static fn() => self::detonate($captured)->otherwise($otherwise));
     }
 
     public function filter(callable $predicate): Implementation
     {
-        return new self(fn() => $this->unwrap()->filter($predicate));
+        $captured = $this->capture();
+
+        return new self(static fn() => self::detonate($captured)->filter($predicate));
     }
 
     public function either(): Either
     {
-        return Either::defer(fn() => $this->unwrap()->either());
+        $captured = $this->capture();
+
+        return Either::defer(static fn() => self::detonate($captured)->either());
     }
 
     /**
@@ -70,9 +80,12 @@ final class Defer implements Implementation
 
     public function toSequence(): Sequence
     {
+        $captured = $this->capture();
+
         /** @psalm-suppress ImpureFunctionCall */
-        return Sequence::defer((function() {
-            foreach ($this->unwrap()->toSequence()->toList() as $value) {
+        return Sequence::defer((static function() use ($captured) {
+            /** @var V $value */
+            foreach (self::detonate($captured)->toSequence()->toList() as $value) {
                 yield $value;
             }
         })());
@@ -80,7 +93,9 @@ final class Defer implements Implementation
 
     public function eitherWay(callable $just, callable $nothing): Maybe
     {
-        return Maybe::defer(fn() => $this->unwrap()->eitherWay($just, $nothing));
+        $captured = $this->capture();
+
+        return Maybe::defer(static fn() => self::detonate($captured)->eitherWay($just, $nothing));
     }
 
     /**
@@ -93,5 +108,36 @@ final class Defer implements Implementation
          * @psalm-suppress ImpureFunctionCall
          */
         return $this->value ??= ($this->deferred)();
+    }
+
+    /**
+     * @return array{\WeakReference<self<V>>, callable(): Maybe<V>}
+     */
+    private function capture(): array
+    {
+        /** @psalm-suppress ImpureMethodCall */
+        return [
+            \WeakReference::create($this),
+            $this->deferred,
+        ];
+    }
+
+    /**
+     * @template T
+     *
+     * @param array{\WeakReference<self<T>>, callable(): Maybe<T>} $captured
+     *
+     * @return Maybe<T>
+     */
+    private static function detonate(array $captured): Maybe
+    {
+        [$ref, $deferred] = $captured;
+        $self = $ref->get();
+
+        if (\is_null($self)) {
+            return $deferred();
+        }
+
+        return $self->unwrap();
     }
 }
