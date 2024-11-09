@@ -9,6 +9,7 @@ use Innmind\Immutable\State\Result;
  * @psalm-immutable
  * @template-covariant S
  * @template-covariant T
+ * @deprecated
  */
 final class State
 {

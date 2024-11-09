@@ -4,6 +4,9 @@ The `State` monad allows you to build a set of pure steps to compute a new state
 
 The state and value can be of any type.
 
+??? warning "Deprecated"
+    `State` is deprecated and will be removed in the next major release.
+
 ## `::of()`
 
 ```php
