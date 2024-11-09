@@ -139,4 +139,35 @@ return static function() {
             );
         },
     );
+
+    yield proof(
+        "Sequence::defer() stack trace doesn't show intermediary sequences when not used",
+        given(Set\Integers::between(1, 10)),
+        static function($assert, $calls) {
+            $expected = null;
+            $sequence = Sequence::defer((static function() use (&$expected) {
+                yield null;
+
+                throw $expected = new Exception;
+            })());
+
+            for ($i = 0; $i < $calls; $i++) {
+                $sequence = $sequence->map(static fn($value) => $value);
+            }
+
+            try {
+                $sequence->toList();
+                $assert->fail('it should throw');
+            } catch (Exception $e) {
+                $assert->same($expected, $e);
+
+                $accumulations = \array_filter(
+                    $e->getTrace(),
+                    static fn($frame) => \str_ends_with($frame['file'] ?? '', 'src/Accumulate.php'),
+                );
+
+                $assert->count(1, $accumulations);
+            }
+        },
+    );
 };
