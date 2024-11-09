@@ -32,17 +32,23 @@ final class Defer implements Implementation
 
     public function map(callable $map): self
     {
-        return new self(fn() => $this->unwrap()->map($map));
+        $captured = $this->capture();
+
+        return new self(static fn() => self::detonate($captured)->map($map));
     }
 
     public function flatMap(callable $map): Either
     {
-        return Either::defer(fn() => $this->unwrap()->flatMap($map));
+        $captured = $this->capture();
+
+        return Either::defer(static fn() => self::detonate($captured)->flatMap($map));
     }
 
     public function leftMap(callable $map): self
     {
-        return new self(fn() => $this->unwrap()->leftMap($map));
+        $captured = $this->capture();
+
+        return new self(static fn() => self::detonate($captured)->leftMap($map));
     }
 
     public function match(callable $right, callable $left)
@@ -52,17 +58,23 @@ final class Defer implements Implementation
 
     public function otherwise(callable $otherwise): Either
     {
-        return Either::defer(fn() => $this->unwrap()->otherwise($otherwise));
+        $captured = $this->capture();
+
+        return Either::defer(static fn() => self::detonate($captured)->otherwise($otherwise));
     }
 
     public function filter(callable $predicate, callable $otherwise): Implementation
     {
-        return new self(fn() => $this->unwrap()->filter($predicate, $otherwise));
+        $captured = $this->capture();
+
+        return new self(static fn() => self::detonate($captured)->filter($predicate, $otherwise));
     }
 
     public function maybe(): Maybe
     {
-        return Maybe::defer(fn() => $this->unwrap()->maybe());
+        $captured = $this->capture();
+
+        return Maybe::defer(static fn() => self::detonate($captured)->maybe());
     }
 
     /**
@@ -75,12 +87,16 @@ final class Defer implements Implementation
 
     public function flip(): self
     {
-        return new self(fn() => $this->unwrap()->flip());
+        $captured = $this->capture();
+
+        return new self(static fn() => self::detonate($captured)->flip());
     }
 
     public function eitherWay(callable $right, callable $left): Either
     {
-        return Either::defer(fn() => $this->unwrap()->eitherWay($right, $left));
+        $captured = $this->capture();
+
+        return Either::defer(static fn() => self::detonate($captured)->eitherWay($right, $left));
     }
 
     /**
@@ -93,5 +109,37 @@ final class Defer implements Implementation
          * @psalm-suppress ImpureFunctionCall
          */
         return $this->value ??= ($this->deferred)();
+    }
+
+    /**
+     * @return array{\WeakReference<self<L1, R1>>, callable(): Either<L1, R1>}
+     */
+    private function capture(): array
+    {
+        /** @psalm-suppress ImpureMethodCall */
+        return [
+            \WeakReference::create($this),
+            $this->deferred,
+        ];
+    }
+
+    /**
+     * @template A
+     * @template B
+     *
+     * @param array{\WeakReference<self<A, B>>, callable(): Either<A, B>} $captured
+     *
+     * @return Either<A, B>
+     */
+    private static function detonate(array $captured): Either
+    {
+        [$ref, $deferred] = $captured;
+        $self = $ref->get();
+
+        if (\is_null($self)) {
+            return $deferred();
+        }
+
+        return $self->unwrap();
     }
 }
