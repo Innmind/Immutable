@@ -80,10 +80,12 @@ final class Defer implements Implementation
      */
     public function get(int $index): Maybe
     {
-        return Maybe::defer(function() use ($index) {
+        $values = $this->values;
+
+        return Maybe::defer(static function() use ($values, $index) {
             $iteration = 0;
 
-            foreach ($this->values as $value) {
+            foreach ($values as $value) {
                 if ($index === $iteration) {
                     return Maybe::just($value);
                 }
@@ -226,8 +228,10 @@ final class Defer implements Implementation
      */
     public function first(): Maybe
     {
-        return Maybe::defer(function() {
-            foreach ($this->values as $value) {
+        $values = $this->values;
+
+        return Maybe::defer(static function() use ($values) {
+            foreach ($values as $value) {
                 return Maybe::just($value);
             }
 
@@ -241,10 +245,12 @@ final class Defer implements Implementation
      */
     public function last(): Maybe
     {
-        return Maybe::defer(function() {
+        $values = $this->values;
+
+        return Maybe::defer(static function() use ($values) {
             $loaded = false;
 
-            foreach ($this->values as $value) {
+            foreach ($values as $value) {
                 $loaded = true;
             }
 
@@ -282,10 +288,12 @@ final class Defer implements Implementation
      */
     public function indexOf($element): Maybe
     {
-        return Maybe::defer(function() use ($element) {
+        $values = $this->values;
+
+        return Maybe::defer(static function() use ($values, $element) {
             $index = 0;
 
-            foreach ($this->values as $value) {
+            foreach ($values as $value) {
                 if ($value === $element) {
                     /** @var Maybe<0|positive-int> */
                     return Maybe::just($index);
@@ -646,8 +654,10 @@ final class Defer implements Implementation
 
     public function find(callable $predicate): Maybe
     {
-        return Maybe::defer(function() use ($predicate) {
-            foreach ($this->values as $value) {
+        $values = $this->values;
+
+        return Maybe::defer(static function() use ($values, $predicate) {
+            foreach ($values as $value) {
                 /** @psalm-suppress ImpureFunctionCall */
                 if ($predicate($value) === true) {
                     return Maybe::just($value);
