@@ -28,6 +28,7 @@ jobs:
         run: php blackbox.php
         env:
           BLACKBOX_SET_SIZE: 20
+          CI: 'true'
   coverage:
     runs-on: ${{ matrix.os }}
     strategy:

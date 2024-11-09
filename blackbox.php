@@ -24,5 +24,9 @@ Application::new($argv)
             )
             ->scenariiPerProof(1),
     )
+    ->when(
+        \getenv('CI') !== false,
+        static fn(Application $app) => $app->scenariiPerProof(1_000),
+    )
     ->tryToProve(Load::everythingIn(__DIR__.'/proofs/'))
     ->exit();
