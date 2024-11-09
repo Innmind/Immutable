@@ -6,6 +6,10 @@
 
 - `Innmind\Immutable\Map::toSequence()`
 
+### Changed
+
+- Use `static` closures as much as possible to reduce the probability of creating circular references by capturing `$this` as it can lead to memory root buffer exhaustion.
+
 ### Fixed
 
 - Using `string`s or `int`s as a `Map` key type and then adding keys of different types was throwing an error.
