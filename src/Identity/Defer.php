@@ -38,7 +38,7 @@ final class Defer implements Implementation
     public function flatMap(callable $map): Identity
     {
         /** @psalm-suppress ImpureFunctionCall */
-        return Identity::lazy(fn() => $map($this->unwrap())->unwrap());
+        return Identity::defer(fn() => $map($this->unwrap())->unwrap());
     }
 
     public function toSequence(): Sequence
