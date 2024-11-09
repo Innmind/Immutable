@@ -14,6 +14,7 @@
 ### Deprecated
 
 - `Innmind\Immutable\State`
+- `Innmind\Immutable\Fold`
 
 ### Fixed
 

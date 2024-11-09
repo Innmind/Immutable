@@ -39,6 +39,9 @@ $fold->match(
 
 This example will read all lines from the socket until one line contains `quit\n` then the loop will stop and either dump all the lines to the output or `throw new RuntimeException('socket not reachable')`.
 
+??? warning "Deprecated"
+    `Fold` is deprecated and will be removed in the next major release.
+
 ## `::with()`
 
 This named constructor accepts a value with the notion that more elements are necessary to compute a result
