@@ -68,7 +68,7 @@ final class Defer implements Implementation
 
     public function size(): int
     {
-        return $this->load()->size();
+        return $this->memoize()->size();
     }
 
     public function count(): int
@@ -184,7 +184,7 @@ final class Defer implements Implementation
     {
         // this cannot be optimised as the whole generator needs to be loaded
         // in order to know the elements to drop
-        return $this->load()->dropEnd($size);
+        return $this->memoize()->dropEnd($size);
     }
 
     /**
@@ -192,7 +192,7 @@ final class Defer implements Implementation
      */
     public function equals(Implementation $sequence): bool
     {
-        return $this->load()->equals($sequence);
+        return $this->memoize()->equals($sequence);
     }
 
     /**
@@ -241,7 +241,7 @@ final class Defer implements Implementation
     public function groupBy(callable $discriminator): Map
     {
         /** @var Map<D, Sequence<T>> */
-        return $this->load()->groupBy($discriminator);
+        return $this->memoize()->groupBy($discriminator);
     }
 
     /**
@@ -453,7 +453,7 @@ final class Defer implements Implementation
     public function partition(callable $predicate): Map
     {
         /** @var Map<bool, Sequence<T>> */
-        return $this->load()->partition($predicate);
+        return $this->memoize()->partition($predicate);
     }
 
     /**
@@ -516,7 +516,7 @@ final class Defer implements Implementation
     {
         // this cannot be optimised as the whole generator needs to be loaded
         // in order to know the elements to drop
-        return $this->load()->takeEnd($size);
+        return $this->memoize()->takeEnd($size);
     }
 
     /**
@@ -835,7 +835,13 @@ final class Defer implements Implementation
      */
     public function memoize(): Implementation
     {
-        return $this->load();
+        $values = [];
+
+        foreach ($this->values as $value) {
+            $values[] = $value;
+        }
+
+        return new Primitive($values);
     }
 
     /**
@@ -905,20 +911,6 @@ final class Defer implements Implementation
                 }
             })($condition),
         );
-    }
-
-    /**
-     * @return Implementation<T>
-     */
-    private function load(): Implementation
-    {
-        $values = [];
-
-        foreach ($this->values as $value) {
-            $values[] = $value;
-        }
-
-        return new Primitive($values);
     }
 
     /**
