@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Fixed
+
+- Using `string`s or `int`s as a `Map` key type and then adding keys of different types was throwing an error.
+
 ## 5.9.0 - 2024-07-05
 
 ### Added

@@ -47,6 +47,10 @@ final class Primitive implements Implementation
             return (new DoubleIndex)->merge($this)($key, $value);
         }
 
+        if (!\is_string($key) && !\is_int($key)) {
+            return (new DoubleIndex)->merge($this)($key, $value);
+        }
+
         $values = $this->values;
         $values[$key] = $value;
 
