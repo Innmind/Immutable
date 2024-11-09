@@ -69,7 +69,7 @@ final class Lazy implements Implementation
     }
 
     /**
-     * @return \Iterator<int, T>
+     * @return \Iterator<T>
      */
     public function iterator(): \Iterator
     {
@@ -904,7 +904,7 @@ final class Lazy implements Implementation
      *
      * @param Implementation<A> $sequence
      *
-     * @return \Iterator<int, A>
+     * @return \Iterator<A>
      */
     private static function open(
         Implementation $sequence,

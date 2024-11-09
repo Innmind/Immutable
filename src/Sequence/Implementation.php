@@ -33,7 +33,7 @@ interface Implementation extends \Countable
     public function size(): int;
 
     /**
-     * @return \Iterator<int, T>
+     * @return \Iterator<T>
      */
     public function iterator(): \Iterator;
 
