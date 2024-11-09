@@ -328,4 +328,12 @@ final class Map implements \Countable
             static fn() => false,
         );
     }
+
+    /**
+     * @return Sequence<Pair<T, S>>
+     */
+    public function toSequence(): Sequence
+    {
+        return $this->implementation->toSequence();
+    }
 }

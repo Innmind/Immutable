@@ -166,4 +166,9 @@ interface Implementation extends \Countable
      * @return Maybe<Pair<T, S>>
      */
     public function find(callable $predicate): Maybe;
+
+    /**
+     * @return Sequence<Pair<T, S>>
+     */
+    public function toSequence(): Sequence;
 }
