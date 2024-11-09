@@ -18,6 +18,7 @@ final class Accumulate implements \Iterator
     private \Generator $generator;
     /** @var list<S> */
     private array $values = [];
+    private bool $started = false;
 
     /**
      * @param \Generator<S> $generator
@@ -32,6 +33,8 @@ final class Accumulate implements \Iterator
      */
     public function current(): mixed
     {
+        /** @psalm-suppress InaccessibleProperty */
+        $this->started = true;
         /** @psalm-suppress UnusedMethodCall */
         $this->pop();
 
@@ -43,6 +46,8 @@ final class Accumulate implements \Iterator
      */
     public function key(): ?int
     {
+        /** @psalm-suppress InaccessibleProperty */
+        $this->started = true;
         /** @psalm-suppress UnusedMethodCall */
         $this->pop();
 
@@ -51,6 +56,8 @@ final class Accumulate implements \Iterator
 
     public function next(): void
     {
+        /** @psalm-suppress InaccessibleProperty */
+        $this->started = true;
         /** @psalm-suppress InaccessibleProperty */
         \next($this->values);
 
@@ -63,11 +70,15 @@ final class Accumulate implements \Iterator
     public function rewind(): void
     {
         /** @psalm-suppress InaccessibleProperty */
+        $this->started = true;
+        /** @psalm-suppress InaccessibleProperty */
         \reset($this->values);
     }
 
     public function valid(): bool
     {
+        /** @psalm-suppress InaccessibleProperty */
+        $this->started = true;
         /** @psalm-suppress ImpureMethodCall */
         $valid = !$this->reachedCacheEnd() || $this->generator->valid();
 
@@ -79,6 +90,11 @@ final class Accumulate implements \Iterator
         }
 
         return $valid;
+    }
+
+    public function started(): bool
+    {
+        return $this->started;
     }
 
     private function reachedCacheEnd(): bool

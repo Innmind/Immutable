@@ -97,4 +97,46 @@ return static function() {
             );
         },
     );
+
+    yield proof(
+        'Sequende::defer() holds intermediary values even when no longer used',
+        given(
+            Set\Sequence::of(Set\Type::any()),
+            Set\Sequence::of(Set\Type::any()),
+        ),
+        static function($assert, $prefix, $suffix) {
+            $initial = Sequence::defer((static function() use ($prefix, $suffix) {
+                foreach ($prefix as $value) {
+                    yield $value;
+                }
+
+                foreach ($suffix as $value) {
+                    yield $value;
+                }
+            })());
+
+            // This does a partial read on the generator
+            $assert->same(
+                $prefix,
+                $initial
+                    ->take(\count($prefix))
+                    ->toList(),
+            );
+
+            // The maps are only here to wrap the generator, it doesn't change
+            // the values
+            $another = $initial
+                ->map(static fn($value) => [$value])
+                ->map(static fn($values) => $values[0]);
+            unset($initial);
+
+            // If it didn't store the intermediary values the array would miss
+            // the prefix values due to the partial read on the initial
+            // generator due to the ->take()->toList() call above
+            $assert->same(
+                [...$prefix, ...$suffix],
+                $another->toList(),
+            );
+        },
+    );
 };
