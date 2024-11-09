@@ -31,20 +31,32 @@ final class Defer implements Implementation
 
     public function map(callable $map): self
     {
-        /** @psalm-suppress ImpureFunctionCall */
-        return new self(fn() => $map($this->unwrap()));
+        $captured = $this->capture();
+
+        /**
+         * @psalm-suppress ImpureFunctionCall
+         * @psalm-suppress MixedArgument
+         */
+        return new self(static fn() => $map(self::detonate($captured)));
     }
 
     public function flatMap(callable $map): Identity
     {
-        /** @psalm-suppress ImpureFunctionCall */
-        return Identity::defer(fn() => $map($this->unwrap())->unwrap());
+        $captured = $this->capture();
+
+        /**
+         * @psalm-suppress ImpureFunctionCall
+         * @psalm-suppress MixedArgument
+         */
+        return Identity::defer(static fn() => $map(self::detonate($captured))->unwrap());
     }
 
     public function toSequence(): Sequence
     {
+        $captured = $this->capture();
+
         /** @psalm-suppress ImpureFunctionCall */
-        return Sequence::defer((fn() => yield $this->unwrap())());
+        return Sequence::defer((static fn() => yield self::detonate($captured))());
     }
 
     public function unwrap(): mixed
@@ -63,5 +75,36 @@ final class Defer implements Implementation
         $this->loaded = true;
 
         return $this->computed;
+    }
+
+    /**
+     * @return array{\WeakReference<Implementation<T>>, callable(): T}
+     */
+    private function capture(): array
+    {
+        /** @psalm-suppress ImpureMethodCall */
+        return [
+            \WeakReference::create($this),
+            $this->value,
+        ];
+    }
+
+    /**
+     * @template V
+     *
+     * @param array{\WeakReference<Implementation<V>>, callable(): V} $captured
+     *
+     * @return V
+     */
+    private static function detonate(array $captured): mixed
+    {
+        [$ref, $value] = $captured;
+        $self = $ref->get();
+
+        if (\is_null($self)) {
+            return $value();
+        }
+
+        return $self->unwrap();
     }
 }
