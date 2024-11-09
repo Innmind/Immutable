@@ -97,4 +97,39 @@ return static function() {
             );
         },
     );
+
+    yield proof(
+        'Sequence::windows()',
+        given(
+            Set\Strings::atLeast(100),
+            Set\Integers::between(1, 50),
+        ),
+        static function($assert, $string, int $size) {
+            $chars = Str::of($string, Str\Encoding::ascii)
+                ->split();
+
+            $windows = $chars
+                ->windows($size);
+
+            $windows->foreach(
+                static fn($chars) => $assert
+                    ->same(
+                        $size,
+                        $chars->size()
+                    ),
+            );
+
+            if ($chars->size() < $size) {
+                $assert->same(
+                    0,
+                    $windows->count()
+                );
+            } else {
+                $assert->same(
+                    $chars->count() - $size + 1,
+                    $windows->count(),
+                );
+            }
+        },
+    );
 };
