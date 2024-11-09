@@ -10,6 +10,7 @@ use Innmind\Immutable\State\Result;
  * @template-covariant S
  * @template-covariant T
  * @deprecated
+ * @psalm-suppress DeprecatedClass
  */
 final class State
 {
