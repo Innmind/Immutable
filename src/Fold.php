@@ -15,6 +15,7 @@ use Innmind\Immutable\Fold\{
  * @template R Result
  * @template C Computation
  * @psalm-immutable
+ * @deprecated
  */
 final class Fold
 {

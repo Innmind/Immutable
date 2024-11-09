@@ -214,6 +214,11 @@ final class Uninitialized implements Implementation
         return Maybe::nothing();
     }
 
+    public function toSequence(): Sequence
+    {
+        return Sequence::of();
+    }
+
     /**
      * @return Map<T, S>
      */

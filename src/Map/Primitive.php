@@ -47,6 +47,10 @@ final class Primitive implements Implementation
             return (new DoubleIndex)->merge($this)($key, $value);
         }
 
+        if (!\is_string($key) && !\is_int($key)) {
+            return (new DoubleIndex)->merge($this)($key, $value);
+        }
+
         $values = $this->values;
         $values[$key] = $value;
 
@@ -348,6 +352,15 @@ final class Primitive implements Implementation
 
         /** @var Maybe<Pair<T, S>> */
         return Maybe::nothing();
+    }
+
+    public function toSequence(): Sequence
+    {
+        /** @var Sequence<Pair<T, S>> */
+        return $this->reduce(
+            Sequence::of(),
+            static fn(Sequence $pairs, $key, $value) => ($pairs)(new Pair($key, $value)),
+        );
     }
 
     /**

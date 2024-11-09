@@ -69,7 +69,7 @@ final class Lazy implements Implementation
     }
 
     /**
-     * @return \Iterator<int, T>
+     * @return \Iterator<T>
      */
     public function iterator(): \Iterator
     {
@@ -86,10 +86,12 @@ final class Lazy implements Implementation
      */
     public function get(int $index): Maybe
     {
-        return Maybe::defer(function() use ($index) {
+        $values = $this->values;
+
+        return Maybe::defer(static function() use ($values, $index) {
             $iteration = 0;
             $register = RegisterCleanup::noop();
-            $generator = ($this->values)($register);
+            $generator = $values($register);
 
             foreach ($generator as $value) {
                 if ($index === $iteration) {
@@ -244,10 +246,15 @@ final class Lazy implements Implementation
      */
     public function last(): Maybe
     {
-        return Maybe::defer(function() {
-            $loaded = false;
+        $values = $this->values;
 
-            foreach ($this->iterator() as $value) {
+        return Maybe::defer(static function() use ($values) {
+            $loaded = false;
+            // No-op as we iterate over the whole iterator so the default
+            // cleanup defined in the callable will be called.
+            $register = RegisterCleanup::noop();
+
+            foreach ($values($register) as $value) {
                 $loaded = true;
             }
 
@@ -293,10 +300,12 @@ final class Lazy implements Implementation
      */
     public function indexOf($element): Maybe
     {
-        return Maybe::defer(function() use ($element) {
+        $values = $this->values;
+
+        return Maybe::defer(static function() use ($values, $element) {
             $index = 0;
             $register = RegisterCleanup::noop();
-            $generator = ($this->values)($register);
+            $generator = $values($register);
 
             foreach ($generator as $value) {
                 if ($value === $element) {
@@ -681,9 +690,11 @@ final class Lazy implements Implementation
 
     public function find(callable $predicate): Maybe
     {
-        return Maybe::defer(function() use ($predicate) {
+        $values = $this->values;
+
+        return Maybe::defer(static function() use ($values, $predicate) {
             $register = RegisterCleanup::noop();
-            $generator = ($this->values)($register);
+            $generator = $values($register);
 
             foreach ($generator as $value) {
                 /** @psalm-suppress ImpureFunctionCall */
@@ -773,8 +784,11 @@ final class Lazy implements Implementation
      */
     public function aggregate(callable $map, callable $exfiltrate): self
     {
-        return new self(function(RegisterCleanup $registerCleanup) use ($map, $exfiltrate) {
-            $aggregate = new Aggregate($this->iterator());
+        $values = $this->values;
+
+        return new self(static function(RegisterCleanup $registerCleanup) use ($values, $map, $exfiltrate) {
+            $noop = RegisterCleanup::noop();
+            $aggregate = new Aggregate($values($noop));
             /** @psalm-suppress MixedArgument */
             $values = $aggregate(static fn($a, $b) => self::open(
                 $exfiltrate($map($a, $b)),
@@ -802,10 +816,12 @@ final class Lazy implements Implementation
      */
     public function dropWhile(callable $condition): self
     {
+        $values = $this->values;
+
         /** @psalm-suppress ImpureFunctionCall */
-        return new self(function(RegisterCleanup $registerCleanup) use ($condition) {
+        return new self(static function(RegisterCleanup $registerCleanup) use ($values, $condition) {
             /** @psalm-suppress ImpureFunctionCall */
-            $generator = ($this->values)($registerCleanup);
+            $generator = $values($registerCleanup);
 
             /** @psalm-suppress ImpureMethodCall */
             while ($generator->valid()) {
@@ -888,7 +904,7 @@ final class Lazy implements Implementation
      *
      * @param Implementation<A> $sequence
      *
-     * @return \Iterator<int, A>
+     * @return \Iterator<A>
      */
     private static function open(
         Implementation $sequence,

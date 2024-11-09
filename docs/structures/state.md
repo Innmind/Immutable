@@ -1,5 +1,8 @@
 # `State`
 
+??? warning "Deprecated"
+    `State` is deprecated and will be removed in the next major release.
+
 The `State` monad allows you to build a set of pure steps to compute a new state. Since the initial state is given when all the steps are built it means that all steps are lazy, this use function composition (so everything is kept in memory).
 
 The state and value can be of any type.

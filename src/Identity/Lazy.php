@@ -44,7 +44,9 @@ final class Lazy implements Implementation
 
     public function toSequence(): Sequence
     {
-        return Sequence::lazy(fn() => yield $this->unwrap());
+        $value = $this->value;
+
+        return Sequence::lazy(static fn() => yield $value());
     }
 
     public function unwrap(): mixed

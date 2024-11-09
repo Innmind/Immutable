@@ -1,5 +1,25 @@
 # Changelog
 
+## 5.10.0 - 2024-11-09
+
+### Added
+
+- `Innmind\Immutable\Map::toSequence()`
+
+### Changed
+
+- Use `static` closures as much as possible to reduce the probability of creating circular references by capturing `$this` as it can lead to memory root buffer exhaustion.
+- Remove keeping intermediary values of a deferred `Sequence` that is referenced by no one.
+
+### Deprecated
+
+- `Innmind\Immutable\State`
+- `Innmind\Immutable\Fold`
+
+### Fixed
+
+- Using `string`s or `int`s as a `Map` key type and then adding keys of different types was throwing an error.
+
 ## 5.9.0 - 2024-07-05
 
 ### Added
