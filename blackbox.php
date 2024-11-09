@@ -22,7 +22,7 @@ Application::new($argv)
                     ->dumpTo('coverage.clover')
                     ->enableWhen(true),
             )
-            ->scenariiPerProof(1),
+            ->scenariiPerProof(50),
     )
     ->tryToProve(Load::everythingIn(__DIR__.'/proofs/'))
     ->exit();
