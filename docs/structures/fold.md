@@ -1,5 +1,8 @@
 # `Fold`
 
+??? warning "Deprecated"
+    `Fold` is deprecated and will be removed in the next major release.
+
 The `Fold` monad is intented to work with _(infinite) stream of data_ by folding each element to a single value. This monad distinguishes between the type used to fold and the result type, this allows to inform the _stream_ that it's no longer necessary to extract elements as the folding is done.
 
 An example is reading from a socket as it's an infinite stream of strings:
@@ -38,9 +41,6 @@ $fold->match(
 ```
 
 This example will read all lines from the socket until one line contains `quit\n` then the loop will stop and either dump all the lines to the output or `throw new RuntimeException('socket not reachable')`.
-
-??? warning "Deprecated"
-    `Fold` is deprecated and will be removed in the next major release.
 
 ## `::with()`
 
