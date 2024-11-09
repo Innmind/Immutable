@@ -354,6 +354,15 @@ final class Primitive implements Implementation
         return Maybe::nothing();
     }
 
+    public function toSequence(): Sequence
+    {
+        /** @var Sequence<Pair<T, S>> */
+        return $this->reduce(
+            Sequence::of(),
+            static fn(Sequence $pairs, $key, $value) => ($pairs)(new Pair($key, $value)),
+        );
+    }
+
     /**
      * @return Map<T, S>
      */

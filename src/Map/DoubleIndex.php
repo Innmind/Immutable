@@ -302,6 +302,11 @@ final class DoubleIndex implements Implementation
         return $this->pairs->find(static fn($pair) => $predicate($pair->key(), $pair->value()));
     }
 
+    public function toSequence(): Sequence
+    {
+        return $this->pairs->toSequence();
+    }
+
     /**
      * @return Map<T, S>
      */

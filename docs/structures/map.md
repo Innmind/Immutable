@@ -349,3 +349,17 @@ Return an empty new map of the same type. Useful to avoid to respecify the templ
 $map = Map::of([1, 2], [3, 4]);
 $map->clear()->size(); // 0
 ```
+
+### `->toSequence()`
+
+Returns an unsorted `Sequence` with all value pairs.
+
+```php
+$map = Map::of([1, 2], [3, 4]);
+$map
+    ->toSequence()
+    ->equals(Sequence::of(
+        new Pair(1, 2),
+        new Pair(3, 4),
+    )); // true
+```
