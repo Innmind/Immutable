@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Fixed
+
+- `Innmind\Immutable\Maybe::memoize()` and `Innmind\Immutable\Either::memoize()` was only unwrapping the first layer of the monad. It now recursively unwraps until all the deferred monads are memoized.
+
 ## 5.10.0 - 2024-11-09
 
 ### Added
