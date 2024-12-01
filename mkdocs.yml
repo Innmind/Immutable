@@ -13,6 +13,7 @@ nav:
     - RegExp: structures/regexp.md
     - Maybe: structures/maybe.md
     - Either: structures/either.md
+    - Attempt: structures/attempt.md
     - Validation: structures/validation.md
     - Identity: structures/identity.md
     - State: structures/state.md

@@ -613,6 +613,38 @@ final class Lazy implements Implementation
     }
 
     /**
+     * @template I
+     *
+     * @param I $carry
+     * @param callable(I, T, Sink\Continuation<I>): Sink\Continuation<I> $reducer
+     *
+     * @return I
+     */
+    public function sink($carry, callable $reducer): mixed
+    {
+        $continuation = Sink\Continuation::of($carry);
+        $register = RegisterCleanup::noop();
+        /** @psalm-suppress ImpureFunctionCall */
+        $generator = ($this->values)($register);
+
+        /** @psalm-suppress ImpureMethodCall */
+        foreach ($generator as $value) {
+            /** @psalm-suppress ImpureFunctionCall */
+            $continuation = $reducer($carry, $value, $continuation);
+            $carry = $continuation->unwrap();
+
+            if (!$continuation->shouldContinue()) {
+                /** @psalm-suppress ImpureMethodCall */
+                $register->cleanup();
+
+                break;
+            }
+        }
+
+        return $continuation->unwrap();
+    }
+
+    /**
      * @return Implementation<T>
      */
     public function clear(): Implementation

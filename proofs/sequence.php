@@ -3,6 +3,8 @@ declare(strict_types = 1);
 
 use Innmind\Immutable\{
     Sequence,
+    Maybe,
+    Either,
     Str,
     Monoid\Concat,
 };
@@ -168,6 +170,247 @@ return static function() {
 
                 $assert->count(1, $accumulations);
             }
+        },
+    );
+
+    yield proof(
+        'Sequence::sink()->until()',
+        given(Set\Sequence::of(Set\Type::any())),
+        static function($assert, $values) {
+            $all = Sequence::of(...$values)
+                ->sink([])
+                ->until(static fn($all, $value, $continuation) => $continuation->continue(
+                    [...$all, $value],
+                ));
+
+            $assert->same($values, $all);
+
+            $none = Sequence::of(...$values)
+                ->sink([])
+                ->until(static fn($all, $value, $continuation) => $continuation->stop(
+                    $all,
+                ));
+
+            $assert->same([], $none);
+        },
+    );
+
+    yield proof(
+        'Sequence::sink()->until() when deferred',
+        given(Set\Sequence::of(Set\Type::any())),
+        static function($assert, $values) {
+            $all = Sequence::defer((static function() use ($values) {
+                yield from $values;
+            })())
+                ->sink([])
+                ->until(static fn($all, $value, $continuation) => $continuation->continue(
+                    [...$all, $value],
+                ));
+
+            $assert->same($values, $all);
+
+            $none = Sequence::defer((static function() use ($values) {
+                yield from $values;
+            })())
+                ->sink([])
+                ->until(static fn($all, $value, $continuation) => $continuation->stop(
+                    $all,
+                ));
+
+            $assert->same([], $none);
+        },
+    );
+
+    yield proof(
+        "Sequence::sink()->until() when deferred doesn't load values after stop",
+        given(
+            Set\Sequence::of(Set\Type::any()),
+            Set\Sequence::of(Set\Type::any()),
+        ),
+        static function($assert, $prefix, $suffix) {
+            $stop = new stdClass;
+            $loaded = false;
+            $all = Sequence::defer((static function() use ($prefix, $suffix, $stop, &$loaded) {
+                yield from $prefix;
+                yield $stop;
+                $loaded = true;
+                yield from $suffix;
+            })())
+                ->sink([])
+                ->until(static fn($all, $value, $continuation) => match ($value) {
+                    $stop => $continuation->stop($all),
+                    default => $continuation->continue(
+                        [...$all, $value],
+                    ),
+                });
+
+            $assert->same($prefix, $all);
+            $assert->false($loaded);
+        },
+    );
+
+    yield proof(
+        'Sequence::sink()->until() when lazy',
+        given(Set\Sequence::of(Set\Type::any())),
+        static function($assert, $values) {
+            $all = Sequence::lazy(static function() use ($values) {
+                yield from $values;
+            })
+                ->sink([])
+                ->until(static fn($all, $value, $continuation) => $continuation->continue(
+                    [...$all, $value],
+                ));
+
+            $assert->same($values, $all);
+
+            $none = Sequence::lazy(static function() use ($values) {
+                yield from $values;
+            })
+                ->sink([])
+                ->until(static fn($all, $value, $continuation) => $continuation->stop(
+                    $all,
+                ));
+
+            $assert->same([], $none);
+        },
+    );
+
+    yield proof(
+        "Sequence::sink()->until() when lazy doesn't load values after stop",
+        given(
+            Set\Sequence::of(Set\Type::any()),
+            Set\Sequence::of(Set\Type::any()),
+        ),
+        static function($assert, $prefix, $suffix) {
+            $stop = new stdClass;
+            $loaded = false;
+            $all = Sequence::lazy(static function() use ($prefix, $suffix, $stop, &$loaded) {
+                yield from $prefix;
+                yield $stop;
+                $loaded = true;
+                yield from $suffix;
+            })
+                ->sink([])
+                ->until(static fn($all, $value, $continuation) => match ($value) {
+                    $stop => $continuation->stop($all),
+                    default => $continuation->continue(
+                        [...$all, $value],
+                    ),
+                });
+
+            $assert->same($prefix, $all);
+            $assert->false($loaded);
+        },
+    );
+
+    yield proof(
+        'Sequence::sink()->until() when lazy cleans up on stop',
+        given(
+            Set\Sequence::of(Set\Type::any()),
+            Set\Sequence::of(Set\Type::any()),
+        ),
+        static function($assert, $prefix, $suffix) {
+            $stop = new stdClass;
+            $cleaned = false;
+            $all = Sequence::lazy(static function($register) use ($prefix, $suffix, $stop, &$cleaned) {
+                $register(static function() use (&$cleaned) {
+                    $cleaned = true;
+                });
+                yield from $prefix;
+                yield $stop;
+                yield from $suffix;
+            })
+                ->sink([])
+                ->until(static fn($all, $value, $continuation) => match ($value) {
+                    $stop => $continuation->stop($all),
+                    default => $continuation->continue(
+                        [...$all, $value],
+                    ),
+                });
+
+            $assert->same($prefix, $all);
+            $assert->true($cleaned);
+        },
+    );
+
+    yield proof(
+        'Sequence::sink()->maybe()',
+        given(
+            Set\Sequence::of(Set\Type::any()),
+            Set\Sequence::of(Set\Type::any()),
+        ),
+        static function($assert, $prefix, $suffix) {
+            $all = Sequence::of(...$prefix, ...$suffix)
+                ->sink([])
+                ->maybe(static fn($all, $value) => Maybe::just(
+                    [...$all, $value],
+                ));
+
+            $assert->same(
+                [...$prefix, ...$suffix],
+                $all->match(
+                    static fn($all) => $all,
+                    static fn() => null,
+                ),
+            );
+
+            $stop = new stdClass;
+            $all = Sequence::of(...$prefix, ...[$stop], ...$suffix)
+                ->sink([])
+                ->maybe(static fn($all, $value) => match ($value) {
+                    $stop => Maybe::nothing(),
+                    default => Maybe::just(
+                        [...$all, $value],
+                    ),
+                });
+
+            $assert->null(
+                $all->match(
+                    static fn($all) => $all,
+                    static fn() => null,
+                ),
+            );
+        },
+    );
+
+    yield proof(
+        'Sequence::sink()->either()',
+        given(
+            Set\Sequence::of(Set\Type::any()),
+            Set\Sequence::of(Set\Type::any()),
+        ),
+        static function($assert, $prefix, $suffix) {
+            $all = Sequence::of(...$prefix, ...$suffix)
+                ->sink([])
+                ->either(static fn($all, $value) => Either::right(
+                    [...$all, $value],
+                ));
+
+            $assert->same(
+                [...$prefix, ...$suffix],
+                $all->match(
+                    static fn($all) => $all,
+                    static fn() => null,
+                ),
+            );
+
+            $stop = new stdClass;
+            $all = Sequence::of(...$prefix, ...[$stop], ...$suffix)
+                ->sink([])
+                ->either(static fn($all, $value) => match ($value) {
+                    $stop => Either::left($all),
+                    default => Either::right(
+                        [...$all, $value],
+                    ),
+                });
+
+            $assert->same(
+                $prefix,
+                $all->match(
+                    static fn() => null,
+                    static fn($all) => $all,
+                ),
+            );
         },
     );
 };
