@@ -107,7 +107,7 @@ final class Defer implements Implementation
          * @psalm-suppress InaccessibleProperty
          * @psalm-suppress ImpureFunctionCall
          */
-        return $this->value ??= ($this->deferred)();
+        return $this->value ??= ($this->deferred)()->memoize();
     }
 
     /**

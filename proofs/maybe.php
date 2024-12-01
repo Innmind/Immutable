@@ -43,4 +43,24 @@ return static function() {
             );
         },
     );
+
+    yield proof(
+        'Maybe::memoize() any composition',
+        given(Set\Type::any()->filter(static fn($value) => !\is_null($value))),
+        static function($assert, $value) {
+            $loaded = false;
+            $maybe = Maybe::defer(static fn() => Maybe::just($value))
+                ->flatMap(static function() use ($value, &$loaded) {
+                    return Maybe::defer(static function() use ($value, &$loaded) {
+                        $loaded = true;
+
+                        return Maybe::just($value);
+                    });
+                });
+
+            $assert->false($loaded);
+            $maybe->memoize();
+            $assert->true($loaded);
+        },
+    );
 };
