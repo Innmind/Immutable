@@ -130,8 +130,9 @@ final class Attempt
      */
     public function unwrap(): mixed
     {
+        /** @var T */
         return $this->match(
-            static fn($value) => $value,
+            static fn(mixed $value): mixed => $value,
             static fn($e) => throw $e,
         );
     }
