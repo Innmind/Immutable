@@ -271,6 +271,18 @@ interface Implementation extends \Countable
     public function reduce($carry, callable $reducer);
 
     /**
+     * Reduce the sequence to a single value but stops on the first failure
+     *
+     * @template I
+     *
+     * @param I $carry
+     * @param callable(I, T, Sink\Continuation<I>): Sink\Continuation<I> $reducer
+     *
+     * @return I
+     */
+    public function sink($carry, callable $reducer): mixed;
+
+    /**
      * Return a set of the same type but without any value
      *
      * @return self<T>

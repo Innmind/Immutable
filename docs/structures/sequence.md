@@ -479,6 +479,80 @@ $sum = $sequence->reduce(0, fn($sum, $int) => $sum + $int);
 $sum; // 10
 ```
 
+### `->sink()` :material-memory-arrow-down:
+
+This is similar to [`->reduce`](#-reduce) except you decide on each iteration it you want to continue reducing or not.
+
+This is useful for long sequences (mainly lazy ones) where you need to reduce until you find some value in the `Sequence` or the reduced value matches some condition. This avoids iterating over values you know for sure you won't need.
+
+=== "By hand"
+    ```php
+    use Innmind\Immutable\Sequence\Sink\Continuation;
+
+    $sequence = Sequence::of(1, 2, 3, 4, 5);
+    $sum = $sequence
+        ->sink(0)
+        ->until(static fn(
+            int $sum,
+            int $i,
+            Continuation $continuation,
+        ) => match (true) {
+            $sum > 5 => $continuation->stop($sum),
+            default => $continuation->continue($sum + $i),
+        });
+    ```
+
+    Here `#!php $sum` is `#!php 6` and the `Sequence` stopped iterating on the 4th value.
+
+=== "Maybe"
+    ```php
+    $sequence = Sequence::of(1, 2, 3, 4, 5);
+    $sum = $sequence
+        ->sink(0)
+        ->maybe(static fn(int $sum, int $i) => match (true) {
+            $sum > 5 => Maybe::nothing(),
+            default => Maybe::just($sum + $i),
+        })
+        ->match(
+            static fn(int $sum) => $sum,
+            static fn() => null,
+        );
+    ```
+
+    Instead of manually specifying if we want to continue or not, it's inferred by the content of the `Maybe`.
+
+    Here the `#!php $sum` is `#!php null` because on the 4th iteration we return a `#!php Maybe::nothing()`.
+
+    !!! warning ""
+        Bear in mind that the carried value is lost when an iteration returns `#!php Maybe::nothing()`.
+
+        If you need to still have access to the carried value you should use `#!php ->sink()->either()` and place the carried value on the left side.
+
+    ??? abstract
+        In essence this allows the transformation of `Sequence<Maybe<T>>` to `Maybe<Sequence<T>>`.
+
+=== "Either"
+    ```php
+    $sequence = Sequence::of(1, 2, 3, 4, 5);
+    $sum = $sequence
+        ->sink(0)
+        ->either(static fn(int $sum, int $i) => match (true) {
+            $sum > 5 => Either::left($sum),
+            default => Either::right($sum + $i),
+        })
+        ->match(
+            static fn(int $sum) => $sum,
+            static fn(int $sum) => $sum,
+        );
+    ```
+
+    Instead of manually specifying if we want to continue or not, it's inferred by the content of the `Either`.
+
+    Here the `#!php $sum` is `#!php 6` because on the 4th iteration we return an `#!php Either::left()` with the carried sum from the previous iteration.
+
+    ??? abstract
+        In essence this allows the transformation of `Sequence<Either<E, T>>` to `Either<E, Sequence<T>>`.
+
 ## Misc.
 
 ### `->equals()` :material-memory-arrow-down:
