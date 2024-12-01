@@ -573,6 +573,18 @@ final class Sequence implements \Countable
     }
 
     /**
+     * @template C
+     *
+     * @param C $carry
+     *
+     * @return Sequence\Sink<T, C>
+     */
+    public function sink(mixed $carry): Sequence\Sink
+    {
+        return Sequence\Sink::of($this->implementation, $carry);
+    }
+
+    /**
      * Return a set of the same type but without any value
      *
      * @return self<T>

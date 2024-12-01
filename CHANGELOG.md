@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- `Innmind\Immutable\Sequence::sink()`
+
 ### Fixed
 
 - `Innmind\Immutable\Maybe::memoize()` and `Innmind\Immutable\Either::memoize()` was only unwrapping the first layer of the monad. It now recursively unwraps until all the deferred monads are memoized.
