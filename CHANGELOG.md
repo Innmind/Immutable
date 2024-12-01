@@ -5,6 +5,7 @@
 ### Added
 
 - `Innmind\Immutable\Sequence::sink()`
+- `Innmind\Immutable\Attempt`
 
 ### Fixed
 

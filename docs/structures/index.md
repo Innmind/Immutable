@@ -9,6 +9,7 @@ This library provides the following structures:
 - [`RegExp`](regexp.md)
 - [`Maybe`](maybe.md)
 - [`Either`](either.md)
+- [`Attempt`](attempt.md)
 - [`Validation`](validation.md)
 - [`Identity`](identity.md)
 - [`State`](state.md)
