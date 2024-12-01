@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## 5.11.0 - 2024-12-01
 
 ### Added
 
