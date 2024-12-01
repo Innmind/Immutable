@@ -122,6 +122,21 @@ final class Attempt
     }
 
     /**
+     * Be aware that this call is not safe as it may throw an exception.
+     *
+     * @throws \Throwable
+     *
+     * @return T
+     */
+    public function unwrap(): mixed
+    {
+        return $this->match(
+            static fn($value) => $value,
+            static fn($e) => throw $e,
+        );
+    }
+
+    /**
      * @template U
      *
      * @param callable(\Throwable): self<U> $recover

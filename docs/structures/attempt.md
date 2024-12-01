@@ -184,3 +184,14 @@ Attempt::defer(static fn() => Attempt::result(\rand()))
         static fn() => null,
     );
 ```
+
+## `->unwrap()`
+
+This will return the result or throw any previous error.
+
+```php
+$result = Attempt::of(static fn() => 1 / $divisor)
+    ->unwrap();
+```
+
+Here `#!php $result` is necessarily a fraction of `#!php 1` but this code may raise the `DivisionByZeroError` exception.

@@ -340,4 +340,23 @@ return static function() {
             );
         },
     );
+
+    yield proof(
+        'Attempt::unwrap()',
+        given(
+            Set\Type::any(),
+            $exceptions,
+        ),
+        static function($assert, $result, $e) {
+            $assert->same(
+                $result,
+                Attempt::result($result)->unwrap(),
+            );
+
+            $assert->throws(
+                static fn() => Attempt::error($e)->unwrap(),
+                $e::class,
+            );
+        },
+    );
 };
