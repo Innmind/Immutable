@@ -4,30 +4,10 @@ on: [push]
 
 jobs:
   blackbox:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macOS-latest]
-        php-version: ['8.2', '8.3']
-        dependency-versions: ['lowest', 'highest']
-    name: 'BlackBox'
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: ${{ matrix.php-version }}
-          extensions: mbstring, intl
-          coverage: none
-      - name: Composer
-        uses: "ramsey/composer-install@v3"
-        with:
-          dependency-versions: ${{ matrix.dependencies }}
-      - name: BlackBox
-        run: php blackbox.php
-        env:
-          BLACKBOX_SET_SIZE: 20
+    uses: innmind/github-workflows/.github/workflows/black-box.yml
+    secrets: inherit
+    env:
+      BLACKBOX_SET_SIZE: 20
   coverage:
     runs-on: ${{ matrix.os }}
     strategy:
