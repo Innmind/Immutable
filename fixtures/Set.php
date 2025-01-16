@@ -21,7 +21,7 @@ final class Set
      *
      * @return Set<Structure<I>>
      */
-    public static function of(DataSet $set, DataSet\Integers $sizes = null): DataSet
+    public static function of(DataSet $set, ?DataSet\Integers $sizes = null): DataSet
     {
         // this is not optimal but it allows to avoid a BC break
         $sizes ??= DataSet\Integers::between(0, 100);

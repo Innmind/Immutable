@@ -22,7 +22,7 @@ final class ObjectKeys implements Implementation
 {
     private \SplObjectStorage $values;
 
-    public function __construct(\SplObjectStorage $values = null)
+    public function __construct(?\SplObjectStorage $values = null)
     {
         $this->values = $values ?? new \SplObjectStorage;
     }

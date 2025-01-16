@@ -609,6 +609,7 @@ final class Primitive implements Implementation
             /**
              * @psalm-suppress ImpureMethodCall
              * @psalm-suppress ImpureFunctionCall
+             * @psalm-suppress PossiblyNullArgument
              */
             if (!$condition($iterator->current())) {
                 /** @psalm-suppress ImpureMethodCall */

@@ -26,7 +26,7 @@ final class DoubleIndex implements Implementation
     /**
      * @param Sequence\Implementation<Pair<T, S>> $pairs
      */
-    public function __construct(Sequence\Implementation $pairs = null)
+    public function __construct(?Sequence\Implementation $pairs = null)
     {
         /** @var Sequence\Implementation<Pair<T, S>> */
         $this->pairs = $pairs ?? new Sequence\Primitive;

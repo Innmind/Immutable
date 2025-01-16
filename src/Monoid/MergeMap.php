@@ -25,7 +25,7 @@ final class MergeMap implements Monoid
      *
      * @return self<A, B>
      */
-    public static function of(string $key = null, string $value = null): self
+    public static function of(?string $key = null, ?string $value = null): self
     {
         /** @var self<A, B> */
         return new self;
