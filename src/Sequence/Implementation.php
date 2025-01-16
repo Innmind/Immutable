@@ -9,6 +9,7 @@ use Innmind\Immutable\{
     Set,
     Maybe,
     SideEffect,
+    Identity,
 };
 
 /**
@@ -32,7 +33,7 @@ interface Implementation extends \Countable
     public function size(): int;
 
     /**
-     * @return \Iterator<int, T>
+     * @return \Iterator<T>
      */
     public function iterator(): \Iterator;
 
@@ -229,6 +230,15 @@ interface Implementation extends \Countable
     public function append(self $sequence): self;
 
     /**
+     * Prepend the given sequence to the current one
+     *
+     * @param self<T> $sequence
+     *
+     * @return self<T>
+     */
+    public function prepend(self $sequence): self;
+
+    /**
      * Return a sequence with all elements from the current one that exist
      * in the given one
      *
@@ -261,6 +271,18 @@ interface Implementation extends \Countable
     public function reduce($carry, callable $reducer);
 
     /**
+     * Reduce the sequence to a single value but stops on the first failure
+     *
+     * @template I
+     *
+     * @param I $carry
+     * @param callable(I, T, Sink\Continuation<I>): Sink\Continuation<I> $reducer
+     *
+     * @return I
+     */
+    public function sink($carry, callable $reducer): mixed;
+
+    /**
      * Return a set of the same type but without any value
      *
      * @return self<T>
@@ -275,6 +297,11 @@ interface Implementation extends \Countable
     public function reverse(): self;
 
     public function empty(): bool;
+
+    /**
+     * @return Identity<self<T>>
+     */
+    public function toIdentity(): Identity;
 
     /**
      * @return Sequence<T>

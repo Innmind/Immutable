@@ -33,8 +33,8 @@ $parse = function(string $string): Maybe {
 
     return Maybe::all($components->get('topLevel'), $components->get('subType'))
         ->flatMap(fn(Str $topLevel, Str $subType) => MediaType::of(
-            $topLevel->toSstring(),
-            $subType->toSstring(),
+            $topLevel->toString(),
+            $subType->toString(),
         ));
 }
 

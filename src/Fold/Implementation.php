@@ -15,6 +15,7 @@ use Innmind\Immutable\{
  * @template C Computation
  * @psalm-immutable
  * @internal
+ * @psalm-suppress DeprecatedClass
  */
 interface Implementation
 {

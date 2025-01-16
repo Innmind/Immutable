@@ -490,6 +490,20 @@ final class Sequence implements \Countable
     }
 
     /**
+     * Prepend the given sequence to the current one
+     *
+     * @param self<T> $sequence
+     *
+     * @return self<T>
+     */
+    public function prepend(self $sequence): self
+    {
+        return new self($this->implementation->prepend(
+            $sequence->implementation,
+        ));
+    }
+
+    /**
      * Return a sequence with all elements from the current one that exist
      * in the given one
      *
@@ -559,6 +573,18 @@ final class Sequence implements \Countable
     }
 
     /**
+     * @template C
+     *
+     * @param C $carry
+     *
+     * @return Sequence\Sink<T, C>
+     */
+    public function sink(mixed $carry): Sequence\Sink
+    {
+        return Sequence\Sink::of($this->implementation, $carry);
+    }
+
+    /**
      * Return a set of the same type but without any value
      *
      * @return self<T>
@@ -589,6 +615,17 @@ final class Sequence implements \Countable
     public function toSet(): Set
     {
         return $this->implementation->toSet();
+    }
+
+    /**
+     * @return Identity<self<T>>
+     */
+    public function toIdentity(): Identity
+    {
+        return $this
+            ->implementation
+            ->toIdentity()
+            ->map(static fn($implementation) => new self($implementation));
     }
 
     /**
@@ -716,6 +753,21 @@ final class Sequence implements \Countable
         $exfiltrate = static fn(self $sequence): Sequence\Implementation => $sequence->implementation;
 
         return new self($this->implementation->aggregate($map, $exfiltrate));
+    }
+
+    /**
+     * @param positive-int $size
+     *
+     * @return self<self<T>>
+     */
+    public function chunk(int $size): self
+    {
+        return $this
+            ->map(static fn($value) => self::of($value))
+            ->aggregate(static fn(Sequence $a, $b) => match ($a->size()) {
+                $size => self::of($a, $b),
+                default => self::of($a->append($b)),
+            });
     }
 
     /**

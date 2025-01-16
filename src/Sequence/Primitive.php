@@ -9,6 +9,7 @@ use Innmind\Immutable\{
     Set,
     Maybe,
     SideEffect,
+    Identity,
 };
 
 /**
@@ -53,7 +54,7 @@ final class Primitive implements Implementation
     }
 
     /**
-     * @return \Iterator<int, T>
+     * @return \Iterator<T>
      */
     public function iterator(): \Iterator
     {
@@ -368,6 +369,22 @@ final class Primitive implements Implementation
      *
      * @return self<T>
      */
+    public function prepend(Implementation $sequence): self
+    {
+        $other = [];
+
+        foreach ($sequence->iterator() as $value) {
+            $other[] = $value;
+        }
+
+        return new self(\array_merge($other, $this->values));
+    }
+
+    /**
+     * @param Implementation<T> $sequence
+     *
+     * @return self<T>
+     */
     public function intersect(Implementation $sequence): self
     {
         return $this->filter(static function(mixed $value) use ($sequence): bool {
@@ -412,6 +429,31 @@ final class Primitive implements Implementation
     }
 
     /**
+     * @template I
+     *
+     * @param I $carry
+     * @param callable(I, T, Sink\Continuation<I>): Sink\Continuation<I> $reducer
+     *
+     * @return I
+     */
+    public function sink($carry, callable $reducer): mixed
+    {
+        $continuation = Sink\Continuation::of($carry);
+
+        foreach ($this->values as $value) {
+            /** @psalm-suppress ImpureFunctionCall */
+            $continuation = $reducer($carry, $value, $continuation);
+            $carry = $continuation->unwrap();
+
+            if (!$continuation->shouldContinue()) {
+                break;
+            }
+        }
+
+        return $continuation->unwrap();
+    }
+
+    /**
      * @return self<T>
      */
     public function clear(): Implementation
@@ -430,6 +472,12 @@ final class Primitive implements Implementation
     public function empty(): bool
     {
         return !$this->has(0);
+    }
+
+    public function toIdentity(): Identity
+    {
+        /** @var Identity<Implementation<T>> */
+        return Identity::of($this);
     }
 
     /**

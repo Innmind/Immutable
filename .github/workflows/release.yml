@@ -1,0 +1,11 @@
+name: Create release
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  release:
+    uses: innmind/github-workflows/.github/workflows/release.yml@main
+    secrets: inherit

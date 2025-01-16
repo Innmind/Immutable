@@ -1,6 +1,9 @@
 # `Fold`
 
-The `Fold` monad is intented to work with _(infinte) stream of data_ by folding each element to a single value. This monad distinguishes between the type used to fold and the result type, this allows to inform the _stream_ that it's no longer necessary to extract elements as the folding is done.
+??? warning "Deprecated"
+    `Fold` is deprecated and will be removed in the next major release.
+
+The `Fold` monad is intented to work with _(infinite) stream of data_ by folding each element to a single value. This monad distinguishes between the type used to fold and the result type, this allows to inform the _stream_ that it's no longer necessary to extract elements as the folding is done.
 
 An example is reading from a socket as it's an infinite stream of strings:
 

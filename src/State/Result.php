@@ -7,6 +7,7 @@ namespace Innmind\Immutable\State;
  * @psalm-immutable
  * @template S
  * @template T
+ * @deprecated
  */
 final class Result
 {

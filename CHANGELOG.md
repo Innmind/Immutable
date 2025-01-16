@@ -1,5 +1,73 @@
 # Changelog
 
+## 5.11.0 - 2024-12-01
+
+### Added
+
+- `Innmind\Immutable\Sequence::sink()`
+- `Innmind\Immutable\Attempt`
+
+### Fixed
+
+- `Innmind\Immutable\Maybe::memoize()` and `Innmind\Immutable\Either::memoize()` was only unwrapping the first layer of the monad. It now recursively unwraps until all the deferred monads are memoized.
+
+## 5.10.0 - 2024-11-09
+
+### Added
+
+- `Innmind\Immutable\Map::toSequence()`
+
+### Changed
+
+- Use `static` closures as much as possible to reduce the probability of creating circular references by capturing `$this` as it can lead to memory root buffer exhaustion.
+- Remove keeping intermediary values of a deferred `Sequence` that is referenced by no one.
+
+### Deprecated
+
+- `Innmind\Immutable\State`
+- `Innmind\Immutable\Fold`
+
+### Fixed
+
+- Using `string`s or `int`s as a `Map` key type and then adding keys of different types was throwing an error.
+
+## 5.9.0 - 2024-07-05
+
+### Added
+
+- `Innmind\Immutable\Sequence::chunk()`
+
+## 5.8.0 - 2024-06-27
+
+### Added
+
+- `Innmind\Immutable\Identity::lazy()`
+- `Innmind\Immutable\Identity::defer()`
+- `Innmind\Immutable\Identity::toSequence()`
+
+### Changed
+
+- `Innmind\Immutable\Sequence::toIdentity()` returns a lazy, deferred or in memory `Identity` based on the kind of `Sequence`
+
+## 5.7.0 - 2024-06-25
+
+### Added
+
+- `Innmind\Immutable\Sequence::prepend()`
+
+## 5.6.0 - 2024-06-15
+
+### Added
+
+- `Innmind\Immutable\Identity`
+- `Innmind\Immutable\Sequence::toIdentity()`
+
+## 5.5.0 - 2024-06-02
+
+### Changed
+
+- A lazy `Sequence::takeEnd()` no longer loads the whole sequence in memory, only the number of elements taken + 1.
+
 ## 5.4.0 - 2024-05-29
 
 ### Added

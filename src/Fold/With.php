@@ -16,6 +16,7 @@ use Innmind\Immutable\{
  * @implements Implementation<F1, R1, C1>
  * @psalm-immutable
  * @internal
+ * @psalm-suppress DeprecatedClass
  */
 final class With implements Implementation
 {
