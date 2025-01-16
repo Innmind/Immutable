@@ -12,23 +12,8 @@ jobs:
     uses: innmind/github-workflows/.github/workflows/coverage-matrix.yml@main
     secrets: inherit
   psalm:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        php-version: ['8.2', '8.3']
-    name: 'Psalm'
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: ${{ matrix.php-version }}
-          extensions: mbstring, intl
-      - name: Composer
-        uses: "ramsey/composer-install@v3"
-      - name: Psalm
-        run: vendor/bin/psalm --shepherd
+    uses: innmind/github-workflows/.github/workflows/psalm-matrix.yml@main
+    secrets: inherit
   cs:
     runs-on: ubuntu-latest
     strategy:
