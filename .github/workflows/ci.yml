@@ -5,9 +5,9 @@ on: [push]
 jobs:
   blackbox:
     uses: innmind/github-workflows/.github/workflows/black-box.yml@main
+    with:
+      scenarii: 20
     secrets: inherit
-    env:
-      BLACKBOX_SET_SIZE: 20
   coverage:
     runs-on: ${{ matrix.os }}
     strategy:
