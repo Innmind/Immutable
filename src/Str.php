@@ -13,7 +13,7 @@ final class Str implements \Stringable
     private string $value;
     private Str\Encoding $encoding;
 
-    private function __construct(string $value, Str\Encoding $encoding = null)
+    private function __construct(string $value, ?Str\Encoding $encoding = null)
     {
         $this->value = $value;
         $this->encoding = $encoding ?? Str\Encoding::utf8;
@@ -27,7 +27,7 @@ final class Str implements \Stringable
     /**
      * @psalm-pure
      */
-    public static function of(string $value, Str\Encoding $encoding = null): self
+    public static function of(string $value, ?Str\Encoding $encoding = null): self
     {
         return new self($value, $encoding);
     }
@@ -75,7 +75,7 @@ final class Str implements \Stringable
      *
      * @return Sequence<self>
      */
-    public function split(string $delimiter = null): Sequence
+    public function split(?string $delimiter = null): Sequence
     {
         if (\is_null($delimiter) || $delimiter === '') {
             return $this->chunk();
@@ -354,7 +354,7 @@ final class Str implements \Stringable
      *
      * @param 0|positive-int $length
      */
-    public function substring(int $start, int $length = null): self
+    public function substring(int $start, ?int $length = null): self
     {
         if ($this->empty()) {
             return $this;
@@ -468,7 +468,7 @@ final class Str implements \Stringable
     /**
      * Trim the string
      */
-    public function trim(string $mask = null): self
+    public function trim(?string $mask = null): self
     {
         return new self(
             $mask === null ? \trim($this->value) : \trim($this->value, $mask),
@@ -479,7 +479,7 @@ final class Str implements \Stringable
     /**
      * Trim the right side of the string
      */
-    public function rightTrim(string $mask = null): self
+    public function rightTrim(?string $mask = null): self
     {
         return new self(
             $mask === null ? \rtrim($this->value) : \rtrim($this->value, $mask),
@@ -490,7 +490,7 @@ final class Str implements \Stringable
     /**
      * Trim the left side of the string
      */
-    public function leftTrim(string $mask = null): self
+    public function leftTrim(?string $mask = null): self
     {
         return new self(
             $mask === null ? \ltrim($this->value) : \ltrim($this->value, $mask),
