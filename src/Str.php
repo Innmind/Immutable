@@ -279,6 +279,8 @@ final class Str implements \Stringable
     /**
      * Split the string using a regular expression
      *
+     * @throws InvalidRegex If the split didn't work
+     *
      * @return Sequence<self>
      */
     public function pregSplit(string|\Stringable $regex, int $limit = -1): Sequence
