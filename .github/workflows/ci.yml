@@ -4,7 +4,7 @@ on: [push]
 
 jobs:
   blackbox:
-    uses: innmind/github-workflows/.github/workflows/black-box.yml
+    uses: innmind/github-workflows/.github/workflows/black-box.yml@main
     secrets: inherit
     env:
       BLACKBOX_SET_SIZE: 20
