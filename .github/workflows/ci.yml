@@ -4,12 +4,12 @@ on: [push]
 
 jobs:
   blackbox:
-    uses: innmind/github-workflows/.github/workflows/black-box-matrix.yml@main
+    uses: innmind/github-workflows/.github/workflows/black-box-matrix.yml
     with:
       scenarii: 20
     secrets: inherit
   coverage:
-    uses: innmind/github-workflows/.github/workflows/coverage-matrix.yml@main
+    uses: innmind/github-workflows/.github/workflows/coverage-matrix.yml
     secrets: inherit
   psalm:
     runs-on: ubuntu-latest
