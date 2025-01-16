@@ -11,15 +11,7 @@ jobs:
     uses: innmind/github-workflows/.github/workflows/coverage-matrix.yml@main
     secrets: inherit
   psalm:
-    uses: innmind/github-workflows/.github/workflows/psalm.yml@main
-    strategy:
-      matrix:
-        php-version: ['8.2', '8.3', '8.4']
-        dependency-versions: ['lowest', 'highest']
-    name: 'Psalm'
-    with:
-      php-version: ${{ matrix.php-version }}
-      dependency-versions: ${{ matrix.dependency-versions }}
+    uses: innmind/github-workflows/.github/workflows/psalm-matrix.yml@main
   cs:
     uses: innmind/github-workflows/.github/workflows/cs.yml@main
     with:
