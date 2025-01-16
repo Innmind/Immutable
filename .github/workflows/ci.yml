@@ -9,34 +9,8 @@ jobs:
       scenarii: 20
     secrets: inherit
   coverage:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macOS-latest]
-        php-version: ['8.2', '8.3']
-        dependency-versions: ['lowest', 'highest']
-    name: 'Coverage'
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: ${{ matrix.php-version }}
-          extensions: mbstring, intl
-          coverage: xdebug
-      - name: Composer
-        uses: "ramsey/composer-install@v3"
-        with:
-          dependency-versions: ${{ matrix.dependencies }}
-      - name: BlackBox
-        run: php blackbox.php
-        env:
-          ENABLE_COVERAGE: 'true'
-          BLACKBOX_SET_SIZE: 1
-      - uses: codecov/codecov-action@v4
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
+    uses: innmind/github-workflows/.github/workflows/coverage.yml@main
+    secrets: inherit
   psalm:
     runs-on: ubuntu-latest
     strategy:
