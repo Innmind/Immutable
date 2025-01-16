@@ -5,19 +5,7 @@ on:
     tags:
       - '*'
 
-permissions:
-  contents: write
-
 jobs:
   release:
-    name: Create release
-    runs-on: ubuntu-22.04
-    steps:
-      - name: Create release
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          tag: ${{ github.ref_name }}
-        run: |
-          gh release create "$tag" \
-              --repo="$GITHUB_REPOSITORY" \
-              --generate-notes
+    uses: innmind/github-workflows/.github/workflows/release.yml@main
+    secrets: inherit
