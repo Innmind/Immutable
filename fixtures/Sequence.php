@@ -18,7 +18,7 @@ final class Sequence
      *
      * @return Set<Structure<I>>
      */
-    public static function of(Set $set, Set\Integers $sizes = null): Set
+    public static function of(Set $set, ?Set\Integers $sizes = null): Set
     {
         // this is not optimal but it allows to avoid a BC break
         $sizes ??= Set\Integers::between(0, 100);

@@ -38,6 +38,7 @@ final class Accumulate implements \Iterator
         /** @psalm-suppress UnusedMethodCall */
         $this->pop();
 
+        /** @var S */
         return \current($this->values);
     }
 

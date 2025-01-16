@@ -58,7 +58,10 @@ final class Aggregate
 
         /** @psalm-suppress ImpureMethodCall */
         while ($this->values->valid()) {
-            /** @psalm-suppress ImpureFunctionCall */
+            /**
+             * @psalm-suppress PossiblyNullArgument
+             * @psalm-suppress ImpureFunctionCall
+             */
             $aggregate = $this->walk($map($n2, $n1), $void);
 
             foreach ($aggregate as $element) {

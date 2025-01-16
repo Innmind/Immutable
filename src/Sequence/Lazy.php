@@ -860,6 +860,7 @@ final class Lazy implements Implementation
                 /**
                  * @psalm-suppress ImpureMethodCall
                  * @psalm-suppress ImpureFunctionCall
+                 * @psalm-suppress PossiblyNullArgument
                  */
                 if (!$condition($generator->current())) {
                     /** @psalm-suppress ImpureMethodCall */

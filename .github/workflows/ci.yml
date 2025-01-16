@@ -4,92 +4,15 @@ on: [push]
 
 jobs:
   blackbox:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macOS-latest]
-        php-version: ['8.2', '8.3']
-        dependency-versions: ['lowest', 'highest']
-    name: 'BlackBox'
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: ${{ matrix.php-version }}
-          extensions: mbstring, intl
-          coverage: none
-      - name: Composer
-        uses: "ramsey/composer-install@v3"
-        with:
-          dependency-versions: ${{ matrix.dependencies }}
-      - name: BlackBox
-        run: php blackbox.php
-        env:
-          BLACKBOX_SET_SIZE: 20
+    uses: innmind/github-workflows/.github/workflows/black-box-matrix.yml@main
+    with:
+      scenarii: 20
   coverage:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macOS-latest]
-        php-version: ['8.2', '8.3']
-        dependency-versions: ['lowest', 'highest']
-    name: 'Coverage'
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: ${{ matrix.php-version }}
-          extensions: mbstring, intl
-          coverage: xdebug
-      - name: Composer
-        uses: "ramsey/composer-install@v3"
-        with:
-          dependency-versions: ${{ matrix.dependencies }}
-      - name: BlackBox
-        run: php blackbox.php
-        env:
-          ENABLE_COVERAGE: 'true'
-          BLACKBOX_SET_SIZE: 1
-      - uses: codecov/codecov-action@v4
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
+    uses: innmind/github-workflows/.github/workflows/coverage-matrix.yml@main
+    secrets: inherit
   psalm:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        php-version: ['8.2', '8.3']
-    name: 'Psalm'
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: ${{ matrix.php-version }}
-          extensions: mbstring, intl
-      - name: Composer
-        uses: "ramsey/composer-install@v3"
-      - name: Psalm
-        run: vendor/bin/psalm --shepherd
+    uses: innmind/github-workflows/.github/workflows/psalm-matrix.yml@main
   cs:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        php-version: ['8.2']
-    name: 'CS'
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: ${{ matrix.php-version }}
-          extensions: mbstring, intl
-      - name: Composer
-        uses: "ramsey/composer-install@v3"
-      - name: CS
-        run: vendor/bin/php-cs-fixer fix --diff --dry-run
+    uses: innmind/github-workflows/.github/workflows/cs.yml@main
+    with:
+      php-version: '8.2'

@@ -22,7 +22,7 @@ final class Append implements Monoid
      *
      * @return self<C>
      */
-    public static function of(string $class = null): self
+    public static function of(?string $class = null): self
     {
         /** @var self<C> */
         return new self;
