@@ -7,13 +7,11 @@ jobs:
     uses: innmind/github-workflows/.github/workflows/black-box-matrix.yml@main
     with:
       scenarii: 20
-    secrets: inherit
   coverage:
     uses: innmind/github-workflows/.github/workflows/coverage-matrix.yml@main
     secrets: inherit
   psalm:
     uses: innmind/github-workflows/.github/workflows/psalm-matrix.yml@main
-    secrets: inherit
   cs:
     uses: innmind/github-workflows/.github/workflows/cs.yml@main
     with:
