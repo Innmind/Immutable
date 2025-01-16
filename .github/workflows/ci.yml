@@ -10,7 +10,6 @@ jobs:
     secrets: inherit
   coverage:
     uses: innmind/github-workflows/.github/workflows/coverage.yml@main
-    secrets: inherit
   psalm:
     runs-on: ubuntu-latest
     strategy:
