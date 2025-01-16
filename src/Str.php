@@ -285,6 +285,12 @@ final class Str implements \Stringable
     {
         /** @psalm-suppress ArgumentTypeCoercion */
         $strings = \preg_split((string) $regex, $this->value, $limit);
+
+        if ($strings === false) {
+            /** @psalm-suppress ImpureFunctionCall */
+            throw new InvalidRegex('', \preg_last_error());
+        }
+
         /** @var Sequence<self> */
         $sequence = Sequence::of();
 
