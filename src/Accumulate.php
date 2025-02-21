@@ -18,6 +18,8 @@ final class Accumulate implements \Iterator
     private \Generator $generator;
     /** @var list<S> */
     private array $values = [];
+    /** @var list<int<0, max>> */
+    private array $cursors = [];
     private bool $started = false;
 
     /**
@@ -70,6 +72,11 @@ final class Accumulate implements \Iterator
 
     public function rewind(): void
     {
+        if (\is_int($cursor = \key($this->values))) {
+            /** @psalm-suppress InaccessibleProperty */
+            $this->cursors[] = $cursor;
+        }
+
         /** @psalm-suppress InaccessibleProperty */
         $this->started = true;
         /** @psalm-suppress InaccessibleProperty */
@@ -84,10 +91,20 @@ final class Accumulate implements \Iterator
         $valid = !$this->reachedCacheEnd() || $this->generator->valid();
 
         if (!$valid) {
-            // once the "true" end has been reached we automatically rewind this
-            // iterator so it is always in a clean state
-            /** @psalm-suppress UnusedMethodCall */
-            $this->rewind();
+            // once the "true" end has been reached we automatically rewind to
+            // the previous cursor position to allow correct iteration when
+            // nesting loops on the same iterator
+            /** @psalm-suppress InaccessibleProperty */
+            $previousCursor = \array_pop($this->cursors);
+            /** @psalm-suppress InaccessibleProperty */
+            \reset($this->values);
+
+            if (\is_int($previousCursor)) {
+                while (\is_int(\key($this->values)) && \key($this->values) !== $previousCursor) {
+                    /** @psalm-suppress InaccessibleProperty */
+                    \next($this->values);
+                }
+            }
         }
 
         return $valid;
