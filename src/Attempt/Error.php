@@ -29,34 +29,40 @@ final class Error implements Implementation
      *
      * @return self<T>
      */
+    #[\Override]
     public function map(callable $map): self
     {
         /** @var self<T> */
         return $this;
     }
 
+    #[\Override]
     public function flatMap(callable $map): Attempt
     {
         return Attempt::error($this->value);
     }
 
+    #[\Override]
     public function match(callable $result, callable $error)
     {
         /** @psalm-suppress ImpureFunctionCall */
         return $error($this->value);
     }
 
+    #[\Override]
     public function recover(callable $recover): Attempt
     {
         /** @psalm-suppress ImpureFunctionCall */
         return $recover($this->value);
     }
 
+    #[\Override]
     public function maybe(): Maybe
     {
         return Maybe::nothing();
     }
 
+    #[\Override]
     public function either(): Either
     {
         return Either::left($this->value);
@@ -65,6 +71,7 @@ final class Error implements Implementation
     /**
      * @return Attempt<R1>
      */
+    #[\Override]
     public function memoize(): Attempt
     {
         return Attempt::error($this->value);

@@ -28,6 +28,7 @@ final class Append implements Monoid
         return new self;
     }
 
+    #[\Override]
     public function identity(): mixed
     {
         /** @var Sequence<T> */
@@ -40,6 +41,7 @@ final class Append implements Monoid
      *
      * @return Sequence<T>
      */
+    #[\Override]
     public function combine(mixed $a, mixed $b): mixed
     {
         return $a->append($b);

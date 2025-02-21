@@ -30,6 +30,7 @@ final class Defer implements Implementation
         $this->deferred = $deferred;
     }
 
+    #[\Override]
     public function map(callable $map): self
     {
         $captured = $this->capture();
@@ -37,6 +38,7 @@ final class Defer implements Implementation
         return new self(static fn() => self::detonate($captured)->map($map));
     }
 
+    #[\Override]
     public function flatMap(callable $map): Attempt
     {
         $captured = $this->capture();
@@ -44,11 +46,13 @@ final class Defer implements Implementation
         return Attempt::defer(static fn() => self::detonate($captured)->flatMap($map));
     }
 
+    #[\Override]
     public function match(callable $result, callable $error)
     {
         return $this->unwrap()->match($result, $error);
     }
 
+    #[\Override]
     public function recover(callable $recover): Attempt
     {
         $captured = $this->capture();
@@ -56,6 +60,7 @@ final class Defer implements Implementation
         return Attempt::defer(static fn() => self::detonate($captured)->recover($recover));
     }
 
+    #[\Override]
     public function maybe(): Maybe
     {
         $captured = $this->capture();
@@ -63,6 +68,7 @@ final class Defer implements Implementation
         return Maybe::defer(static fn() => self::detonate($captured)->maybe());
     }
 
+    #[\Override]
     public function either(): Either
     {
         $captured = $this->capture();
@@ -73,6 +79,7 @@ final class Defer implements Implementation
     /**
      * @return Attempt<R1>
      */
+    #[\Override]
     public function memoize(): Attempt
     {
         return $this->unwrap();

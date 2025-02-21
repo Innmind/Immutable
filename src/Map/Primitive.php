@@ -37,6 +37,7 @@ final class Primitive implements Implementation
      *
      * @return Implementation<T, S>
      */
+    #[\Override]
     public function __invoke($key, $value): Implementation
     {
         /** @psalm-suppress DocblockTypeContradiction */
@@ -85,12 +86,14 @@ final class Primitive implements Implementation
         return Maybe::nothing();
     }
 
+    #[\Override]
     public function size(): int
     {
         /** @psalm-suppress MixedArgumentTypeCoercion */
         return \count($this->values);
     }
 
+    #[\Override]
     public function count(): int
     {
         return $this->size();
@@ -101,6 +104,7 @@ final class Primitive implements Implementation
      *
      * @return Maybe<S>
      */
+    #[\Override]
     public function get($key): Maybe
     {
         if (!$this->contains($key)) {
@@ -113,6 +117,7 @@ final class Primitive implements Implementation
     /**
      * @param T $key
      */
+    #[\Override]
     public function contains($key): bool
     {
         /** @psalm-suppress MixedArgumentTypeCoercion */
@@ -122,6 +127,7 @@ final class Primitive implements Implementation
     /**
      * @return self<T, S>
      */
+    #[\Override]
     public function clear(): self
     {
         return new self;
@@ -130,6 +136,7 @@ final class Primitive implements Implementation
     /**
      * @param Implementation<T, S> $map
      */
+    #[\Override]
     public function equals(Implementation $map): bool
     {
         if (!$map->keys()->equals($this->keys())) {
@@ -158,6 +165,7 @@ final class Primitive implements Implementation
      *
      * @return self<T, S>
      */
+    #[\Override]
     public function filter(callable $predicate): self
     {
         /** @var array<T, S> */
@@ -176,6 +184,7 @@ final class Primitive implements Implementation
     /**
      * @param callable(T, S): void $function
      */
+    #[\Override]
     public function foreach(callable $function): SideEffect
     {
         foreach ($this->values as $k => $v) {
@@ -193,6 +202,7 @@ final class Primitive implements Implementation
      *
      * @return Map<D, Map<T, S>>
      */
+    #[\Override]
     public function groupBy(callable $discriminator): Map
     {
         /** @var Map<D, Map<T, S>> */
@@ -216,6 +226,7 @@ final class Primitive implements Implementation
     /**
      * @return Set<T>
      */
+    #[\Override]
     public function keys(): Set
     {
         /** @psalm-suppress MixedArgumentTypeCoercion */
@@ -227,6 +238,7 @@ final class Primitive implements Implementation
     /**
      * @return Sequence<S>
      */
+    #[\Override]
     public function values(): Sequence
     {
         /** @psalm-suppress MixedArgumentTypeCoercion */
@@ -242,6 +254,7 @@ final class Primitive implements Implementation
      *
      * @return self<T, B>
      */
+    #[\Override]
     public function map(callable $function): self
     {
         /** @var array<T, B> */
@@ -260,6 +273,7 @@ final class Primitive implements Implementation
      *
      * @return self<T, S>
      */
+    #[\Override]
     public function remove($key): self
     {
         if (!$this->contains($key)) {
@@ -278,6 +292,7 @@ final class Primitive implements Implementation
      *
      * @return Implementation<T, S>
      */
+    #[\Override]
     public function merge(Implementation $map): Implementation
     {
         return $map->reduce(
@@ -291,6 +306,7 @@ final class Primitive implements Implementation
      *
      * @return Map<bool, Map<T, S>>
      */
+    #[\Override]
     public function partition(callable $predicate): Map
     {
         $truthy = $this->clearMap();
@@ -319,6 +335,7 @@ final class Primitive implements Implementation
      *
      * @return I|R
      */
+    #[\Override]
     public function reduce($carry, callable $reducer)
     {
         foreach ($this->values as $k => $v) {
@@ -329,6 +346,7 @@ final class Primitive implements Implementation
         return $carry;
     }
 
+    #[\Override]
     public function empty(): bool
     {
         /**
@@ -341,6 +359,7 @@ final class Primitive implements Implementation
         return \is_null(\key($this->values));
     }
 
+    #[\Override]
     public function find(callable $predicate): Maybe
     {
         foreach ($this->values as $k => $v) {
@@ -354,6 +373,7 @@ final class Primitive implements Implementation
         return Maybe::nothing();
     }
 
+    #[\Override]
     public function toSequence(): Sequence
     {
         /** @var Sequence<Pair<T, S>> */

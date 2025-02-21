@@ -30,7 +30,7 @@
         }
     },
     "require-dev": {
-        "innmind/static-analysis": "~1.1",
+        "innmind/static-analysis": "^1.2.1",
         "innmind/black-box": "^5.5.1",
         "innmind/coding-standard": "~2.0"
     },

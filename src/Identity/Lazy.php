@@ -26,6 +26,7 @@ final class Lazy implements Implementation
         $this->value = $value;
     }
 
+    #[\Override]
     public function map(callable $map): self
     {
         $value = $this->value;
@@ -34,6 +35,7 @@ final class Lazy implements Implementation
         return new self(static fn() => $map($value()));
     }
 
+    #[\Override]
     public function flatMap(callable $map): Identity
     {
         $value = $this->value;
@@ -42,6 +44,7 @@ final class Lazy implements Implementation
         return Identity::lazy(static fn() => $map($value())->unwrap());
     }
 
+    #[\Override]
     public function toSequence(): Sequence
     {
         $value = $this->value;
@@ -49,6 +52,7 @@ final class Lazy implements Implementation
         return Sequence::lazy(static fn() => yield $value());
     }
 
+    #[\Override]
     public function unwrap(): mixed
     {
         /** @psalm-suppress ImpureFunctionCall */

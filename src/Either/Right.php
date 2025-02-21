@@ -28,12 +28,14 @@ final class Right implements Implementation
         $this->value = $value;
     }
 
+    #[\Override]
     public function map(callable $map): self
     {
         /** @psalm-suppress ImpureFunctionCall */
         return new self($map($this->value));
     }
 
+    #[\Override]
     public function flatMap(callable $map): Either
     {
         /** @psalm-suppress ImpureFunctionCall */
@@ -47,23 +49,27 @@ final class Right implements Implementation
      *
      * @return self<T, R1>
      */
+    #[\Override]
     public function leftMap(callable $map): self
     {
         /** @var self<T, R1> */
         return $this;
     }
 
+    #[\Override]
     public function match(callable $right, callable $left)
     {
         /** @psalm-suppress ImpureFunctionCall */
         return $right($this->value);
     }
 
+    #[\Override]
     public function otherwise(callable $otherwise): Either
     {
         return Either::right($this->value);
     }
 
+    #[\Override]
     public function filter(callable $predicate, callable $otherwise): Implementation
     {
         /** @psalm-suppress ImpureFunctionCall */
@@ -75,6 +81,7 @@ final class Right implements Implementation
         return new Left($otherwise());
     }
 
+    #[\Override]
     public function maybe(): Maybe
     {
         return Maybe::just($this->value);
@@ -83,16 +90,19 @@ final class Right implements Implementation
     /**
      * @return Either<L1, R1>
      */
+    #[\Override]
     public function memoize(): Either
     {
         return Either::right($this->value);
     }
 
+    #[\Override]
     public function flip(): Implementation
     {
         return new Left($this->value);
     }
 
+    #[\Override]
     public function eitherWay(callable $right, callable $left): Either
     {
         /** @psalm-suppress ImpureFunctionCall */

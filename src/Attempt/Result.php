@@ -25,34 +25,40 @@ final class Result implements Implementation
     ) {
     }
 
+    #[\Override]
     public function map(callable $map): self
     {
         /** @psalm-suppress ImpureFunctionCall */
         return new self($map($this->value));
     }
 
+    #[\Override]
     public function flatMap(callable $map): Attempt
     {
         /** @psalm-suppress ImpureFunctionCall */
         return $map($this->value);
     }
 
+    #[\Override]
     public function match(callable $result, callable $error)
     {
         /** @psalm-suppress ImpureFunctionCall */
         return $result($this->value);
     }
 
+    #[\Override]
     public function recover(callable $recover): Attempt
     {
         return Attempt::result($this->value);
     }
 
+    #[\Override]
     public function maybe(): Maybe
     {
         return Maybe::just($this->value);
     }
 
+    #[\Override]
     public function either(): Either
     {
         return Either::right($this->value);
@@ -61,6 +67,7 @@ final class Result implements Implementation
     /**
      * @return Attempt<R1>
      */
+    #[\Override]
     public function memoize(): Attempt
     {
         return Attempt::result($this->value);
