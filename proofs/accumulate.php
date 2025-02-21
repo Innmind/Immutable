@@ -1,4 +1,5 @@
 <?php
+declare(strict_types = 1);
 
 use Innmind\Immutable\Accumulate;
 use Innmind\BlackBox\Set;
