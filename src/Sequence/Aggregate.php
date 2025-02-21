@@ -36,6 +36,8 @@ final class Aggregate
         // to be sure there is no false equality (as the values may contain null)
         $void = new \stdClass;
 
+        // todo $this->values->rewind();
+
         /** @psalm-suppress ImpureMethodCall */
         if (!$this->values->valid()) {
             return;

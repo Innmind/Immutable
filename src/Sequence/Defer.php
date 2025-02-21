@@ -34,9 +34,11 @@ final class Defer implements Implementation
          * @psalm-suppress ImpureFunctionCall
          */
         $this->values = new Accumulate((static function(\Generator $generator): \Generator {
-            /** @var T $value */
-            foreach ($generator as $value) {
-                yield $value;
+            $generator->rewind();
+
+            while ($generator->valid()) {
+                yield $generator->current();
+                $generator->next();
             }
         })($generator));
         $this->generator = $generator;
@@ -57,9 +59,11 @@ final class Defer implements Implementation
             (static function(mixed $element) use ($captured): \Generator {
                 $values = self::detonate($captured);
 
-                /** @var T $value */
-                foreach ($values as $value) {
-                    yield $value;
+                $values->rewind();
+
+                while ($values->valid()) {
+                    yield $values->current();
+                    $values->next();
                 }
 
                 yield $element;
@@ -101,12 +105,17 @@ final class Defer implements Implementation
             /** @var \Iterator<T> */
             $values = self::detonate($captured);
 
-            foreach ($values as $value) {
+            $values->rewind();
+
+            while ($values->valid()) {
+                $value = $values->current();
+
                 if ($index === $iteration) {
                     return Maybe::just($value);
                 }
 
                 ++$iteration;
+                $values->next();
             }
 
             /** @var Maybe<T> */
@@ -143,13 +152,18 @@ final class Defer implements Implementation
                 $uniques = [];
                 /** @var \Iterator<T> */
                 $values = self::detonate($captured);
+                $values->rewind();
 
-                foreach ($values as $value) {
+                while ($values->valid()) {
+                    $value = $values->current();
+
                     if (!\in_array($value, $uniques, true)) {
                         $uniques[] = $value;
 
                         yield $value;
                     }
+
+                    $values->next();
                 }
             })(),
         );
@@ -169,15 +183,18 @@ final class Defer implements Implementation
                 $dropped = 0;
                 /** @var \Iterator<T> */
                 $values = self::detonate($captured);
+                $values->rewind();
 
-                foreach ($values as $value) {
+                while ($values->valid()) {
                     if ($dropped < $toDrop) {
                         ++$dropped;
+                        $values->next();
 
                         continue;
                     }
 
-                    yield $value;
+                    yield $values->current();
+                    $values->next();
                 }
             })($size),
         );
@@ -220,11 +237,16 @@ final class Defer implements Implementation
             (static function(callable $predicate) use ($captured): \Generator {
                 /** @var \Iterator<T> */
                 $values = self::detonate($captured);
+                $values->rewind();
 
-                foreach ($values as $value) {
+                while ($values->valid()) {
+                    $value = $values->current();
+
                     if ($predicate($value)) {
                         yield $value;
                     }
+
+                    $values->next();
                 }
             })($predicate),
         );
@@ -236,9 +258,12 @@ final class Defer implements Implementation
     #[\Override]
     public function foreach(callable $function): SideEffect
     {
-        foreach ($this->values as $value) {
+        $this->values->rewind();
+
+        while ($this->values->valid()) {
             /** @psalm-suppress ImpureFunctionCall */
-            $function($value);
+            $function($this->values->current());
+            $this->values->next();
         }
 
         return new SideEffect;
@@ -268,9 +293,10 @@ final class Defer implements Implementation
         return Maybe::defer(static function() use ($captured) {
             /** @var \Iterator<T> */
             $values = self::detonate($captured);
+            $values->rewind();
 
-            foreach ($values as $value) {
-                return Maybe::just($value);
+            while ($values->valid()) {
+                return Maybe::just($values->current());
             }
 
             /** @var Maybe<T> */
@@ -290,9 +316,12 @@ final class Defer implements Implementation
             $loaded = false;
             /** @var \Iterator<T> */
             $values = self::detonate($captured);
+            $values->rewind();
 
-            foreach ($values as $value) {
+            while ($values->valid()) {
                 $loaded = true;
+                $value = $values->current();
+                $values->next();
             }
 
             if (!$loaded) {
@@ -314,10 +343,14 @@ final class Defer implements Implementation
     #[\Override]
     public function contains($element): bool
     {
-        foreach ($this->values as $value) {
-            if ($value === $element) {
+        $this->values->rewind();
+
+        while ($this->values->valid()) {
+            if ($this->values->current() === $element) {
                 return true;
             }
+
+            $this->values->next();
         }
 
         return false;
@@ -337,14 +370,16 @@ final class Defer implements Implementation
             $index = 0;
             /** @var \Iterator<T> */
             $values = self::detonate($captured);
+            $values->rewind();
 
-            foreach ($values as $value) {
-                if ($value === $element) {
+            while ($values->valid()) {
+                if ($values->current() === $element) {
                     /** @var Maybe<0|positive-int> */
                     return Maybe::just($index);
                 }
 
                 ++$index;
+                $values->next();
             }
 
             /** @var Maybe<0|positive-int> */
@@ -371,9 +406,11 @@ final class Defer implements Implementation
                 $index = 0;
                 /** @var \Iterator<T> */
                 $values = self::detonate($captured);
+                $values->rewind();
 
-                foreach ($values as $_) {
+                while ($values->valid()) {
                     yield $index++;
+                    $values->next();
                 }
             })(),
         );
@@ -396,9 +433,11 @@ final class Defer implements Implementation
             (static function(callable $map) use ($captured): \Generator {
                 /** @var \Iterator<T> */
                 $values = self::detonate($captured);
+                $values->rewind();
 
-                foreach ($values as $value) {
-                    yield $map($value);
+                while ($values->valid()) {
+                    yield $map($values->current());
+                    $values->next();
                 }
             })($function),
         );
@@ -423,15 +462,23 @@ final class Defer implements Implementation
             (static function(callable $map, callable $exfiltrate) use ($captured): \Generator {
                 /** @var \Iterator<T> */
                 $values = self::detonate($captured);
+                $values->rewind();
 
-                foreach ($values as $value) {
+                while ($values->valid()) {
                     /**
                      * @var callable(T): C $map
                      * @var callable(C): Implementation<S> $exfiltrate
+                     * @psalm-suppress PossiblyNullArgument
                      */
-                    foreach ($exfiltrate($map($value))->iterator() as $inner) {
-                        yield $inner;
+                    $inner = $exfiltrate($map($values->current()))->iterator();
+                    $inner->rewind();
+
+                    while ($inner->valid()) {
+                        yield $inner->current();
+                        $inner->next();
                     }
+
+                    $values->next();
                 }
             })($map, $exfiltrate),
         );
@@ -452,10 +499,12 @@ final class Defer implements Implementation
             (static function(int $toPad, mixed $element) use ($captured): \Generator {
                 /** @var \Iterator<T> */
                 $values = self::detonate($captured);
+                $values->rewind();
 
-                foreach ($values as $value) {
-                    yield $value;
+                while ($values->valid()) {
+                    yield $values->current();
                     --$toPad;
+                    $values->next();
                 }
 
                 while ($toPad > 0) {
@@ -492,13 +541,15 @@ final class Defer implements Implementation
                 $index = 0;
                 /** @var \Iterator<T> */
                 $values = self::detonate($captured);
+                $values->rewind();
 
-                foreach ($values as $value) {
+                while ($values->valid()) {
                     if ($index >= $from && $index < $until) {
-                        yield $value;
+                        yield $values->current();
                     }
 
                     ++$index;
+                    $values->next();
                 }
             })($from, $until),
         );
@@ -518,14 +569,19 @@ final class Defer implements Implementation
                 $taken = 0;
                 /** @var \Iterator<T> */
                 $values = self::detonate($captured);
+                $values->rewind();
 
-                foreach ($values as $value) {
+                while ($values->valid()) {
+                    // TODO inline this call when Accumulate implementation is fixed
+                    $value = $values->current();
+
                     if ($taken >= $size) {
                         return;
                     }
 
                     yield $value;
                     ++$taken;
+                    $values->next();
                 }
             })($size),
         );
@@ -559,14 +615,19 @@ final class Defer implements Implementation
             (static function(Implementation $sequence) use ($captured): \Generator {
                 /** @var \Iterator<T> */
                 $values = self::detonate($captured);
+                $values->rewind();
 
-                foreach ($values as $value) {
-                    yield $value;
+                while ($values->valid()) {
+                    yield $values->current();
+                    $values->next();
                 }
 
-                /** @var T $value */
-                foreach ($sequence->iterator() as $value) {
-                    yield $value;
+                $iterator = $sequence->iterator();
+                $iterator->rewind();
+
+                while ($iterator->valid()) {
+                    yield $iterator->current();
+                    $iterator->next();
                 }
             })($sequence),
         );
@@ -587,14 +648,19 @@ final class Defer implements Implementation
             (static function(Implementation $sequence) use ($captured): \Generator {
                 /** @var \Iterator<T> */
                 $values = self::detonate($captured);
+                $iterator = $sequence->iterator();
+                $iterator->rewind();
 
-                /** @var T $value */
-                foreach ($sequence->iterator() as $value) {
-                    yield $value;
+                while ($iterator->valid()) {
+                    yield $iterator->current();
+                    $iterator->next();
                 }
 
-                foreach ($values as $value) {
-                    yield $value;
+                $values->rewind();
+
+                while ($values->valid()) {
+                    yield $values->current();
+                    $values->next();
                 }
             })($sequence),
         );
@@ -632,9 +698,11 @@ final class Defer implements Implementation
                 $loaded = [];
                 /** @var \Iterator<T> */
                 $values = self::detonate($captured);
+                $values->rewind();
 
-                foreach ($values as $value) {
-                    $loaded[] = $value;
+                while ($values->valid()) {
+                    $loaded[] = $values->current();
+                    $values->next();
                 }
 
                 \usort($loaded, $sorter);
@@ -658,9 +726,12 @@ final class Defer implements Implementation
     #[\Override]
     public function reduce($carry, callable $reducer)
     {
-        foreach ($this->values as $value) {
+        $this->values->rewind();
+
+        while ($this->values->valid()) {
             /** @psalm-suppress ImpureFunctionCall */
-            $carry = $reducer($carry, $value);
+            $carry = $reducer($carry, $this->values->current());
+            $this->values->next();
         }
 
         return $carry;
@@ -678,15 +749,18 @@ final class Defer implements Implementation
     public function sink($carry, callable $reducer): mixed
     {
         $continuation = Sink\Continuation::of($carry);
+        $this->values->rewind();
 
-        foreach ($this->values as $value) {
+        while ($this->values->valid()) {
             /** @psalm-suppress ImpureFunctionCall */
-            $continuation = $reducer($carry, $value, $continuation);
+            $continuation = $reducer($carry, $this->values->current(), $continuation);
             $carry = $continuation->unwrap();
 
             if (!$continuation->shouldContinue()) {
                 return $continuation->unwrap();
             }
+
+            $this->values->next();
         }
 
         return $continuation->unwrap();
@@ -715,9 +789,11 @@ final class Defer implements Implementation
                 $reversed = [];
                 /** @var \Iterator<T> */
                 $values = self::detonate($captured);
+                $values->rewind();
 
-                foreach ($values as $value) {
-                    \array_unshift($reversed, $value);
+                while ($values->valid()) {
+                    \array_unshift($reversed, $values->current());
+                    $values->next();
                 }
 
                 foreach ($reversed as $value) {
@@ -757,9 +833,11 @@ final class Defer implements Implementation
             (static function() use ($captured): \Generator {
                 /** @var \Iterator<T> */
                 $values = self::detonate($captured);
+                $values->rewind();
 
-                foreach ($values as $value) {
-                    yield $value;
+                while ($values->valid()) {
+                    yield $values->current();
+                    $values->next();
                 }
             })(),
         );
@@ -778,9 +856,11 @@ final class Defer implements Implementation
             (static function() use ($captured): \Generator {
                 /** @var \Iterator<T> */
                 $values = self::detonate($captured);
+                $values->rewind();
 
-                foreach ($values as $value) {
-                    yield $value;
+                while ($values->valid()) {
+                    yield $values->current();
+                    $values->next();
                 }
             })(),
         );
@@ -794,12 +874,20 @@ final class Defer implements Implementation
         return Maybe::defer(static function() use ($captured, $predicate) {
             /** @var \Iterator<T> */
             $values = self::detonate($captured);
+            $values->rewind();
 
-            foreach ($values as $value) {
-                /** @psalm-suppress ImpureFunctionCall */
+            while ($values->valid()) {
+                $value = $values->current();
+
+                /**
+                 * @psalm-suppress ImpureFunctionCall
+                 * @psalm-suppress PossiblyNullArgument
+                 */
                 if ($predicate($value) === true) {
                     return Maybe::just($value);
                 }
+
+                $values->next();
             }
 
             /** @var Maybe<T> */
@@ -839,13 +927,16 @@ final class Defer implements Implementation
             (static function(\Iterator $other) use ($captured) {
                 /** @var \Iterator<T> $self */
                 $self = self::detonate($captured);
+                $self->rewind();
+                // todo $other->rewind()
 
-                foreach ($self as $value) {
+                while ($self->valid()) {
                     if (!$other->valid()) {
                         return;
                     }
 
-                    yield [$value, $other->current()];
+                    yield [$self->current(), $other->current()];
+                    $self->next();
                     $other->next();
                 }
             })($sequence->iterator()),
@@ -869,12 +960,16 @@ final class Defer implements Implementation
             (static function(mixed $carry, callable $assert) use ($captured): \Generator {
                 /** @var \Iterator<T> */
                 $values = self::detonate($captured);
+                $values->rewind();
 
-                foreach ($values as $value) {
+                while ($values->valid()) {
+                    $value = $values->current();
                     /** @var R */
                     $carry = $assert($carry, $value);
 
                     yield $value;
+
+                    $values->next();
                 }
             })($carry, $assert),
         );
@@ -904,9 +999,11 @@ final class Defer implements Implementation
     public function memoize(): Implementation
     {
         $values = [];
+        $this->values->rewind();
 
-        foreach ($this->values as $value) {
-            $values[] = $value;
+        while ($this->values->valid()) {
+            $values[] = $this->values->current();
+            $this->values->next();
         }
 
         return new Primitive($values);
@@ -926,6 +1023,7 @@ final class Defer implements Implementation
         return new self((static function(callable $condition) use ($captured) {
             /** @var \Iterator<T> */
             $values = self::detonate($captured);
+            // todo $values->rewind();
 
             /** @psalm-suppress ImpureMethodCall */
             while ($values->valid()) {
@@ -971,13 +1069,17 @@ final class Defer implements Implementation
             (static function(callable $condition) use ($captured): \Generator {
                 /** @var \Iterator<T> */
                 $values = self::detonate($captured);
+                $values->rewind();
 
-                foreach ($values as $value) {
+                while ($values->valid()) {
+                    $value = $values->current();
+
                     if (!$condition($value)) {
                         return;
                     }
 
                     yield $value;
+                    $values->next();
                 }
             })($condition),
         );
