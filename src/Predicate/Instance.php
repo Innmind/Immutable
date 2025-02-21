@@ -23,6 +23,7 @@ final class Instance implements Predicate
         $this->class = $class;
     }
 
+    #[\Override]
     public function __invoke(mixed $value): bool
     {
         return $value instanceof $this->class;

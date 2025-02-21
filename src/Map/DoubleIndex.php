@@ -38,6 +38,7 @@ final class DoubleIndex implements Implementation
      *
      * @return self<T, S>
      */
+    #[\Override]
     public function __invoke($key, $value): self
     {
         $map = $this->remove($key);
@@ -61,11 +62,13 @@ final class DoubleIndex implements Implementation
         return new self(new Sequence\Primitive([new Pair($key, $value)]));
     }
 
+    #[\Override]
     public function size(): int
     {
         return $this->pairs->size();
     }
 
+    #[\Override]
     public function count(): int
     {
         return $this->size();
@@ -76,6 +79,7 @@ final class DoubleIndex implements Implementation
      *
      * @return Maybe<S>
      */
+    #[\Override]
     public function get($key): Maybe
     {
         return $this
@@ -87,6 +91,7 @@ final class DoubleIndex implements Implementation
     /**
      * @param T $key
      */
+    #[\Override]
     public function contains($key): bool
     {
         return $this
@@ -101,6 +106,7 @@ final class DoubleIndex implements Implementation
     /**
      * @return self<T, S>
      */
+    #[\Override]
     public function clear(): self
     {
         return new self($this->pairs->clear());
@@ -109,6 +115,7 @@ final class DoubleIndex implements Implementation
     /**
      * @param Implementation<T, S> $map
      */
+    #[\Override]
     public function equals(Implementation $map): bool
     {
         if (!$map->keys()->equals($this->keys())) {
@@ -137,6 +144,7 @@ final class DoubleIndex implements Implementation
      *
      * @return self<T, S>
      */
+    #[\Override]
     public function filter(callable $predicate): self
     {
         return new self($this->pairs->filter(
@@ -147,6 +155,7 @@ final class DoubleIndex implements Implementation
     /**
      * @param callable(T, S): void $function
      */
+    #[\Override]
     public function foreach(callable $function): SideEffect
     {
         foreach ($this->pairs->iterator() as $pair) {
@@ -164,6 +173,7 @@ final class DoubleIndex implements Implementation
      *
      * @return Map<D, Map<T, S>>
      */
+    #[\Override]
     public function groupBy(callable $discriminator): Map
     {
         /** @var Map<D, Map<T, S>> */
@@ -187,6 +197,7 @@ final class DoubleIndex implements Implementation
     /**
      * @return Set<T>
      */
+    #[\Override]
     public function keys(): Set
     {
         return $this
@@ -198,6 +209,7 @@ final class DoubleIndex implements Implementation
     /**
      * @return Sequence<S>
      */
+    #[\Override]
     public function values(): Sequence
     {
         return $this
@@ -213,6 +225,7 @@ final class DoubleIndex implements Implementation
      *
      * @return self<T, B>
      */
+    #[\Override]
     public function map(callable $function): self
     {
         return new self($this->pairs->map(static fn($pair) => new Pair(
@@ -226,6 +239,7 @@ final class DoubleIndex implements Implementation
      *
      * @return self<T, S>
      */
+    #[\Override]
     public function remove($key): self
     {
         return new self($this->pairs->filter(
@@ -238,6 +252,7 @@ final class DoubleIndex implements Implementation
      *
      * @return self<T, S>
      */
+    #[\Override]
     public function merge(Implementation $map): self
     {
         return $map->reduce(
@@ -251,6 +266,7 @@ final class DoubleIndex implements Implementation
      *
      * @return Map<bool, Map<T, S>>
      */
+    #[\Override]
     public function partition(callable $predicate): Map
     {
         $truthy = $this->clearMap();
@@ -282,6 +298,7 @@ final class DoubleIndex implements Implementation
      *
      * @return I|R
      */
+    #[\Override]
     public function reduce($carry, callable $reducer)
     {
         foreach ($this->pairs->iterator() as $pair) {
@@ -292,16 +309,19 @@ final class DoubleIndex implements Implementation
         return $carry;
     }
 
+    #[\Override]
     public function empty(): bool
     {
         return $this->pairs->empty();
     }
 
+    #[\Override]
     public function find(callable $predicate): Maybe
     {
         return $this->pairs->find(static fn($pair) => $predicate($pair->key(), $pair->value()));
     }
 
+    #[\Override]
     public function toSequence(): Sequence
     {
         return $this->pairs->toSequence();

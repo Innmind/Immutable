@@ -50,6 +50,7 @@ final class Success implements Implementation
      *
      * @return Implementation<F, T>
      */
+    #[\Override]
     public function map(callable $map): Implementation
     {
         /** @psalm-suppress ImpureFunctionCall */
@@ -65,6 +66,7 @@ final class Success implements Implementation
      *
      * @return Implementation<F|T, V>
      */
+    #[\Override]
     public function flatMap(callable $map, callable $exfiltrate): Implementation
     {
         /** @psalm-suppress ImpureFunctionCall */
@@ -78,6 +80,7 @@ final class Success implements Implementation
      *
      * @return Implementation<T, S>
      */
+    #[\Override]
     public function mapFailures(callable $map): Implementation
     {
         /** @var Implementation<T, S> */
@@ -92,6 +95,7 @@ final class Success implements Implementation
      *
      * @return Validation<T, S|V>
      */
+    #[\Override]
     public function otherwise(callable $map): Validation
     {
         return Validation::success($this->value);
@@ -106,6 +110,7 @@ final class Success implements Implementation
      *
      * @return Implementation<F, T>
      */
+    #[\Override]
     public function and(Implementation $other, callable $fold): Implementation
     {
         if ($other instanceof self) {
@@ -125,6 +130,7 @@ final class Success implements Implementation
      *
      * @return T
      */
+    #[\Override]
     public function match(callable $success, callable $failure)
     {
         /** @psalm-suppress ImpureFunctionCall */
@@ -134,6 +140,7 @@ final class Success implements Implementation
     /**
      * @return Maybe<S>
      */
+    #[\Override]
     public function maybe(): Maybe
     {
         return Maybe::just($this->value);
@@ -142,6 +149,7 @@ final class Success implements Implementation
     /**
      * @return Either<Sequence<F>, S>
      */
+    #[\Override]
     public function either(): Either
     {
         return Either::right($this->value);

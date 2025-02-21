@@ -31,6 +31,7 @@ final class Accumulate implements \Iterator
     /**
      * @return S
      */
+    #[\Override]
     public function current(): mixed
     {
         /** @psalm-suppress InaccessibleProperty */
@@ -45,6 +46,7 @@ final class Accumulate implements \Iterator
     /**
      * @return int<0, max>|null
      */
+    #[\Override]
     public function key(): ?int
     {
         /** @psalm-suppress InaccessibleProperty */
@@ -55,6 +57,7 @@ final class Accumulate implements \Iterator
         return \key($this->values);
     }
 
+    #[\Override]
     public function next(): void
     {
         /** @psalm-suppress InaccessibleProperty */
@@ -68,6 +71,7 @@ final class Accumulate implements \Iterator
         }
     }
 
+    #[\Override]
     public function rewind(): void
     {
         /** @psalm-suppress InaccessibleProperty */
@@ -76,6 +80,7 @@ final class Accumulate implements \Iterator
         \reset($this->values);
     }
 
+    #[\Override]
     public function valid(): bool
     {
         /** @psalm-suppress InaccessibleProperty */

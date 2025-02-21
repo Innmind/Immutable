@@ -35,6 +35,7 @@ final class Primitive implements Implementation
      *
      * @return self<T>
      */
+    #[\Override]
     public function __invoke($element): self
     {
         $values = $this->values;
@@ -43,11 +44,13 @@ final class Primitive implements Implementation
         return new self($values);
     }
 
+    #[\Override]
     public function size(): int
     {
         return \count($this->values);
     }
 
+    #[\Override]
     public function count(): int
     {
         return $this->size();
@@ -56,6 +59,7 @@ final class Primitive implements Implementation
     /**
      * @return \Iterator<T>
      */
+    #[\Override]
     public function iterator(): \Iterator
     {
         return new \ArrayIterator($this->values);
@@ -64,6 +68,7 @@ final class Primitive implements Implementation
     /**
      * @return Maybe<T>
      */
+    #[\Override]
     public function get(int $index): Maybe
     {
         if (!$this->has($index)) {
@@ -79,6 +84,7 @@ final class Primitive implements Implementation
      *
      * @return self<T>
      */
+    #[\Override]
     public function diff(Implementation $sequence): self
     {
         return $this->filter(static function(mixed $value) use ($sequence): bool {
@@ -90,6 +96,7 @@ final class Primitive implements Implementation
     /**
      * @return self<T>
      */
+    #[\Override]
     public function distinct(): self
     {
         return $this->reduce(
@@ -108,6 +115,7 @@ final class Primitive implements Implementation
     /**
      * @return self<T>
      */
+    #[\Override]
     public function drop(int $size): self
     {
         return new self(\array_slice($this->values, $size));
@@ -116,6 +124,7 @@ final class Primitive implements Implementation
     /**
      * @return self<T>
      */
+    #[\Override]
     public function dropEnd(int $size): self
     {
         return new self(\array_slice($this->values, 0, $this->size() - $size));
@@ -124,6 +133,7 @@ final class Primitive implements Implementation
     /**
      * @param Implementation<T> $sequence
      */
+    #[\Override]
     public function equals(Implementation $sequence): bool
     {
         $other = [];
@@ -140,6 +150,7 @@ final class Primitive implements Implementation
      *
      * @return self<T>
      */
+    #[\Override]
     public function filter(callable $predicate): self
     {
         /** @psalm-suppress ImpureFunctionCall */
@@ -152,6 +163,7 @@ final class Primitive implements Implementation
     /**
      * @param callable(T): void $function
      */
+    #[\Override]
     public function foreach(callable $function): SideEffect
     {
         foreach ($this->values as $value) {
@@ -168,6 +180,7 @@ final class Primitive implements Implementation
      *
      * @return Map<D, Sequence<T>>
      */
+    #[\Override]
     public function groupBy(callable $discriminator): Map
     {
         /** @var Map<D, Sequence<T>> */
@@ -192,6 +205,7 @@ final class Primitive implements Implementation
     /**
      * @return Maybe<T>
      */
+    #[\Override]
     public function first(): Maybe
     {
         return $this->get(0);
@@ -200,6 +214,7 @@ final class Primitive implements Implementation
     /**
      * @return Maybe<T>
      */
+    #[\Override]
     public function last(): Maybe
     {
         return $this->get($this->size() - 1);
@@ -208,6 +223,7 @@ final class Primitive implements Implementation
     /**
      * @param T $element
      */
+    #[\Override]
     public function contains($element): bool
     {
         return \in_array($element, $this->values, true);
@@ -218,6 +234,7 @@ final class Primitive implements Implementation
      *
      * @return Maybe<0|positive-int>
      */
+    #[\Override]
     public function indexOf($element): Maybe
     {
         $index = \array_search($element, $this->values, true);
@@ -236,6 +253,7 @@ final class Primitive implements Implementation
      *
      * @return self<int>
      */
+    #[\Override]
     public function indices(): self
     {
         if ($this->empty()) {
@@ -254,6 +272,7 @@ final class Primitive implements Implementation
      *
      * @return self<S>
      */
+    #[\Override]
     public function map(callable $function): self
     {
         /** @psalm-suppress ImpureFunctionCall */
@@ -269,6 +288,7 @@ final class Primitive implements Implementation
      *
      * @return Implementation<S>
      */
+    #[\Override]
     public function flatMap(callable $map, callable $exfiltrate): Implementation
     {
         /**
@@ -288,6 +308,7 @@ final class Primitive implements Implementation
      *
      * @return self<T>
      */
+    #[\Override]
     public function pad(int $size, $element): self
     {
         return new self(\array_pad($this->values, $size, $element));
@@ -298,6 +319,7 @@ final class Primitive implements Implementation
      *
      * @return Map<bool, Sequence<T>>
      */
+    #[\Override]
     public function partition(callable $predicate): Map
     {
         /** @var list<T> */
@@ -323,6 +345,7 @@ final class Primitive implements Implementation
     /**
      * @return self<T>
      */
+    #[\Override]
     public function slice(int $from, int $until): self
     {
         return new self(\array_slice(
@@ -335,6 +358,7 @@ final class Primitive implements Implementation
     /**
      * @return self<T>
      */
+    #[\Override]
     public function take(int $size): self
     {
         return $this->slice(0, $size);
@@ -343,6 +367,7 @@ final class Primitive implements Implementation
     /**
      * @return self<T>
      */
+    #[\Override]
     public function takeEnd(int $size): self
     {
         return $this->slice($this->size() - $size, $this->size());
@@ -353,6 +378,7 @@ final class Primitive implements Implementation
      *
      * @return self<T>
      */
+    #[\Override]
     public function append(Implementation $sequence): self
     {
         $other = [];
@@ -369,6 +395,7 @@ final class Primitive implements Implementation
      *
      * @return self<T>
      */
+    #[\Override]
     public function prepend(Implementation $sequence): self
     {
         $other = [];
@@ -385,6 +412,7 @@ final class Primitive implements Implementation
      *
      * @return self<T>
      */
+    #[\Override]
     public function intersect(Implementation $sequence): self
     {
         return $this->filter(static function(mixed $value) use ($sequence): bool {
@@ -398,6 +426,7 @@ final class Primitive implements Implementation
      *
      * @return self<T>
      */
+    #[\Override]
     public function sort(callable $function): self
     {
         $self = clone $this;
@@ -419,6 +448,7 @@ final class Primitive implements Implementation
      *
      * @return I|R
      */
+    #[\Override]
     public function reduce($carry, callable $reducer)
     {
         /**
@@ -436,6 +466,7 @@ final class Primitive implements Implementation
      *
      * @return I
      */
+    #[\Override]
     public function sink($carry, callable $reducer): mixed
     {
         $continuation = Sink\Continuation::of($carry);
@@ -456,6 +487,7 @@ final class Primitive implements Implementation
     /**
      * @return self<T>
      */
+    #[\Override]
     public function clear(): Implementation
     {
         return new self;
@@ -464,16 +496,19 @@ final class Primitive implements Implementation
     /**
      * @return self<T>
      */
+    #[\Override]
     public function reverse(): self
     {
         return new self(\array_reverse($this->values));
     }
 
+    #[\Override]
     public function empty(): bool
     {
         return !$this->has(0);
     }
 
+    #[\Override]
     public function toIdentity(): Identity
     {
         /** @var Identity<Implementation<T>> */
@@ -483,6 +518,7 @@ final class Primitive implements Implementation
     /**
      * @return Sequence<T>
      */
+    #[\Override]
     public function toSequence(): Sequence
     {
         return Sequence::of(...$this->values);
@@ -491,11 +527,13 @@ final class Primitive implements Implementation
     /**
      * @return Set<T>
      */
+    #[\Override]
     public function toSet(): Set
     {
         return Set::of(...$this->values);
     }
 
+    #[\Override]
     public function find(callable $predicate): Maybe
     {
         foreach ($this->values as $value) {
@@ -509,6 +547,7 @@ final class Primitive implements Implementation
         return Maybe::nothing();
     }
 
+    #[\Override]
     public function match(callable $wrap, callable $match, callable $empty)
     {
         /** @psalm-suppress MixedArgument */
@@ -527,6 +566,7 @@ final class Primitive implements Implementation
      *
      * @return Implementation<array{T, S}>
      */
+    #[\Override]
     public function zip(Implementation $sequence): Implementation
     {
         /** @var list<array{T, S}> */
@@ -556,6 +596,7 @@ final class Primitive implements Implementation
      *
      * @return self<T>
      */
+    #[\Override]
     public function safeguard($carry, callable $assert): self
     {
         $_ = $this->reduce($carry, $assert);
@@ -571,6 +612,7 @@ final class Primitive implements Implementation
      *
      * @return self<T|A>
      */
+    #[\Override]
     public function aggregate(callable $map, callable $exfiltrate): self
     {
         $aggregate = new Aggregate($this->iterator());
@@ -589,6 +631,7 @@ final class Primitive implements Implementation
     /**
      * @return self<T>
      */
+    #[\Override]
     public function memoize(): self
     {
         return $this;
@@ -599,6 +642,7 @@ final class Primitive implements Implementation
      *
      * @return self<T>
      */
+    #[\Override]
     public function dropWhile(callable $condition): self
     {
         $values = [];
@@ -640,6 +684,7 @@ final class Primitive implements Implementation
      *
      * @return self<T>
      */
+    #[\Override]
     public function takeWhile(callable $condition): self
     {
         $values = [];

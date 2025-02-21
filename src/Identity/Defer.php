@@ -29,6 +29,7 @@ final class Defer implements Implementation
         $this->value = $value;
     }
 
+    #[\Override]
     public function map(callable $map): self
     {
         $captured = $this->capture();
@@ -40,6 +41,7 @@ final class Defer implements Implementation
         return new self(static fn() => $map(self::detonate($captured)));
     }
 
+    #[\Override]
     public function flatMap(callable $map): Identity
     {
         $captured = $this->capture();
@@ -51,6 +53,7 @@ final class Defer implements Implementation
         return Identity::defer(static fn() => $map(self::detonate($captured))->unwrap());
     }
 
+    #[\Override]
     public function toSequence(): Sequence
     {
         $captured = $this->capture();
@@ -59,6 +62,7 @@ final class Defer implements Implementation
         return Sequence::defer((static fn() => yield self::detonate($captured))());
     }
 
+    #[\Override]
     public function unwrap(): mixed
     {
         if ($this->loaded) {

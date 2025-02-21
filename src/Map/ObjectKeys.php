@@ -33,6 +33,7 @@ final class ObjectKeys implements Implementation
      *
      * @return Implementation<T, S>
      */
+    #[\Override]
     public function __invoke($key, $value): Implementation
     {
         if (!\is_object($key)) {
@@ -71,6 +72,7 @@ final class ObjectKeys implements Implementation
         return Maybe::nothing();
     }
 
+    #[\Override]
     public function size(): int
     {
         /**
@@ -80,6 +82,7 @@ final class ObjectKeys implements Implementation
         return $this->values->count();
     }
 
+    #[\Override]
     public function count(): int
     {
         return $this->size();
@@ -90,6 +93,7 @@ final class ObjectKeys implements Implementation
      *
      * @return Maybe<S>
      */
+    #[\Override]
     public function get($key): Maybe
     {
         if (!$this->contains($key)) {
@@ -108,6 +112,7 @@ final class ObjectKeys implements Implementation
     /**
      * @param T $key
      */
+    #[\Override]
     public function contains($key): bool
     {
         if (!\is_object($key)) {
@@ -124,6 +129,7 @@ final class ObjectKeys implements Implementation
     /**
      * @return self<T, S>
      */
+    #[\Override]
     public function clear(): self
     {
         return new self;
@@ -132,6 +138,7 @@ final class ObjectKeys implements Implementation
     /**
      * @param Implementation<T, S> $map
      */
+    #[\Override]
     public function equals(Implementation $map): bool
     {
         if (!$map->keys()->equals($this->keys())) {
@@ -165,6 +172,7 @@ final class ObjectKeys implements Implementation
      *
      * @return self<T, S>
      */
+    #[\Override]
     public function filter(callable $predicate): self
     {
         /** @var \SplObjectStorage<object, mixed> */
@@ -189,6 +197,7 @@ final class ObjectKeys implements Implementation
     /**
      * @param callable(T, S): void $function
      */
+    #[\Override]
     public function foreach(callable $function): SideEffect
     {
         /** @psalm-suppress ImpureMethodCall */
@@ -215,6 +224,7 @@ final class ObjectKeys implements Implementation
      *
      * @return Map<D, Map<T, S>>
      */
+    #[\Override]
     public function groupBy(callable $discriminator): Map
     {
         /** @var Map<D, Map<T, S>> */
@@ -247,6 +257,7 @@ final class ObjectKeys implements Implementation
     /**
      * @return Set<T>
      */
+    #[\Override]
     public function keys(): Set
     {
         /** @var Set<T> */
@@ -261,6 +272,7 @@ final class ObjectKeys implements Implementation
     /**
      * @return Sequence<S>
      */
+    #[\Override]
     public function values(): Sequence
     {
         /** @var Sequence<S> */
@@ -279,6 +291,7 @@ final class ObjectKeys implements Implementation
      *
      * @return self<T, B>
      */
+    #[\Override]
     public function map(callable $function): self
     {
         /** @var \SplObjectStorage<object, mixed> */
@@ -306,6 +319,7 @@ final class ObjectKeys implements Implementation
      *
      * @return self<T, S>
      */
+    #[\Override]
     public function remove($key): self
     {
         if (!$this->contains($key)) {
@@ -330,6 +344,7 @@ final class ObjectKeys implements Implementation
      *
      * @return Implementation<T, S>
      */
+    #[\Override]
     public function merge(Implementation $map): Implementation
     {
         return $map->reduce(
@@ -343,6 +358,7 @@ final class ObjectKeys implements Implementation
      *
      * @return Map<bool, Map<T, S>>
      */
+    #[\Override]
     public function partition(callable $predicate): Map
     {
         $truthy = $this->clearMap();
@@ -380,6 +396,7 @@ final class ObjectKeys implements Implementation
      *
      * @return I|R
      */
+    #[\Override]
     public function reduce($carry, callable $reducer)
     {
         /** @psalm-suppress ImpureMethodCall */
@@ -399,6 +416,7 @@ final class ObjectKeys implements Implementation
         return $carry;
     }
 
+    #[\Override]
     public function empty(): bool
     {
         /** @psalm-suppress ImpureMethodCall */
@@ -408,6 +426,7 @@ final class ObjectKeys implements Implementation
         return !$this->values->valid();
     }
 
+    #[\Override]
     public function find(callable $predicate): Maybe
     {
         /** @psalm-suppress ImpureMethodCall */
@@ -430,6 +449,7 @@ final class ObjectKeys implements Implementation
         return Maybe::nothing();
     }
 
+    #[\Override]
     public function toSequence(): Sequence
     {
         /** @var Sequence<Pair<T, S>> */

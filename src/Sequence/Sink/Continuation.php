@@ -23,6 +23,8 @@ final class Continuation
      * @psalm-pure
      * @template A
      *
+     * @param A $carry
+     *
      * @return self<A>
      */
     public static function of(mixed $carry): self

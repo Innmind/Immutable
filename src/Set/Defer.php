@@ -34,6 +34,7 @@ final class Defer implements Implementation
      *
      * @return self<T>
      */
+    #[\Override]
     public function __invoke($element): self
     {
         return self::distinct(($this->values)($element));
@@ -52,11 +53,13 @@ final class Defer implements Implementation
         return self::distinct(new Sequence\Defer($generator));
     }
 
+    #[\Override]
     public function size(): int
     {
         return $this->values->size();
     }
 
+    #[\Override]
     public function count(): int
     {
         return $this->values->size();
@@ -65,6 +68,7 @@ final class Defer implements Implementation
     /**
      * @return \Iterator<T>
      */
+    #[\Override]
     public function iterator(): \Iterator
     {
         return $this->values->iterator();
@@ -75,6 +79,7 @@ final class Defer implements Implementation
      *
      * @return self<T>
      */
+    #[\Override]
     public function intersect(Implementation $set): self
     {
         if ($this === $set) {
@@ -89,6 +94,7 @@ final class Defer implements Implementation
     /**
      * @param T $element
      */
+    #[\Override]
     public function contains($element): bool
     {
         return $this->values->contains($element);
@@ -99,6 +105,7 @@ final class Defer implements Implementation
      *
      * @return self<T>
      */
+    #[\Override]
     public function remove($element): self
     {
         return new self($this->values->filter(
@@ -111,6 +118,7 @@ final class Defer implements Implementation
      *
      * @return self<T>
      */
+    #[\Override]
     public function diff(Implementation $set): self
     {
         return new self($this->values->diff($set->sequence()));
@@ -119,6 +127,7 @@ final class Defer implements Implementation
     /**
      * @param Implementation<T> $set
      */
+    #[\Override]
     public function equals(Implementation $set): bool
     {
         if ($this->size() !== $set->size()) {
@@ -133,6 +142,7 @@ final class Defer implements Implementation
      *
      * @return self<T>
      */
+    #[\Override]
     public function filter(callable $predicate): self
     {
         return new self($this->values->filter($predicate));
@@ -141,6 +151,7 @@ final class Defer implements Implementation
     /**
      * @param callable(T): void $function
      */
+    #[\Override]
     public function foreach(callable $function): SideEffect
     {
         return $this->values->foreach($function);
@@ -153,6 +164,7 @@ final class Defer implements Implementation
      *
      * @return Map<D, Set<T>>
      */
+    #[\Override]
     public function groupBy(callable $discriminator): Map
     {
         return $this
@@ -168,6 +180,7 @@ final class Defer implements Implementation
      *
      * @return self<S>
      */
+    #[\Override]
     public function map(callable $function): self
     {
         return self::distinct($this->values->map($function));
@@ -181,6 +194,7 @@ final class Defer implements Implementation
      *
      * @return self<S>
      */
+    #[\Override]
     public function flatMap(callable $map, callable $exfiltrate): self
     {
         return self::distinct($this->values->flatMap($map, $exfiltrate));
@@ -191,6 +205,7 @@ final class Defer implements Implementation
      *
      * @return Map<bool, Set<T>>
      */
+    #[\Override]
     public function partition(callable $predicate): Map
     {
         return $this
@@ -204,6 +219,7 @@ final class Defer implements Implementation
      *
      * @return Sequence<T>
      */
+    #[\Override]
     public function sort(callable $function): Sequence
     {
         return $this
@@ -217,6 +233,7 @@ final class Defer implements Implementation
      *
      * @return self<T>
      */
+    #[\Override]
     public function merge(Implementation $set): self
     {
         return self::distinct($this->values->append($set->sequence()));
@@ -231,6 +248,7 @@ final class Defer implements Implementation
      *
      * @return I|R
      */
+    #[\Override]
     public function reduce($carry, callable $reducer)
     {
         return $this->values->reduce($carry, $reducer);
@@ -239,16 +257,19 @@ final class Defer implements Implementation
     /**
      * @return Implementation<T>
      */
+    #[\Override]
     public function clear(): Implementation
     {
         return Primitive::of();
     }
 
+    #[\Override]
     public function empty(): bool
     {
         return $this->values->empty();
     }
 
+    #[\Override]
     public function find(callable $predicate): Maybe
     {
         return $this->values->find($predicate);
@@ -261,6 +282,7 @@ final class Defer implements Implementation
      *
      * @return self<T>
      */
+    #[\Override]
     public function safeguard($carry, callable $assert): self
     {
         return new self($this->values->safeguard($carry, $assert));
@@ -269,6 +291,7 @@ final class Defer implements Implementation
     /**
      * @return Sequence\Implementation<T>
      */
+    #[\Override]
     public function sequence(): Sequence\Implementation
     {
         return $this->values;
@@ -277,6 +300,7 @@ final class Defer implements Implementation
     /**
      * @return Implementation<T>
      */
+    #[\Override]
     public function memoize(): Implementation
     {
         return new Primitive($this->values->memoize());

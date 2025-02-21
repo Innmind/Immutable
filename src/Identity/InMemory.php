@@ -24,23 +24,27 @@ final class InMemory implements Implementation
         $this->value = $value;
     }
 
+    #[\Override]
     public function map(callable $map): self
     {
         /** @psalm-suppress ImpureFunctionCall */
         return new self($map($this->value));
     }
 
+    #[\Override]
     public function flatMap(callable $map): Identity
     {
         /** @psalm-suppress ImpureFunctionCall */
         return $map($this->value);
     }
 
+    #[\Override]
     public function toSequence(): Sequence
     {
         return Sequence::of($this->value);
     }
 
+    #[\Override]
     public function unwrap(): mixed
     {
         return $this->value;
