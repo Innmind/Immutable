@@ -928,7 +928,7 @@ final class Defer implements Implementation
                 /** @var \Iterator<T> $self */
                 $self = self::detonate($captured);
                 $self->rewind();
-                // todo $other->rewind()
+                $other->rewind();
 
                 while ($self->valid()) {
                     if (!$other->valid()) {
@@ -1023,7 +1023,7 @@ final class Defer implements Implementation
         return new self((static function(callable $condition) use ($captured) {
             /** @var \Iterator<T> */
             $values = self::detonate($captured);
-            // todo $values->rewind();
+            $values->rewind();
 
             /** @psalm-suppress ImpureMethodCall */
             while ($values->valid()) {
