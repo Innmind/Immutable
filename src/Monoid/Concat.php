@@ -14,11 +14,13 @@ use Innmind\Immutable\{
  */
 final class Concat implements Monoid
 {
+    #[\Override]
     public function identity(): Str
     {
         return Str::of('');
     }
 
+    #[\Override]
     public function combine(mixed $a, mixed $b): Str
     {
         return $a->append($b->toString());

@@ -187,6 +187,7 @@ final class Sequence implements \Countable
     /**
      * @return 0|positive-int
      */
+    #[\Override]
     public function count(): int
     {
         return $this->implementation->size();

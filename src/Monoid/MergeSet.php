@@ -28,6 +28,7 @@ final class MergeSet implements Monoid
         return new self;
     }
 
+    #[\Override]
     public function identity(): mixed
     {
         /** @var Set<T> */
@@ -40,6 +41,7 @@ final class MergeSet implements Monoid
      *
      * @return Set<T>
      */
+    #[\Override]
     public function combine(mixed $a, mixed $b): mixed
     {
         return $a->merge($b);

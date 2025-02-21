@@ -30,6 +30,7 @@ final class Defer implements Implementation
         $this->deferred = $deferred;
     }
 
+    #[\Override]
     public function map(callable $map): self
     {
         $captured = $this->capture();
@@ -37,6 +38,7 @@ final class Defer implements Implementation
         return new self(static fn() => self::detonate($captured)->map($map));
     }
 
+    #[\Override]
     public function flatMap(callable $map): Maybe
     {
         $captured = $this->capture();
@@ -44,11 +46,13 @@ final class Defer implements Implementation
         return Maybe::defer(static fn() => self::detonate($captured)->flatMap($map));
     }
 
+    #[\Override]
     public function match(callable $just, callable $nothing)
     {
         return $this->unwrap()->match($just, $nothing);
     }
 
+    #[\Override]
     public function otherwise(callable $otherwise): Maybe
     {
         $captured = $this->capture();
@@ -56,6 +60,7 @@ final class Defer implements Implementation
         return Maybe::defer(static fn() => self::detonate($captured)->otherwise($otherwise));
     }
 
+    #[\Override]
     public function filter(callable $predicate): Implementation
     {
         $captured = $this->capture();
@@ -63,6 +68,7 @@ final class Defer implements Implementation
         return new self(static fn() => self::detonate($captured)->filter($predicate));
     }
 
+    #[\Override]
     public function either(): Either
     {
         $captured = $this->capture();
@@ -73,11 +79,13 @@ final class Defer implements Implementation
     /**
      * @return Maybe<V>
      */
+    #[\Override]
     public function memoize(): Maybe
     {
         return $this->unwrap();
     }
 
+    #[\Override]
     public function toSequence(): Sequence
     {
         $captured = $this->capture();
@@ -91,6 +99,7 @@ final class Defer implements Implementation
         })());
     }
 
+    #[\Override]
     public function eitherWay(callable $just, callable $nothing): Maybe
     {
         $captured = $this->capture();

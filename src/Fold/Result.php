@@ -38,17 +38,20 @@ final class Result implements Implementation
      *
      * @return self<F1, R1, A>
      */
+    #[\Override]
     public function map(callable $map): self
     {
         /** @var self<F1, R1, A> */
         return $this;
     }
 
+    #[\Override]
     public function flatMap(callable $map): Fold
     {
         return Fold::result($this->result);
     }
 
+    #[\Override]
     public function mapResult(callable $map): self
     {
         /** @psalm-suppress ImpureFunctionCall */
@@ -62,6 +65,7 @@ final class Result implements Implementation
      *
      * @return self<A, R1, C1>
      */
+    #[\Override]
     public function mapFailure(callable $map): self
     {
         /** @var self<A, R1, C1> */
@@ -71,12 +75,14 @@ final class Result implements Implementation
     /**
      * @return Maybe<Either<F1, R1>>
      */
+    #[\Override]
     public function maybe(): Maybe
     {
         /** @var Maybe<Either<F1, R1>> */
         return Maybe::just(Either::right($this->result));
     }
 
+    #[\Override]
     public function match(
         callable $with,
         callable $result,

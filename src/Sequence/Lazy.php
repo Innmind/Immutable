@@ -37,6 +37,7 @@ final class Lazy implements Implementation
      *
      * @return Implementation<T>
      */
+    #[\Override]
     public function __invoke($element): Implementation
     {
         $values = $this->values;
@@ -52,6 +53,7 @@ final class Lazy implements Implementation
         );
     }
 
+    #[\Override]
     public function size(): int
     {
         $size = 0;
@@ -63,6 +65,7 @@ final class Lazy implements Implementation
         return $size;
     }
 
+    #[\Override]
     public function count(): int
     {
         return $this->size();
@@ -71,6 +74,7 @@ final class Lazy implements Implementation
     /**
      * @return \Iterator<T>
      */
+    #[\Override]
     public function iterator(): \Iterator
     {
         // when accessing the iterator from the outside we cannot know when it
@@ -84,6 +88,7 @@ final class Lazy implements Implementation
     /**
      * @return Maybe<T>
      */
+    #[\Override]
     public function get(int $index): Maybe
     {
         $values = $this->values;
@@ -113,6 +118,7 @@ final class Lazy implements Implementation
      *
      * @return Implementation<T>
      */
+    #[\Override]
     public function diff(Implementation $sequence): Implementation
     {
         return $this->filter(static function(mixed $value) use ($sequence): bool {
@@ -124,6 +130,7 @@ final class Lazy implements Implementation
     /**
      * @return Implementation<T>
      */
+    #[\Override]
     public function distinct(): Implementation
     {
         $values = $this->values;
@@ -147,6 +154,7 @@ final class Lazy implements Implementation
     /**
      * @return Implementation<T>
      */
+    #[\Override]
     public function drop(int $size): Implementation
     {
         $values = $this->values;
@@ -173,6 +181,7 @@ final class Lazy implements Implementation
      *
      * @return Implementation<T>
      */
+    #[\Override]
     public function dropEnd(int $size): Implementation
     {
         // this cannot be optimised as the whole generator needs to be loaded
@@ -183,6 +192,7 @@ final class Lazy implements Implementation
     /**
      * @param Implementation<T> $sequence
      */
+    #[\Override]
     public function equals(Implementation $sequence): bool
     {
         return $this->load()->equals($sequence);
@@ -193,6 +203,7 @@ final class Lazy implements Implementation
      *
      * @return Implementation<T>
      */
+    #[\Override]
     public function filter(callable $predicate): Implementation
     {
         $values = $this->values;
@@ -211,6 +222,7 @@ final class Lazy implements Implementation
     /**
      * @param callable(T): void $function
      */
+    #[\Override]
     public function foreach(callable $function): SideEffect
     {
         foreach ($this->iterator() as $value) {
@@ -227,6 +239,7 @@ final class Lazy implements Implementation
      *
      * @return Map<D, Sequence<T>>
      */
+    #[\Override]
     public function groupBy(callable $discriminator): Map
     {
         /** @var Map<D, Sequence<T>> */
@@ -236,6 +249,7 @@ final class Lazy implements Implementation
     /**
      * @return Maybe<T>
      */
+    #[\Override]
     public function first(): Maybe
     {
         return $this->get(0);
@@ -244,6 +258,7 @@ final class Lazy implements Implementation
     /**
      * @return Maybe<T>
      */
+    #[\Override]
     public function last(): Maybe
     {
         $values = $this->values;
@@ -274,6 +289,7 @@ final class Lazy implements Implementation
     /**
      * @param T $element
      */
+    #[\Override]
     public function contains($element): bool
     {
         $register = RegisterCleanup::noop();
@@ -298,6 +314,7 @@ final class Lazy implements Implementation
      *
      * @return Maybe<0|positive-int>
      */
+    #[\Override]
     public function indexOf($element): Maybe
     {
         $values = $this->values;
@@ -328,6 +345,7 @@ final class Lazy implements Implementation
      *
      * @return Implementation<0|positive-int>
      */
+    #[\Override]
     public function indices(): Implementation
     {
         $values = $this->values;
@@ -351,6 +369,7 @@ final class Lazy implements Implementation
      *
      * @return Implementation<S>
      */
+    #[\Override]
     public function map(callable $function): Implementation
     {
         $values = $this->values;
@@ -373,6 +392,7 @@ final class Lazy implements Implementation
      *
      * @return self<S>
      */
+    #[\Override]
     public function flatMap(callable $map, callable $exfiltrate): self
     {
         $values = $this->values;
@@ -398,6 +418,7 @@ final class Lazy implements Implementation
      *
      * @return Implementation<T>
      */
+    #[\Override]
     public function pad(int $size, $element): Implementation
     {
         $values = $this->values;
@@ -422,6 +443,7 @@ final class Lazy implements Implementation
      *
      * @return Map<bool, Sequence<T>>
      */
+    #[\Override]
     public function partition(callable $predicate): Map
     {
         /** @var Map<bool, Sequence<T>> */
@@ -431,6 +453,7 @@ final class Lazy implements Implementation
     /**
      * @return Implementation<T>
      */
+    #[\Override]
     public function slice(int $from, int $until): Implementation
     {
         /** @psalm-suppress ArgumentTypeCoercion */
@@ -442,6 +465,7 @@ final class Lazy implements Implementation
     /**
      * @return Implementation<T>
      */
+    #[\Override]
     public function take(int $size): Implementation
     {
         $values = $this->values;
@@ -477,6 +501,7 @@ final class Lazy implements Implementation
      *
      * @return Implementation<T>
      */
+    #[\Override]
     public function takeEnd(int $size): Implementation
     {
         $values = $this->values;
@@ -507,6 +532,7 @@ final class Lazy implements Implementation
      *
      * @return Implementation<T>
      */
+    #[\Override]
     public function append(Implementation $sequence): Implementation
     {
         $values = $this->values;
@@ -532,6 +558,7 @@ final class Lazy implements Implementation
      *
      * @return Implementation<T>
      */
+    #[\Override]
     public function prepend(Implementation $sequence): Implementation
     {
         $values = $this->values;
@@ -557,6 +584,7 @@ final class Lazy implements Implementation
      *
      * @return Implementation<T>
      */
+    #[\Override]
     public function intersect(Implementation $sequence): Implementation
     {
         return $this->filter(static function(mixed $value) use ($sequence): bool {
@@ -570,6 +598,7 @@ final class Lazy implements Implementation
      *
      * @return Implementation<T>
      */
+    #[\Override]
     public function sort(callable $function): Implementation
     {
         $values = $this->values;
@@ -602,6 +631,7 @@ final class Lazy implements Implementation
      *
      * @return I|R
      */
+    #[\Override]
     public function reduce($carry, callable $reducer)
     {
         foreach ($this->iterator() as $value) {
@@ -620,6 +650,7 @@ final class Lazy implements Implementation
      *
      * @return I
      */
+    #[\Override]
     public function sink($carry, callable $reducer): mixed
     {
         $continuation = Sink\Continuation::of($carry);
@@ -647,6 +678,7 @@ final class Lazy implements Implementation
     /**
      * @return Implementation<T>
      */
+    #[\Override]
     public function clear(): Implementation
     {
         return new Primitive;
@@ -655,6 +687,7 @@ final class Lazy implements Implementation
     /**
      * @return Implementation<T>
      */
+    #[\Override]
     public function reverse(): Implementation
     {
         $values = $this->values;
@@ -676,12 +709,14 @@ final class Lazy implements Implementation
         );
     }
 
+    #[\Override]
     public function empty(): bool
     {
         /** @psalm-suppress ImpureMethodCall */
         return !$this->iterator()->valid();
     }
 
+    #[\Override]
     public function toIdentity(): Identity
     {
         /** @var Identity<Implementation<T>> */
@@ -691,6 +726,7 @@ final class Lazy implements Implementation
     /**
      * @return Sequence<T>
      */
+    #[\Override]
     public function toSequence(): Sequence
     {
         $values = $this->values;
@@ -707,6 +743,7 @@ final class Lazy implements Implementation
     /**
      * @return Set<T>
      */
+    #[\Override]
     public function toSet(): Set
     {
         $values = $this->values;
@@ -720,6 +757,7 @@ final class Lazy implements Implementation
         );
     }
 
+    #[\Override]
     public function find(callable $predicate): Maybe
     {
         $values = $this->values;
@@ -742,6 +780,7 @@ final class Lazy implements Implementation
         });
     }
 
+    #[\Override]
     public function match(callable $wrap, callable $match, callable $empty)
     {
         /** @psalm-suppress ImpureFunctionCall */
@@ -757,6 +796,7 @@ final class Lazy implements Implementation
      *
      * @return Implementation<array{T, S}>
      */
+    #[\Override]
     public function zip(Implementation $sequence): Implementation
     {
         $values = $this->values;
@@ -791,6 +831,7 @@ final class Lazy implements Implementation
      *
      * @return self<T>
      */
+    #[\Override]
     public function safeguard($carry, callable $assert): self
     {
         $values = $this->values;
@@ -814,6 +855,7 @@ final class Lazy implements Implementation
      *
      * @return self<T|A>
      */
+    #[\Override]
     public function aggregate(callable $map, callable $exfiltrate): self
     {
         $values = $this->values;
@@ -836,6 +878,7 @@ final class Lazy implements Implementation
     /**
      * @return Implementation<T>
      */
+    #[\Override]
     public function memoize(): Implementation
     {
         return $this->load();
@@ -846,6 +889,7 @@ final class Lazy implements Implementation
      *
      * @return self<T>
      */
+    #[\Override]
     public function dropWhile(callable $condition): self
     {
         $values = $this->values;
@@ -890,6 +934,7 @@ final class Lazy implements Implementation
      *
      * @return self<T>
      */
+    #[\Override]
     public function takeWhile(callable $condition): self
     {
         $values = $this->values;

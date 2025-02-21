@@ -31,6 +31,7 @@ final class MergeMap implements Monoid
         return new self;
     }
 
+    #[\Override]
     public function identity(): mixed
     {
         /** @var Map<T, U> */
@@ -43,6 +44,7 @@ final class MergeMap implements Monoid
      *
      * @return Map<T, U>
      */
+    #[\Override]
     public function combine(mixed $a, mixed $b): mixed
     {
         return $a->merge($b);
