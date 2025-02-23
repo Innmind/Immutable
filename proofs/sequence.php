@@ -413,4 +413,24 @@ return static function() {
             );
         },
     );
+
+    yield proof(
+        'Sequence::lazy()->take() should not load an extra element',
+        given(
+            Set\Sequence::of(Set\Type::any()),
+        ),
+        static function($assert, $values) {
+            $sequence = Sequence::lazy(function() use ($values) {
+                yield from $values;
+                throw new \Exception;
+            })->take(\count($values));
+
+            $assert->not()->throws(
+                static fn() => $assert->same(
+                    $values,
+                    $sequence->toList(),
+                ),
+            );
+        },
+    );
 };

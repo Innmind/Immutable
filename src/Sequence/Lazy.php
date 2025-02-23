@@ -472,6 +472,10 @@ final class Lazy implements Implementation
 
         return new self(
             static function(RegisterCleanup $register) use ($values, $size): \Generator {
+                if ($size === 0) {
+                    return;
+                }
+
                 $taken = 0;
                 // We intercept the registering of the cleanup function here
                 // because this generator can be stopped when we reach the number
@@ -482,15 +486,15 @@ final class Lazy implements Implementation
                 $middleware = $register->push();
 
                 foreach ($values($middleware) as $value) {
+                    yield $value;
+                    ++$taken;
+
                     if ($taken >= $size) {
                         $middleware->cleanup();
                         $register->pop();
 
                         return;
                     }
-
-                    yield $value;
-                    ++$taken;
                 }
             },
         );
