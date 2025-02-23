@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Fixed
+
+- A lazy `Sequence` would load an extra element that is never used when calling `take`
+
 ## 5.11.1 - 2025-01-16
 
 ### Fixed

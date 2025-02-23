@@ -1336,7 +1336,7 @@ class SequenceTest extends TestCase
         $cleanups = [];
 
         $this->assertSame([1, 2], $sequence->take(2)->toList());
-        $this->assertSame(['child2', 'parent'], $cleanups);
+        $this->assertSame(['child1', 'parent'], $cleanups);
 
         $cleanups = [];
 
