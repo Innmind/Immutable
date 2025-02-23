@@ -28,6 +28,7 @@ final class OrPredicate implements Predicate
         $this->b = $b;
     }
 
+    #[\Override]
     public function __invoke(mixed $value): bool
     {
         return ($this->a)($value) || ($this->b)($value);

@@ -30,6 +30,7 @@ final class Defer implements Implementation
         $this->deferred = $deferred;
     }
 
+    #[\Override]
     public function map(callable $map): self
     {
         $captured = $this->capture();
@@ -37,6 +38,7 @@ final class Defer implements Implementation
         return new self(static fn() => self::detonate($captured)->map($map));
     }
 
+    #[\Override]
     public function flatMap(callable $map): Either
     {
         $captured = $this->capture();
@@ -44,6 +46,7 @@ final class Defer implements Implementation
         return Either::defer(static fn() => self::detonate($captured)->flatMap($map));
     }
 
+    #[\Override]
     public function leftMap(callable $map): self
     {
         $captured = $this->capture();
@@ -51,11 +54,13 @@ final class Defer implements Implementation
         return new self(static fn() => self::detonate($captured)->leftMap($map));
     }
 
+    #[\Override]
     public function match(callable $right, callable $left)
     {
         return $this->unwrap()->match($right, $left);
     }
 
+    #[\Override]
     public function otherwise(callable $otherwise): Either
     {
         $captured = $this->capture();
@@ -63,6 +68,7 @@ final class Defer implements Implementation
         return Either::defer(static fn() => self::detonate($captured)->otherwise($otherwise));
     }
 
+    #[\Override]
     public function filter(callable $predicate, callable $otherwise): Implementation
     {
         $captured = $this->capture();
@@ -70,6 +76,7 @@ final class Defer implements Implementation
         return new self(static fn() => self::detonate($captured)->filter($predicate, $otherwise));
     }
 
+    #[\Override]
     public function maybe(): Maybe
     {
         $captured = $this->capture();
@@ -80,11 +87,13 @@ final class Defer implements Implementation
     /**
      * @return Either<L1, R1>
      */
+    #[\Override]
     public function memoize(): Either
     {
         return $this->unwrap();
     }
 
+    #[\Override]
     public function flip(): self
     {
         $captured = $this->capture();
@@ -92,6 +101,7 @@ final class Defer implements Implementation
         return new self(static fn() => self::detonate($captured)->flip());
     }
 
+    #[\Override]
     public function eitherWay(callable $right, callable $left): Either
     {
         $captured = $this->capture();

@@ -47,6 +47,7 @@ final class Defer implements Implementation
      *
      * @return Implementation<T>
      */
+    #[\Override]
     public function __invoke($element): Implementation
     {
         $captured = $this->capture();
@@ -66,11 +67,13 @@ final class Defer implements Implementation
         );
     }
 
+    #[\Override]
     public function size(): int
     {
         return $this->memoize()->size();
     }
 
+    #[\Override]
     public function count(): int
     {
         return $this->size();
@@ -79,6 +82,7 @@ final class Defer implements Implementation
     /**
      * @return \Iterator<T>
      */
+    #[\Override]
     public function iterator(): \Iterator
     {
         return $this->values;
@@ -87,6 +91,7 @@ final class Defer implements Implementation
     /**
      * @return Maybe<T>
      */
+    #[\Override]
     public function get(int $index): Maybe
     {
         $captured = $this->capture();
@@ -114,6 +119,7 @@ final class Defer implements Implementation
      *
      * @return Implementation<T>
      */
+    #[\Override]
     public function diff(Implementation $sequence): Implementation
     {
         return $this->filter(static function(mixed $value) use ($sequence): bool {
@@ -125,6 +131,7 @@ final class Defer implements Implementation
     /**
      * @return Implementation<T>
      */
+    #[\Override]
     public function distinct(): Implementation
     {
         $captured = $this->capture();
@@ -151,6 +158,7 @@ final class Defer implements Implementation
     /**
      * @return Implementation<T>
      */
+    #[\Override]
     public function drop(int $size): Implementation
     {
         $captured = $this->capture();
@@ -180,6 +188,7 @@ final class Defer implements Implementation
      *
      * @return Implementation<T>
      */
+    #[\Override]
     public function dropEnd(int $size): Implementation
     {
         // this cannot be optimised as the whole generator needs to be loaded
@@ -190,6 +199,7 @@ final class Defer implements Implementation
     /**
      * @param Implementation<T> $sequence
      */
+    #[\Override]
     public function equals(Implementation $sequence): bool
     {
         return $this->memoize()->equals($sequence);
@@ -200,6 +210,7 @@ final class Defer implements Implementation
      *
      * @return Implementation<T>
      */
+    #[\Override]
     public function filter(callable $predicate): Implementation
     {
         $captured = $this->capture();
@@ -222,6 +233,7 @@ final class Defer implements Implementation
     /**
      * @param callable(T): void $function
      */
+    #[\Override]
     public function foreach(callable $function): SideEffect
     {
         foreach ($this->values as $value) {
@@ -238,6 +250,7 @@ final class Defer implements Implementation
      *
      * @return Map<D, Sequence<T>>
      */
+    #[\Override]
     public function groupBy(callable $discriminator): Map
     {
         /** @var Map<D, Sequence<T>> */
@@ -247,6 +260,7 @@ final class Defer implements Implementation
     /**
      * @return Maybe<T>
      */
+    #[\Override]
     public function first(): Maybe
     {
         $captured = $this->capture();
@@ -267,6 +281,7 @@ final class Defer implements Implementation
     /**
      * @return Maybe<T>
      */
+    #[\Override]
     public function last(): Maybe
     {
         $captured = $this->capture();
@@ -296,6 +311,7 @@ final class Defer implements Implementation
     /**
      * @param T $element
      */
+    #[\Override]
     public function contains($element): bool
     {
         foreach ($this->values as $value) {
@@ -312,6 +328,7 @@ final class Defer implements Implementation
      *
      * @return Maybe<0|positive-int>
      */
+    #[\Override]
     public function indexOf($element): Maybe
     {
         $captured = $this->capture();
@@ -340,6 +357,7 @@ final class Defer implements Implementation
      *
      * @return Implementation<0|positive-int>
      */
+    #[\Override]
     public function indices(): Implementation
     {
         $captured = $this->capture();
@@ -368,6 +386,7 @@ final class Defer implements Implementation
      *
      * @return Implementation<S>
      */
+    #[\Override]
     public function map(callable $function): Implementation
     {
         $captured = $this->capture();
@@ -394,6 +413,7 @@ final class Defer implements Implementation
      *
      * @return self<S>
      */
+    #[\Override]
     public function flatMap(callable $map, callable $exfiltrate): self
     {
         $captured = $this->capture();
@@ -422,6 +442,7 @@ final class Defer implements Implementation
      *
      * @return Implementation<T>
      */
+    #[\Override]
     public function pad(int $size, $element): Implementation
     {
         $captured = $this->capture();
@@ -450,6 +471,7 @@ final class Defer implements Implementation
      *
      * @return Map<bool, Sequence<T>>
      */
+    #[\Override]
     public function partition(callable $predicate): Map
     {
         /** @var Map<bool, Sequence<T>> */
@@ -459,6 +481,7 @@ final class Defer implements Implementation
     /**
      * @return Implementation<T>
      */
+    #[\Override]
     public function slice(int $from, int $until): Implementation
     {
         $captured = $this->capture();
@@ -484,6 +507,7 @@ final class Defer implements Implementation
     /**
      * @return Implementation<T>
      */
+    #[\Override]
     public function take(int $size): Implementation
     {
         $captured = $this->capture();
@@ -512,6 +536,7 @@ final class Defer implements Implementation
      *
      * @return Implementation<T>
      */
+    #[\Override]
     public function takeEnd(int $size): Implementation
     {
         // this cannot be optimised as the whole generator needs to be loaded
@@ -524,6 +549,7 @@ final class Defer implements Implementation
      *
      * @return Implementation<T>
      */
+    #[\Override]
     public function append(Implementation $sequence): Implementation
     {
         $captured = $this->capture();
@@ -551,6 +577,7 @@ final class Defer implements Implementation
      *
      * @return Implementation<T>
      */
+    #[\Override]
     public function prepend(Implementation $sequence): Implementation
     {
         $captured = $this->capture();
@@ -578,6 +605,7 @@ final class Defer implements Implementation
      *
      * @return Implementation<T>
      */
+    #[\Override]
     public function intersect(Implementation $sequence): Implementation
     {
         return $this->filter(static function(mixed $value) use ($sequence): bool {
@@ -591,6 +619,7 @@ final class Defer implements Implementation
      *
      * @return Implementation<T>
      */
+    #[\Override]
     public function sort(callable $function): Implementation
     {
         $captured = $this->capture();
@@ -626,6 +655,7 @@ final class Defer implements Implementation
      *
      * @return I|R
      */
+    #[\Override]
     public function reduce($carry, callable $reducer)
     {
         foreach ($this->values as $value) {
@@ -644,6 +674,7 @@ final class Defer implements Implementation
      *
      * @return I
      */
+    #[\Override]
     public function sink($carry, callable $reducer): mixed
     {
         $continuation = Sink\Continuation::of($carry);
@@ -664,6 +695,7 @@ final class Defer implements Implementation
     /**
      * @return Implementation<T>
      */
+    #[\Override]
     public function clear(): Implementation
     {
         return new Primitive;
@@ -672,6 +704,7 @@ final class Defer implements Implementation
     /**
      * @return Implementation<T>
      */
+    #[\Override]
     public function reverse(): Implementation
     {
         $captured = $this->capture();
@@ -694,6 +727,7 @@ final class Defer implements Implementation
         );
     }
 
+    #[\Override]
     public function empty(): bool
     {
         /** @psalm-suppress ImpureMethodCall */
@@ -703,6 +737,7 @@ final class Defer implements Implementation
         return !$this->values->valid();
     }
 
+    #[\Override]
     public function toIdentity(): Identity
     {
         /** @var Identity<Implementation<T>> */
@@ -712,6 +747,7 @@ final class Defer implements Implementation
     /**
      * @return Sequence<T>
      */
+    #[\Override]
     public function toSequence(): Sequence
     {
         $captured = $this->capture();
@@ -732,6 +768,7 @@ final class Defer implements Implementation
     /**
      * @return Set<T>
      */
+    #[\Override]
     public function toSet(): Set
     {
         $captured = $this->capture();
@@ -749,6 +786,7 @@ final class Defer implements Implementation
         );
     }
 
+    #[\Override]
     public function find(callable $predicate): Maybe
     {
         $captured = $this->capture();
@@ -769,6 +807,7 @@ final class Defer implements Implementation
         });
     }
 
+    #[\Override]
     public function match(callable $wrap, callable $match, callable $empty)
     {
         /** @psalm-suppress MixedArgument */
@@ -787,6 +826,7 @@ final class Defer implements Implementation
      *
      * @return Implementation<array{T, S}>
      */
+    #[\Override]
     public function zip(Implementation $sequence): Implementation
     {
         $captured = $this->capture();
@@ -819,6 +859,7 @@ final class Defer implements Implementation
      *
      * @return self<T>
      */
+    #[\Override]
     public function safeguard($carry, callable $assert): self
     {
         $captured = $this->capture();
@@ -847,6 +888,7 @@ final class Defer implements Implementation
      *
      * @return self<T|A>
      */
+    #[\Override]
     public function aggregate(callable $map, callable $exfiltrate): self
     {
         $aggregate = new Aggregate($this->iterator());
@@ -858,6 +900,7 @@ final class Defer implements Implementation
     /**
      * @return Implementation<T>
      */
+    #[\Override]
     public function memoize(): Implementation
     {
         $values = [];
@@ -874,6 +917,7 @@ final class Defer implements Implementation
      *
      * @return self<T>
      */
+    #[\Override]
     public function dropWhile(callable $condition): self
     {
         $captured = $this->capture();
@@ -917,6 +961,7 @@ final class Defer implements Implementation
      *
      * @return self<T>
      */
+    #[\Override]
     public function takeWhile(callable $condition): self
     {
         $captured = $this->capture();

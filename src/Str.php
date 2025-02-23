@@ -19,6 +19,7 @@ final class Str implements \Stringable
         $this->encoding = $encoding ?? Str\Encoding::utf8;
     }
 
+    #[\Override]
     public function __toString(): string
     {
         return $this->value;
