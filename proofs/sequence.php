@@ -420,9 +420,10 @@ return static function() {
             Set\Sequence::of(Set\Type::any()),
         ),
         static function($assert, $values) {
-            $sequence = Sequence::lazy(function() use ($values) {
+            $sequence = Sequence::lazy(static function() use ($values) {
                 yield from $values;
-                throw new \Exception;
+
+                throw new Exception;
             })->take(\count($values));
 
             $assert->not()->throws(
