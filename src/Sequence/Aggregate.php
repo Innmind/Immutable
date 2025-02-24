@@ -37,6 +37,9 @@ final class Aggregate
         $void = new \stdClass;
 
         /** @psalm-suppress ImpureMethodCall */
+        $this->values->rewind();
+
+        /** @psalm-suppress ImpureMethodCall */
         if (!$this->values->valid()) {
             return;
         }
