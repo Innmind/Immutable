@@ -20,7 +20,7 @@ use Innmind\Immutable\{
  */
 final class Lazy implements Implementation
 {
-    /** @var \Closure(RegisterCleanup): \Generator<int, T> */
+    /** @var \Closure(RegisterCleanup): \Generator<int<0, max>, T> */
     private \Closure $values;
 
     /**
@@ -28,7 +28,7 @@ final class Lazy implements Implementation
      */
     public function __construct(callable $generator)
     {
-        /** @var \Closure(RegisterCleanup): \Generator<int, T> */
+        /** @var \Closure(RegisterCleanup): \Generator<int<0, max>, T> */
         $this->values = \Closure::fromCallable($generator);
     }
 
@@ -80,17 +80,16 @@ final class Lazy implements Implementation
     }
 
     /**
-     * @return \Iterator<T>
+     * @return Iterator<T>
      */
     #[\Override]
-    public function iterator(): \Iterator
+    public function iterator(): Iterator
     {
         // when accessing the iterator from the outside we cannot know when it
         // will be stopped being iterated over so we can't have a way to notify
         // the generator to cleanup its ressources, so we pass an empty function
         // that does nothing
-        /** @psalm-suppress ImpureFunctionCall */
-        return ($this->values)(RegisterCleanup::noop());
+        return Iterator::lazy($this->values, RegisterCleanup::noop());
     }
 
     /**

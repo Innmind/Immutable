@@ -84,12 +84,12 @@ final class Defer implements Implementation
     }
 
     /**
-     * @return \Iterator<T>
+     * @return Iterator<T>
      */
     #[\Override]
-    public function iterator(): \Iterator
+    public function iterator(): Iterator
     {
-        return $this->values;
+        return Iterator::defer($this->values);
     }
 
     /**

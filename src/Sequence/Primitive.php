@@ -57,12 +57,12 @@ final class Primitive implements Implementation
     }
 
     /**
-     * @return \Iterator<T>
+     * @return Iterator<T>
      */
     #[\Override]
-    public function iterator(): \Iterator
+    public function iterator(): Iterator
     {
-        return new \ArrayIterator($this->values);
+        return Iterator::primitive($this->values);
     }
 
     /**
