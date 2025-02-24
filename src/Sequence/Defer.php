@@ -877,12 +877,10 @@ final class Defer implements Implementation
             $values->rewind();
 
             while ($values->valid()) {
+                /** @var T */
                 $value = $values->current();
 
-                /**
-                 * @psalm-suppress ImpureFunctionCall
-                 * @psalm-suppress PossiblyNullArgument
-                 */
+                /** @psalm-suppress ImpureFunctionCall */
                 if ($predicate($value) === true) {
                     return Maybe::just($value);
                 }

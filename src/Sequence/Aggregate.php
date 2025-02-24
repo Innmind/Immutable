@@ -113,6 +113,9 @@ final class Aggregate
     private function walk(\Iterator $values, \stdClass $void): \Generator
     {
         /** @psalm-suppress ImpureMethodCall */
+        $values->rewind();
+
+        /** @psalm-suppress ImpureMethodCall */
         if (!$values->valid()) {
             return $void;
         }
