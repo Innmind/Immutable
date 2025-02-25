@@ -512,4 +512,53 @@ return static function() {
             $assert->same([4, 5, 6, 7], $lazy->toList());
         },
     );
+
+    yield test(
+        'Lazy Sequence::toSet()',
+        static function($assert) {
+            $loaded = false;
+            $lazy = Sequence::lazy(static function() use (&$loaded) {
+                yield 1;
+                yield 2;
+                yield 3;
+                $loaded = true;
+            });
+
+            $set = $lazy->toSet();
+            $assert->false($loaded);
+            $assert->same([1, 2, 3], $set->toList());
+            $assert->true($loaded);
+        },
+    );
+
+    yield test(
+        'Deferred Sequence::filter() is iterable twice',
+        static function($assert) {
+            $defer = Sequence::defer((static function() {
+                yield 1;
+                yield 2;
+                yield 3;
+                yield 4;
+            })());
+            $odd = $defer->filter(static fn($i) => $i%2 === 0);
+
+            $assert->same([2, 4], $odd->toList());
+            $assert->same([2, 4], $odd->toList());
+            $assert->same([1, 2, 3, 4], $defer->toList());
+        },
+    );
+
+    yield test(
+        'Consuming out of order deferred sequences',
+        static function($assert) {
+            $source = Sequence::defer((static function() {
+                yield from \range(0, 10);
+            })());
+            $initial = $source->filter(static fn($i) => $i%2 === 0);
+            $other = $source->filter(static fn() => false);
+            unset($source);
+
+            $assert->false($initial->equals($other));
+        },
+    );
 };
