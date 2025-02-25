@@ -122,21 +122,21 @@ final class DoubleIndex implements Implementation
             return false;
         }
 
-        foreach ($this->pairs->iterator() as $pair) {
-            $equals = $map
-                ->get($pair->key())
-                ->filter(static fn($value) => $value === $pair->value())
-                ->match(
-                    static fn() => true,
-                    static fn() => false,
-                );
-
-            if (!$equals) {
-                return false;
-            }
-        }
-
-        return true;
+        return $this
+            ->pairs
+            ->find(
+                static fn($pair) => $map
+                    ->get($pair->key())
+                    ->filter(static fn($value) => $value === $pair->value())
+                    ->match(
+                        static fn() => false,
+                        static fn() => true,
+                    ),
+            )
+            ->match(
+                static fn() => false,
+                static fn() => true,
+            );
     }
 
     /**
@@ -158,12 +158,11 @@ final class DoubleIndex implements Implementation
     #[\Override]
     public function foreach(callable $function): SideEffect
     {
-        foreach ($this->pairs->iterator() as $pair) {
-            /** @psalm-suppress ImpureFunctionCall */
-            $function($pair->key(), $pair->value());
-        }
-
-        return new SideEffect;
+        /** @psalm-suppress ImpureFunctionCall */
+        return $this->pairs->foreach(static fn($pair) => $function(
+            $pair->key(),
+            $pair->value(),
+        ));
     }
 
     /**
@@ -178,20 +177,29 @@ final class DoubleIndex implements Implementation
     {
         /** @var Map<D, Map<T, S>> */
         $groups = Map::of();
-
-        foreach ($this->pairs->iterator() as $pair) {
-            /** @psalm-suppress ImpureFunctionCall */
-            $key = $discriminator($pair->key(), $pair->value());
-
-            $group = $groups->get($key)->match(
-                static fn($group) => $group,
-                fn() => $this->clearMap(),
-            );
-            $groups = ($groups)($key, ($group)($pair->key(), $pair->value()));
-        }
+        $empty = $this->clearMap();
 
         /** @var Map<D, Map<T, S>> */
-        return $groups;
+        return $this->pairs->reduce(
+            $groups,
+            static function(Map $groups, $pair) use ($discriminator, $empty) {
+                /** @psalm-suppress ImpureFunctionCall */
+                $key = $discriminator($pair->key(), $pair->value());
+                /** @var Map<T, S> */
+                $group = $groups->get($key)->match(
+                    static fn(Map $group) => $group,
+                    static fn() => $empty,
+                );
+
+                return ($groups)(
+                    $key,
+                    ($group)(
+                        $pair->key(),
+                        $pair->value(),
+                    ),
+                );
+            }
+        );
     }
 
     /**
@@ -272,19 +280,30 @@ final class DoubleIndex implements Implementation
         $truthy = $this->clearMap();
         $falsy = $this->clearMap();
 
-        foreach ($this->pairs->iterator() as $pair) {
-            $key = $pair->key();
-            $value = $pair->value();
+        [$truthy, $falsy] = $this->pairs->reduce(
+            [$truthy, $falsy],
+            static function(array $carry, $pair) use ($predicate) {
+                /**
+                 * @var Map<T, S> $truthy
+                 * @var Map<T, S> $falsy
+                 */
+                [$truthy, $falsy] = $carry;
 
-            /** @psalm-suppress ImpureFunctionCall */
-            $return = $predicate($key, $value);
+                $key = $pair->key();
+                $value = $pair->value();
 
-            if ($return === true) {
-                $truthy = ($truthy)($key, $value);
-            } else {
-                $falsy = ($falsy)($key, $value);
-            }
-        }
+                /** @psalm-suppress ImpureFunctionCall */
+                $return = $predicate($key, $value);
+
+                if ($return === true) {
+                    $truthy = ($truthy)($key, $value);
+                } else {
+                    $falsy = ($falsy)($key, $value);
+                }
+
+                return [$truthy, $falsy];
+            },
+        );
 
         return Map::of([true, $truthy], [false, $falsy]);
     }
@@ -301,12 +320,18 @@ final class DoubleIndex implements Implementation
     #[\Override]
     public function reduce($carry, callable $reducer)
     {
-        foreach ($this->pairs->iterator() as $pair) {
-            /** @psalm-suppress ImpureFunctionCall */
-            $carry = $reducer($carry, $pair->key(), $pair->value());
-        }
-
-        return $carry;
+        /**
+         * @psalm-suppress ImpureFunctionCall
+         * @psalm-suppress MixedArgument
+         */
+        return $this->pairs->reduce(
+            $carry,
+            static fn($carry, $pair) => $reducer(
+                $carry,
+                $pair->key(),
+                $pair->value(),
+            ),
+        );
     }
 
     #[\Override]
