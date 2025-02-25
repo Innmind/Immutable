@@ -32,11 +32,6 @@ interface Implementation extends \Countable
     public function size(): int;
 
     /**
-     * @return \Iterator<T>
-     */
-    public function iterator(): \Iterator;
-
-    /**
      * Intersect this set with the given one
      *
      * @param self<T> $set

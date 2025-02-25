@@ -66,15 +66,6 @@ final class Defer implements Implementation
     }
 
     /**
-     * @return \Iterator<T>
-     */
-    #[\Override]
-    public function iterator(): \Iterator
-    {
-        return $this->values->iterator();
-    }
-
-    /**
      * @param Implementation<T> $set
      *
      * @return self<T>

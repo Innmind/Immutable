@@ -42,7 +42,7 @@ class LazyTest extends TestCase
             yield 2;
         });
 
-        $this->assertSame([1, 2], \iterator_to_array($set->iterator()));
+        $this->assertSame([1, 2], \iterator_to_array($set->sequence()->iterator()));
     }
 
     public function testIntersect()
@@ -63,10 +63,10 @@ class LazyTest extends TestCase
 
         $this->assertFalse($aLoaded);
         $this->assertFalse($bLoaded);
-        $this->assertSame([1, 2], \iterator_to_array($a->iterator()));
-        $this->assertSame([2, 3], \iterator_to_array($b->iterator()));
+        $this->assertSame([1, 2], \iterator_to_array($a->sequence()->iterator()));
+        $this->assertSame([2, 3], \iterator_to_array($b->sequence()->iterator()));
         $this->assertInstanceOf(Lazy::class, $c);
-        $this->assertSame([2], \iterator_to_array($c->iterator()));
+        $this->assertSame([2], \iterator_to_array($c->sequence()->iterator()));
         $this->assertTrue($aLoaded);
         $this->assertTrue($bLoaded);
     }
@@ -81,10 +81,10 @@ class LazyTest extends TestCase
         $b = ($a)(2);
 
         $this->assertFalse($loaded);
-        $this->assertSame([1], \iterator_to_array($a->iterator()));
+        $this->assertSame([1], \iterator_to_array($a->sequence()->iterator()));
         $this->assertInstanceOf(Lazy::class, $b);
-        $this->assertSame([1, 2], \iterator_to_array($b->iterator()));
-        $this->assertSame([1, 2], \iterator_to_array(($b)(2)->iterator()));
+        $this->assertSame([1, 2], \iterator_to_array($b->sequence()->iterator()));
+        $this->assertSame([1, 2], \iterator_to_array(($b)(2)->sequence()->iterator()));
         $this->assertTrue($loaded);
     }
 
@@ -108,10 +108,10 @@ class LazyTest extends TestCase
         });
         $b = $a->remove(3);
 
-        $this->assertSame([1, 2, 3, 4], \iterator_to_array($a->iterator()));
+        $this->assertSame([1, 2, 3, 4], \iterator_to_array($a->sequence()->iterator()));
         $this->assertInstanceOf(Lazy::class, $b);
-        $this->assertSame([1, 2, 4], \iterator_to_array($b->iterator()));
-        $this->assertSame([1, 2, 3, 4], \iterator_to_array($a->remove(5)->iterator()));
+        $this->assertSame([1, 2, 4], \iterator_to_array($b->sequence()->iterator()));
+        $this->assertSame([1, 2, 3, 4], \iterator_to_array($a->remove(5)->sequence()->iterator()));
     }
 
     public function testDiff()
@@ -133,10 +133,10 @@ class LazyTest extends TestCase
 
         $this->assertFalse($aLoaded);
         $this->assertFalse($bLoaded);
-        $this->assertSame([1, 2, 3], \iterator_to_array($a->iterator()));
-        $this->assertSame([2, 4], \iterator_to_array($b->iterator()));
+        $this->assertSame([1, 2, 3], \iterator_to_array($a->sequence()->iterator()));
+        $this->assertSame([2, 4], \iterator_to_array($b->sequence()->iterator()));
         $this->assertInstanceOf(Lazy::class, $c);
-        $this->assertSame([1, 3], \iterator_to_array($c->iterator()));
+        $this->assertSame([1, 3], \iterator_to_array($c->sequence()->iterator()));
         $this->assertTrue($aLoaded);
         $this->assertTrue($bLoaded);
     }
@@ -179,9 +179,9 @@ class LazyTest extends TestCase
         $b = $a->filter(static fn($i) => $i % 2 === 0);
 
         $this->assertFalse($loaded);
-        $this->assertSame([1, 2, 3, 4], \iterator_to_array($a->iterator()));
+        $this->assertSame([1, 2, 3, 4], \iterator_to_array($a->sequence()->iterator()));
         $this->assertInstanceOf(Lazy::class, $b);
-        $this->assertSame([2, 4], \iterator_to_array($b->iterator()));
+        $this->assertSame([2, 4], \iterator_to_array($b->sequence()->iterator()));
         $this->assertTrue($loaded);
     }
 
@@ -218,7 +218,7 @@ class LazyTest extends TestCase
         });
         $groups = $set->groupBy(static fn($i) => $i % 2);
 
-        $this->assertSame([1, 2, 3, 4], \iterator_to_array($set->iterator()));
+        $this->assertSame([1, 2, 3, 4], \iterator_to_array($set->sequence()->iterator()));
         $this->assertInstanceOf(Map::class, $groups);
         $this->assertCount(2, $groups);
         $this->assertSame([2, 4], $this->get($groups, 0)->toList());
@@ -237,9 +237,9 @@ class LazyTest extends TestCase
         $b = $a->map(static fn($i) => $i * 2);
 
         $this->assertFalse($loaded);
-        $this->assertSame([1, 2, 3], \iterator_to_array($a->iterator()));
+        $this->assertSame([1, 2, 3], \iterator_to_array($a->sequence()->iterator()));
         $this->assertInstanceOf(Lazy::class, $b);
-        $this->assertSame([2, 4, 6], \iterator_to_array($b->iterator()));
+        $this->assertSame([2, 4, 6], \iterator_to_array($b->sequence()->iterator()));
         $this->assertTrue($loaded);
     }
 
@@ -253,7 +253,7 @@ class LazyTest extends TestCase
 
         $this->assertSame(
             [1],
-            \iterator_to_array($set->map(static fn() => 1)->iterator()),
+            \iterator_to_array($set->map(static fn() => 1)->sequence()->iterator()),
         );
     }
 
@@ -267,7 +267,7 @@ class LazyTest extends TestCase
         });
         $groups = $set->partition(static fn($i) => $i % 2 === 0);
 
-        $this->assertSame([1, 2, 3, 4], \iterator_to_array($set->iterator()));
+        $this->assertSame([1, 2, 3, 4], \iterator_to_array($set->sequence()->iterator()));
         $this->assertInstanceOf(Map::class, $groups);
         $this->assertCount(2, $groups);
         $this->assertSame([2, 4], $this->get($groups, true)->toList());
@@ -287,7 +287,7 @@ class LazyTest extends TestCase
         $sorted = $set->sort(static fn($a, $b) => $a > $b ? 1 : -1);
 
         $this->assertFalse($loaded);
-        $this->assertSame([1, 4, 3, 2], \iterator_to_array($set->iterator()));
+        $this->assertSame([1, 4, 3, 2], \iterator_to_array($set->sequence()->iterator()));
         $this->assertInstanceOf(Sequence::class, $sorted);
         $this->assertSame([1, 2, 3, 4], $sorted->toList());
         $this->assertTrue($loaded);
@@ -311,10 +311,10 @@ class LazyTest extends TestCase
 
         $this->assertFalse($aLoaded);
         $this->assertFalse($bLoaded);
-        $this->assertSame([1, 2], \iterator_to_array($a->iterator()));
-        $this->assertSame([2, 3], \iterator_to_array($b->iterator()));
+        $this->assertSame([1, 2], \iterator_to_array($a->sequence()->iterator()));
+        $this->assertSame([2, 3], \iterator_to_array($b->sequence()->iterator()));
         $this->assertInstanceOf(Lazy::class, $c);
-        $this->assertSame([1, 2, 3], \iterator_to_array($c->iterator()));
+        $this->assertSame([1, 2, 3], \iterator_to_array($c->sequence()->iterator()));
         $this->assertTrue($aLoaded);
         $this->assertTrue($bLoaded);
     }
@@ -338,9 +338,9 @@ class LazyTest extends TestCase
         });
         $b = $a->clear();
 
-        $this->assertSame([1], \iterator_to_array($a->iterator()));
+        $this->assertSame([1], \iterator_to_array($a->sequence()->iterator()));
         $this->assertInstanceOf(Implementation::class, $b);
-        $this->assertSame([], \iterator_to_array($b->iterator()));
+        $this->assertSame([], \iterator_to_array($b->sequence()->iterator()));
     }
 
     public function testEmpty()
