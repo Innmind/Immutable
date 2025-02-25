@@ -1,59 +1,26 @@
 <?php
 declare(strict_types = 1);
 
-namespace Innmind\Immutable\Sequence;
+namespace Innmind\Immutable\Sequence\Iterator;
 
-use Innmind\Immutable\{
-    Accumulate,
-    RegisterCleanup,
-    Sequence\Iterator\Lazy,
-    Sequence\Iterator\Defer,
-    Sequence\Iterator\Primitive,
-};
+use Innmind\Immutable\RegisterCleanup;
 
 /**
  * @internal
  * @template-covariant T
  * @implements \Iterator<T>
  */
-final class Iterator implements \Iterator
+final class Lazy implements \Iterator
 {
     /**
      * @psalm-mutation-free
      *
-     * @param Lazy<T>|Defer<T>|Primitive<T> $inner
+     * @param \Generator<int<0, max>, T> $inner
      */
     private function __construct(
-        private Lazy|Defer|Primitive $inner,
+        private \Generator $inner,
+        private RegisterCleanup $register,
     ) {
-    }
-
-    /**
-     * @internal
-     * @template A
-     * @psalm-pure
-     *
-     * @param list<A> $values
-     *
-     * @return self<A>
-     */
-    public static function primitive(array $values): self
-    {
-        return new self(Primitive::of($values));
-    }
-
-    /**
-     * @internal
-     * @template A
-     * @psalm-pure
-     *
-     * @param Accumulate<A>|\Generator<int<0, max>, A> $values
-     *
-     * @return self<A>
-     */
-    public static function defer(Accumulate|\Generator $values): self
-    {
-        return new self(Defer::of($values));
     }
 
     /**
@@ -65,11 +32,12 @@ final class Iterator implements \Iterator
      *
      * @return self<A>
      */
-    public static function lazy(
+    public static function of(
         \Closure $generator,
         RegisterCleanup $register,
     ): self {
-        return new self(Lazy::of($generator, $register));
+        /** @psalm-suppress ImpureFunctionCall */
+        return new self($generator($register), $register);
     }
 
     /**
@@ -110,6 +78,6 @@ final class Iterator implements \Iterator
 
     public function cleanup(): void
     {
-        $this->inner->cleanup();
+        $this->register->cleanup();
     }
 }

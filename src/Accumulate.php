@@ -91,8 +91,7 @@ final class Accumulate implements \Iterator
         if (!$valid) {
             // once the "true" end has been reached we automatically rewind this
             // iterator so it is always in a clean state
-            /** @psalm-suppress UnusedMethodCall */
-            $this->rewind();
+            $this->cleanup();
         }
 
         return $valid;
@@ -101,6 +100,12 @@ final class Accumulate implements \Iterator
     public function started(): bool
     {
         return $this->started;
+    }
+
+    public function cleanup(): void
+    {
+        // todo correctly re-position the previous cursor
+        $this->rewind();
     }
 
     private function reachedCacheEnd(): bool

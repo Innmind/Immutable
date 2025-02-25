@@ -603,6 +603,12 @@ final class Primitive implements Implementation
             $other->next();
         }
 
+        /** @psalm-suppress ImpureMethodCall */
+        if ($other->valid()) {
+            /** @psalm-suppress ImpureMethodCall */
+            $other->cleanup();
+        }
+
         /** @var Implementation<array{T, S}> */
         return new self($values);
     }

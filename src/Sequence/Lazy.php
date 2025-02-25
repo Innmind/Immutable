@@ -1127,16 +1127,19 @@ final class Lazy implements Implementation
      *
      * @param Implementation<A> $sequence
      *
-     * @return \Iterator<A>
+     * @return Iterator<A>
      */
     private static function open(
         Implementation $sequence,
         RegisterCleanup $registerCleanup,
-    ): \Iterator {
+    ): Iterator {
         if ($sequence instanceof self) {
-            return ($sequence->values)($registerCleanup);
+            return Iterator::lazy($sequence->values, $registerCleanup);
         }
 
-        return $sequence->iterator();
+        $iterator = $sequence->iterator();
+        $registerCleanup(static fn() => $iterator->cleanup());
+
+        return $iterator;
     }
 }
