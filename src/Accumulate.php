@@ -18,6 +18,8 @@ final class Accumulate implements \Iterator
     private \Generator $generator;
     /** @var list<S> */
     private array $values = [];
+    /** @var list<int<0, max>> */
+    private array $cursors = [];
     private bool $started = false;
 
     /**
@@ -74,6 +76,11 @@ final class Accumulate implements \Iterator
     #[\Override]
     public function rewind(): void
     {
+        if ($this->started && !\is_null($key = $this->key())) {
+            /** @psalm-suppress InaccessibleProperty */
+            $this->cursors[] = $key;
+        }
+
         /** @psalm-suppress InaccessibleProperty */
         $this->started = true;
         /** @psalm-suppress InaccessibleProperty */
@@ -104,8 +111,23 @@ final class Accumulate implements \Iterator
 
     public function cleanup(): void
     {
-        // todo correctly re-position the previous cursor
-        $this->rewind();
+        /** @psalm-suppress InaccessibleProperty */
+        $previousCursor = \array_pop($this->cursors);
+
+        if (\is_null($previousCursor)) {
+            return;
+        }
+
+        // Re-position the cursor to the previous position before entering a new
+        // loop. It only iterate over the cached values because the previous
+        // cursor must be in the cache.
+        /** @psalm-suppress InaccessibleProperty */
+        \reset($this->values);
+
+        while (\is_int(\key($this->values)) && \key($this->values) !== $previousCursor) {
+            /** @psalm-suppress InaccessibleProperty */
+            \next($this->values);
+        }
     }
 
     private function reachedCacheEnd(): bool
@@ -115,7 +137,8 @@ final class Accumulate implements \Iterator
 
     private function pop(): void
     {
-        if ($this->reachedCacheEnd()) {
+        /** @psalm-suppress ImpureMethodCall */
+        if ($this->reachedCacheEnd() && $this->generator->valid()) {
             /**
              * @psalm-suppress InaccessibleProperty
              * @psalm-suppress ImpureMethodCall
