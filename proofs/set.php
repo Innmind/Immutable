@@ -80,6 +80,27 @@ return static function() {
                     ))
                     ->toList(),
             );
+
+            $doubles = $set->map(static fn($i) => $i*2);
+
+            $assert->same(
+                [
+                    [1, 2],
+                    [1, 4],
+                    [1, 6],
+                    [2, 2],
+                    [2, 4],
+                    [2, 6],
+                    [3, 2],
+                    [3, 4],
+                    [3, 6],
+                ],
+                $set
+                    ->flatMap(static fn($i) => $doubles->map(
+                        static fn($j) => [$i, $j],
+                    ))
+                    ->toList(),
+            );
         },
     );
 

@@ -434,4 +434,47 @@ return static function() {
             );
         },
     );
+
+    yield test(
+        'Partial load a deferred Sequence appended to a lazy one',
+        static function($assert) {
+            $lazy = Sequence::lazy(static function() {
+                yield 1;
+                yield 2;
+                yield 3;
+                yield 4;
+                yield 5;
+            });
+            $defer = Sequence::defer((static function() {
+                yield 6;
+                yield 7;
+                yield 8;
+                yield 9;
+                yield 10;
+            })());
+
+            $assert->same(
+                [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 6, 7, 8, 9, 10],
+                $lazy
+                    ->append($defer)
+                    ->take(7)
+                    ->flatMap(static fn($i) => match (true) {
+                        $i > 5 => $defer,
+                        default => Sequence::of($i),
+                    })
+                    ->toList(),
+            );
+            $assert->same(
+                [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 6, 7, 8, 9, 10],
+                $defer
+                    ->prepend($lazy)
+                    ->take(7)
+                    ->flatMap(static fn($i) => match (true) {
+                        $i > 5 => $defer,
+                        default => Sequence::of($i),
+                    })
+                    ->toList(),
+            );
+        },
+    );
 };
