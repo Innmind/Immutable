@@ -20,16 +20,16 @@ use Innmind\Immutable\{
  */
 final class DoubleIndex implements Implementation
 {
-    /** @var Sequence\Implementation<Pair<T, S>> */
-    private Sequence\Implementation $pairs;
+    /** @var Sequence<Pair<T, S>> */
+    private Sequence $pairs;
 
     /**
-     * @param Sequence\Implementation<Pair<T, S>> $pairs
+     * @param Sequence<Pair<T, S>> $pairs
      */
-    public function __construct(?Sequence\Implementation $pairs = null)
+    public function __construct(?Sequence $pairs = null)
     {
-        /** @var Sequence\Implementation<Pair<T, S>> */
-        $this->pairs = $pairs ?? new Sequence\Primitive;
+        /** @var Sequence<Pair<T, S>> */
+        $this->pairs = $pairs ?? Sequence::of();
     }
 
     /**
@@ -58,8 +58,7 @@ final class DoubleIndex implements Implementation
      */
     public static function of($key, $value): self
     {
-        /** @psalm-suppress MixedArgumentTypeCoercion */
-        return new self(new Sequence\Primitive([new Pair($key, $value)]));
+        return new self(Sequence::of(new Pair($key, $value)));
     }
 
     #[\Override]
@@ -94,13 +93,7 @@ final class DoubleIndex implements Implementation
     #[\Override]
     public function contains($key): bool
     {
-        return $this
-            ->pairs
-            ->find(static fn($pair) => $pair->key() === $key)
-            ->match(
-                static fn() => true,
-                static fn() => false,
-            );
+        return $this->pairs->any(static fn($pair) => $pair->key() === $key);
     }
 
     /**
@@ -122,21 +115,15 @@ final class DoubleIndex implements Implementation
             return false;
         }
 
-        return $this
-            ->pairs
-            ->find(
-                static fn($pair) => $map
-                    ->get($pair->key())
-                    ->filter(static fn($value) => $value === $pair->value())
-                    ->match(
-                        static fn() => false,
-                        static fn() => true,
-                    ),
-            )
-            ->match(
-                static fn() => false,
-                static fn() => true,
-            );
+        return $this->pairs->matches(
+            static fn($pair) => $map
+                ->get($pair->key())
+                ->filter(static fn($value) => $value === $pair->value())
+                ->match(
+                    static fn() => true,
+                    static fn() => false,
+                ),
+        );
     }
 
     /**
@@ -220,10 +207,7 @@ final class DoubleIndex implements Implementation
     #[\Override]
     public function values(): Sequence
     {
-        return $this
-            ->pairs
-            ->map(static fn($pair) => $pair->value())
-            ->toSequence();
+        return $this->pairs->map(static fn($pair) => $pair->value());
     }
 
     /**
@@ -349,7 +333,7 @@ final class DoubleIndex implements Implementation
     #[\Override]
     public function toSequence(): Sequence
     {
-        return $this->pairs->toSequence();
+        return $this->pairs;
     }
 
     /**
