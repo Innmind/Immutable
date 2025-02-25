@@ -1134,19 +1134,15 @@ final class Defer implements Implementation
 
     /**
      * @return array{
-     *     \WeakReference<self<T>>,
-     *     Accumulate<T>|\Generator<int<0, max>, T>,
+     *     Accumulate<T>,
+     *     \Generator<int<0, max>, T>,
      * }
      */
     private function capture(): array
     {
-        /** @psalm-suppress ImpureMethodCall */
         return [
-            \WeakReference::create($this),
-            match ($this->values->started()) {
-                true => $this->values,
-                false => $this->generator,
-            },
+            $this->values,
+            $this->generator,
         ];
     }
 
@@ -1154,21 +1150,22 @@ final class Defer implements Implementation
      * @template V
      *
      * @param array{
-     *     \WeakReference<self<V>>,
-     *     Accumulate<V>|\Generator<int<0, max>, V>,
+     *     Accumulate<V>,
+     *     \Generator<int<0, max>, V>,
      * } $captured
      *
      * @return Iterator<V>
      */
     private static function detonate(array $captured): Iterator
     {
-        [$ref, $generator] = $captured;
-        $self = $ref->get();
+        [$values, $generator] = $captured;
+        $values = \WeakReference::create($values);
+        $values = $values->get();
 
-        if (\is_null($self)) {
+        if (\is_null($values)) {
             return Iterator::defer($generator);
         }
 
-        return $self->iterator();
+        return Iterator::defer($values);
     }
 }
