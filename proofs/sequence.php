@@ -477,4 +477,39 @@ return static function() {
             );
         },
     );
+
+    yield test(
+        'Sequence::defer()->zip() with a partially loaded lazy Sequence',
+        static function($assert) {
+            $defer = Sequence::defer((static function() {
+                yield 1;
+                yield 2;
+                yield 3;
+            })());
+            $cleaned = false;
+            $loaded = false;
+            $lazy = Sequence::lazy(static function($register) use (&$cleaned, &$loaded) {
+                $register(static function() use (&$cleaned) {
+                    $cleaned = true;
+                });
+
+                yield 4;
+                yield 5;
+                yield 6;
+                yield 7;
+                $loaded = true;
+            });
+
+            $assert->same(
+                [[1, 4], [2, 5], [3, 6]],
+                $defer
+                    ->zip($lazy)
+                    ->toList(),
+            );
+            $assert->true($cleaned);
+            $assert->false($loaded);
+            $assert->same([1, 2, 3], $defer->toList());
+            $assert->same([4, 5, 6, 7], $lazy->toList());
+        },
+    );
 };
