@@ -1159,6 +1159,13 @@ final class Defer implements Implementation
     private static function detonate(array $captured): Iterator
     {
         [$values, $generator] = $captured;
+        // By wrapping $values with a weak reference and assigning it to the
+        // same variable we decrement its refcount by 1. This means that when
+        // fetching the object back if it still exist then it's used by another
+        // deferred sequence. This works even if the initial sequence wrapping
+        // it no longer exist.
+        // And if the object no longer exist then this object was the last one
+        // using it and we can safely use the generator.
         $values = \WeakReference::create($values);
         $values = $values->get();
 
