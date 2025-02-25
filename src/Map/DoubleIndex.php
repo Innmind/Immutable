@@ -185,7 +185,7 @@ final class DoubleIndex implements Implementation
                         $pair->value(),
                     ),
                 );
-            }
+            },
         );
     }
 

@@ -864,7 +864,6 @@ final class Lazy implements Implementation
     #[\Override]
     public function toSet(): Set
     {
-
         return Set::lazy($this->values);
     }
 
