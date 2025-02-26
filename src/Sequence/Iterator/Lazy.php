@@ -67,6 +67,8 @@ final class Lazy implements \Iterator
     #[\Override]
     public function valid(): bool
     {
+        // Do not call the register cleanup as the user is expected to call a
+        // cleanup code at the end of the generator.
         return $this->inner->valid();
     }
 
