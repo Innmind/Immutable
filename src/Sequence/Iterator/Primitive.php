@@ -73,6 +73,7 @@ final class Primitive implements \Iterator
 
     public function cleanup(): void
     {
-        $this->inner->rewind();
+        // Do nothing to be in the same state has if the iterator was completely
+        // iterated over.
     }
 }
