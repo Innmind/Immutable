@@ -633,16 +633,13 @@ final class Defer implements Implementation
                 $values->rewind();
 
                 while ($values->valid()) {
-                    // TODO inline this call when Accumulate implementation is fixed
-                    $value = $values->current();
-
                     if ($taken >= $size) {
                         $values->cleanup();
 
                         return;
                     }
 
-                    yield $value;
+                    yield $values->current();
                     ++$taken;
                     $values->next();
                 }
