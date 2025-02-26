@@ -600,4 +600,41 @@ return static function() {
             );
         },
     );
+
+    yield proof(
+        'Sequence::aggregate() should not alter the initial Sequence by default',
+        given(Set\Sequence::of(Set\type::any())),
+        static function($assert, $values) {
+            $inMemory = Sequence::of(...$values);
+
+            $assert->same(
+                $values,
+                $inMemory
+                    ->aggregate(static fn($a, $b) => Sequence::of($a, $b))
+                    ->toList(),
+            );
+
+            $defer = Sequence::defer((static function() use ($values) {
+                yield from $values;
+            })());
+
+            $assert->same(
+                $values,
+                $defer
+                    ->aggregate(static fn($a, $b) => Sequence::of($a, $b))
+                    ->toList(),
+            );
+
+            $lazy = Sequence::lazy(static function() use ($values) {
+                yield from $values;
+            });
+
+            $assert->same(
+                $values,
+                $lazy
+                    ->aggregate(static fn($a, $b) => Sequence::of($a, $b))
+                    ->toList(),
+            );
+        },
+    );
 };
