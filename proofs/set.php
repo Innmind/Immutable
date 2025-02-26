@@ -52,4 +52,130 @@ return static function() {
             );
         },
     );
+
+    yield test(
+        'Set defer nesting calls',
+        static function($assert) {
+            $set = Set::defer((static function() {
+                yield 1;
+                yield 2;
+                yield 3;
+            })());
+
+            $assert->same(
+                [
+                    [1, 1],
+                    [1, 2],
+                    [1, 3],
+                    [2, 1],
+                    [2, 2],
+                    [2, 3],
+                    [3, 1],
+                    [3, 2],
+                    [3, 3],
+                ],
+                $set
+                    ->flatMap(static fn($i) => $set->map(
+                        static fn($j) => [$i, $j],
+                    ))
+                    ->toList(),
+            );
+
+            $doubles = $set->map(static fn($i) => $i*2);
+
+            $assert->same(
+                [
+                    [1, 2],
+                    [1, 4],
+                    [1, 6],
+                    [2, 2],
+                    [2, 4],
+                    [2, 6],
+                    [3, 2],
+                    [3, 4],
+                    [3, 6],
+                ],
+                $set
+                    ->flatMap(static fn($i) => $doubles->map(
+                        static fn($j) => [$i, $j],
+                    ))
+                    ->toList(),
+            );
+        },
+    );
+
+    yield test(
+        'Set nesting calls',
+        static function($assert) {
+            $set = Set::of(1, 2, 3);
+
+            $assert->same(
+                [
+                    [1, 1],
+                    [1, 2],
+                    [1, 3],
+                    [2, 1],
+                    [2, 2],
+                    [2, 3],
+                    [3, 1],
+                    [3, 2],
+                    [3, 3],
+                ],
+                $set
+                    ->flatMap(static fn($i) => $set->map(
+                        static fn($j) => [$i, $j],
+                    ))
+                    ->toList(),
+            );
+
+            $doubles = $set->map(static fn($i) => $i*2);
+
+            $assert->same(
+                [
+                    [1, 2],
+                    [1, 4],
+                    [1, 6],
+                    [2, 2],
+                    [2, 4],
+                    [2, 6],
+                    [3, 2],
+                    [3, 4],
+                    [3, 6],
+                ],
+                $set
+                    ->flatMap(static fn($i) => $doubles->map(
+                        static fn($j) => [$i, $j],
+                    ))
+                    ->toList(),
+            );
+        },
+    );
+
+    yield test(
+        'Set defer partial nesting calls',
+        static function($assert) {
+            $set = Set::defer((static function() {
+                yield 1;
+                yield 2;
+                yield 3;
+            })());
+
+            $assert->same(
+                [
+                    [1, 1],
+                    [2, 1],
+                    [3, 1],
+                ],
+                $set
+                    ->flatMap(
+                        static fn($i) => $set
+                            ->find(static fn() => true)
+                            ->toSequence()
+                            ->toSet()
+                            ->map(static fn($j) => [$i, $j]),
+                    )
+                    ->toList(),
+            );
+        },
+    );
 };

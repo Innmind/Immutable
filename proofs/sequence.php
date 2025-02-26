@@ -434,4 +434,207 @@ return static function() {
             );
         },
     );
+
+    yield proof(
+        'Sequence::defer()->take() should not load an extra element',
+        given(
+            Set\Sequence::of(Set\Type::any()),
+        ),
+        static function($assert, $values) {
+            $sequence = Sequence::defer((static function() use ($values) {
+                yield from $values;
+
+                throw new Exception;
+            })())->take(\count($values));
+
+            $assert->not()->throws(
+                static fn() => $assert->same(
+                    $values,
+                    $sequence->toList(),
+                ),
+            );
+        },
+    );
+
+    yield test(
+        'Partial load a deferred Sequence appended to a lazy one',
+        static function($assert) {
+            $lazy = Sequence::lazy(static function() {
+                yield 1;
+                yield 2;
+                yield 3;
+                yield 4;
+                yield 5;
+            });
+            $defer = Sequence::defer((static function() {
+                yield 6;
+                yield 7;
+                yield 8;
+                yield 9;
+                yield 10;
+            })());
+
+            $assert->same(
+                [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 6, 7, 8, 9, 10],
+                $lazy
+                    ->append($defer)
+                    ->take(7)
+                    ->flatMap(static fn($i) => match (true) {
+                        $i > 5 => $defer,
+                        default => Sequence::of($i),
+                    })
+                    ->toList(),
+            );
+            $assert->same(
+                [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 6, 7, 8, 9, 10],
+                $defer
+                    ->prepend($lazy)
+                    ->take(7)
+                    ->flatMap(static fn($i) => match (true) {
+                        $i > 5 => $defer,
+                        default => Sequence::of($i),
+                    })
+                    ->toList(),
+            );
+        },
+    );
+
+    yield test(
+        'Sequence::defer()->zip() with a partially loaded lazy Sequence',
+        static function($assert) {
+            $defer = Sequence::defer((static function() {
+                yield 1;
+                yield 2;
+                yield 3;
+            })());
+            $cleaned = false;
+            $loaded = false;
+            $lazy = Sequence::lazy(static function($register) use (&$cleaned, &$loaded) {
+                $register(static function() use (&$cleaned) {
+                    $cleaned = true;
+                });
+
+                yield 4;
+                yield 5;
+                yield 6;
+                yield 7;
+                $loaded = true;
+            });
+
+            $assert->same(
+                [[1, 4], [2, 5], [3, 6]],
+                $defer
+                    ->zip($lazy)
+                    ->toList(),
+            );
+            $assert->true($cleaned);
+            $assert->false($loaded);
+            $assert->same([1, 2, 3], $defer->toList());
+            $assert->same([4, 5, 6, 7], $lazy->toList());
+        },
+    );
+
+    yield test(
+        'Lazy Sequence::toSet()',
+        static function($assert) {
+            $loaded = false;
+            $lazy = Sequence::lazy(static function() use (&$loaded) {
+                yield 1;
+                yield 2;
+                yield 3;
+                $loaded = true;
+            });
+
+            $set = $lazy->toSet();
+            $assert->false($loaded);
+            $assert->same([1, 2, 3], $set->toList());
+            $assert->true($loaded);
+        },
+    );
+
+    yield test(
+        'Deferred Sequence::filter() is iterable twice',
+        static function($assert) {
+            $defer = Sequence::defer((static function() {
+                yield 1;
+                yield 2;
+                yield 3;
+                yield 4;
+            })());
+            $odd = $defer->filter(static fn($i) => $i%2 === 0);
+
+            $assert->same([2, 4], $odd->toList());
+            $assert->same([2, 4], $odd->toList());
+            $assert->same([1, 2, 3, 4], $defer->toList());
+        },
+    );
+
+    yield test(
+        'Consuming out of order deferred sequences',
+        static function($assert) {
+            $source = Sequence::defer((static function() {
+                yield from \range(0, 10);
+            })());
+            $initial = $source->filter(static fn($i) => $i%2 === 0);
+            $other = $source->filter(static fn() => false);
+            unset($source);
+
+            $assert->false($initial->equals($other));
+        },
+    );
+
+    yield test(
+        'Calling first inside a lazy Sequence::flatMap()',
+        static function($assert) {
+            $lazy = Sequence::lazy(static function() {
+                yield 1;
+                yield 2;
+                yield 3;
+            });
+
+            $assert->same(
+                [1, 1, 1],
+                $lazy
+                    ->flatMap(static fn() => $lazy->first()->toSequence())
+                    ->toList(),
+            );
+        },
+    );
+
+    yield proof(
+        'Sequence::aggregate() should not alter the initial Sequence by default',
+        given(Set\Sequence::of(Set\type::any())),
+        static function($assert, $values) {
+            $inMemory = Sequence::of(...$values);
+
+            $assert->same(
+                $values,
+                $inMemory
+                    ->aggregate(static fn($a, $b) => Sequence::of($a, $b))
+                    ->toList(),
+            );
+
+            $defer = Sequence::defer((static function() use ($values) {
+                yield from $values;
+            })());
+
+            $assert->same(
+                $values,
+                $defer
+                    ->aggregate(static fn($a, $b) => Sequence::of($a, $b))
+                    ->toList(),
+            );
+
+            $lazy = Sequence::lazy(static function() use ($values) {
+                yield from $values;
+            });
+
+            $assert->same(
+                $values,
+                $lazy
+                    ->aggregate(static fn($a, $b) => Sequence::of($a, $b))
+                    ->toList(),
+            );
+        },
+    );
 };
