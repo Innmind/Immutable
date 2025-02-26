@@ -18,6 +18,8 @@ final class Accumulate implements \Iterator
     private \Generator $generator;
     /** @var list<S> */
     private array $values = [];
+    /** @var list<int<0, max>> */
+    private array $cursors = [];
     private bool $started = false;
 
     /**
@@ -74,6 +76,11 @@ final class Accumulate implements \Iterator
     #[\Override]
     public function rewind(): void
     {
+        if ($this->started && !\is_null($key = $this->key())) {
+            /** @psalm-suppress InaccessibleProperty */
+            $this->cursors[] = $key;
+        }
+
         /** @psalm-suppress InaccessibleProperty */
         $this->started = true;
         /** @psalm-suppress InaccessibleProperty */
@@ -91,8 +98,7 @@ final class Accumulate implements \Iterator
         if (!$valid) {
             // once the "true" end has been reached we automatically rewind this
             // iterator so it is always in a clean state
-            /** @psalm-suppress UnusedMethodCall */
-            $this->rewind();
+            $this->cleanup();
         }
 
         return $valid;
@@ -103,6 +109,27 @@ final class Accumulate implements \Iterator
         return $this->started;
     }
 
+    public function cleanup(): void
+    {
+        /** @psalm-suppress InaccessibleProperty */
+        $previousCursor = \array_pop($this->cursors);
+
+        if (\is_null($previousCursor)) {
+            return;
+        }
+
+        // Re-position the cursor to the previous position before entering a new
+        // loop. It only iterate over the cached values because the previous
+        // cursor must be in the cache.
+        /** @psalm-suppress InaccessibleProperty */
+        \reset($this->values);
+
+        while (\is_int(\key($this->values)) && \key($this->values) !== $previousCursor) {
+            /** @psalm-suppress InaccessibleProperty */
+            \next($this->values);
+        }
+    }
+
     private function reachedCacheEnd(): bool
     {
         return \key($this->values) === null;
@@ -110,7 +137,8 @@ final class Accumulate implements \Iterator
 
     private function pop(): void
     {
-        if ($this->reachedCacheEnd()) {
+        /** @psalm-suppress ImpureMethodCall */
+        if ($this->reachedCacheEnd() && $this->generator->valid()) {
             /**
              * @psalm-suppress InaccessibleProperty
              * @psalm-suppress ImpureMethodCall

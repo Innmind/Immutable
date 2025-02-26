@@ -33,9 +33,9 @@ interface Implementation extends \Countable
     public function size(): int;
 
     /**
-     * @return \Iterator<T>
+     * @return Iterator<T>
      */
-    public function iterator(): \Iterator;
+    public function iterator(): Iterator;
 
     /**
      * Return the element at the given index

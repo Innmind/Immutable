@@ -1,5 +1,16 @@
 # Changelog
 
+## [Unreleased]
+
+### Changed
+
+- The function passed to `RegisterCleanup` for lazy `Set`s or `Sequence`s is not called when the monad is partially loaded when called from a deferred/in memory `Set`/`Sequence` (such as `Sequence::zip()`, a call to `find` inside a `flatMap`, etc...).
+
+### Fixed
+
+- When a deferred `Set` or `Sequence` is used while iterating over itself it could produce unexpected results such as infinite loops or skipped values.
+- Fix iterating over a closed `\Generator` on a deferred `Set`/`Sequence` when the source monad no longer exist and the monad at hand has already been iterated over.
+
 ## 5.11.2 - 2025-02-23
 
 ### Fixed

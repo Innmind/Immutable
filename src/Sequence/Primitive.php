@@ -57,12 +57,12 @@ final class Primitive implements Implementation
     }
 
     /**
-     * @return \Iterator<T>
+     * @return Iterator<T>
      */
     #[\Override]
-    public function iterator(): \Iterator
+    public function iterator(): Iterator
     {
-        return new \ArrayIterator($this->values);
+        return Iterator::primitive($this->values);
     }
 
     /**
@@ -137,9 +137,16 @@ final class Primitive implements Implementation
     public function equals(Implementation $sequence): bool
     {
         $other = [];
+        $iterator = $sequence->iterator();
+        /** @psalm-suppress ImpureMethodCall */
+        $iterator->rewind();
 
-        foreach ($sequence->iterator() as $value) {
-            $other[] = $value;
+        /** @psalm-suppress ImpureMethodCall */
+        while ($iterator->valid()) {
+            /** @psalm-suppress ImpureMethodCall */
+            $other[] = $iterator->current();
+            /** @psalm-suppress ImpureMethodCall */
+            $iterator->next();
         }
 
         return $this->values === $other;
@@ -248,20 +255,15 @@ final class Primitive implements Implementation
         return Maybe::just($index);
     }
 
-    /**
-     * @psalm-suppress LessSpecificImplementedReturnType Don't why it complains
-     *
-     * @return self<int>
-     */
     #[\Override]
     public function indices(): self
     {
         if ($this->empty()) {
-            /** @var self<int> */
+            /** @var self<int<0, max>> */
             return new self;
         }
 
-        /** @var self<int> */
+        /** @var self<int<0, max>> */
         return new self(\range(0, $this->size() - 1));
     }
 
@@ -382,9 +384,16 @@ final class Primitive implements Implementation
     public function append(Implementation $sequence): self
     {
         $other = [];
+        $iterator = $sequence->iterator();
+        /** @psalm-suppress ImpureMethodCall */
+        $iterator->rewind();
 
-        foreach ($sequence->iterator() as $value) {
-            $other[] = $value;
+        /** @psalm-suppress ImpureMethodCall */
+        while ($iterator->valid()) {
+            /** @psalm-suppress ImpureMethodCall */
+            $other[] = $iterator->current();
+            /** @psalm-suppress ImpureMethodCall */
+            $iterator->next();
         }
 
         return new self(\array_merge($this->values, $other));
@@ -399,9 +408,16 @@ final class Primitive implements Implementation
     public function prepend(Implementation $sequence): self
     {
         $other = [];
+        $iterator = $sequence->iterator();
+        /** @psalm-suppress ImpureMethodCall */
+        $iterator->rewind();
 
-        foreach ($sequence->iterator() as $value) {
-            $other[] = $value;
+        /** @psalm-suppress ImpureMethodCall */
+        while ($iterator->valid()) {
+            /** @psalm-suppress ImpureMethodCall */
+            $other[] = $iterator->current();
+            /** @psalm-suppress ImpureMethodCall */
+            $iterator->next();
         }
 
         return new self(\array_merge($other, $this->values));
@@ -429,14 +445,14 @@ final class Primitive implements Implementation
     #[\Override]
     public function sort(callable $function): self
     {
-        $self = clone $this;
+        $values = $this->values;
         /**
          * @psalm-suppress InaccessibleProperty
          * @psalm-suppress ImpureFunctionCall
          */
-        \usort($self->values, $function);
+        \usort($values, $function);
 
-        return $self;
+        return new self($values);
     }
 
     /**
@@ -572,8 +588,10 @@ final class Primitive implements Implementation
         /** @var list<array{T, S}> */
         $values = [];
         $other = $sequence->iterator();
+        /** @psalm-suppress ImpureMethodCall */
+        $other->rewind();
 
-        foreach ($this->iterator() as $value) {
+        foreach ($this->values as $value) {
             /** @psalm-suppress ImpureMethodCall */
             if (!$other->valid()) {
                 break;
@@ -583,6 +601,12 @@ final class Primitive implements Implementation
             $values[] = [$value, $other->current()];
             /** @psalm-suppress ImpureMethodCall */
             $other->next();
+        }
+
+        /** @psalm-suppress ImpureMethodCall */
+        if ($other->valid()) {
+            /** @psalm-suppress ImpureMethodCall */
+            $other->cleanup();
         }
 
         /** @var Implementation<array{T, S}> */
@@ -618,11 +642,16 @@ final class Primitive implements Implementation
         $aggregate = new Aggregate($this->iterator());
         /** @psalm-suppress MixedArgument */
         $values = $aggregate(static fn($a, $b) => $exfiltrate($map($a, $b))->iterator());
+        /** @psalm-suppress ImpureMethodCall */
+        $values->rewind();
         $aggregated = [];
 
         /** @psalm-suppress ImpureMethodCall */
-        foreach ($values as $value) {
-            $aggregated[] = $value;
+        while ($values->valid()) {
+            /** @psalm-suppress ImpureMethodCall */
+            $aggregated[] = $values->current();
+            /** @psalm-suppress ImpureMethodCall */
+            $values->next();
         }
 
         return new self($aggregated);
@@ -647,6 +676,8 @@ final class Primitive implements Implementation
     {
         $values = [];
         $iterator = $this->iterator();
+        /** @psalm-suppress ImpureMethodCall */
+        $iterator->rewind();
 
         /** @psalm-suppress ImpureMethodCall */
         while ($iterator->valid()) {
@@ -689,7 +720,7 @@ final class Primitive implements Implementation
     {
         $values = [];
 
-        foreach ($this->iterator() as $current) {
+        foreach ($this->values as $current) {
             /** @psalm-suppress ImpureFunctionCall */
             if (!$condition($current)) {
                 break;
