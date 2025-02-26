@@ -57,7 +57,7 @@ final class Defer implements Implementation
 
         /** @psalm-suppress ImpureFunctionCall */
         return new self(
-            (static function(mixed $element) use ($captured): \Generator {
+            (static function(mixed $element) use (&$captured): \Generator {
                 $values = self::detonate($captured);
 
                 $values->rewind();
@@ -101,7 +101,7 @@ final class Defer implements Implementation
     {
         $captured = $this->capture();
 
-        return Maybe::defer(static function() use ($captured, $index) {
+        return Maybe::defer(static function() use (&$captured, $index) {
             $iteration = 0;
             /** @var Iterator<T> */
             $values = self::detonate($captured);
@@ -150,7 +150,7 @@ final class Defer implements Implementation
 
         /** @psalm-suppress ImpureFunctionCall */
         return new self(
-            (static function() use ($captured): \Generator {
+            (static function() use (&$captured): \Generator {
                 /** @var list<T> */
                 $uniques = [];
                 /** @var \Iterator<T> */
@@ -182,7 +182,7 @@ final class Defer implements Implementation
 
         /** @psalm-suppress ImpureFunctionCall */
         return new self(
-            (static function(int $toDrop) use ($captured): \Generator {
+            (static function(int $toDrop) use (&$captured): \Generator {
                 $dropped = 0;
                 /** @var \Iterator<T> */
                 $values = self::detonate($captured);
@@ -237,7 +237,7 @@ final class Defer implements Implementation
 
         /** @psalm-suppress ImpureFunctionCall */
         return new self(
-            (static function(callable $predicate) use ($captured): \Generator {
+            (static function(callable $predicate) use (&$captured): \Generator {
                 /** @var \Iterator<T> */
                 $values = self::detonate($captured);
                 $values->rewind();
@@ -293,7 +293,7 @@ final class Defer implements Implementation
     {
         $captured = $this->capture();
 
-        return Maybe::defer(static function() use ($captured) {
+        return Maybe::defer(static function() use (&$captured) {
             /** @var Iterator<T> */
             $values = self::detonate($captured);
             $values->rewind();
@@ -317,7 +317,7 @@ final class Defer implements Implementation
     {
         $captured = $this->capture();
 
-        return Maybe::defer(static function() use ($captured) {
+        return Maybe::defer(static function() use (&$captured) {
             $loaded = false;
             /** @var \Iterator<T> */
             $values = self::detonate($captured);
@@ -379,7 +379,7 @@ final class Defer implements Implementation
     {
         $captured = $this->capture();
 
-        return Maybe::defer(static function() use ($captured, $element) {
+        return Maybe::defer(static function() use (&$captured, $element) {
             $index = 0;
             /** @var Iterator<T> */
             $values = self::detonate($captured);
@@ -417,7 +417,7 @@ final class Defer implements Implementation
          * @var Implementation<0|positive-int>
          */
         return new self(
-            (static function() use ($captured): \Generator {
+            (static function() use (&$captured): \Generator {
                 $index = 0;
                 /** @var \Iterator<T> */
                 $values = self::detonate($captured);
@@ -445,7 +445,7 @@ final class Defer implements Implementation
 
         /** @psalm-suppress ImpureFunctionCall */
         return new self(
-            (static function(callable $map) use ($captured): \Generator {
+            (static function(callable $map) use (&$captured): \Generator {
                 /** @var \Iterator<T> */
                 $values = self::detonate($captured);
                 $values->rewind();
@@ -474,7 +474,7 @@ final class Defer implements Implementation
 
         /** @psalm-suppress ImpureFunctionCall */
         return new self(
-            (static function(callable $map, callable $exfiltrate) use ($captured): \Generator {
+            (static function(callable $map, callable $exfiltrate) use (&$captured): \Generator {
                 /** @var \Iterator<T> */
                 $values = self::detonate($captured);
                 $values->rewind();
@@ -511,7 +511,7 @@ final class Defer implements Implementation
 
         /** @psalm-suppress ImpureFunctionCall */
         return new self(
-            (static function(int $toPad, mixed $element) use ($captured): \Generator {
+            (static function(int $toPad, mixed $element) use (&$captured): \Generator {
                 /** @var \Iterator<T> */
                 $values = self::detonate($captured);
                 $values->rewind();
@@ -552,7 +552,7 @@ final class Defer implements Implementation
 
         /** @psalm-suppress ImpureFunctionCall */
         return new self(
-            (static function(int $from, int $until) use ($captured): \Generator {
+            (static function(int $from, int $until) use (&$captured): \Generator {
                 $index = 0;
                 /** @var Iterator<T> */
                 $values = self::detonate($captured);
@@ -586,7 +586,7 @@ final class Defer implements Implementation
 
         /** @psalm-suppress ImpureFunctionCall */
         return new self(
-            (static function(int $size) use ($captured): \Generator {
+            (static function(int $size) use (&$captured): \Generator {
                 $taken = 0;
                 /** @var Iterator<T> */
                 $values = self::detonate($captured);
@@ -635,7 +635,7 @@ final class Defer implements Implementation
 
         /** @psalm-suppress ImpureFunctionCall */
         return new self(
-            (static function(Implementation $sequence) use ($captured): \Generator {
+            (static function(Implementation $sequence) use (&$captured): \Generator {
                 /** @var \Iterator<T> */
                 $values = self::detonate($captured);
                 $values->rewind();
@@ -668,7 +668,7 @@ final class Defer implements Implementation
 
         /** @psalm-suppress ImpureFunctionCall */
         return new self(
-            (static function(Implementation $sequence) use ($captured): \Generator {
+            (static function(Implementation $sequence) use (&$captured): \Generator {
                 /** @var \Iterator<T> */
                 $values = self::detonate($captured);
                 $iterator = $sequence->iterator();
@@ -715,7 +715,7 @@ final class Defer implements Implementation
 
         /** @psalm-suppress ImpureFunctionCall */
         return new self(
-            (static function(callable $function) use ($captured): \Generator {
+            (static function(callable $function) use (&$captured): \Generator {
                 /** @var callable(T, T): int $sorter */
                 $sorter = $function;
                 $loaded = [];
@@ -818,7 +818,7 @@ final class Defer implements Implementation
 
         /** @psalm-suppress ImpureFunctionCall */
         return new self(
-            (static function() use ($captured): \Generator {
+            (static function() use (&$captured): \Generator {
                 $reversed = [];
                 /** @var \Iterator<T> */
                 $values = self::detonate($captured);
@@ -871,7 +871,7 @@ final class Defer implements Implementation
 
         /** @psalm-suppress ImpureFunctionCall */
         return Sequence::defer(
-            (static function() use ($captured): \Generator {
+            (static function() use (&$captured): \Generator {
                 /** @var \Iterator<T> */
                 $values = self::detonate($captured);
                 $values->rewind();
@@ -894,7 +894,7 @@ final class Defer implements Implementation
 
         /** @psalm-suppress ImpureFunctionCall */
         return Set::defer(
-            (static function() use ($captured): \Generator {
+            (static function() use (&$captured): \Generator {
                 /** @var \Iterator<T> */
                 $values = self::detonate($captured);
                 $values->rewind();
@@ -912,7 +912,7 @@ final class Defer implements Implementation
     {
         $captured = $this->capture();
 
-        return Maybe::defer(static function() use ($captured, $predicate) {
+        return Maybe::defer(static function() use (&$captured, $predicate) {
             /** @var Iterator<T> */
             $values = self::detonate($captured);
             $values->rewind();
@@ -965,7 +965,7 @@ final class Defer implements Implementation
          * @var Implementation<array{T, S}>
          */
         return new self(
-            (static function(Iterator $other) use ($captured) {
+            (static function(Iterator $other) use (&$captured) {
                 /** @var \Iterator<T> $self */
                 $self = self::detonate($captured);
                 $self->rewind();
@@ -1002,7 +1002,7 @@ final class Defer implements Implementation
 
         /** @psalm-suppress ImpureFunctionCall */
         return new self(
-            (static function(mixed $carry, callable $assert) use ($captured): \Generator {
+            (static function(mixed $carry, callable $assert) use (&$captured): \Generator {
                 /** @var \Iterator<T> */
                 $values = self::detonate($captured);
                 $values->rewind();
@@ -1065,7 +1065,7 @@ final class Defer implements Implementation
         $captured = $this->capture();
 
         /** @psalm-suppress ImpureFunctionCall */
-        return new self((static function(callable $condition) use ($captured) {
+        return new self((static function(callable $condition) use (&$captured) {
             /** @var \Iterator<T> */
             $values = self::detonate($captured);
             $values->rewind();
@@ -1111,7 +1111,7 @@ final class Defer implements Implementation
 
         /** @psalm-suppress ImpureFunctionCall */
         return new self(
-            (static function(callable $condition) use ($captured): \Generator {
+            (static function(callable $condition) use (&$captured): \Generator {
                 /** @var Iterator<T> */
                 $values = self::detonate($captured);
                 $values->rewind();
@@ -1153,12 +1153,23 @@ final class Defer implements Implementation
      *     Accumulate<V>,
      *     \Generator<int<0, max>, V>,
      * } $captured
+     * @param-out null $captured
      *
      * @return Iterator<V>
      */
-    private static function detonate(array $captured): Iterator
+    private static function detonate(array &$captured): Iterator
     {
         [$values, $generator] = $captured;
+
+        // If $values has already been used once we must use it because the
+        // underlying generator will not produce all the values for this
+        // instance. And the instance that used this $values may no longer exist
+        // in memory, meaning we're the last reference to it.
+        if ($values->started()) {
+            return Iterator::defer($values);
+        }
+
+        $captured = null;
         // By wrapping $values with a weak reference and assigning it to the
         // same variable we decrement its refcount by 1. This means that when
         // fetching the object back if it still exist then it's used by another
