@@ -435,6 +435,27 @@ return static function() {
         },
     );
 
+    yield proof(
+        'Sequence::defer()->take() should not load an extra element',
+        given(
+            Set\Sequence::of(Set\Type::any()),
+        ),
+        static function($assert, $values) {
+            $sequence = Sequence::defer((static function() use ($values) {
+                yield from $values;
+
+                throw new Exception;
+            })())->take(\count($values));
+
+            $assert->not()->throws(
+                static fn() => $assert->same(
+                    $values,
+                    $sequence->toList(),
+                ),
+            );
+        },
+    );
+
     yield test(
         'Partial load a deferred Sequence appended to a lazy one',
         static function($assert) {

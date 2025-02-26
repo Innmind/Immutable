@@ -625,6 +625,10 @@ final class Defer implements Implementation
         /** @psalm-suppress ImpureFunctionCall */
         return new self(
             (static function(int $size) use (&$captured): \Generator {
+                if ($size === 0) {
+                    return;
+                }
+
                 $taken = 0;
                 /**
                  * @psalm-suppress PossiblyNullArgument
@@ -634,14 +638,15 @@ final class Defer implements Implementation
                 $values->rewind();
 
                 while ($values->valid()) {
+                    yield $values->current();
+                    ++$taken;
+
                     if ($taken >= $size) {
                         $values->cleanup();
 
                         return;
                     }
 
-                    yield $values->current();
-                    ++$taken;
                     $values->next();
                 }
             })($size),
