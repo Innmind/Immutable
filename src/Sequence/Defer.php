@@ -315,9 +315,10 @@ final class Defer implements Implementation
             $values->rewind();
 
             while ($values->valid()) {
+                $value = $values->current();
                 $values->cleanup();
 
-                return Maybe::just($values->current());
+                return Maybe::just($value);
             }
 
             /** @var Maybe<T> */

@@ -561,4 +561,22 @@ return static function() {
             $assert->false($initial->equals($other));
         },
     );
+
+    yield test(
+        'Calling first inside a lazy Sequence::flatMap()',
+        static function($assert) {
+            $lazy = Sequence::lazy(static function() {
+                yield 1;
+                yield 2;
+                yield 3;
+            });
+
+            $assert->same(
+                [1, 1, 1],
+                $lazy
+                    ->flatMap(static fn() => $lazy->first()->toSequence())
+                    ->toList(),
+            );
+        },
+    );
 };
