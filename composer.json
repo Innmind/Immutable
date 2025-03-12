@@ -31,7 +31,7 @@
     },
     "require-dev": {
         "innmind/static-analysis": "^1.2.1",
-        "innmind/black-box": "^5.5.1",
+        "innmind/black-box": "^5.5.1|~6.0",
         "innmind/coding-standard": "~2.0"
     },
     "conflict": {
