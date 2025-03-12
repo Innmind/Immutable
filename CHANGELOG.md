@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+
+- Support for `innmind/black-box` `6`
+
 ## 5.11.3 - 2025-02-26
 
 ### Changed
