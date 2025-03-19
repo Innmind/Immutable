@@ -25,6 +25,7 @@ final class SideEffect
      */
     public static function identity(): self
     {
+        /** @psalm-suppress ImpureStaticProperty This will become an enum in the future */
         return self::$instance ??= new self;
     }
 }
