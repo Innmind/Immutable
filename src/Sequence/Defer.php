@@ -282,7 +282,7 @@ final class Defer implements Implementation
             $this->values->next();
         }
 
-        return new SideEffect;
+        return SideEffect::identity();
     }
 
     /**

@@ -270,7 +270,7 @@ final class Lazy implements Implementation
             $iterator->next();
         }
 
-        return new SideEffect;
+        return SideEffect::identity();
     }
 
     /**

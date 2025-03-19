@@ -214,7 +214,7 @@ final class ObjectKeys implements Implementation
             $function($key, $v);
         }
 
-        return new SideEffect;
+        return SideEffect::identity();
     }
 
     /**
