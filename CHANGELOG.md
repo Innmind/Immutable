@@ -1,5 +1,16 @@
 # Changelog
 
+## 5.12.0 - 2025-03-19
+
+### Added
+
+- Support for `innmind/black-box` `6`
+- `Innmind\Immutable\SideEffect::identity()`
+
+### Deprecated
+
+- `Innmind\Immutable\SideEffect::__construct()`, use `Innmind\Immutable\SideEffect::identity()` instead
+
 ## 5.11.3 - 2025-02-26
 
 ### Changed
