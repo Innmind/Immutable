@@ -6,6 +6,7 @@ namespace Innmind\Immutable\Sequence;
 use Innmind\Immutable\{
     Maybe,
     Either,
+    Attempt,
 };
 
 /**
@@ -116,6 +117,37 @@ final class Sink
                 return $either->match(
                     static fn() => $continuation->continue($either),
                     static fn() => $continuation->stop($either),
+                );
+            },
+        );
+    }
+
+    /**
+     * This will consume all the values from the Sequence as long as a value is
+     * contained in the returned Attempt.
+     *
+     * @param callable(C, T): Attempt<C> $reducer
+     *
+     * @return Attempt<C>
+     */
+    public function attempt(callable $reducer): Attempt
+    {
+        return $this->implementation->sink(
+            Attempt::result($this->carry),
+            static function($carry, $value, $continuation) use ($reducer) {
+                /**
+                 * @var Attempt<C> $carry
+                 * @var T $value
+                 */
+
+                /** @psalm-suppress MixedArgument */
+                $attempt = $carry
+                    ->flatMap(static fn($carry) => $reducer($carry, $value))
+                    ->memoize();
+
+                return $attempt->match(
+                    static fn() => $continuation->continue($attempt),
+                    static fn() => $continuation->stop($attempt),
                 );
             },
         );
