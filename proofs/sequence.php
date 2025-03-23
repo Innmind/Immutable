@@ -5,6 +5,7 @@ use Innmind\Immutable\{
     Sequence,
     Maybe,
     Either,
+    Attempt,
     Str,
     Monoid\Concat,
 };
@@ -409,6 +410,47 @@ return static function() {
                 $all->match(
                     static fn() => null,
                     static fn($all) => $all,
+                ),
+            );
+        },
+    );
+
+    yield proof(
+        'Sequence::sink()->attempt()',
+        given(
+            Set\Sequence::of(Set\Type::any()),
+            Set\Sequence::of(Set\Type::any()),
+        ),
+        static function($assert, $prefix, $suffix) {
+            $all = Sequence::of(...$prefix, ...$suffix)
+                ->sink([])
+                ->attempt(static fn($all, $value) => Attempt::result(
+                    [...$all, $value],
+                ));
+
+            $assert->same(
+                [...$prefix, ...$suffix],
+                $all->match(
+                    static fn($all) => $all,
+                    static fn() => null,
+                ),
+            );
+
+            $stop = new Exception;
+            $all = Sequence::of(...$prefix, ...[$stop], ...$suffix)
+                ->sink([])
+                ->attempt(static fn($all, $value) => match ($value) {
+                    $stop => Attempt::error($stop),
+                    default => Attempt::result(
+                        [...$all, $value],
+                    ),
+                });
+
+            $assert->same(
+                $stop,
+                $all->match(
+                    static fn($all) => $all,
+                    static fn($e) => $e,
                 ),
             );
         },

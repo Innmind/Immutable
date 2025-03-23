@@ -553,6 +553,31 @@ This is useful for long sequences (mainly lazy ones) where you need to reduce un
     ??? abstract
         In essence this allows the transformation of `Sequence<Either<E, T>>` to `Either<E, Sequence<T>>`.
 
+=== "Attempt"
+    ```php
+    $sequence = Sequence::of(1, 2, 3, 4, 5);
+    $sum = $sequence
+        ->sink(0)
+        ->attempt(static fn(int $sum, int $i) => match (true) {
+            $sum > 5 => Attempt::error(new \Exception('sum too high')),
+            default => Attempt::result($sum + $i),
+        })
+        ->match(
+            static fn(int $sum) => $sum,
+            static fn(\Exception $e) => null,
+        );
+    ```
+
+    Instead of manually specifying if we want to continue or not, it's inferred by the content of the `Attempt`.
+
+    Here the `#!php $sum` is `#!php null` because on the 4th iteration we return a `#!php Attempt::error()`.
+
+    !!! warning ""
+        Bear in mind that the carried value is lost when an iteration returns `#!php Attempt::error()`. Unless you attach the value to the exception.
+
+    ??? abstract
+        In essence this allows the transformation of `Sequence<Attempt<T>>` to `Attempt<Sequence<T>>`.
+
 ## Misc.
 
 ### `->equals()` :material-memory-arrow-down:
