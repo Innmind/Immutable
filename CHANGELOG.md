@@ -1,5 +1,11 @@
 # Changelog
 
+## 5.13.0 - 2025-03-23
+
+### Added
+
+- `Innmind\Immutable\Sequence::sink()->attempt()`
+
 ## 5.12.0 - 2025-03-19
 
 ### Added
