@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+
+- `Innmind\Immutable\Sequence::snap()`
+
 ## 5.13.0 - 2025-03-23
 
 ### Added
