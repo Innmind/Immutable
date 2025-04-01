@@ -4,8 +4,7 @@ declare(strict_types = 1);
 namespace Tests\Innmind\Immutable\Set;
 
 use Innmind\Immutable\{
-    Set\Defer,
-    Set\Implementation,
+    Set,
     Map,
     Sequence,
     SideEffect,
@@ -17,8 +16,8 @@ class DeferTest extends TestCase
     public function testInterface()
     {
         $this->assertInstanceOf(
-            Implementation::class,
-            Defer::of((static function() {
+            Set::class,
+            Set::defer((static function() {
                 yield;
             })()),
         );
@@ -26,7 +25,7 @@ class DeferTest extends TestCase
 
     public function testSize()
     {
-        $set = Defer::of((static function() {
+        $set = Set::defer((static function() {
             yield 1;
             yield 2;
         })());
@@ -37,24 +36,24 @@ class DeferTest extends TestCase
 
     public function testIterator()
     {
-        $set = Defer::of((static function() {
+        $set = Set::defer((static function() {
             yield 1;
             yield 2;
         })());
 
-        $this->assertSame([1, 2], \iterator_to_array($set->sequence()->iterator()));
+        $this->assertSame([1, 2], $set->unsorted()->toList());
     }
 
     public function testIntersect()
     {
         $aLoaded = false;
         $bLoaded = false;
-        $a = Defer::of((static function() use (&$aLoaded) {
+        $a = Set::defer((static function() use (&$aLoaded) {
             yield 1;
             yield 2;
             $aLoaded = true;
         })());
-        $b = Defer::of((static function() use (&$bLoaded) {
+        $b = Set::defer((static function() use (&$bLoaded) {
             yield 2;
             yield 3;
             $bLoaded = true;
@@ -63,10 +62,10 @@ class DeferTest extends TestCase
 
         $this->assertFalse($aLoaded);
         $this->assertFalse($bLoaded);
-        $this->assertSame([1, 2], \iterator_to_array($a->sequence()->iterator()));
-        $this->assertSame([2, 3], \iterator_to_array($b->sequence()->iterator()));
-        $this->assertInstanceOf(Defer::class, $c);
-        $this->assertSame([2], \iterator_to_array($c->sequence()->iterator()));
+        $this->assertSame([1, 2], $a->unsorted()->toList());
+        $this->assertSame([2, 3], $b->unsorted()->toList());
+        $this->assertInstanceOf(Set::class, $c);
+        $this->assertSame([2], $c->unsorted()->toList());
         $this->assertTrue($aLoaded);
         $this->assertTrue($bLoaded);
     }
@@ -74,23 +73,23 @@ class DeferTest extends TestCase
     public function testAdd()
     {
         $loaded = false;
-        $a = Defer::of((static function() use (&$loaded) {
+        $a = Set::defer((static function() use (&$loaded) {
             yield 1;
             $loaded = true;
         })());
         $b = ($a)(2);
 
         $this->assertFalse($loaded);
-        $this->assertSame([1], \iterator_to_array($a->sequence()->iterator()));
-        $this->assertInstanceOf(Defer::class, $b);
-        $this->assertSame([1, 2], \iterator_to_array($b->sequence()->iterator()));
-        $this->assertSame([1, 2], \iterator_to_array(($b)(2)->sequence()->iterator()));
+        $this->assertSame([1], $a->unsorted()->toList());
+        $this->assertInstanceOf(Set::class, $b);
+        $this->assertSame([1, 2], $b->unsorted()->toList());
+        $this->assertSame([1, 2], ($b)(2)->unsorted()->toList());
         $this->assertTrue($loaded);
     }
 
     public function testContains()
     {
-        $set = Defer::of((static function() {
+        $set = Set::defer((static function() {
             yield 1;
         })());
 
@@ -100,7 +99,7 @@ class DeferTest extends TestCase
 
     public function testRemove()
     {
-        $a = Defer::of((static function() {
+        $a = Set::defer((static function() {
             yield 1;
             yield 2;
             yield 3;
@@ -108,23 +107,23 @@ class DeferTest extends TestCase
         })());
         $b = $a->remove(3);
 
-        $this->assertSame([1, 2, 3, 4], \iterator_to_array($a->sequence()->iterator()));
-        $this->assertInstanceOf(Defer::class, $b);
-        $this->assertSame([1, 2, 4], \iterator_to_array($b->sequence()->iterator()));
-        $this->assertSame([1, 2, 3, 4], \iterator_to_array($a->remove(5)->sequence()->iterator()));
+        $this->assertSame([1, 2, 3, 4], $a->unsorted()->toList());
+        $this->assertInstanceOf(Set::class, $b);
+        $this->assertSame([1, 2, 4], $b->unsorted()->toList());
+        $this->assertSame([1, 2, 3, 4], $a->remove(5)->unsorted()->toList());
     }
 
     public function testDiff()
     {
         $aLoaded = false;
-        $a = Defer::of((static function() use (&$aLoaded) {
+        $a = Set::defer((static function() use (&$aLoaded) {
             yield 1;
             yield 2;
             yield 3;
             $aLoaded = true;
         })());
         $bLoaded = false;
-        $b = Defer::of((static function() use (&$bLoaded) {
+        $b = Set::defer((static function() use (&$bLoaded) {
             yield 2;
             yield 4;
             $bLoaded = true;
@@ -133,28 +132,28 @@ class DeferTest extends TestCase
 
         $this->assertFalse($aLoaded);
         $this->assertFalse($bLoaded);
-        $this->assertSame([1, 2, 3], \iterator_to_array($a->sequence()->iterator()));
-        $this->assertSame([2, 4], \iterator_to_array($b->sequence()->iterator()));
-        $this->assertInstanceOf(Defer::class, $c);
-        $this->assertSame([1, 3], \iterator_to_array($c->sequence()->iterator()));
+        $this->assertSame([1, 2, 3], $a->unsorted()->toList());
+        $this->assertSame([2, 4], $b->unsorted()->toList());
+        $this->assertInstanceOf(Set::class, $c);
+        $this->assertSame([1, 3], $c->unsorted()->toList());
         $this->assertTrue($aLoaded);
         $this->assertTrue($bLoaded);
     }
 
     public function testEquals()
     {
-        $a = Defer::of((static function() {
+        $a = Set::defer((static function() {
             yield 1;
             yield 2;
         })());
-        $aBis = Defer::of((static function() {
+        $aBis = Set::defer((static function() {
             yield 1;
             yield 2;
         })());
-        $b = Defer::of((static function() {
+        $b = Set::defer((static function() {
             yield 1;
         })());
-        $c = Defer::of((static function() {
+        $c = Set::defer((static function() {
             yield 1;
             yield 2;
             yield 3;
@@ -169,7 +168,7 @@ class DeferTest extends TestCase
     public function testFilter()
     {
         $loaded = false;
-        $a = Defer::of((static function() use (&$loaded) {
+        $a = Set::defer((static function() use (&$loaded) {
             yield 1;
             yield 2;
             yield 3;
@@ -179,15 +178,15 @@ class DeferTest extends TestCase
         $b = $a->filter(static fn($i) => $i % 2 === 0);
 
         $this->assertFalse($loaded);
-        $this->assertSame([1, 2, 3, 4], \iterator_to_array($a->sequence()->iterator()));
-        $this->assertInstanceOf(Defer::class, $b);
-        $this->assertSame([2, 4], \iterator_to_array($b->sequence()->iterator()));
+        $this->assertSame([1, 2, 3, 4], $a->unsorted()->toList());
+        $this->assertInstanceOf(Set::class, $b);
+        $this->assertSame([2, 4], $b->unsorted()->toList());
         $this->assertTrue($loaded);
     }
 
     public function testForeach()
     {
-        $set = Defer::of((static function() {
+        $set = Set::defer((static function() {
             yield 1;
             yield 2;
             yield 3;
@@ -210,7 +209,7 @@ class DeferTest extends TestCase
 
     public function testGroupBy()
     {
-        $set = Defer::of((static function() {
+        $set = Set::defer((static function() {
             yield 1;
             yield 2;
             yield 3;
@@ -218,7 +217,7 @@ class DeferTest extends TestCase
         })());
         $groups = $set->groupBy(static fn($i) => $i % 2);
 
-        $this->assertSame([1, 2, 3, 4], \iterator_to_array($set->sequence()->iterator()));
+        $this->assertSame([1, 2, 3, 4], $set->unsorted()->toList());
         $this->assertInstanceOf(Map::class, $groups);
         $this->assertCount(2, $groups);
         $this->assertSame([2, 4], $this->get($groups, 0)->toList());
@@ -228,7 +227,7 @@ class DeferTest extends TestCase
     public function testMap()
     {
         $loaded = false;
-        $a = Defer::of((static function() use (&$loaded) {
+        $a = Set::defer((static function() use (&$loaded) {
             yield 1;
             yield 2;
             yield 3;
@@ -237,15 +236,15 @@ class DeferTest extends TestCase
         $b = $a->map(static fn($i) => $i * 2);
 
         $this->assertFalse($loaded);
-        $this->assertSame([1, 2, 3], \iterator_to_array($a->sequence()->iterator()));
-        $this->assertInstanceOf(Defer::class, $b);
-        $this->assertSame([2, 4, 6], \iterator_to_array($b->sequence()->iterator()));
+        $this->assertSame([1, 2, 3], $a->unsorted()->toList());
+        $this->assertInstanceOf(Set::class, $b);
+        $this->assertSame([2, 4, 6], $b->unsorted()->toList());
         $this->assertTrue($loaded);
     }
 
     public function testMapDoesntIntroduceDuplicates()
     {
-        $set = Defer::of((static function() {
+        $set = Set::defer((static function() {
             yield 1;
             yield 2;
             yield 3;
@@ -253,13 +252,13 @@ class DeferTest extends TestCase
 
         $this->assertSame(
             [1],
-            \iterator_to_array($set->map(static fn() => 1)->sequence()->iterator()),
+            $set->map(static fn() => 1)->unsorted()->toList(),
         );
     }
 
     public function testPartition()
     {
-        $set = Defer::of((static function() {
+        $set = Set::defer((static function() {
             yield 1;
             yield 2;
             yield 3;
@@ -267,7 +266,7 @@ class DeferTest extends TestCase
         })());
         $groups = $set->partition(static fn($i) => $i % 2 === 0);
 
-        $this->assertSame([1, 2, 3, 4], \iterator_to_array($set->sequence()->iterator()));
+        $this->assertSame([1, 2, 3, 4], $set->unsorted()->toList());
         $this->assertInstanceOf(Map::class, $groups);
         $this->assertCount(2, $groups);
         $this->assertSame([2, 4], $this->get($groups, true)->toList());
@@ -277,7 +276,7 @@ class DeferTest extends TestCase
     public function testSort()
     {
         $loaded = false;
-        $set = Defer::of((static function() use (&$loaded) {
+        $set = Set::defer((static function() use (&$loaded) {
             yield 1;
             yield 4;
             yield 3;
@@ -287,7 +286,7 @@ class DeferTest extends TestCase
         $sorted = $set->sort(static fn($a, $b) => $a > $b ? 1 : -1);
 
         $this->assertFalse($loaded);
-        $this->assertSame([1, 4, 3, 2], \iterator_to_array($set->sequence()->iterator()));
+        $this->assertSame([1, 4, 3, 2], $set->unsorted()->toList());
         $this->assertInstanceOf(Sequence::class, $sorted);
         $this->assertSame([1, 2, 3, 4], $sorted->toList());
         $this->assertTrue($loaded);
@@ -296,13 +295,13 @@ class DeferTest extends TestCase
     public function testMerge()
     {
         $aLoaded = false;
-        $a = Defer::of((static function() use (&$aLoaded) {
+        $a = Set::defer((static function() use (&$aLoaded) {
             yield 1;
             yield 2;
             $aLoaded = true;
         })());
         $bLoaded = false;
-        $b = Defer::of((static function() use (&$bLoaded) {
+        $b = Set::defer((static function() use (&$bLoaded) {
             yield 2;
             yield 3;
             $bLoaded = true;
@@ -311,17 +310,17 @@ class DeferTest extends TestCase
 
         $this->assertFalse($aLoaded);
         $this->assertFalse($bLoaded);
-        $this->assertSame([1, 2], \iterator_to_array($a->sequence()->iterator()));
-        $this->assertSame([2, 3], \iterator_to_array($b->sequence()->iterator()));
-        $this->assertInstanceOf(Defer::class, $c);
-        $this->assertSame([1, 2, 3], \iterator_to_array($c->sequence()->iterator()));
+        $this->assertSame([1, 2], $a->unsorted()->toList());
+        $this->assertSame([2, 3], $b->unsorted()->toList());
+        $this->assertInstanceOf(Set::class, $c);
+        $this->assertSame([1, 2, 3], $c->unsorted()->toList());
         $this->assertTrue($aLoaded);
         $this->assertTrue($bLoaded);
     }
 
     public function testReduce()
     {
-        $set = Defer::of((static function() {
+        $set = Set::defer((static function() {
             yield 1;
             yield 2;
             yield 3;
@@ -333,22 +332,22 @@ class DeferTest extends TestCase
 
     public function testClear()
     {
-        $a = Defer::of((static function() {
+        $a = Set::defer((static function() {
             yield 1;
         })());
         $b = $a->clear();
 
-        $this->assertSame([1], \iterator_to_array($a->sequence()->iterator()));
-        $this->assertInstanceOf(Implementation::class, $b);
-        $this->assertSame([], \iterator_to_array($b->sequence()->iterator()));
+        $this->assertSame([1], $a->unsorted()->toList());
+        $this->assertInstanceOf(Set::class, $b);
+        $this->assertSame([], $b->unsorted()->toList());
     }
 
     public function testEmpty()
     {
-        $a = Defer::of((static function() {
+        $a = Set::defer((static function() {
             yield 1;
         })());
-        $b = Defer::of((static function() {
+        $b = Set::defer((static function() {
             if (false) {
                 yield 1;
             }
@@ -361,7 +360,7 @@ class DeferTest extends TestCase
     public function testFind()
     {
         $count = 0;
-        $sequence = Defer::of((static function() use (&$count) {
+        $sequence = Set::defer((static function() use (&$count) {
             ++$count;
             yield 1;
             ++$count;

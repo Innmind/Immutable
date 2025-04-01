@@ -800,4 +800,19 @@ final class Sequence implements \Countable
     {
         return new self($this->implementation->takeWhile($condition));
     }
+
+    /**
+     * This method will make sure all the underlying data is loaded when a
+     * future method that needs to access data is called.
+     *
+     * This is similar to ::defer() except it loads everything in memory at once
+     * before doing the operation. This avoids to deal with partially loaded
+     * iterators that may lead to bugs.
+     *
+     * @return self<T>
+     */
+    public function snap(): self
+    {
+        return new self(new Sequence\Snap($this->implementation));
+    }
 }

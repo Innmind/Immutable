@@ -950,7 +950,10 @@ final class Defer implements Implementation
     {
         $captured = $this->capture();
 
-        /** @psalm-suppress ImpureFunctionCall */
+        /**
+         * @psalm-suppress ImpureFunctionCall
+         * @psalm-suppress DeprecatedMethod
+         */
         return Set::defer(
             (static function() use (&$captured): \Generator {
                 /**

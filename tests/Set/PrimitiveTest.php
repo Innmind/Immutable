@@ -4,8 +4,7 @@ declare(strict_types = 1);
 namespace Tests\Innmind\Immutable\Set;
 
 use Innmind\Immutable\{
-    Set\Primitive,
-    Set\Implementation,
+    Set,
     Map,
     Sequence,
     SideEffect,
@@ -17,48 +16,48 @@ class PrimitiveTest extends TestCase
     public function testInterface()
     {
         $this->assertInstanceOf(
-            Implementation::class,
-            Primitive::of(),
+            Set::class,
+            Set::of(),
         );
     }
 
     public function testSize()
     {
-        $this->assertSame(2, (Primitive::of(1, 2))->size());
-        $this->assertSame(2, (Primitive::of(1, 2))->count());
+        $this->assertSame(2, Set::of(1, 2)->size());
+        $this->assertSame(2, Set::of(1, 2)->count());
     }
 
     public function testIterator()
     {
-        $this->assertSame([1, 2], \iterator_to_array((Primitive::of(1, 2))->sequence()->iterator()));
+        $this->assertSame([1, 2], Set::of(1, 2)->unsorted()->toList());
     }
 
     public function testIntersect()
     {
-        $a = Primitive::of(1, 2);
-        $b = Primitive::of(2, 3);
+        $a = Set::of(1, 2);
+        $b = Set::of(2, 3);
         $c = $a->intersect($b);
 
-        $this->assertSame([1, 2], \iterator_to_array($a->sequence()->iterator()));
-        $this->assertSame([2, 3], \iterator_to_array($b->sequence()->iterator()));
-        $this->assertInstanceOf(Primitive::class, $c);
-        $this->assertSame([2], \iterator_to_array($c->sequence()->iterator()));
+        $this->assertSame([1, 2], $a->unsorted()->toList());
+        $this->assertSame([2, 3], $b->unsorted()->toList());
+        $this->assertInstanceOf(Set::class, $c);
+        $this->assertSame([2], $c->unsorted()->toList());
     }
 
     public function testAdd()
     {
-        $a = Primitive::of(1);
+        $a = Set::of(1);
         $b = ($a)(2);
 
-        $this->assertSame([1], \iterator_to_array($a->sequence()->iterator()));
-        $this->assertInstanceOf(Primitive::class, $b);
-        $this->assertSame([1, 2], \iterator_to_array($b->sequence()->iterator()));
-        $this->assertSame($b, ($b)(2));
+        $this->assertSame([1], $a->unsorted()->toList());
+        $this->assertInstanceOf(Set::class, $b);
+        $this->assertSame([1, 2], $b->unsorted()->toList());
+        $this->assertTrue($b->equals(($b)(2)));
     }
 
     public function testContains()
     {
-        $set = Primitive::of(1);
+        $set = Set::of(1);
 
         $this->assertTrue($set->contains(1));
         $this->assertFalse($set->contains(2));
@@ -66,47 +65,47 @@ class PrimitiveTest extends TestCase
 
     public function testRemove()
     {
-        $a = Primitive::of(1, 2, 3, 4);
+        $a = Set::of(1, 2, 3, 4);
         $b = $a->remove(3);
 
-        $this->assertSame([1, 2, 3, 4], \iterator_to_array($a->sequence()->iterator()));
-        $this->assertInstanceOf(Primitive::class, $b);
-        $this->assertSame([1, 2, 4], \iterator_to_array($b->sequence()->iterator()));
-        $this->assertSame($a, $a->remove(5));
+        $this->assertSame([1, 2, 3, 4], $a->unsorted()->toList());
+        $this->assertInstanceOf(Set::class, $b);
+        $this->assertSame([1, 2, 4], $b->unsorted()->toList());
+        $this->assertTrue($a->equals($a->remove(5)));
     }
 
     public function testDiff()
     {
-        $a = Primitive::of(1, 2, 3);
-        $b = Primitive::of(2, 4);
+        $a = Set::of(1, 2, 3);
+        $b = Set::of(2, 4);
         $c = $a->diff($b);
 
-        $this->assertSame([1, 2, 3], \iterator_to_array($a->sequence()->iterator()));
-        $this->assertSame([2, 4], \iterator_to_array($b->sequence()->iterator()));
-        $this->assertInstanceOf(Primitive::class, $c);
-        $this->assertSame([1, 3], \iterator_to_array($c->sequence()->iterator()));
+        $this->assertSame([1, 2, 3], $a->unsorted()->toList());
+        $this->assertSame([2, 4], $b->unsorted()->toList());
+        $this->assertInstanceOf(Set::class, $c);
+        $this->assertSame([1, 3], $c->unsorted()->toList());
     }
 
     public function testEquals()
     {
-        $this->assertTrue((Primitive::of(1, 2))->equals(Primitive::of(1, 2)));
-        $this->assertFalse((Primitive::of(1, 2))->equals(Primitive::of(1)));
-        $this->assertFalse((Primitive::of(1, 2))->equals(Primitive::of(1, 2, 3)));
+        $this->assertTrue((Set::of(1, 2))->equals(Set::of(1, 2)));
+        $this->assertFalse((Set::of(1, 2))->equals(Set::of(1)));
+        $this->assertFalse((Set::of(1, 2))->equals(Set::of(1, 2, 3)));
     }
 
     public function testFilter()
     {
-        $a = Primitive::of(1, 2, 3, 4);
+        $a = Set::of(1, 2, 3, 4);
         $b = $a->filter(static fn($i) => $i % 2 === 0);
 
-        $this->assertSame([1, 2, 3, 4], \iterator_to_array($a->sequence()->iterator()));
-        $this->assertInstanceOf(Primitive::class, $b);
-        $this->assertSame([2, 4], \iterator_to_array($b->sequence()->iterator()));
+        $this->assertSame([1, 2, 3, 4], $a->unsorted()->toList());
+        $this->assertInstanceOf(Set::class, $b);
+        $this->assertSame([2, 4], $b->unsorted()->toList());
     }
 
     public function testForeach()
     {
-        $set = Primitive::of(1, 2, 3, 4);
+        $set = Set::of(1, 2, 3, 4);
         $calls = 0;
         $sum = 0;
 
@@ -124,10 +123,10 @@ class PrimitiveTest extends TestCase
 
     public function testGroupBy()
     {
-        $set = Primitive::of(1, 2, 3, 4);
+        $set = Set::of(1, 2, 3, 4);
         $groups = $set->groupBy(static fn($i) => $i % 2);
 
-        $this->assertSame([1, 2, 3, 4], \iterator_to_array($set->sequence()->iterator()));
+        $this->assertSame([1, 2, 3, 4], $set->unsorted()->toList());
         $this->assertInstanceOf(Map::class, $groups);
         $this->assertCount(2, $groups);
         $this->assertSame([2, 4], $this->get($groups, 0)->toList());
@@ -136,20 +135,20 @@ class PrimitiveTest extends TestCase
 
     public function testMap()
     {
-        $a = Primitive::of(1, 2, 3);
+        $a = Set::of(1, 2, 3);
         $b = $a->map(static fn($i) => $i * 2);
 
-        $this->assertSame([1, 2, 3], \iterator_to_array($a->sequence()->iterator()));
-        $this->assertInstanceOf(Primitive::class, $b);
-        $this->assertSame([2, 4, 6], \iterator_to_array($b->sequence()->iterator()));
+        $this->assertSame([1, 2, 3], $a->unsorted()->toList());
+        $this->assertInstanceOf(Set::class, $b);
+        $this->assertSame([2, 4, 6], $b->unsorted()->toList());
     }
 
     public function testPartition()
     {
-        $set = Primitive::of(1, 2, 3, 4);
+        $set = Set::of(1, 2, 3, 4);
         $groups = $set->partition(static fn($i) => $i % 2 === 0);
 
-        $this->assertSame([1, 2, 3, 4], \iterator_to_array($set->sequence()->iterator()));
+        $this->assertSame([1, 2, 3, 4], $set->unsorted()->toList());
         $this->assertInstanceOf(Map::class, $groups);
         $this->assertCount(2, $groups);
         $this->assertSame([2, 4], $this->get($groups, true)->toList());
@@ -158,52 +157,52 @@ class PrimitiveTest extends TestCase
 
     public function testSort()
     {
-        $set = Primitive::of(1, 4, 3, 2);
+        $set = Set::of(1, 4, 3, 2);
         $sorted = $set->sort(static fn($a, $b) => $a > $b ? 1 : -1);
 
-        $this->assertSame([1, 4, 3, 2], \iterator_to_array($set->sequence()->iterator()));
+        $this->assertSame([1, 4, 3, 2], $set->unsorted()->toList());
         $this->assertInstanceOf(Sequence::class, $sorted);
         $this->assertSame([1, 2, 3, 4], $sorted->toList());
     }
 
     public function testMerge()
     {
-        $a = Primitive::of(1, 2);
-        $b = Primitive::of(2, 3);
+        $a = Set::of(1, 2);
+        $b = Set::of(2, 3);
         $c = $a->merge($b);
 
-        $this->assertSame([1, 2], \iterator_to_array($a->sequence()->iterator()));
-        $this->assertSame([2, 3], \iterator_to_array($b->sequence()->iterator()));
-        $this->assertInstanceOf(Primitive::class, $c);
-        $this->assertSame([1, 2, 3], \iterator_to_array($c->sequence()->iterator()));
+        $this->assertSame([1, 2], $a->unsorted()->toList());
+        $this->assertSame([2, 3], $b->unsorted()->toList());
+        $this->assertInstanceOf(Set::class, $c);
+        $this->assertSame([1, 2, 3], $c->unsorted()->toList());
     }
 
     public function testReduce()
     {
-        $set = Primitive::of(1, 2, 3, 4);
+        $set = Set::of(1, 2, 3, 4);
 
         $this->assertSame(10, $set->reduce(0, static fn($sum, $i) => $sum + $i));
     }
 
     public function testClear()
     {
-        $a = Primitive::of(1);
+        $a = Set::of(1);
         $b = $a->clear();
 
-        $this->assertSame([1], \iterator_to_array($a->sequence()->iterator()));
-        $this->assertInstanceOf(Primitive::class, $b);
-        $this->assertSame([], \iterator_to_array($b->sequence()->iterator()));
+        $this->assertSame([1], $a->unsorted()->toList());
+        $this->assertInstanceOf(Set::class, $b);
+        $this->assertSame([], $b->unsorted()->toList());
     }
 
     public function testEmpty()
     {
-        $this->assertTrue((Primitive::of())->empty());
-        $this->assertFalse((Primitive::of(1))->empty());
+        $this->assertTrue((Set::of())->empty());
+        $this->assertFalse((Set::of(1))->empty());
     }
 
     public function testFind()
     {
-        $sequence = Primitive::of(1, 2, 3);
+        $sequence = Set::of(1, 2, 3);
 
         $this->assertSame(
             1,
