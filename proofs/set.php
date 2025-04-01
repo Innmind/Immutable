@@ -178,4 +178,78 @@ return static function() {
             );
         },
     );
+
+    yield proof(
+        'Set::snap() loads a lazy set only once',
+        given(
+            DataSet\Type::any(),
+            DataSet\Sequence::of(DataSet\Type::any()),
+        )->filter(static fn($value, $rest) => !\in_array($value, $rest, true)),
+        static function($assert, $value, $rest) {
+            $loaded = 0;
+            $sequence = Set::lazy(static function() use (&$loaded, $value, $rest) {
+                yield $value;
+                yield from $rest;
+
+                ++$loaded;
+            })
+                ->snap()
+                ->map(static fn($value) => [$value]);
+
+            $assert->same(0, $loaded);
+            $assert->same(
+                [$value],
+                $sequence->find(static fn() => true)->match(
+                    static fn($value) => $value,
+                    static fn() => null,
+                ),
+            );
+            $assert->same(1, $loaded);
+            $assert->same(
+                [$value],
+                $sequence->find(static fn() => true)->match(
+                    static fn($value) => $value,
+                    static fn() => null,
+                ),
+            );
+            $assert->same(1, $loaded);
+        },
+    );
+
+    yield proof(
+        'Set::snap() loads a deferred set at once',
+        given(
+            DataSet\Type::any(),
+            DataSet\Sequence::of(DataSet\Type::any()),
+        )->filter(static fn($value, $rest) => !\in_array($value, $rest, true)),
+        static function($assert, $value, $rest) {
+            $loaded = 0;
+            $sequence = Set::defer((static function() use (&$loaded, $value, $rest) {
+                yield $value;
+                yield from $rest;
+
+                ++$loaded;
+            })())
+                ->snap()
+                ->map(static fn($value) => [$value]);
+
+            $assert->same(0, $loaded);
+            $assert->same(
+                [$value],
+                $sequence->find(static fn() => true)->match(
+                    static fn($value) => $value,
+                    static fn() => null,
+                ),
+            );
+            $assert->same(1, $loaded);
+            $assert->same(
+                [$value],
+                $sequence->find(static fn() => true)->match(
+                    static fn($value) => $value,
+                    static fn() => null,
+                ),
+            );
+            $assert->same(1, $loaded);
+        },
+    );
 };

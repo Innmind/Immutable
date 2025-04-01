@@ -413,8 +413,7 @@ final class Snap implements Implementation
     #[\Override]
     public function toSet(): Set
     {
-        // todo change to $this->toSet()->snap();
-        return $this->memoize()->toSet();
+        return $this->toSet()->snap();
     }
 
     #[\Override]

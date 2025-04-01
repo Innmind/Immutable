@@ -5,6 +5,7 @@
 ### Added
 
 - `Innmind\Immutable\Sequence::snap()`
+- `Innmind\Immutable\Set::snap()`
 
 ### Changed
 
