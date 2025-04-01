@@ -814,3 +814,22 @@ $sequence = Sequence::lazy(function() {
     ->map(static fn($line) => \strtoupper($line)) // still no line loaded here
     ->memoize(); // load all lines and apply strtoupper on each
 ```
+
+### `->snap()`
+
+This method indicates that the `Sequence` will be [memoized](#-memoize) when a method that needs to load the data is called.
+
+```php
+$sequence = Sequence::lazy(function() {
+    $stream = \fopen('some-file', 'r');
+    while (!\feof($stream)) {
+        yield \fgets($stream);
+    }
+})
+    ->map(static fn($line) => \trim($line, "\n"))
+    ->exclude(static fn($line) => $line === '')
+    ->snap()
+    ->map(static fn($line) => \strtoupper($line)); // still no line loaded here
+```
+
+Unlike `->memoize()`, if no code after this needs to access the data then nothing is loaded but it some does then it will load all non empty lines at once.
