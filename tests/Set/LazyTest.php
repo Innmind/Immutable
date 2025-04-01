@@ -4,8 +4,7 @@ declare(strict_types = 1);
 namespace Tests\Innmind\Immutable\Set;
 
 use Innmind\Immutable\{
-    Set\Lazy,
-    Set\Implementation,
+    Set,
     Map,
     Sequence,
     SideEffect,
@@ -17,8 +16,8 @@ class LazyTest extends TestCase
     public function testInterface()
     {
         $this->assertInstanceOf(
-            Implementation::class,
-            Lazy::of(static function() {
+            Set::class,
+            Set::lazy(static function() {
                 yield;
             }),
         );
@@ -26,7 +25,7 @@ class LazyTest extends TestCase
 
     public function testSize()
     {
-        $set = Lazy::of(static function() {
+        $set = Set::lazy(static function() {
             yield 1;
             yield 2;
         });
@@ -37,24 +36,24 @@ class LazyTest extends TestCase
 
     public function testIterator()
     {
-        $set = Lazy::of(static function() {
+        $set = Set::lazy(static function() {
             yield 1;
             yield 2;
         });
 
-        $this->assertSame([1, 2], \iterator_to_array($set->sequence()->iterator()));
+        $this->assertSame([1, 2], $set->unsorted()->toList());
     }
 
     public function testIntersect()
     {
         $aLoaded = false;
         $bLoaded = false;
-        $a = Lazy::of(static function() use (&$aLoaded) {
+        $a = Set::lazy(static function() use (&$aLoaded) {
             yield 1;
             yield 2;
             $aLoaded = true;
         });
-        $b = Lazy::of(static function() use (&$bLoaded) {
+        $b = Set::lazy(static function() use (&$bLoaded) {
             yield 2;
             yield 3;
             $bLoaded = true;
@@ -63,10 +62,10 @@ class LazyTest extends TestCase
 
         $this->assertFalse($aLoaded);
         $this->assertFalse($bLoaded);
-        $this->assertSame([1, 2], \iterator_to_array($a->sequence()->iterator()));
-        $this->assertSame([2, 3], \iterator_to_array($b->sequence()->iterator()));
-        $this->assertInstanceOf(Lazy::class, $c);
-        $this->assertSame([2], \iterator_to_array($c->sequence()->iterator()));
+        $this->assertSame([1, 2], $a->unsorted()->toList());
+        $this->assertSame([2, 3], $b->unsorted()->toList());
+        $this->assertInstanceOf(Set::class, $c);
+        $this->assertSame([2], $c->unsorted()->toList());
         $this->assertTrue($aLoaded);
         $this->assertTrue($bLoaded);
     }
@@ -74,23 +73,23 @@ class LazyTest extends TestCase
     public function testAdd()
     {
         $loaded = false;
-        $a = Lazy::of(static function() use (&$loaded) {
+        $a = Set::lazy(static function() use (&$loaded) {
             yield 1;
             $loaded = true;
         });
         $b = ($a)(2);
 
         $this->assertFalse($loaded);
-        $this->assertSame([1], \iterator_to_array($a->sequence()->iterator()));
-        $this->assertInstanceOf(Lazy::class, $b);
-        $this->assertSame([1, 2], \iterator_to_array($b->sequence()->iterator()));
-        $this->assertSame([1, 2], \iterator_to_array(($b)(2)->sequence()->iterator()));
+        $this->assertSame([1], $a->unsorted()->toList());
+        $this->assertInstanceOf(Set::class, $b);
+        $this->assertSame([1, 2], $b->unsorted()->toList());
+        $this->assertSame([1, 2], ($b)(2)->unsorted()->toList());
         $this->assertTrue($loaded);
     }
 
     public function testContains()
     {
-        $set = Lazy::of(static function() {
+        $set = Set::lazy(static function() {
             yield 1;
         });
 
@@ -100,7 +99,7 @@ class LazyTest extends TestCase
 
     public function testRemove()
     {
-        $a = Lazy::of(static function() {
+        $a = Set::lazy(static function() {
             yield 1;
             yield 2;
             yield 3;
@@ -108,23 +107,23 @@ class LazyTest extends TestCase
         });
         $b = $a->remove(3);
 
-        $this->assertSame([1, 2, 3, 4], \iterator_to_array($a->sequence()->iterator()));
-        $this->assertInstanceOf(Lazy::class, $b);
-        $this->assertSame([1, 2, 4], \iterator_to_array($b->sequence()->iterator()));
-        $this->assertSame([1, 2, 3, 4], \iterator_to_array($a->remove(5)->sequence()->iterator()));
+        $this->assertSame([1, 2, 3, 4], $a->unsorted()->toList());
+        $this->assertInstanceOf(Set::class, $b);
+        $this->assertSame([1, 2, 4], $b->unsorted()->toList());
+        $this->assertSame([1, 2, 3, 4], $a->remove(5)->unsorted()->toList());
     }
 
     public function testDiff()
     {
         $aLoaded = false;
-        $a = Lazy::of(static function() use (&$aLoaded) {
+        $a = Set::lazy(static function() use (&$aLoaded) {
             yield 1;
             yield 2;
             yield 3;
             $aLoaded = true;
         });
         $bLoaded = false;
-        $b = Lazy::of(static function() use (&$bLoaded) {
+        $b = Set::lazy(static function() use (&$bLoaded) {
             yield 2;
             yield 4;
             $bLoaded = true;
@@ -133,28 +132,28 @@ class LazyTest extends TestCase
 
         $this->assertFalse($aLoaded);
         $this->assertFalse($bLoaded);
-        $this->assertSame([1, 2, 3], \iterator_to_array($a->sequence()->iterator()));
-        $this->assertSame([2, 4], \iterator_to_array($b->sequence()->iterator()));
-        $this->assertInstanceOf(Lazy::class, $c);
-        $this->assertSame([1, 3], \iterator_to_array($c->sequence()->iterator()));
+        $this->assertSame([1, 2, 3], $a->unsorted()->toList());
+        $this->assertSame([2, 4], $b->unsorted()->toList());
+        $this->assertInstanceOf(Set::class, $c);
+        $this->assertSame([1, 3], $c->unsorted()->toList());
         $this->assertTrue($aLoaded);
         $this->assertTrue($bLoaded);
     }
 
     public function testEquals()
     {
-        $a = Lazy::of(static function() {
+        $a = Set::lazy(static function() {
             yield 1;
             yield 2;
         });
-        $aBis = Lazy::of(static function() {
+        $aBis = Set::lazy(static function() {
             yield 1;
             yield 2;
         });
-        $b = Lazy::of(static function() {
+        $b = Set::lazy(static function() {
             yield 1;
         });
-        $c = Lazy::of(static function() {
+        $c = Set::lazy(static function() {
             yield 1;
             yield 2;
             yield 3;
@@ -169,7 +168,7 @@ class LazyTest extends TestCase
     public function testFilter()
     {
         $loaded = false;
-        $a = Lazy::of(static function() use (&$loaded) {
+        $a = Set::lazy(static function() use (&$loaded) {
             yield 1;
             yield 2;
             yield 3;
@@ -179,15 +178,15 @@ class LazyTest extends TestCase
         $b = $a->filter(static fn($i) => $i % 2 === 0);
 
         $this->assertFalse($loaded);
-        $this->assertSame([1, 2, 3, 4], \iterator_to_array($a->sequence()->iterator()));
-        $this->assertInstanceOf(Lazy::class, $b);
-        $this->assertSame([2, 4], \iterator_to_array($b->sequence()->iterator()));
+        $this->assertSame([1, 2, 3, 4], $a->unsorted()->toList());
+        $this->assertInstanceOf(Set::class, $b);
+        $this->assertSame([2, 4], $b->unsorted()->toList());
         $this->assertTrue($loaded);
     }
 
     public function testForeach()
     {
-        $set = Lazy::of(static function() {
+        $set = Set::lazy(static function() {
             yield 1;
             yield 2;
             yield 3;
@@ -210,7 +209,7 @@ class LazyTest extends TestCase
 
     public function testGroupBy()
     {
-        $set = Lazy::of(static function() {
+        $set = Set::lazy(static function() {
             yield 1;
             yield 2;
             yield 3;
@@ -218,7 +217,7 @@ class LazyTest extends TestCase
         });
         $groups = $set->groupBy(static fn($i) => $i % 2);
 
-        $this->assertSame([1, 2, 3, 4], \iterator_to_array($set->sequence()->iterator()));
+        $this->assertSame([1, 2, 3, 4], $set->unsorted()->toList());
         $this->assertInstanceOf(Map::class, $groups);
         $this->assertCount(2, $groups);
         $this->assertSame([2, 4], $this->get($groups, 0)->toList());
@@ -228,7 +227,7 @@ class LazyTest extends TestCase
     public function testMap()
     {
         $loaded = false;
-        $a = Lazy::of(static function() use (&$loaded) {
+        $a = Set::lazy(static function() use (&$loaded) {
             yield 1;
             yield 2;
             yield 3;
@@ -237,15 +236,15 @@ class LazyTest extends TestCase
         $b = $a->map(static fn($i) => $i * 2);
 
         $this->assertFalse($loaded);
-        $this->assertSame([1, 2, 3], \iterator_to_array($a->sequence()->iterator()));
-        $this->assertInstanceOf(Lazy::class, $b);
-        $this->assertSame([2, 4, 6], \iterator_to_array($b->sequence()->iterator()));
+        $this->assertSame([1, 2, 3], $a->unsorted()->toList());
+        $this->assertInstanceOf(Set::class, $b);
+        $this->assertSame([2, 4, 6], $b->unsorted()->toList());
         $this->assertTrue($loaded);
     }
 
     public function testMapDoesntIntroduceDuplicates()
     {
-        $set = Lazy::of(static function() {
+        $set = Set::lazy(static function() {
             yield 1;
             yield 2;
             yield 3;
@@ -253,13 +252,13 @@ class LazyTest extends TestCase
 
         $this->assertSame(
             [1],
-            \iterator_to_array($set->map(static fn() => 1)->sequence()->iterator()),
+            $set->map(static fn() => 1)->unsorted()->toList(),
         );
     }
 
     public function testPartition()
     {
-        $set = Lazy::of(static function() {
+        $set = Set::lazy(static function() {
             yield 1;
             yield 2;
             yield 3;
@@ -267,7 +266,7 @@ class LazyTest extends TestCase
         });
         $groups = $set->partition(static fn($i) => $i % 2 === 0);
 
-        $this->assertSame([1, 2, 3, 4], \iterator_to_array($set->sequence()->iterator()));
+        $this->assertSame([1, 2, 3, 4], $set->unsorted()->toList());
         $this->assertInstanceOf(Map::class, $groups);
         $this->assertCount(2, $groups);
         $this->assertSame([2, 4], $this->get($groups, true)->toList());
@@ -277,7 +276,7 @@ class LazyTest extends TestCase
     public function testSort()
     {
         $loaded = false;
-        $set = Lazy::of(static function() use (&$loaded) {
+        $set = Set::lazy(static function() use (&$loaded) {
             yield 1;
             yield 4;
             yield 3;
@@ -287,7 +286,7 @@ class LazyTest extends TestCase
         $sorted = $set->sort(static fn($a, $b) => $a > $b ? 1 : -1);
 
         $this->assertFalse($loaded);
-        $this->assertSame([1, 4, 3, 2], \iterator_to_array($set->sequence()->iterator()));
+        $this->assertSame([1, 4, 3, 2], $set->unsorted()->toList());
         $this->assertInstanceOf(Sequence::class, $sorted);
         $this->assertSame([1, 2, 3, 4], $sorted->toList());
         $this->assertTrue($loaded);
@@ -296,13 +295,13 @@ class LazyTest extends TestCase
     public function testMerge()
     {
         $aLoaded = false;
-        $a = Lazy::of(static function() use (&$aLoaded) {
+        $a = Set::lazy(static function() use (&$aLoaded) {
             yield 1;
             yield 2;
             $aLoaded = true;
         });
         $bLoaded = false;
-        $b = Lazy::of(static function() use (&$bLoaded) {
+        $b = Set::lazy(static function() use (&$bLoaded) {
             yield 2;
             yield 3;
             $bLoaded = true;
@@ -311,17 +310,17 @@ class LazyTest extends TestCase
 
         $this->assertFalse($aLoaded);
         $this->assertFalse($bLoaded);
-        $this->assertSame([1, 2], \iterator_to_array($a->sequence()->iterator()));
-        $this->assertSame([2, 3], \iterator_to_array($b->sequence()->iterator()));
-        $this->assertInstanceOf(Lazy::class, $c);
-        $this->assertSame([1, 2, 3], \iterator_to_array($c->sequence()->iterator()));
+        $this->assertSame([1, 2], $a->unsorted()->toList());
+        $this->assertSame([2, 3], $b->unsorted()->toList());
+        $this->assertInstanceOf(Set::class, $c);
+        $this->assertSame([1, 2, 3], $c->unsorted()->toList());
         $this->assertTrue($aLoaded);
         $this->assertTrue($bLoaded);
     }
 
     public function testReduce()
     {
-        $set = Lazy::of(static function() {
+        $set = Set::lazy(static function() {
             yield 1;
             yield 2;
             yield 3;
@@ -333,22 +332,22 @@ class LazyTest extends TestCase
 
     public function testClear()
     {
-        $a = Lazy::of(static function() {
+        $a = Set::lazy(static function() {
             yield 1;
         });
         $b = $a->clear();
 
-        $this->assertSame([1], \iterator_to_array($a->sequence()->iterator()));
-        $this->assertInstanceOf(Implementation::class, $b);
-        $this->assertSame([], \iterator_to_array($b->sequence()->iterator()));
+        $this->assertSame([1], $a->unsorted()->toList());
+        $this->assertInstanceOf(Set::class, $b);
+        $this->assertSame([], $b->unsorted()->toList());
     }
 
     public function testEmpty()
     {
-        $a = Lazy::of(static function() {
+        $a = Set::lazy(static function() {
             yield 1;
         });
-        $b = Lazy::of(static function() {
+        $b = Set::lazy(static function() {
             if (false) {
                 yield 1;
             }
@@ -361,7 +360,7 @@ class LazyTest extends TestCase
     public function testFind()
     {
         $count = 0;
-        $sequence = Lazy::of(static function() use (&$count) {
+        $sequence = Set::lazy(static function() use (&$count) {
             ++$count;
             yield 1;
             ++$count;
@@ -406,7 +405,7 @@ class LazyTest extends TestCase
     public function testCallCleanupWhenElementBeingLookedForIsFoundBeforeTheEndOfGenerator()
     {
         $cleanupCalled = false;
-        $sequence = Lazy::of(static function($registerCleanup) use (&$cleanupCalled) {
+        $sequence = Set::lazy(static function($registerCleanup) use (&$cleanupCalled) {
             $registerCleanup(static function() use (&$cleanupCalled) {
                 $cleanupCalled = true;
             });
@@ -424,7 +423,7 @@ class LazyTest extends TestCase
     public function testCallCleanupWhenFindingElementBeforeTheEndOfGenerator()
     {
         $cleanupCalled = false;
-        $sequence = Lazy::of(static function($registerCleanup) use (&$cleanupCalled) {
+        $sequence = Set::lazy(static function($registerCleanup) use (&$cleanupCalled) {
             $registerCleanup(static function() use (&$cleanupCalled) {
                 $cleanupCalled = true;
             });
