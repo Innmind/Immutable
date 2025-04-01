@@ -6,6 +6,10 @@
 
 - `Innmind\Immutable\Sequence::snap()`
 
+### Changed
+
+- `Innmind\Immutable\Set` implementation now directly uses `Innmind\Immutable\Sequence`
+
 ## 5.13.0 - 2025-03-23
 
 ### Added
