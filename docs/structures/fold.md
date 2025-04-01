@@ -76,11 +76,11 @@ $fold = Fold::with([])->flatMap(static fn($elements) => match ($someElement) {
 
 ## `->mapResult()`
 
-Same as [`->map()`](#map) except that it will transform the _result_ value when there is one.
+Same as [`->map()`](#-map) except that it will transform the _result_ value when there is one.
 
 ## `->mapFailure()`
 
-Same as [`->map()`](#map) except that it will transform the _failure_ value when there is one.
+Same as [`->map()`](#-map) except that it will transform the _failure_ value when there is one.
 
 ## `->maybe()`
 
