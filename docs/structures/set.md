@@ -30,6 +30,9 @@ The method ask a generator that will provide the elements. Once the elements are
 !!! warning ""
     Beware of the case where the source you read the elements is not altered before the first use of the set.
 
+??? warning "Deprecated"
+    This constructor is deprecated. You should use `Set::lazy()->snap()` instead.
+
 ### `::lazy()`
 
 This is similar to `::defer()` with the exception that the elements are not kept in memory but reloaded upon each use.
