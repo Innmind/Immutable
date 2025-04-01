@@ -11,6 +11,10 @@
 
 - `Innmind\Immutable\Set` implementation now directly uses `Innmind\Immutable\Sequence`
 
+### Deprecated
+
+- `Innmind\Immutable\Set::defer()`
+
 ## 5.13.0 - 2025-03-23
 
 ### Added

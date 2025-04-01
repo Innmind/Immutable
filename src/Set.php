@@ -56,6 +56,7 @@ final class Set implements \Countable
      *
      * @template V
      * @psalm-pure
+     * @deprecated You should use ::snap() instead
      *
      * @param \Generator<V> $generator
      *
