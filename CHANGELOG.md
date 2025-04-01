@@ -14,6 +14,7 @@
 ### Deprecated
 
 - `Innmind\Immutable\Set::defer()`
+- `Innmind\Immutable\Sequence::indexOf()`
 
 ## 5.13.0 - 2025-03-23
 

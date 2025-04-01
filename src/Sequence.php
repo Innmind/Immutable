@@ -364,6 +364,8 @@ final class Sequence implements \Countable
     /**
      * Return the index for the given element
      *
+     * @deprecated
+     *
      * @param T $element
      *
      * @return Maybe<0|positive-int>

@@ -173,6 +173,9 @@ $sequence->indexOf(2); // Maybe::just(1)
 $sequence->indexOf(4); // Maybe::nothing()
 ```
 
+??? warning "Deprecated"
+    This method will be remove in the next major version.
+
 ### `->find()`
 
 Returns a [`Maybe`](maybe.md) object containing the first element that matches the predicate.
