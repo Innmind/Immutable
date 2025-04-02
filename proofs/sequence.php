@@ -863,4 +863,29 @@ return static function() {
             $assert->same(1, $loaded);
         },
     );
+
+    yield proof(
+        'Sequence->snap()->toSet()',
+        given(
+            Set\Sequence::of(Set\Integers::any()),
+            Set\Elements::of(
+                static fn(array $values) => Sequence::of(...$values),
+                static fn(array $values) => Sequence::defer(
+                    (static fn() => yield from $values)(),
+                ),
+                static fn(array $values) => Sequence::lazy(
+                    static fn() => yield from $values,
+                ),
+            ),
+        ),
+        static function($assert, $values, $build) {
+            $assert->same(
+                \array_unique($values),
+                $build($values)
+                    ->snap()
+                    ->toSet()
+                    ->toList(),
+            );
+        },
+    );
 };

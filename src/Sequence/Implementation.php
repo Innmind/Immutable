@@ -313,11 +313,6 @@ interface Implementation extends \Countable
     public function toIdentity(): Identity;
 
     /**
-     * @return Sequence<T>
-     */
-    public function toSequence(): Sequence;
-
-    /**
      * @return Set<T>
      */
     public function toSet(): Set;

@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Fixed
+
+- `Sequence->snap()->toSet()` being recursive
+
 ## 5.14.0 - 2025-04-02
 
 ### Added
