@@ -429,7 +429,7 @@ final class Snap implements Implementation
     #[\Override]
     public function toSet(): Set
     {
-        return $this->toSet()->snap();
+        return $this->will->toSet()->snap();
     }
 
     #[\Override]
