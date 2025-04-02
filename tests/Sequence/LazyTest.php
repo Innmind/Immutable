@@ -4,6 +4,7 @@ declare(strict_types = 1);
 namespace Tests\Innmind\Immutable\Sequence;
 
 use Innmind\Immutable\{
+    Sequence,
     Sequence\Lazy,
     Sequence\Implementation,
     Map,
@@ -667,7 +668,7 @@ class LazyTest extends TestCase
     public function testReverse()
     {
         $loaded = false;
-        $a = new Lazy(static function() use (&$loaded) {
+        $a = Sequence::lazy(static function() use (&$loaded) {
             yield from [1, 2];
             yield from [3, 4];
             $loaded = true;
@@ -675,9 +676,9 @@ class LazyTest extends TestCase
         $b = $a->reverse();
 
         $this->assertFalse($loaded);
-        $this->assertSame([1, 2, 3, 4], $a->toSequence()->toList());
-        $this->assertInstanceOf(Lazy::class, $b);
-        $this->assertSame([4, 3, 2, 1], \iterator_to_array($b->iterator()));
+        $this->assertSame([1, 2, 3, 4], $a->toList());
+        $this->assertInstanceOf(Sequence::class, $b);
+        $this->assertSame([4, 3, 2, 1], $b->toList());
         $this->assertTrue($loaded);
     }
 

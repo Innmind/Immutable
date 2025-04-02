@@ -867,15 +867,6 @@ final class Lazy implements Implementation
     }
 
     /**
-     * @return Sequence<T>
-     */
-    #[\Override]
-    public function toSequence(): Sequence
-    {
-        return Sequence::lazy($this->values);
-    }
-
-    /**
      * @return Set<T>
      */
     #[\Override]
@@ -1115,6 +1106,14 @@ final class Lazy implements Implementation
                 }
             },
         );
+    }
+
+    /**
+     * @return Sequence<T>
+     */
+    private function toSequence(): Sequence
+    {
+        return Sequence::lazy($this->values);
     }
 
     /**

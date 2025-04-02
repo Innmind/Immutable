@@ -316,7 +316,7 @@ final class Primitive implements Implementation
     public function via(callable $map): Sequence
     {
         /** @psalm-suppress ImpureFunctionCall */
-        return $map($this->toSequence());
+        return $map(Sequence::of(...$this->values));
     }
 
     /**
@@ -543,15 +543,6 @@ final class Primitive implements Implementation
     {
         /** @var Identity<Implementation<T>> */
         return Identity::of($this);
-    }
-
-    /**
-     * @return Sequence<T>
-     */
-    #[\Override]
-    public function toSequence(): Sequence
-    {
-        return Sequence::of(...$this->values);
     }
 
     /**
