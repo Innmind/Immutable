@@ -173,6 +173,9 @@ $sequence->indexOf(2); // Maybe::just(1)
 $sequence->indexOf(4); // Maybe::nothing()
 ```
 
+??? warning "Deprecated"
+    This method will be remove in the next major version.
+
 ### `->find()`
 
 Returns a [`Maybe`](maybe.md) object containing the first element that matches the predicate.
@@ -235,6 +238,51 @@ $ints = Sequence::ints(1, 2, 3);
 $squares = $ints->flatMap(fn($i) => Sequence::of($i, $i**2));
 $squares->equals(Sequence::ints(1, 1, 2, 4, 3, 9)); // true
 ```
+
+### `->via()`
+
+This method configures the `Sequence` via the provided callable. It allows a more fluent API when the code to modify the `Sequence` lies elsewhere and may be dynamic.
+
+=== "Do"
+    ```php
+    $doubles = static fn(Sequence $sequence) => $sequence->map(
+        static fn(int $i) => $i * 2,
+    );
+
+    $sequence = Sequence::of(1, 2, 3)
+        ->via($doubles)
+        ->via($doubles);
+    ```
+
+=== "Instead of"
+    ```php
+    $doubles = static fn(Sequence $sequence) => $sequence->map(
+        static fn(int $i) => $i * 2,
+    );
+
+    $sequence = $doubles(
+        $doubles(
+            Sequence::of(1, 2, 3),
+        ),
+    );
+    ```
+
+In both cases it returns `#!php Sequence::of(4, 8, 12)`, but `#!php ->via()` offers a more readable experience.
+
+??? tip
+    For [lazy](#lazy) sequences the callable will be called everytime you call un unwrapping method :material-memory-arrow-down:.
+
+    This allows to have stateful configuration.
+
+    If you want the callable to be called once you need to use this strategy instead:
+
+    ```php
+    $sequence = Sequence::lazy($generator)
+        ->toIdentity()
+        ->map($doubles)
+        ->map($doubles)
+        ->unwrap();
+    ```
 
 ### `->zip()`
 
@@ -814,3 +862,22 @@ $sequence = Sequence::lazy(function() {
     ->map(static fn($line) => \strtoupper($line)) // still no line loaded here
     ->memoize(); // load all lines and apply strtoupper on each
 ```
+
+### `->snap()`
+
+This method indicates that the `Sequence` will be [memoized](#-memoize) when a method that needs to load the data is called.
+
+```php
+$sequence = Sequence::lazy(function() {
+    $stream = \fopen('some-file', 'r');
+    while (!\feof($stream)) {
+        yield \fgets($stream);
+    }
+})
+    ->map(static fn($line) => \trim($line, "\n"))
+    ->exclude(static fn($line) => $line === '')
+    ->snap()
+    ->map(static fn($line) => \strtoupper($line)); // still no line loaded here
+```
+
+Unlike `->memoize()`, if no code after this needs to access the data then nothing is loaded but it some does then it will load all non empty lines at once.

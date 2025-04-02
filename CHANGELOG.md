@@ -1,5 +1,22 @@
 # Changelog
 
+## 5.14.0 - 2025-04-02
+
+### Added
+
+- `Innmind\Immutable\Sequence::snap()`
+- `Innmind\Immutable\Set::snap()`
+- `Innmind\Immutable\Sequence::via()`
+
+### Changed
+
+- `Innmind\Immutable\Set` implementation now directly uses `Innmind\Immutable\Sequence`
+
+### Deprecated
+
+- `Innmind\Immutable\Set::defer()`
+- `Innmind\Immutable\Sequence::indexOf()`
+
 ## 5.13.0 - 2025-03-23
 
 ### Added

@@ -364,6 +364,8 @@ final class Sequence implements \Countable
     /**
      * Return the index for the given element
      *
+     * @deprecated
+     *
      * @param T $element
      *
      * @return Maybe<0|positive-int>
@@ -412,6 +414,18 @@ final class Sequence implements \Countable
         $exfiltrate = static fn(self $sequence): Sequence\Implementation => $sequence->implementation;
 
         return new self($this->implementation->flatMap($map, $exfiltrate));
+    }
+
+    /**
+     * @template S
+     *
+     * @param callable(self<T>): self<S> $map
+     *
+     * @return self<S>
+     */
+    public function via(callable $map): self
+    {
+        return $this->implementation->via($map);
     }
 
     /**
@@ -799,5 +813,20 @@ final class Sequence implements \Countable
     public function takeWhile(callable $condition): self
     {
         return new self($this->implementation->takeWhile($condition));
+    }
+
+    /**
+     * This method will make sure all the underlying data is loaded when a
+     * future method that needs to access data is called.
+     *
+     * This is similar to ::defer() except it loads everything in memory at once
+     * before doing the operation. This avoids to deal with partially loaded
+     * iterators that may lead to bugs.
+     *
+     * @return self<T>
+     */
+    public function snap(): self
+    {
+        return new self(new Sequence\Snap($this->implementation));
     }
 }

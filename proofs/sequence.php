@@ -679,4 +679,188 @@ return static function() {
             );
         },
     );
+
+    yield proof(
+        'Sequence::snap() loads a lazy sequence only once',
+        given(
+            Set\Type::any(),
+            Set\Sequence::of(Set\Type::any()),
+            Set\Type::any(),
+        ),
+        static function($assert, $value, $rest, $last) {
+            $loaded = 0;
+            $sequence = Sequence::lazy(static function() use (&$loaded, $value, $rest, $last) {
+                yield $value;
+                yield from $rest;
+                yield $last;
+
+                ++$loaded;
+            })
+                ->snap()
+                ->map(static fn($value) => [$value]);
+
+            $assert->same(0, $loaded);
+            $assert->same(
+                [$value],
+                $sequence->first()->match(
+                    static fn($value) => $value,
+                    static fn() => null,
+                ),
+            );
+            $assert->same(1, $loaded);
+            $assert->same(
+                [$last],
+                $sequence->last()->match(
+                    static fn($value) => $value,
+                    static fn() => null,
+                ),
+            );
+            $assert->same(1, $loaded);
+        },
+    );
+
+    yield proof(
+        'Sequence::snap() loads a deferred sequence at once',
+        given(
+            Set\Type::any(),
+            Set\Sequence::of(Set\Type::any()),
+            Set\Type::any(),
+        ),
+        static function($assert, $value, $rest, $last) {
+            $loaded = 0;
+            $sequence = Sequence::defer((static function() use (&$loaded, $value, $rest, $last) {
+                yield $value;
+                yield from $rest;
+                yield $last;
+
+                ++$loaded;
+            })())
+                ->snap()
+                ->map(static fn($value) => [$value]);
+
+            $assert->same(0, $loaded);
+            $assert->same(
+                [$value],
+                $sequence->first()->match(
+                    static fn($value) => $value,
+                    static fn() => null,
+                ),
+            );
+            $assert->same(1, $loaded);
+            $assert->same(
+                [$last],
+                $sequence->last()->match(
+                    static fn($value) => $value,
+                    static fn() => null,
+                ),
+            );
+            $assert->same(1, $loaded);
+        },
+    );
+
+    yield proof(
+        'Sequence::via()',
+        given(
+            Set\Sequence::of(Set\Type::any()),
+            Set\Elements::of(
+                static fn(array $values) => Sequence::of(...$values),
+                static fn(array $values) => Sequence::defer(
+                    (static fn() => yield from $values)(),
+                ),
+                static fn(array $values) => Sequence::lazy(
+                    static fn() => yield from $values,
+                ),
+            ),
+            Set\Sequence::of(Set\Type::any()),
+        ),
+        static function($assert, $initial, $build, $new) {
+            $sequence = $build($initial);
+            $sequence2 = $sequence->via(static function($sequence) use ($assert, $initial, $build, $new) {
+                $assert->same($initial, $sequence->toList());
+
+                return $build($new);
+            });
+
+            $assert->same($new, $sequence2->toList());
+        },
+    );
+
+    yield proof(
+        "Sequence::via() doesn't load underlying generators",
+        given(
+            Set\Sequence::of(Set\Type::any()),
+            Set\Elements::of(
+                static fn(bool &$loaded, array $values) => Sequence::defer(
+                    (static function() use (&$loaded, $values) {
+                        yield from $values;
+                        $loaded = true;
+                    })(),
+                ),
+                static fn(bool &$loaded, array $values) => Sequence::lazy(
+                    static function() use (&$loaded, $values) {
+                        yield from $values;
+                        $loaded = true;
+                    },
+                ),
+            ),
+        ),
+        static function($assert, $initial, $build) {
+            $loaded = false;
+            $sequence = $build($loaded, $initial);
+            $sequence2 = $sequence->via(static fn($sequence) => $sequence);
+
+            $assert->false($loaded);
+            $assert->same($initial, $sequence2->toList());
+        },
+    );
+
+    yield proof(
+        'Sequence::via() on a lazy sequence calls the function everytime the sequence is unwrapped',
+        given(
+            Set\Sequence::of(Set\Type::any()),
+        ),
+        static function($assert, $values) {
+            $loaded = 0;
+            $sequence = Sequence::lazy(
+                static fn() => yield from $values,
+            );
+            $sequence2 = $sequence->via(static function($sequence) use (&$loaded) {
+                ++$loaded;
+
+                return $sequence;
+            });
+
+            $assert->same(0, $loaded);
+            $assert->same($values, $sequence2->toList());
+            $assert->same(1, $loaded);
+            $assert->same($values, $sequence2->toList());
+            $assert->same(2, $loaded);
+        },
+    );
+
+    yield proof(
+        'Sequence::lazy()->snap()->via() loads the generator once',
+        given(
+            Set\Sequence::of(Set\Type::any()),
+        ),
+        static function($assert, $values) {
+            $loaded = 0;
+            $sequence = Sequence::lazy(
+                static fn() => yield from $values,
+            );
+            $sequence2 = $sequence
+                ->snap()
+                ->via(static function($sequence) use (&$loaded) {
+                    ++$loaded;
+
+                    return $sequence;
+                });
+
+            $assert->same(0, $loaded);
+            $assert->same($values, $sequence2->toList());
+            $assert->same(1, $loaded);
+            $assert->same($values, $sequence2->toList());
+            $assert->same(1, $loaded);
+        },
+    );
 };

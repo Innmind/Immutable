@@ -9,10 +9,10 @@ namespace Innmind\Immutable;
  */
 final class Set implements \Countable
 {
-    /** @var Set\Implementation<T> */
-    private Set\Implementation $implementation;
+    /** @var Sequence<T> */
+    private Sequence $implementation;
 
-    private function __construct(Set\Implementation $implementation)
+    private function __construct(Sequence $implementation)
     {
         $this->implementation = $implementation;
     }
@@ -31,7 +31,7 @@ final class Set implements \Countable
      */
     public function __invoke($element): self
     {
-        return new self(($this->implementation)($element));
+        return new self(($this->implementation)($element)->distinct());
     }
 
     /**
@@ -45,7 +45,7 @@ final class Set implements \Countable
      */
     public static function of(...$values): self
     {
-        return new self(Set\Primitive::of(...$values));
+        return new self(Sequence::of(...$values)->distinct());
     }
 
     /**
@@ -56,6 +56,7 @@ final class Set implements \Countable
      *
      * @template V
      * @psalm-pure
+     * @deprecated You should use ::snap() instead
      *
      * @param \Generator<V> $generator
      *
@@ -63,7 +64,7 @@ final class Set implements \Countable
      */
     public static function defer(\Generator $generator): self
     {
-        return new self(Set\Defer::of($generator));
+        return new self(Sequence::defer($generator)->distinct());
     }
 
     /**
@@ -83,7 +84,7 @@ final class Set implements \Countable
      */
     public static function lazy(callable $generator): self
     {
-        return new self(Set\Lazy::of($generator));
+        return new self(Sequence::lazy($generator)->distinct());
     }
 
     /**
@@ -94,7 +95,7 @@ final class Set implements \Countable
      */
     public static function mixed(mixed ...$values): self
     {
-        return new self(Set\Primitive::of(...$values));
+        return self::of(...$values);
     }
 
     /**
@@ -106,7 +107,7 @@ final class Set implements \Countable
     public static function ints(int ...$values): self
     {
         /** @var self<int> */
-        $self = new self(Set\Primitive::of(...$values));
+        $self = self::of(...$values);
 
         return $self;
     }
@@ -120,7 +121,7 @@ final class Set implements \Countable
     public static function floats(float ...$values): self
     {
         /** @var self<float> */
-        $self = new self(Set\Primitive::of(...$values));
+        $self = self::of(...$values);
 
         return $self;
     }
@@ -134,7 +135,7 @@ final class Set implements \Countable
     public static function strings(string ...$values): self
     {
         /** @var self<string> */
-        $self = new self(Set\Primitive::of(...$values));
+        $self = self::of(...$values);
 
         return $self;
     }
@@ -148,7 +149,7 @@ final class Set implements \Countable
     public static function objects(object ...$values): self
     {
         /** @var self<object> */
-        $self = new self(Set\Primitive::of(...$values));
+        $self = self::of(...$values);
 
         return $self;
     }
@@ -179,6 +180,12 @@ final class Set implements \Countable
      */
     public function intersect(self $set): self
     {
+        if ($this === $set) {
+            // this is necessary as the manipulation of the same iterator below
+            // leads to unexpected behaviour
+            return $this;
+        }
+
         return new self($this->implementation->intersect(
             $set->implementation,
         ));
@@ -215,7 +222,9 @@ final class Set implements \Countable
      */
     public function remove($element): self
     {
-        return new self($this->implementation->remove($element));
+        return new self($this->implementation->filter(
+            static fn($value) => $value !== $element,
+        ));
     }
 
     /**
@@ -239,7 +248,13 @@ final class Set implements \Countable
      */
     public function equals(self $set): bool
     {
-        return $this->implementation->equals($set->implementation);
+        $size = $this->size();
+
+        if ($size !== $set->size()) {
+            return false;
+        }
+
+        return $this->intersect($set)->size() === $size;
     }
 
     /**
@@ -305,7 +320,10 @@ final class Set implements \Countable
      */
     public function groupBy(callable $discriminator): Map
     {
-        return $this->implementation->groupBy($discriminator);
+        return $this
+            ->implementation
+            ->groupBy($discriminator)
+            ->map(static fn(mixed $_, $sequence) => $sequence->toSet());
     }
 
     /**
@@ -319,7 +337,12 @@ final class Set implements \Countable
      */
     public function map(callable $function): self
     {
-        return new self($this->implementation->map($function));
+        return new self(
+            $this
+                ->implementation
+                ->map($function)
+                ->distinct(),
+        );
     }
 
     /**
@@ -333,10 +356,13 @@ final class Set implements \Countable
      */
     public function flatMap(callable $map): self
     {
-        /** @var callable(self<S>): Sequence\Implementation<S> */
-        $exfiltrate = static fn(self $set): Sequence\Implementation => $set->implementation->sequence();
-
-        return new self($this->implementation->flatMap($map, $exfiltrate));
+        /** @psalm-suppress MixedArgument */
+        return new self(
+            $this
+                ->implementation
+                ->flatMap(static fn($value) => $map($value)->unsorted())
+                ->distinct(),
+        );
     }
 
     /**
@@ -348,7 +374,10 @@ final class Set implements \Countable
      */
     public function partition(callable $predicate): Map
     {
-        return $this->implementation->partition($predicate);
+        return $this
+            ->implementation
+            ->partition($predicate)
+            ->map(static fn($_, $sequence) => $sequence->toSet());
     }
 
     /**
@@ -370,10 +399,7 @@ final class Set implements \Countable
      */
     public function unsorted(): Sequence
     {
-        return $this
-            ->implementation
-            ->sequence()
-            ->toSequence();
+        return $this->implementation;
     }
 
     /**
@@ -385,9 +411,12 @@ final class Set implements \Countable
      */
     public function merge(self $set): self
     {
-        return new self($this->implementation->merge(
-            $set->implementation,
-        ));
+        return new self(
+            $this
+                ->implementation
+                ->append($set->implementation)
+                ->distinct(),
+        );
     }
 
     /**
@@ -413,7 +442,7 @@ final class Set implements \Countable
      */
     public function clear(): self
     {
-        return new self($this->implementation->clear());
+        return new self(Sequence::of());
     }
 
     public function empty(): bool
@@ -441,10 +470,9 @@ final class Set implements \Countable
      */
     public function match(callable $match, callable $empty)
     {
-        /** @psalm-suppress MixedArgument For some reason Psalm no longer recognize the type of $first */
-        return $this->implementation->sequence()->match(
-            static fn($sequence) => new self(new Set\Primitive($sequence)),
-            static fn($first, $rest) => $match($first, $rest),
+        /** @psalm-suppress MixedArgument */
+        return $this->implementation->match(
+            static fn($first, $rest) => $match($first, $rest->toSet()),
             $empty,
         );
     }
@@ -454,13 +482,7 @@ final class Set implements \Countable
      */
     public function matches(callable $predicate): bool
     {
-        /** @psalm-suppress MixedArgument For some reason Psalm no longer recognize the type in `find` */
-        return $this
-            ->find(static fn($value) => !$predicate($value))
-            ->match(
-                static fn() => false,
-                static fn() => true,
-            );
+        return $this->implementation->matches($predicate);
     }
 
     /**
@@ -468,10 +490,7 @@ final class Set implements \Countable
      */
     public function any(callable $predicate): bool
     {
-        return $this->find($predicate)->match(
-            static fn() => true,
-            static fn() => false,
-        );
+        return $this->implementation->any($predicate);
     }
 
     /**
@@ -479,19 +498,7 @@ final class Set implements \Countable
      */
     public function toList(): array
     {
-        /** @var list<T> */
-        $all = [];
-
-        /** @var list<T> */
-        return $this->reduce(
-            $all,
-            static function(array $carry, $value): array {
-                /** @var T $value */
-                $carry[] = $value;
-
-                return $carry;
-            },
-        );
+        return $this->implementation->toList();
     }
 
     /**
@@ -522,5 +529,20 @@ final class Set implements \Countable
     public function memoize(): self
     {
         return new self($this->implementation->memoize());
+    }
+
+    /**
+     * This method will make sure all the underlying data is loaded when a
+     * future method that needs to access data is called.
+     *
+     * This is similar to ::defer() except it loads everything in memory at once
+     * before doing the operation. This avoids to deal with partially loaded
+     * iterators that may lead to bugs.
+     *
+     * @return self<T>
+     */
+    public function snap(): self
+    {
+        return new self($this->implementation->snap());
     }
 }
