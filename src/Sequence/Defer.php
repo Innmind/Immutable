@@ -935,32 +935,6 @@ final class Defer implements Implementation
     }
 
     /**
-     * @return Sequence<T>
-     */
-    #[\Override]
-    public function toSequence(): Sequence
-    {
-        $captured = $this->capture();
-
-        /** @psalm-suppress ImpureFunctionCall */
-        return Sequence::defer(
-            (static function() use (&$captured): \Generator {
-                /**
-                 * @psalm-suppress PossiblyNullArgument
-                 * @var Iterator<T>
-                 */
-                $values = self::detonate($captured);
-                $values->rewind();
-
-                while ($values->valid()) {
-                    yield $values->current();
-                    $values->next();
-                }
-            })(),
-        );
-    }
-
-    /**
      * @return Set<T>
      */
     #[\Override]
@@ -1226,6 +1200,31 @@ final class Defer implements Implementation
                     $values->next();
                 }
             })($condition),
+        );
+    }
+
+    /**
+     * @return Sequence<T>
+     */
+    private function toSequence(): Sequence
+    {
+        $captured = $this->capture();
+
+        /** @psalm-suppress ImpureFunctionCall */
+        return Sequence::defer(
+            (static function() use (&$captured): \Generator {
+                /**
+                 * @psalm-suppress PossiblyNullArgument
+                 * @var Iterator<T>
+                 */
+                $values = self::detonate($captured);
+                $values->rewind();
+
+                while ($values->valid()) {
+                    yield $values->current();
+                    $values->next();
+                }
+            })(),
         );
     }
 

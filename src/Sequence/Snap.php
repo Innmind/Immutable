@@ -415,21 +415,12 @@ final class Snap implements Implementation
     }
 
     /**
-     * @return Sequence<T>
-     */
-    #[\Override]
-    public function toSequence(): Sequence
-    {
-        return $this->toSequence()->snap();
-    }
-
-    /**
      * @return Set<T>
      */
     #[\Override]
     public function toSet(): Set
     {
-        return $this->toSet()->snap();
+        return $this->will->toSet()->snap();
     }
 
     #[\Override]
