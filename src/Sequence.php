@@ -417,6 +417,18 @@ final class Sequence implements \Countable
     }
 
     /**
+     * @template S
+     *
+     * @param callable(self<T>): self<S> $map
+     *
+     * @return self<S>
+     */
+    public function via(callable $map): self
+    {
+        return $this->implementation->via($map);
+    }
+
+    /**
      * Pad the sequence to a defined size with the given element
      *
      * @param 0|positive-int $size
