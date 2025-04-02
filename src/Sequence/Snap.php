@@ -238,6 +238,22 @@ final class Snap implements Implementation
     }
 
     /**
+     * @template S
+     *
+     * @param callable(Sequence<T>): Sequence<S> $map
+     *
+     * @return Sequence<S>
+     */
+    #[\Override]
+    public function via(callable $map): Sequence
+    {
+        return $this
+            ->will
+            ->via($map)
+            ->snap();
+    }
+
+    /**
      * @param 0|positive-int $size
      * @param T $element
      *

@@ -6,6 +6,7 @@
 
 - `Innmind\Immutable\Sequence::snap()`
 - `Innmind\Immutable\Set::snap()`
+- `Innmind\Immutable\Sequence::via()`
 
 ### Changed
 

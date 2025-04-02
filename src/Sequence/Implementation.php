@@ -174,6 +174,15 @@ interface Implementation extends \Countable
     public function flatMap(callable $map, callable $exfiltrate): self;
 
     /**
+     * @template S
+     *
+     * @param callable(Sequence<T>): Sequence<S> $map
+     *
+     * @return Sequence<S>
+     */
+    public function via(callable $map): Sequence;
+
+    /**
      * Pad the sequence to a defined size with the given element
      *
      * @param 0|positive-int $size

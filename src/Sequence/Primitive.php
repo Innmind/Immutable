@@ -306,6 +306,20 @@ final class Primitive implements Implementation
     }
 
     /**
+     * @template S
+     *
+     * @param callable(Sequence<T>): Sequence<S> $map
+     *
+     * @return Sequence<S>
+     */
+    #[\Override]
+    public function via(callable $map): Sequence
+    {
+        /** @psalm-suppress ImpureFunctionCall */
+        return $map($this->toSequence());
+    }
+
+    /**
      * @param T $element
      *
      * @return self<T>

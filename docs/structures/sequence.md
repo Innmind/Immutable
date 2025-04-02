@@ -239,6 +239,51 @@ $squares = $ints->flatMap(fn($i) => Sequence::of($i, $i**2));
 $squares->equals(Sequence::ints(1, 1, 2, 4, 3, 9)); // true
 ```
 
+### `->via()`
+
+This method configures the `Sequence` via the provided callable. It allows a more fluent API when the code to modify the `Sequence` lies elsewhere and may be dynamic.
+
+=== "Do"
+    ```php
+    $doubles = static fn(Sequence $sequence) => $sequence->map(
+        static fn(int $i) => $i * 2,
+    );
+
+    $sequence = Sequence::of(1, 2, 3)
+        ->via($doubles)
+        ->via($doubles);
+    ```
+
+=== "Instead of"
+    ```php
+    $doubles = static fn(Sequence $sequence) => $sequence->map(
+        static fn(int $i) => $i * 2,
+    );
+
+    $sequence = $doubles(
+        $doubles(
+            Sequence::of(1, 2, 3),
+        ),
+    );
+    ```
+
+In both cases it returns `#!php Sequence::of(4, 8, 12)`, but `#!php ->via()` offers a more readable experience.
+
+??? tip
+    For [lazy](#lazy) sequences the callable will be called everytime you call un unwrapping method :material-memory-arrow-down:.
+
+    This allows to have stateful configuration.
+
+    If you want the callable to be called once you need to use this strategy instead:
+
+    ```php
+    $sequence = Sequence::lazy($generator)
+        ->toIdentity()
+        ->map($doubles)
+        ->map($doubles)
+        ->unwrap();
+    ```
+
 ### `->zip()`
 
 This method allows to merge 2 sequences into a new one by combining the values of the 2 into pairs.
