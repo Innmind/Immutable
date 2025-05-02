@@ -250,6 +250,12 @@ final class Snap implements Implementation
     #[\Override]
     public function via(callable $map): Sequence
     {
+        // If this snapped version has been loaded then there is no need to keep
+        // wrapping the new transformations inside a Snap.
+        if ($this->implementation instanceof Primitive) {
+            return $this->implementation->via($map);
+        }
+
         $self = $this;
 
         // $map is not directly called on $this to allow to keep the lazyness or
