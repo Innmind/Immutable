@@ -452,7 +452,7 @@ final class Snap implements Implementation
         // already loaded data.
         return Set::lazy(static function() use ($self) {
             yield from $self->iterator();
-        });
+        })->snap();
     }
 
     #[\Override]
