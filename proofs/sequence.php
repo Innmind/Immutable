@@ -1002,4 +1002,22 @@ return static function() {
             $assert->same($values, $sequence->toList());
         },
     );
+
+    yield proof(
+        'Sequence::lazy()->snap()->toSet() should keep values in memory',
+        given(
+            Set\Sequence::of(Set\Integers::any()),
+        ),
+        static function($assert, $values) {
+            $set = Sequence::lazy(static fn() => yield from $values)
+                ->snap()
+                ->toSet()
+                ->map(static fn() => new stdClass);
+
+            $assert->same(
+                $set->toList(),
+                $set->toList(),
+            );
+        },
+    );
 };
