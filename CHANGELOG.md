@@ -1,5 +1,11 @@
 # Changelog
 
+## 5.14.3 - 2025-05-02
+
+### Fixed
+
+- `Sequence->snap()->toSet()` wasn't properly keeping values in memory (transformations were lazy)
+
 ## 5.14.2 - 2025-05-02
 
 ### Fixed
