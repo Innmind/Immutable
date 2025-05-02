@@ -983,4 +983,23 @@ return static function() {
             $assert->same(1, $loaded);
         },
     );
+
+    yield proof(
+        'Sequence::lazy()->snap() should not keep the original sequence when no longer used',
+        given(
+            Set\Sequence::of(Set\Integers::any()),
+        ),
+        static function($assert, $values) {
+            $beacon = new stdClass;
+            $sequence = Sequence::lazy(static function() use ($values, $beacon) {
+                yield from $values;
+            })->snap();
+            $beacon = WeakReference::create($beacon);
+
+            $assert->object($beacon->get());
+            $assert->same($values, $sequence->toList());
+            $assert->null($beacon->get());
+            $assert->same($values, $sequence->toList());
+        },
+    );
 };
