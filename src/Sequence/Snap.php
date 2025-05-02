@@ -433,6 +433,12 @@ final class Snap implements Implementation
     #[\Override]
     public function toSet(): Set
     {
+        // If this snapped version has been loaded then there is no need to go
+        // back to a lazy Set
+        if ($this->implementation instanceof Primitive) {
+            return $this->implementation->toSet();
+        }
+
         $self = $this;
 
         // By using a lazy Set we're sure that we don't load the data too early.
