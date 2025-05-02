@@ -176,7 +176,7 @@ interface Implementation extends \Countable
     /**
      * @template S
      *
-     * @param callable(Sequence<T>): Sequence<S> $map
+     * @param callable(self<T>): Sequence<S> $map
      *
      * @return Sequence<S>
      */
@@ -367,9 +367,9 @@ interface Implementation extends \Countable
     public function aggregate(callable $map, callable $exfiltrate): self;
 
     /**
-     * @return self<T>
+     * @return Primitive<T>
      */
-    public function memoize(): self;
+    public function memoize(): Primitive;
 
     /**
      * @param callable(T): bool $condition

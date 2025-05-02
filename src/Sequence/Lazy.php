@@ -484,17 +484,17 @@ final class Lazy implements Implementation
     /**
      * @template S
      *
-     * @param callable(Sequence<T>): Sequence<S> $map
+     * @param callable(Implementation<T>): Sequence<S> $map
      *
      * @return Sequence<S>
      */
     #[\Override]
     public function via(callable $map): Sequence
     {
-        $sequence = $this->toSequence();
+        $self = $this;
 
-        return Sequence::lazy(static function() use ($sequence, $map) {
-            yield $map($sequence);
+        return Sequence::lazy(static function() use ($self, $map) {
+            yield $map($self);
         })->flatMap(static fn($sequence) => $sequence);
     }
 
@@ -1015,10 +1015,10 @@ final class Lazy implements Implementation
     }
 
     /**
-     * @return Implementation<T>
+     * @return Primitive<T>
      */
     #[\Override]
-    public function memoize(): Implementation
+    public function memoize(): Primitive
     {
         return $this->load();
     }
@@ -1109,17 +1109,9 @@ final class Lazy implements Implementation
     }
 
     /**
-     * @return Sequence<T>
+     * @return Primitive<T>
      */
-    private function toSequence(): Sequence
-    {
-        return Sequence::lazy($this->values);
-    }
-
-    /**
-     * @return Implementation<T>
-     */
-    private function load(): Implementation
+    private function load(): Primitive
     {
         $values = [];
         $iterator = $this->iterator();

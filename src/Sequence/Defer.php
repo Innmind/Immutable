@@ -534,18 +534,18 @@ final class Defer implements Implementation
     /**
      * @template S
      *
-     * @param callable(Sequence<T>): Sequence<S> $map
+     * @param callable(Implementation<T>): Sequence<S> $map
      *
      * @return Sequence<S>
      */
     #[\Override]
     public function via(callable $map): Sequence
     {
-        $sequence = $this->toSequence();
+        $self = $this;
 
         /** @psalm-suppress ImpureFunctionCall */
-        return Sequence::defer((static function() use ($sequence, $map) {
-            yield $map($sequence);
+        return Sequence::defer((static function() use ($self, $map) {
+            yield $map($self);
         })())->flatMap(static fn($sequence) => $sequence);
     }
 
@@ -1103,10 +1103,10 @@ final class Defer implements Implementation
     }
 
     /**
-     * @return Implementation<T>
+     * @return Primitive<T>
      */
     #[\Override]
-    public function memoize(): Implementation
+    public function memoize(): Primitive
     {
         $values = [];
         $this->values->rewind();
@@ -1200,31 +1200,6 @@ final class Defer implements Implementation
                     $values->next();
                 }
             })($condition),
-        );
-    }
-
-    /**
-     * @return Sequence<T>
-     */
-    private function toSequence(): Sequence
-    {
-        $captured = $this->capture();
-
-        /** @psalm-suppress ImpureFunctionCall */
-        return Sequence::defer(
-            (static function() use (&$captured): \Generator {
-                /**
-                 * @psalm-suppress PossiblyNullArgument
-                 * @var Iterator<T>
-                 */
-                $values = self::detonate($captured);
-                $values->rewind();
-
-                while ($values->valid()) {
-                    yield $values->current();
-                    $values->next();
-                }
-            })(),
         );
     }
 

@@ -1,5 +1,12 @@
 # Changelog
 
+## 5.14.2 - 2025-05-02
+
+### Fixed
+
+- `Sequence->snap()` on an already loaded sequence created useless objects
+- `Sequence->snap()` wasn't keeping intermediary steps in memory
+
 ## 5.14.1 - 2025-04-02
 
 ### Fixed

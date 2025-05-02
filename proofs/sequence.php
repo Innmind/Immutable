@@ -720,6 +720,53 @@ return static function() {
     );
 
     yield proof(
+        'Sequence::snap() keeps in memory intermediary steps',
+        given(
+            Set\Type::any(),
+            Set\Sequence::of(Set\Type::any()),
+            Set\Type::any(),
+        ),
+        static function($assert, $value, $rest, $last) {
+            $loaded = 0;
+            $snapped = Sequence::lazy(static function() use (&$loaded, $value, $rest, $last) {
+                yield $value;
+                yield from $rest;
+                yield $last;
+
+                ++$loaded;
+            })->snap();
+            $mapped = $snapped->map(static fn($value) => [$value]);
+
+            $assert->same(0, $loaded);
+            $assert->same(
+                [$value],
+                $mapped->first()->match(
+                    static fn($value) => $value,
+                    static fn() => null,
+                ),
+            );
+            $assert->same(1, $loaded);
+            $assert->same(
+                [$last],
+                $mapped->last()->match(
+                    static fn($value) => $value,
+                    static fn() => null,
+                ),
+            );
+            $assert->same(1, $loaded);
+
+            $assert->same(
+                $last,
+                $snapped->last()->match(
+                    static fn($value) => $value,
+                    static fn() => null,
+                ),
+            );
+            $assert->same(1, $loaded);
+        },
+    );
+
+    yield proof(
         'Sequence::snap() loads a deferred sequence at once',
         given(
             Set\Type::any(),
@@ -865,6 +912,31 @@ return static function() {
     );
 
     yield proof(
+        'Sequence::lazy()->snap()->via() loads the initial snapped sequence only once',
+        given(
+            Set\Sequence::of(Set\Type::any()),
+        ),
+        static function($assert, $values) {
+            $loaded = 0;
+            $sequence = Sequence::lazy(
+                static function() use ($values, &$loaded) {
+                    yield from $values;
+                    ++$loaded;
+                },
+            )->snap();
+            $sequence2 = $sequence->via(static fn($sequence) => $sequence);
+
+            $assert->same(0, $loaded);
+            $assert->same($values, $sequence2->toList());
+            $assert->same(1, $loaded);
+            $assert->same($values, $sequence2->toList());
+            $assert->same(1, $loaded);
+            $assert->same($values, $sequence->toList());
+            $assert->same(1, $loaded);
+        },
+    );
+
+    yield proof(
         'Sequence->snap()->toSet()',
         given(
             Set\Sequence::of(Set\Integers::any()),
@@ -886,6 +958,48 @@ return static function() {
                     ->toSet()
                     ->toList(),
             );
+        },
+    );
+
+    yield proof(
+        'Sequence::lazy()->snap()->toSet() only load the generator once',
+        given(
+            Set\Sequence::of(Set\Integers::any()),
+        ),
+        static function($assert, $values) {
+            $loaded = 0;
+            $sequence = Sequence::lazy(static function() use ($values, &$loaded) {
+                yield from $values;
+                ++$loaded;
+            })->snap();
+            $set = $sequence->toSet();
+
+            $assert->same(
+                \array_unique($values),
+                $set->toList(),
+            );
+            $assert->same(1, $loaded);
+            $assert->same($values, $sequence->toList());
+            $assert->same(1, $loaded);
+        },
+    );
+
+    yield proof(
+        'Sequence::lazy()->snap() should not keep the original sequence when no longer used',
+        given(
+            Set\Sequence::of(Set\Integers::any()),
+        ),
+        static function($assert, $values) {
+            $beacon = new stdClass;
+            $sequence = Sequence::lazy(static function() use ($values, $beacon) {
+                yield from $values;
+            })->snap();
+            $beacon = WeakReference::create($beacon);
+
+            $assert->object($beacon->get());
+            $assert->same($values, $sequence->toList());
+            $assert->null($beacon->get());
+            $assert->same($values, $sequence->toList());
         },
     );
 };
