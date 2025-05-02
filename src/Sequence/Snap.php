@@ -22,8 +22,7 @@ final class Snap implements Implementation
     private Implementation $implementation;
     /** @var pure-Closure(Implementation): Implementation<T> */
     private \Closure $will;
-    /** @var ?Implementation<T> */
-    private ?Implementation $snapshot;
+    private bool $loaded;
 
     /**
      * @param ?pure-Closure(Implementation): Implementation<T> $will
@@ -34,7 +33,7 @@ final class Snap implements Implementation
     ) {
         $this->implementation = $implementation;
         $this->will = $will ?? static fn(Implementation $sequence): Implementation => $sequence;
-        $this->snapshot = null;
+        $this->loaded = false;
     }
 
     /**
@@ -244,17 +243,26 @@ final class Snap implements Implementation
     /**
      * @template S
      *
-     * @param callable(Sequence<T>): Sequence<S> $map
+     * @param callable(Implementation<T>): Sequence<S> $map
      *
      * @return Sequence<S>
      */
     #[\Override]
     public function via(callable $map): Sequence
     {
-        // todo fix
+        $self = $this;
+
+        // $map is not directly called on $this to allow to keep the lazyness or
+        // deferredness of the underlying sequence.
+        // If multiple snapped steps are composed together, this implementation
+        // will recursively forward the ->via call until it reaches a lazy or
+        // deferred sequence. But instead of calling the $map with its own
+        // implementation it will be called with $this. It means that the user
+        // $map function is indeed called with a snapped sequence, and all
+        // steps will be memoized when the user finally tries to extract values.
         return $this
             ->implementation
-            ->via($map)
+            ->via(static fn() => $map($self))
             ->snap();
     }
 
@@ -487,8 +495,21 @@ final class Snap implements Implementation
     #[\Override]
     public function memoize(): Implementation
     {
+        if ($this->loaded) {
+            return $this->implementation;
+        }
+
+        // By overwriting the property with the memoized version of the data it
+        // allows to free the previous object from memory if the user doesn't
+        // reference it. If the user does, then it's still kept in memory and
+        // memoized itself due to the ->memoize() call before applying the
+        // action on this version.
         /** @psalm-suppress InaccessibleProperty */
-        return $this->snapshot ??= ($this->will)($this->implementation->memoize());
+        $this->implementation = ($this->will)($this->implementation->memoize());
+        /** @psalm-suppress InaccessibleProperty */
+        $this->loaded = true;
+
+        return $this->implementation;
     }
 
     /**

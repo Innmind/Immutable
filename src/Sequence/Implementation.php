@@ -176,7 +176,7 @@ interface Implementation extends \Countable
     /**
      * @template S
      *
-     * @param callable(Sequence<T>): Sequence<S> $map
+     * @param callable(self<T>): Sequence<S> $map
      *
      * @return Sequence<S>
      */

@@ -912,6 +912,31 @@ return static function() {
     );
 
     yield proof(
+        'Sequence::lazy()->snap()->via() loads the initial snapped sequence only once',
+        given(
+            Set\Sequence::of(Set\Type::any()),
+        ),
+        static function($assert, $values) {
+            $loaded = 0;
+            $sequence = Sequence::lazy(
+                static function() use ($values, &$loaded) {
+                    yield from $values;
+                    ++$loaded;
+                },
+            )->snap();
+            $sequence2 = $sequence->via(static fn($sequence) => $sequence);
+
+            $assert->same(0, $loaded);
+            $assert->same($values, $sequence2->toList());
+            $assert->same(1, $loaded);
+            $assert->same($values, $sequence2->toList());
+            $assert->same(1, $loaded);
+            $assert->same($values, $sequence->toList());
+            $assert->same(1, $loaded);
+        },
+    );
+
+    yield proof(
         'Sequence->snap()->toSet()',
         given(
             Set\Sequence::of(Set\Integers::any()),

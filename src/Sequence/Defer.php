@@ -534,18 +534,18 @@ final class Defer implements Implementation
     /**
      * @template S
      *
-     * @param callable(Sequence<T>): Sequence<S> $map
+     * @param callable(Implementation<T>): Sequence<S> $map
      *
      * @return Sequence<S>
      */
     #[\Override]
     public function via(callable $map): Sequence
     {
-        $sequence = $this->toSequence();
+        $self = $this;
 
         /** @psalm-suppress ImpureFunctionCall */
-        return Sequence::defer((static function() use ($sequence, $map) {
-            yield $map($sequence);
+        return Sequence::defer((static function() use ($self, $map) {
+            yield $map($self);
         })())->flatMap(static fn($sequence) => $sequence);
     }
 

@@ -425,7 +425,9 @@ final class Sequence implements \Countable
      */
     public function via(callable $map): self
     {
-        return $this->implementation->via($map);
+        return $this->implementation->via(
+            static fn($implementation) => $map(new self($implementation)),
+        );
     }
 
     /**
