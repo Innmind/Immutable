@@ -960,4 +960,27 @@ return static function() {
             );
         },
     );
+
+    yield proof(
+        'Sequence::lazy()->snap()->toSet() only load the generator once',
+        given(
+            Set\Sequence::of(Set\Integers::any()),
+        ),
+        static function($assert, $values) {
+            $loaded = 0;
+            $sequence = Sequence::lazy(static function() use ($values, &$loaded) {
+                yield from $values;
+                ++$loaded;
+            })->snap();
+            $set = $sequence->toSet();
+
+            $assert->same(
+                \array_unique($values),
+                $set->toList(),
+            );
+            $assert->same(1, $loaded);
+            $assert->same($values, $sequence->toList());
+            $assert->same(1, $loaded);
+        },
+    );
 };

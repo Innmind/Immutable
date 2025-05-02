@@ -433,8 +433,16 @@ final class Snap implements Implementation
     #[\Override]
     public function toSet(): Set
     {
-        // todo fix
-        return $this->implementation->toSet()->snap();
+        $self = $this;
+
+        // By using a lazy Set we're sure that we don't load the data too early.
+        // And the source of the generator is $this, meaning that as soon the
+        // Set starts to load a value it memoize $this (thus loading everything
+        // in memory). And all new iterations over the Set will reuse the
+        // already loaded data.
+        return Set::lazy(static function() use ($self) {
+            yield from $self->iterator();
+        });
     }
 
     #[\Override]
