@@ -524,6 +524,10 @@ final class Snap implements Implementation
         // action on this version.
         /** @psalm-suppress InaccessibleProperty */
         $this->implementation = ($this->will)($this->implementation->memoize());
+        // Overwriting the action here allows to free from memory any variable
+        // captured in the user provided callable.
+        /** @psalm-suppress InaccessibleProperty */
+        $this->will = static fn(Implementation $sequence): Implementation => $sequence;
 
         /** @var Primitive<T> */
         return $this->implementation;
