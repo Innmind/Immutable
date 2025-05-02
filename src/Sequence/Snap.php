@@ -42,7 +42,7 @@ final class Snap implements Implementation
     #[\Override]
     public function __invoke($element): Implementation
     {
-        return $this->will(static fn($sequence) => $sequence($element));
+        return $this->will(static fn($self) => $self($element));
     }
 
     #[\Override]
@@ -85,7 +85,7 @@ final class Snap implements Implementation
     #[\Override]
     public function diff(Implementation $sequence): Implementation
     {
-        return $this->will(static fn($sequence) => $sequence->diff($sequence));
+        return $this->will(static fn($self) => $self->diff($sequence));
     }
 
     /**
@@ -94,7 +94,7 @@ final class Snap implements Implementation
     #[\Override]
     public function distinct(): Implementation
     {
-        return $this->will(static fn($sequence) => $sequence->distinct());
+        return $this->will(static fn($self) => $self->distinct());
     }
 
     /**
@@ -105,7 +105,7 @@ final class Snap implements Implementation
     #[\Override]
     public function drop(int $size): Implementation
     {
-        return $this->will(static fn($sequence) => $sequence->drop($size));
+        return $this->will(static fn($self) => $self->drop($size));
     }
 
     /**
@@ -116,7 +116,7 @@ final class Snap implements Implementation
     #[\Override]
     public function dropEnd(int $size): Implementation
     {
-        return $this->will(static fn($sequence) => $sequence->dropEnd($size));
+        return $this->will(static fn($self) => $self->dropEnd($size));
     }
 
     /**
@@ -136,7 +136,7 @@ final class Snap implements Implementation
     #[\Override]
     public function filter(callable $predicate): Implementation
     {
-        return $this->will(static fn($sequence) => $sequence->filter($predicate));
+        return $this->will(static fn($self) => $self->filter($predicate));
     }
 
     /**
@@ -207,7 +207,7 @@ final class Snap implements Implementation
     #[\Override]
     public function indices(): Implementation
     {
-        return $this->will(static fn($sequence) => $sequence->indices());
+        return $this->will(static fn($self) => $self->indices());
     }
 
     /**
@@ -220,7 +220,7 @@ final class Snap implements Implementation
     #[\Override]
     public function map(callable $function): Implementation
     {
-        return $this->will(static fn($sequence) => $sequence->map($function));
+        return $this->will(static fn($self) => $self->map($function));
     }
 
     /**
@@ -235,7 +235,7 @@ final class Snap implements Implementation
     #[\Override]
     public function flatMap(callable $map, callable $exfiltrate): self
     {
-        return $this->will(static fn($sequence) => $sequence->flatMap($map, $exfiltrate));
+        return $this->will(static fn($self) => $self->flatMap($map, $exfiltrate));
     }
 
     /**
@@ -279,7 +279,7 @@ final class Snap implements Implementation
     #[\Override]
     public function pad(int $size, $element): Implementation
     {
-        return $this->will(static fn($sequence) => $sequence->pad($size, $element));
+        return $this->will(static fn($self) => $self->pad($size, $element));
     }
 
     /**
@@ -303,7 +303,7 @@ final class Snap implements Implementation
     #[\Override]
     public function slice(int $from, int $until): Implementation
     {
-        return $this->will(static fn($sequence) => $sequence->slice($from, $until));
+        return $this->will(static fn($self) => $self->slice($from, $until));
     }
 
     /**
@@ -314,7 +314,7 @@ final class Snap implements Implementation
     #[\Override]
     public function take(int $size): Implementation
     {
-        return $this->will(static fn($sequence) => $sequence->take($size));
+        return $this->will(static fn($self) => $self->take($size));
     }
 
     /**
@@ -325,7 +325,7 @@ final class Snap implements Implementation
     #[\Override]
     public function takeEnd(int $size): Implementation
     {
-        return $this->will(static fn($sequence) => $sequence->takeEnd($size));
+        return $this->will(static fn($self) => $self->takeEnd($size));
     }
 
     /**
@@ -336,7 +336,7 @@ final class Snap implements Implementation
     #[\Override]
     public function append(Implementation $sequence): Implementation
     {
-        return $this->will(static fn($sequence) => $sequence->append($sequence));
+        return $this->will(static fn($self) => $self->append($sequence));
     }
 
     /**
@@ -347,7 +347,7 @@ final class Snap implements Implementation
     #[\Override]
     public function prepend(Implementation $sequence): Implementation
     {
-        return $this->will(static fn($sequence) => $sequence->prepend($sequence));
+        return $this->will(static fn($self) => $self->prepend($sequence));
     }
 
     /**
@@ -358,7 +358,7 @@ final class Snap implements Implementation
     #[\Override]
     public function intersect(Implementation $sequence): Implementation
     {
-        return $this->will(static fn($sequence) => $sequence->intersect($sequence));
+        return $this->will(static fn($self) => $self->intersect($sequence));
     }
 
     /**
@@ -369,7 +369,7 @@ final class Snap implements Implementation
     #[\Override]
     public function sort(callable $function): Implementation
     {
-        return $this->will(static fn($sequence) => $sequence->sort($function));
+        return $this->will(static fn($self) => $self->sort($function));
     }
 
     /**
@@ -416,7 +416,7 @@ final class Snap implements Implementation
     #[\Override]
     public function reverse(): Implementation
     {
-        return $this->will(static fn($sequence) => $sequence->reverse());
+        return $this->will(static fn($self) => $self->reverse());
     }
 
     #[\Override]
@@ -477,7 +477,7 @@ final class Snap implements Implementation
     #[\Override]
     public function zip(Implementation $sequence): self
     {
-        return $this->will(static fn($sequence) => $sequence->zip($sequence));
+        return $this->will(static fn($self) => $self->zip($sequence));
     }
 
     /**
@@ -490,7 +490,7 @@ final class Snap implements Implementation
     #[\Override]
     public function safeguard($carry, callable $assert): Implementation
     {
-        return $this->will(static fn($sequence) => $sequence->safeguard($carry, $assert));
+        return $this->will(static fn($self) => $self->safeguard($carry, $assert));
     }
 
     /**
@@ -504,7 +504,7 @@ final class Snap implements Implementation
     #[\Override]
     public function aggregate(callable $map, callable $exfiltrate): Implementation
     {
-        return $this->will(static fn($sequence) => $sequence->aggregate($map, $exfiltrate));
+        return $this->will(static fn($self) => $self->aggregate($map, $exfiltrate));
     }
 
     /**
@@ -541,7 +541,7 @@ final class Snap implements Implementation
     #[\Override]
     public function dropWhile(callable $condition): Implementation
     {
-        return $this->will(static fn($sequence) => $sequence->dropWhile($condition));
+        return $this->will(static fn($self) => $self->dropWhile($condition));
     }
 
     /**
@@ -552,7 +552,7 @@ final class Snap implements Implementation
     #[\Override]
     public function takeWhile(callable $condition): Implementation
     {
-        return $this->will(static fn($sequence) => $sequence->takeWhile($condition));
+        return $this->will(static fn($self) => $self->takeWhile($condition));
     }
 
     /**
