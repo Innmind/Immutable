@@ -230,10 +230,10 @@ final class Snap implements Implementation
      * @param callable(T): C $map
      * @param callable(C): Implementation<S> $exfiltrate
      *
-     * @return self<S>
+     * @return Implementation<S>
      */
     #[\Override]
-    public function flatMap(callable $map, callable $exfiltrate): self
+    public function flatMap(callable $map, callable $exfiltrate): Implementation
     {
         return $this->will(static fn($self) => $self->flatMap($map, $exfiltrate));
     }
@@ -472,10 +472,10 @@ final class Snap implements Implementation
      *
      * @param Implementation<S> $sequence
      *
-     * @return self<array{T, S}>
+     * @return Implementation<array{T, S}>
      */
     #[\Override]
-    public function zip(Implementation $sequence): self
+    public function zip(Implementation $sequence): Implementation
     {
         return $this->will(static fn($self) => $self->zip($sequence));
     }
@@ -560,10 +560,14 @@ final class Snap implements Implementation
      *
      * @param pure-Closure(Implementation<T>): Implementation<S> $method
      *
-     * @return self<S>
+     * @return Implementation<S>
      */
-    private function will(\Closure $method): self
+    private function will(\Closure $method): Implementation
     {
+        if ($this->implementation instanceof Primitive) {
+            return $method($this->implementation);
+        }
+
         return new self($this, $method);
     }
 }
