@@ -1204,31 +1204,6 @@ final class Defer implements Implementation
     }
 
     /**
-     * @return Sequence<T>
-     */
-    private function toSequence(): Sequence
-    {
-        $captured = $this->capture();
-
-        /** @psalm-suppress ImpureFunctionCall */
-        return Sequence::defer(
-            (static function() use (&$captured): \Generator {
-                /**
-                 * @psalm-suppress PossiblyNullArgument
-                 * @var Iterator<T>
-                 */
-                $values = self::detonate($captured);
-                $values->rewind();
-
-                while ($values->valid()) {
-                    yield $values->current();
-                    $values->next();
-                }
-            })(),
-        );
-    }
-
-    /**
      * @return array{
      *     Accumulate<T>,
      *     \Generator<int<0, max>, T>,

@@ -1109,14 +1109,6 @@ final class Lazy implements Implementation
     }
 
     /**
-     * @return Sequence<T>
-     */
-    private function toSequence(): Sequence
-    {
-        return Sequence::lazy($this->values);
-    }
-
-    /**
      * @return Primitive<T>
      */
     private function load(): Primitive
