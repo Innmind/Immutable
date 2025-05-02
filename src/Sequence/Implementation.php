@@ -367,9 +367,9 @@ interface Implementation extends \Countable
     public function aggregate(callable $map, callable $exfiltrate): self;
 
     /**
-     * @return self<T>
+     * @return Primitive<T>
      */
-    public function memoize(): self;
+    public function memoize(): Primitive;
 
     /**
      * @param callable(T): bool $condition

@@ -1103,10 +1103,10 @@ final class Defer implements Implementation
     }
 
     /**
-     * @return Implementation<T>
+     * @return Primitive<T>
      */
     #[\Override]
-    public function memoize(): Implementation
+    public function memoize(): Primitive
     {
         $values = [];
         $this->values->rewind();

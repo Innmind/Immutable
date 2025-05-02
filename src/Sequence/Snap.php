@@ -22,7 +22,6 @@ final class Snap implements Implementation
     private Implementation $implementation;
     /** @var pure-Closure(Implementation): Implementation<T> */
     private \Closure $will;
-    private bool $loaded;
 
     /**
      * @param ?pure-Closure(Implementation): Implementation<T> $will
@@ -33,7 +32,6 @@ final class Snap implements Implementation
     ) {
         $this->implementation = $implementation;
         $this->will = $will ?? static fn(Implementation $sequence): Implementation => $sequence;
-        $this->loaded = false;
     }
 
     /**
@@ -510,12 +508,12 @@ final class Snap implements Implementation
     }
 
     /**
-     * @return Implementation<T>
+     * @return Primitive<T>
      */
     #[\Override]
-    public function memoize(): Implementation
+    public function memoize(): Primitive
     {
-        if ($this->loaded) {
+        if ($this->implementation instanceof Primitive) {
             return $this->implementation;
         }
 
@@ -526,9 +524,8 @@ final class Snap implements Implementation
         // action on this version.
         /** @psalm-suppress InaccessibleProperty */
         $this->implementation = ($this->will)($this->implementation->memoize());
-        /** @psalm-suppress InaccessibleProperty */
-        $this->loaded = true;
 
+        /** @var Primitive<T> */
         return $this->implementation;
     }
 
