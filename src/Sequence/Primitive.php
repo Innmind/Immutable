@@ -308,7 +308,7 @@ final class Primitive implements Implementation
     /**
      * @template S
      *
-     * @param callable(Sequence<T>): Sequence<S> $map
+     * @param callable(Implementation<T>): Sequence<S> $map
      *
      * @return Sequence<S>
      */
@@ -316,7 +316,7 @@ final class Primitive implements Implementation
     public function via(callable $map): Sequence
     {
         /** @psalm-suppress ImpureFunctionCall */
-        return $map(Sequence::of(...$this->values));
+        return $map($this);
     }
 
     /**
