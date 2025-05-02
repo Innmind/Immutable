@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Fixed
+
+- `Sequence->snap()` on an already loaded sequence created useless objects
+
 ## 5.14.1 - 2025-04-02
 
 ### Fixed

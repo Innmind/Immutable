@@ -827,6 +827,10 @@ final class Sequence implements \Countable
      */
     public function snap(): self
     {
+        if ($this->implementation instanceof Sequence\Primitive) {
+            return $this;
+        }
+
         return new self(new Sequence\Snap($this->implementation));
     }
 }
