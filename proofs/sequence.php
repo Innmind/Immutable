@@ -720,6 +720,53 @@ return static function() {
     );
 
     yield proof(
+        'Sequence::snap() keeps in memory intermediary steps',
+        given(
+            Set\Type::any(),
+            Set\Sequence::of(Set\Type::any()),
+            Set\Type::any(),
+        ),
+        static function($assert, $value, $rest, $last) {
+            $loaded = 0;
+            $snapped = Sequence::lazy(static function() use (&$loaded, $value, $rest, $last) {
+                yield $value;
+                yield from $rest;
+                yield $last;
+
+                ++$loaded;
+            })->snap();
+            $mapped = $snapped->map(static fn($value) => [$value]);
+
+            $assert->same(0, $loaded);
+            $assert->same(
+                [$value],
+                $mapped->first()->match(
+                    static fn($value) => $value,
+                    static fn() => null,
+                ),
+            );
+            $assert->same(1, $loaded);
+            $assert->same(
+                [$last],
+                $mapped->last()->match(
+                    static fn($value) => $value,
+                    static fn() => null,
+                ),
+            );
+            $assert->same(1, $loaded);
+
+            $assert->same(
+                $last,
+                $snapped->last()->match(
+                    static fn($value) => $value,
+                    static fn() => null,
+                ),
+            );
+            $assert->same(1, $loaded);
+        },
+    );
+
+    yield proof(
         'Sequence::snap() loads a deferred sequence at once',
         given(
             Set\Type::any(),

@@ -5,6 +5,7 @@
 ### Fixed
 
 - `Sequence->snap()` on an already loaded sequence created useless objects
+- `Sequence->snap()` wasn't keeping intermediary steps in memory
 
 ## 5.14.1 - 2025-04-02
 
