@@ -248,6 +248,12 @@ final class Set implements \Countable
      */
     public function equals(self $set): bool
     {
+        if ($this === $set) {
+            // This avoids loading a lazy set, as a Set is necessarily equal to
+            // itself
+            return true;
+        }
+
         $size = $this->size();
 
         if ($size !== $set->size()) {

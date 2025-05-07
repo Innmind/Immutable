@@ -1020,4 +1020,20 @@ return static function() {
             );
         },
     );
+
+    yield proof(
+        'Sequence::equals() should not load its data when compared to itself',
+        given(Set\Sequence::of(Set\Type::any())),
+        static function($assert, $values) {
+            $loaded = false;
+            $sequence = Sequence::lazy(static function() use (&$loaded, $values) {
+                $loaded = true;
+
+                yield from $values;
+            });
+
+            $assert->true($sequence->equals($sequence));
+            $assert->false($loaded);
+        },
+    );
 };
