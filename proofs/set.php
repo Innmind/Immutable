@@ -252,4 +252,20 @@ return static function() {
             $assert->same(1, $loaded);
         },
     );
+
+    yield proof(
+        'Set::equals() should not load its data when compared to itself',
+        given(DataSet\Sequence::of(DataSet\Type::any())),
+        static function($assert, $values) {
+            $loaded = false;
+            $set = Set::lazy(static function() use (&$loaded, $values) {
+                $loaded = true;
+
+                yield from $values;
+            });
+
+            $assert->true($set->equals($set));
+            $assert->false($loaded);
+        },
+    );
 };
