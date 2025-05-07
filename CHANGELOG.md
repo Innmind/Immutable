@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Fixed
+
+- `Set::equals()` and `Sequence::equals()` were loading their data when compared to themselves
+
 ## 5.14.3 - 2025-05-02
 
 ### Fixed
