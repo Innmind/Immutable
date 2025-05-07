@@ -260,6 +260,12 @@ final class Sequence implements \Countable
      */
     public function equals(self $sequence): bool
     {
+        if ($this === $sequence) {
+            // This avoids loading a lazy/deferred/snapped sequence, as a
+            // Sequence is necessarily equal to itself
+            return true;
+        }
+
         return $this->implementation->equals(
             $sequence->implementation,
         );
