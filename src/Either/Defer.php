@@ -6,6 +6,7 @@ namespace Innmind\Immutable\Either;
 use Innmind\Immutable\{
     Either,
     Maybe,
+    Attempt,
 };
 
 /**
@@ -82,6 +83,14 @@ final class Defer implements Implementation
         $captured = $this->capture();
 
         return Maybe::defer(static fn() => self::detonate($captured)->maybe());
+    }
+
+    #[\Override]
+    public function attempt(callable $error): Attempt
+    {
+        $captured = $this->capture();
+
+        return Attempt::defer(static fn() => self::detonate($captured)->attempt($error));
     }
 
     /**

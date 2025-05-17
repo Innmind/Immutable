@@ -7,6 +7,7 @@ use Innmind\Immutable\{
     Maybe,
     Either,
     Sequence,
+    Attempt,
 };
 
 /**
@@ -70,6 +71,12 @@ final class Just implements Implementation
     public function either(): Either
     {
         return Either::right($this->value);
+    }
+
+    #[\Override]
+    public function attempt(callable $error): Attempt
+    {
+        return Attempt::result($this->value);
     }
 
     /**

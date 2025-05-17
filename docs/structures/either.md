@@ -186,6 +186,19 @@ Either::left('something')->maybe()->match(
 ); // returns null
 ```
 
+## `->attempt()`
+
+This returns an [`Attempt`](attempt.md) containing the right value, in case of a left value it returns an `Attempt` with the error provided by the callable inside.
+
+```php
+Either::right('something')
+    ->attempt(static fn() => new \Exception)
+    ->unwrap(); // returns 'something'
+Either::left('something')
+    ->attempt(static fn(string $left) => new \Exception($left))
+    ->unwrap(); // throws new \Exception('something')
+```
+
 ## `->memoize()`
 
 This method force to load the contained value into memory. This is only useful for a deferred `Either`, this will do nothing for other either as the value is already known.

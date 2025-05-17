@@ -157,6 +157,16 @@ final class Either
     }
 
     /**
+     * @param callable(L): \Throwable $error
+     *
+     * @return Attempt<R>
+     */
+    public function attempt(callable $error): Attempt
+    {
+        return $this->either->attempt($error);
+    }
+
+    /**
      * Force loading the value in memory (only useful for a deferred Either)
      *
      * @return self<L, R>

@@ -6,6 +6,7 @@ namespace Innmind\Immutable\Either;
 use Innmind\Immutable\{
     Either,
     Maybe,
+    Attempt,
 };
 
 /**
@@ -79,6 +80,13 @@ final class Left implements Implementation
     public function maybe(): Maybe
     {
         return Maybe::nothing();
+    }
+
+    #[\Override]
+    public function attempt(callable $error): Attempt
+    {
+        /** @psalm-suppress ImpureFunctionCall */
+        return Attempt::error($error($this->value));
     }
 
     /**
