@@ -6,6 +6,7 @@ namespace Innmind\Immutable\Either;
 use Innmind\Immutable\{
     Either,
     Maybe,
+    Attempt,
 };
 
 /**
@@ -85,6 +86,12 @@ final class Right implements Implementation
     public function maybe(): Maybe
     {
         return Maybe::just($this->value);
+    }
+
+    #[\Override]
+    public function attempt(callable $error): Attempt
+    {
+        return Attempt::result($this->value);
     }
 
     /**

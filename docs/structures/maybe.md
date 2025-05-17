@@ -166,6 +166,19 @@ Maybe::nothing()
     ); // return 'something'
 ```
 
+## `->either()`
+
+This returns an [`Attempt`](attempt.md) containing the value as a result and the error is provided by the callable.
+
+```php
+Maybe::just('something')
+    ->attempt(static fn() => new \Exception)
+    ->unwrap(); // returns 'something'
+Maybe::nothing()
+    ->attempt(static fn() => new \Exception)
+    ->unwrap(); // throws the exception
+```
+
 ## `->memoize()`
 
 This method force to load the contained value into memory. This is only useful for a deferred `Maybe`, this will do nothing for other maybe as the value is already known.

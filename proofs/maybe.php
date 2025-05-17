@@ -63,4 +63,66 @@ return static function() {
             $assert->true($loaded);
         },
     );
+
+    yield proof(
+        'Maybe->attempt()',
+        given(Set\Type::any()),
+        static function($assert, $value) {
+            $assert->same(
+                $value,
+                Maybe::just($value)
+                    ->attempt(static fn() => new Exception)
+                    ->unwrap(),
+            );
+
+            $expected = new Exception;
+            $assert->same(
+                $expected,
+                Maybe::nothing()
+                    ->attempt(static fn() => $expected)
+                    ->match(
+                        static fn() => null,
+                        static fn($error) => $error,
+                    ),
+            );
+        },
+    );
+
+    yield proof(
+        'Maybe::defer()->attempt()',
+        given(Set\Type::any()),
+        static function($assert, $value) {
+            $loaded = false;
+            $attempt = Maybe::defer(static function() use (&$loaded, $value) {
+                $loaded = true;
+
+                return Maybe::just($value);
+            })->attempt(static fn() => new Exception);
+
+            $assert->false($loaded);
+            $assert->same(
+                $value,
+                $attempt->unwrap(),
+            );
+            $assert->true($loaded);
+
+            $expected = new Exception;
+            $loaded = false;
+            $attempt = Maybe::defer(static function() use (&$loaded) {
+                $loaded = true;
+
+                return Maybe::nothing();
+            })->attempt(static fn() => $expected);
+
+            $assert->false($loaded);
+            $assert->same(
+                $expected,
+                $attempt->match(
+                    static fn() => null,
+                    static fn($error) => $error,
+                ),
+            );
+            $assert->true($loaded);
+        },
+    );
 };

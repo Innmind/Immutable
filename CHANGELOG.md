@@ -1,5 +1,12 @@
 # Changelog
 
+## 5.15.0 - 2025-05-17
+
+### Added
+
+- `Innmind\Immutable\Maybe::attempt()`
+- `Innmind\Immutable\Either::attempt()`
+
 ## 5.14.4 - 2025-05-07
 
 ### Fixed

@@ -186,6 +186,16 @@ final class Maybe
     }
 
     /**
+     * @param callable(): \Throwable $error
+     *
+     * @return Attempt<T>
+     */
+    public function attempt(callable $error): Attempt
+    {
+        return $this->maybe->attempt($error);
+    }
+
+    /**
      * Force loading the value in memory (only useful for a deferred Maybe)
      *
      * @return self<T>
