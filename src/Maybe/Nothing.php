@@ -7,6 +7,7 @@ use Innmind\Immutable\{
     Maybe,
     Either,
     Sequence,
+    Attempt,
 };
 
 /**
@@ -52,6 +53,13 @@ final class Nothing implements Implementation
     public function either(): Either
     {
         return Either::left(null);
+    }
+
+    #[\Override]
+    public function attempt(callable $error): Attempt
+    {
+        /** @psalm-suppress ImpureFunctionCall */
+        return Attempt::error($error());
     }
 
     /**

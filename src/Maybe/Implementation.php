@@ -7,6 +7,7 @@ use Innmind\Immutable\{
     Maybe,
     Either,
     Sequence,
+    Attempt,
 };
 
 /**
@@ -64,6 +65,13 @@ interface Implementation
      * @return Either<null, T>
      */
     public function either(): Either;
+
+    /**
+     * @param callable(): \Throwable $error
+     *
+     * @return Attempt<T>
+     */
+    public function attempt(callable $error): Attempt;
 
     /**
      * @return Maybe<T>

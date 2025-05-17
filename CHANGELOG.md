@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+
+- `Innmind\Immutable\Maybe::attempt()`
+
 ## 5.14.4 - 2025-05-07
 
 ### Fixed

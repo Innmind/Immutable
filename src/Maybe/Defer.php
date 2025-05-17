@@ -7,6 +7,7 @@ use Innmind\Immutable\{
     Maybe,
     Either,
     Sequence,
+    Attempt,
 };
 
 /**
@@ -74,6 +75,14 @@ final class Defer implements Implementation
         $captured = $this->capture();
 
         return Either::defer(static fn() => self::detonate($captured)->either());
+    }
+
+    #[\Override]
+    public function attempt(callable $error): Attempt
+    {
+        $captured = $this->capture();
+
+        return Attempt::defer(static fn() => self::detonate($captured)->attempt($error));
     }
 
     /**
