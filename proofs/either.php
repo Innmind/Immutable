@@ -24,4 +24,80 @@ return static function() {
             $assert->true($loaded);
         },
     );
+
+    yield proof(
+        'Either->attempt()',
+        given(
+            Set\Type::any(),
+            Set\Type::any(),
+        ),
+        static function($assert, $right, $left) {
+            $assert->same(
+                $right,
+                Either::right($right)
+                    ->attempt(static fn() => new Exception)
+                    ->unwrap(),
+            );
+
+            $expected = new Exception;
+            $assert->same(
+                $expected,
+                Either::left($left)
+                    ->attempt(static function($value) use ($assert, $left, $expected) {
+                        $assert->same($left, $value);
+
+                        return $expected;
+                    })
+                    ->match(
+                        static fn() => null,
+                        static fn($error) => $error,
+                    ),
+            );
+        },
+    );
+
+    yield proof(
+        'Either::defer()->attempt()',
+        given(
+            Set\Type::any(),
+            Set\Type::any(),
+        ),
+        static function($assert, $right, $left) {
+            $loaded = false;
+            $attempt = Either::defer(static function() use (&$loaded, $right) {
+                $loaded = true;
+
+                return Either::right($right);
+            })->attempt(static fn() => new Exception);
+
+            $assert->false($loaded);
+            $assert->same(
+                $right,
+                $attempt->unwrap(),
+            );
+            $assert->true($loaded);
+
+            $expected = new Exception;
+            $loaded = false;
+            $attempt = Either::defer(static function() use (&$loaded, $left) {
+                $loaded = true;
+
+                return Either::left($left);
+            })->attempt(static function($value) use ($assert, $left, $expected) {
+                $assert->same($left, $value);
+
+                return $expected;
+            });
+
+            $assert->false($loaded);
+            $assert->same(
+                $expected,
+                $attempt->match(
+                    static fn() => null,
+                    static fn($error) => $error,
+                ),
+            );
+            $assert->true($loaded);
+        },
+    );
 };

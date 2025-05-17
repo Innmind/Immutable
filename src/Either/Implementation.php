@@ -6,6 +6,7 @@ namespace Innmind\Immutable\Either;
 use Innmind\Immutable\{
     Either,
     Maybe,
+    Attempt,
 };
 
 /**
@@ -78,6 +79,13 @@ interface Implementation
      * @return Maybe<R>
      */
     public function maybe(): Maybe;
+
+    /**
+     * @param callable(L): \Throwable $error
+     *
+     * @return Attempt<R>
+     */
+    public function attempt(callable $error): Attempt;
 
     /**
      * @return Either<L, R>

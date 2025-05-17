@@ -5,6 +5,7 @@
 ### Added
 
 - `Innmind\Immutable\Maybe::attempt()`
+- `Innmind\Immutable\Either::attempt()`
 
 ## 5.14.4 - 2025-05-07
 
