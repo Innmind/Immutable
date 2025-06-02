@@ -72,4 +72,11 @@ final class Result implements Implementation
     {
         return Attempt::result($this->value);
     }
+
+    #[\Override]
+    public function eitherWay(callable $result, callable $error): Attempt
+    {
+        /** @psalm-suppress ImpureFunctionCall */
+        return $result($this->value);
+    }
 }

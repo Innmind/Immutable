@@ -174,4 +174,17 @@ final class Attempt
     {
         return $this->implementation->memoize();
     }
+
+    /**
+     * @template V
+     *
+     * @param callable(T): self<V> $result
+     * @param callable(\Throwable): self<V> $error
+     *
+     * @return self<V>
+     */
+    public function eitherWay(callable $result, callable $error): self
+    {
+        return $this->implementation->eitherWay($result, $error);
+    }
 }

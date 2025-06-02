@@ -76,4 +76,11 @@ final class Error implements Implementation
     {
         return Attempt::error($this->value);
     }
+
+    #[\Override]
+    public function eitherWay(callable $result, callable $error): Attempt
+    {
+        /** @psalm-suppress ImpureFunctionCall */
+        return $error($this->value);
+    }
 }
