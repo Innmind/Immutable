@@ -9,6 +9,7 @@
 - `Innmind\Immutable\Predicate\AndPredicate::or()`
 - `Innmind\Immutable\Predicate\AndPredicate::and()`
 - `Innmind\Immutable\Monoid\ArrayMerge`
+- `Innmind\Immutable\Attempt::eitherWay()`
 
 ## 5.15.0 - 2025-05-17
 

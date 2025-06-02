@@ -195,3 +195,26 @@ $result = Attempt::of(static fn() => 1 / $divisor)
 ```
 
 Here `#!php $result` is necessarily a fraction of `#!php 1` but this code may raise the `DivisionByZeroError` exception.
+
+## `->eitherWay()`
+
+This method kind of combines both `flatMap` and `recover` in a single call. This is useful when you can't call `recover` after `flatMap` because you don't want to override the error returned by `flatMap`.
+
+```php
+/**
+ * @return Attempt<SideEffect> SideEffect when on macOS
+ */
+function isMac(): Attempt { /* ... */}
+/**
+ * @return Attempt<SideEffect>
+ */
+function runMac(): Attempt { /* ... */ }
+/**
+ * @return Attempt<SideEffect>
+ */
+function runLinux(): Attempt { /* ... */ }
+
+$_ = isMac()->eitherWay(runMac(...), runLinux(...));
+```
+
+In this case we want to run `runLinux` only when `isMac` returns an error which is possible thanks to `->eitherWay()`. Contrary to `isMac()->flatMap(runMac(...))->recover(runLinux(...))` that could lead to `runLinux` to be called if `runMac` returns an error.

@@ -67,4 +67,14 @@ interface Implementation
      * @return Attempt<T>
      */
     public function memoize(): Attempt;
+
+    /**
+     * @template V
+     *
+     * @param callable(T): Attempt<V> $result
+     * @param callable(\Throwable): Attempt<V> $error
+     *
+     * @return Attempt<V>
+     */
+    public function eitherWay(callable $result, callable $error): Attempt;
 }

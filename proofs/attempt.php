@@ -359,4 +359,177 @@ return static function() {
             );
         },
     );
+
+    yield proof(
+        'Attempt::eitherWay()',
+        given(
+            Set\Type::any(),
+            Set\Type::any(),
+            $exceptions,
+            $exceptions,
+        ),
+        static function($assert, $result1, $result2, $error1, $error2) {
+            $assert->same(
+                $result1,
+                Attempt::result($result1)
+                    ->eitherWay(
+                        Attempt::result(...),
+                        Attempt::result(...),
+                    )
+                    ->match(
+                        static fn($value) => $value,
+                        static fn() => null,
+                    ),
+            );
+            $assert->same(
+                $result2,
+                Attempt::result($result1)
+                    ->eitherWay(
+                        static fn() => Attempt::result($result2),
+                        Attempt::result(...),
+                    )
+                    ->match(
+                        static fn($value) => $value,
+                        static fn() => null,
+                    ),
+            );
+            $assert->same(
+                $error1,
+                Attempt::error($error1)
+                    ->eitherWay(
+                        Attempt::result(...),
+                        Attempt::error(...),
+                    )
+                    ->match(
+                        static fn() => null,
+                        static fn($value) => $value,
+                    ),
+            );
+            $assert->same(
+                $error1,
+                Attempt::error($error1)
+                    ->eitherWay(
+                        Attempt::error(...),
+                        Attempt::result(...),
+                    )
+                    ->match(
+                        static fn($value) => $value,
+                        static fn() => null,
+                    ),
+            );
+            $assert->same(
+                $error2,
+                Attempt::error($error1)
+                    ->eitherWay(
+                        Attempt::result(...),
+                        static fn() => Attempt::error($error2),
+                    )
+                    ->match(
+                        static fn() => null,
+                        static fn($value) => $value,
+                    ),
+            );
+        },
+    );
+
+    yield proof(
+        'Attempt::defer()->eitherWay()',
+        given(
+            Set\Type::any(),
+            Set\Type::any(),
+            $exceptions,
+            $exceptions,
+        ),
+        static function($assert, $result1, $result2, $error1, $error2) {
+            $loaded = false;
+            $attempt = Attempt::defer(static function() use (&$loaded, $result1) {
+                $loaded = true;
+
+                return Attempt::result($result1);
+            })->eitherWay(
+                Attempt::result(...),
+                Attempt::result(...),
+            );
+            $assert->false($loaded);
+            $assert->same(
+                $result1,
+                $attempt->match(
+                    static fn($value) => $value,
+                    static fn() => null,
+                ),
+            );
+
+            $loaded = false;
+            $attempt = Attempt::defer(static function() use (&$loaded, $result1) {
+                $loaded = true;
+
+                return Attempt::result($result1);
+            })->eitherWay(
+                static fn() => Attempt::result($result2),
+                Attempt::result(...),
+            );
+            $assert->false($loaded);
+            $assert->same(
+                $result2,
+                $attempt->match(
+                    static fn($value) => $value,
+                    static fn() => null,
+                ),
+            );
+
+            $loaded = false;
+            $attempt = Attempt::defer(static function() use (&$loaded, $error1) {
+                $loaded = true;
+
+                return Attempt::error($error1);
+            })->eitherWay(
+                Attempt::result(...),
+                Attempt::error(...),
+            );
+            $assert->false($loaded);
+            $assert->same(
+                $error1,
+                $attempt->match(
+                    static fn() => null,
+                    static fn($value) => $value,
+                ),
+            );
+
+            $loaded = false;
+            $attempt = Attempt::defer(static function() use (&$loaded, $error1) {
+                $loaded = true;
+
+                return Attempt::error($error1);
+            })->eitherWay(
+                Attempt::error(...),
+                Attempt::result(...),
+            );
+            $assert->false($loaded);
+            $assert->same(
+                $error1,
+                $attempt->match(
+                    static fn($value) => $value,
+                    static fn() => null,
+                ),
+            );
+
+            $loaded = false;
+            $attempt = Attempt::defer(static function() use (&$loaded, $error1) {
+                $loaded = true;
+
+                return Attempt::error($error1);
+            })->eitherWay(
+                Attempt::result(...),
+                static fn() => Attempt::error($error2),
+            );
+            $assert->false($loaded);
+            $assert->same(
+                $error2,
+                $attempt->match(
+                    static fn() => null,
+                    static fn($value) => $value,
+                ),
+            );
+        },
+    );
 };

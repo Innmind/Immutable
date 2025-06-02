@@ -85,6 +85,16 @@ final class Defer implements Implementation
         return $this->unwrap();
     }
 
+    #[\Override]
+    public function eitherWay(callable $result, callable $error): Attempt
+    {
+        $captured = $this->capture();
+
+        return Attempt::defer(
+            static fn() => self::detonate($captured)->eitherWay($result, $error),
+        );
+    }
+
     /**
      * @return Attempt<R1>
      */
