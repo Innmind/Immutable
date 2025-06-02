@@ -1,5 +1,14 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+
+- `Innmind\Immutable\Predicate\OrPredicate::or()`
+- `Innmind\Immutable\Predicate\OrPredicate::and()`
+- `Innmind\Immutable\Predicate\AndPredicate::or()`
+- `Innmind\Immutable\Predicate\AndPredicate::and()`
+
 ## 5.15.0 - 2025-05-17
 
 ### Added
