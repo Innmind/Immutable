@@ -16,6 +16,7 @@ This library comes with a few monoids:
 - `Innmind\Immutable\Monoid\Append` to append 2 instances of `Innmind\Immutable\Sequence` together
 - `Innmind\Immutable\Monoid\MergeSet` to append 2 instances of `Innmind\Immutable\Set` together
 - `Innmind\Immutable\Monoid\MergeMap` to append 2 instances of `Innmind\Immutable\Map` together
+- `Innmind\Immutable\Monoid\ArrayMerge` to append 2 arrays together (keys are preserved)
 
 ## Create your own
 
