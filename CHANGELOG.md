@@ -1,5 +1,16 @@
 # Changelog
 
+## 5.16.0 - 2025-06-02
+
+### Added
+
+- `Innmind\Immutable\Predicate\OrPredicate::or()`
+- `Innmind\Immutable\Predicate\OrPredicate::and()`
+- `Innmind\Immutable\Predicate\AndPredicate::or()`
+- `Innmind\Immutable\Predicate\AndPredicate::and()`
+- `Innmind\Immutable\Monoid\ArrayMerge`
+- `Innmind\Immutable\Attempt::eitherWay()`
+
 ## 5.15.0 - 2025-05-17
 
 ### Added

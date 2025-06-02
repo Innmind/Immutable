@@ -48,4 +48,28 @@ final class OrPredicate implements Predicate
     {
         return new self($a, $b);
     }
+
+    /**
+     * @template C
+     *
+     * @param Predicate<C> $other
+     *
+     * @return self<A|B, C>
+     */
+    public function or(Predicate $other): self
+    {
+        return new self($this, $other);
+    }
+
+    /**
+     * @template C
+     *
+     * @param Predicate<C> $other
+     *
+     * @return AndPredicate<A|B, C>
+     */
+    public function and(Predicate $other): AndPredicate
+    {
+        return AndPredicate::of($this, $other);
+    }
 }

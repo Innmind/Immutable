@@ -166,7 +166,7 @@ Maybe::nothing()
     ); // return 'something'
 ```
 
-## `->either()`
+## `->attempt()`
 
 This returns an [`Attempt`](attempt.md) containing the value as a result and the error is provided by the callable.
 
