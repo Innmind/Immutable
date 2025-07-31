@@ -59,7 +59,7 @@ final class Map implements \Countable
     }
 
     /**
-     * @return 0|positive-int
+     * @return int<0, max>
      */
     public function size(): int
     {
@@ -67,7 +67,7 @@ final class Map implements \Countable
     }
 
     /**
-     * @return 0|positive-int
+     * @return int<0, max>
      */
     #[\Override]
     public function count(): int

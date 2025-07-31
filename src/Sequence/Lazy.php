@@ -198,7 +198,7 @@ final class Lazy implements Implementation
     }
 
     /**
-     * @param 0|positive-int $size
+     * @param int<0, max> $size
      *
      * @return Implementation<T>
      */
@@ -362,7 +362,7 @@ final class Lazy implements Implementation
     /**
      * @param T $element
      *
-     * @return Maybe<0|positive-int>
+     * @return Maybe<int<0, max>>
      */
     #[\Override]
     public function indexOf($element): Maybe
@@ -379,7 +379,7 @@ final class Lazy implements Implementation
                 if ($iterator->current() === $element) {
                     $register->cleanup();
 
-                    /** @var Maybe<0|positive-int> */
+                    /** @var Maybe<int<0, max>> */
                     return Maybe::just($index);
                 }
 
@@ -387,7 +387,7 @@ final class Lazy implements Implementation
                 $iterator->next();
             }
 
-            /** @var Maybe<0|positive-int> */
+            /** @var Maybe<int<0, max>> */
             return Maybe::nothing();
         });
     }
@@ -395,14 +395,14 @@ final class Lazy implements Implementation
     /**
      * Return the list of indices
      *
-     * @return Implementation<0|positive-int>
+     * @return Implementation<int<0, max>>
      */
     #[\Override]
     public function indices(): Implementation
     {
         $values = $this->values;
 
-        /** @var Implementation<0|positive-int> */
+        /** @var Implementation<int<0, max>> */
         return new self(
             static function(RegisterCleanup $registerCleanup) use ($values): \Generator {
                 $index = 0;
@@ -594,7 +594,7 @@ final class Lazy implements Implementation
     }
 
     /**
-     * @param 0|positive-int $size
+     * @param int<0, max> $size
      *
      * @return Implementation<T>
      */

@@ -93,7 +93,7 @@ final class Str implements \Stringable
     /**
      * Returns a collection of the string splitted by the given chunk size
      *
-     * @param positive-int $size
+     * @param int<1, max> $size
      *
      * @return Sequence<self>
      */
@@ -113,20 +113,20 @@ final class Str implements \Stringable
     /**
      * Returns the position of the first occurence of the string
      *
-     * @param 0|positive-int $offset
+     * @param int<0, max> $offset
      *
-     * @return Maybe<0|positive-int>
+     * @return Maybe<int<0, max>>
      */
     public function position(string|\Stringable $needle, int $offset = 0): Maybe
     {
         $position = \mb_strpos($this->value, (string) $needle, $offset, $this->encoding->toString());
 
         if ($position === false) {
-            /** @var Maybe<0|positive-int> */
+            /** @var Maybe<int<0, max>> */
             return Maybe::nothing();
         }
 
-        /** @var Maybe<0|positive-int> */
+        /** @var Maybe<int<0, max>> */
         return Maybe::just($position);
     }
 
@@ -165,7 +165,7 @@ final class Str implements \Stringable
     /**
      * Return the string length
      *
-     * @return 0|positive-int
+     * @return int<0, max>
      */
     public function length(): int
     {
@@ -193,7 +193,7 @@ final class Str implements \Stringable
     /**
      * Pad to the right
      *
-     * @param positive-int $length
+     * @param int<1, max> $length
      */
     public function rightPad(int $length, string|\Stringable $character = ' '): self
     {
@@ -203,7 +203,7 @@ final class Str implements \Stringable
     /**
      * Pad to the left
      *
-     * @param positive-int $length
+     * @param int<1, max> $length
      */
     public function leftPad(int $length, string|\Stringable $character = ' '): self
     {
@@ -213,7 +213,7 @@ final class Str implements \Stringable
     /**
      * Pad both sides
      *
-     * @param positive-int $length
+     * @param int<1, max> $length
      */
     public function uniPad(int $length, string|\Stringable $character = ' '): self
     {
@@ -223,7 +223,7 @@ final class Str implements \Stringable
     /**
      * Repeat the string n times
      *
-     * @param positive-int $repeat
+     * @param int<1, max> $repeat
      */
     public function repeat(int $repeat): self
     {
@@ -352,7 +352,7 @@ final class Str implements \Stringable
     /**
      * Return part of the string
      *
-     * @param 0|positive-int $length
+     * @param int<0, max> $length
      */
     public function substring(int $start, ?int $length = null): self
     {
@@ -366,7 +366,7 @@ final class Str implements \Stringable
     }
 
     /**
-     * @param 0|positive-int $size
+     * @param int<0, max> $size
      */
     public function take(int $size): self
     {
@@ -374,7 +374,7 @@ final class Str implements \Stringable
     }
 
     /**
-     * @param 0|positive-int $size
+     * @param int<0, max> $size
      */
     public function takeEnd(int $size): self
     {
@@ -382,7 +382,7 @@ final class Str implements \Stringable
     }
 
     /**
-     * @param 0|positive-int $size
+     * @param int<0, max> $size
      */
     public function drop(int $size): self
     {
@@ -390,7 +390,7 @@ final class Str implements \Stringable
     }
 
     /**
-     * @param 0|positive-int $size
+     * @param int<0, max> $size
      */
     public function dropEnd(int $size): self
     {

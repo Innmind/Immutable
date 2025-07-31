@@ -174,7 +174,7 @@ final class Sequence implements \Countable
     }
 
     /**
-     * @return 0|positive-int
+     * @return int<0, max>
      */
     public function size(): int
     {
@@ -182,7 +182,7 @@ final class Sequence implements \Countable
     }
 
     /**
-     * @return 0|positive-int
+     * @return int<0, max>
      */
     #[\Override]
     public function count(): int
@@ -193,7 +193,7 @@ final class Sequence implements \Countable
     /**
      * Return the element at the given index
      *
-     * @param 0|positive-int $index
+     * @param int<0, max> $index
      *
      * @return Maybe<T>
      */
@@ -229,7 +229,7 @@ final class Sequence implements \Countable
     /**
      * Remove the n first elements
      *
-     * @param 0|positive-int $size
+     * @param int<0, max> $size
      *
      * @return self<T>
      */
@@ -241,7 +241,7 @@ final class Sequence implements \Countable
     /**
      * Remove the n last elements
      *
-     * @param 0|positive-int $size
+     * @param int<0, max> $size
      *
      * @return self<T>
      */
@@ -371,7 +371,7 @@ final class Sequence implements \Countable
      *
      * @param T $element
      *
-     * @return Maybe<0|positive-int>
+     * @return Maybe<int<0, max>>
      */
     public function indexOf($element): Maybe
     {
@@ -381,7 +381,7 @@ final class Sequence implements \Countable
     /**
      * Return the list of indices
      *
-     * @return self<0|positive-int>
+     * @return self<int<0, max>>
      */
     public function indices(): self
     {
@@ -436,7 +436,7 @@ final class Sequence implements \Countable
     /**
      * Pad the sequence to a defined size with the given element
      *
-     * @param 0|positive-int $size
+     * @param int<0, max> $size
      * @param T $element
      *
      * @return self<T>
@@ -461,8 +461,8 @@ final class Sequence implements \Countable
     /**
      * Slice the sequence
      *
-     * @param 0|positive-int $from
-     * @param 0|positive-int $until
+     * @param int<0, max> $from
+     * @param int<0, max> $until
      *
      * @return self<T>
      */
@@ -474,7 +474,7 @@ final class Sequence implements \Countable
     /**
      * Return a sequence with the n first elements
      *
-     * @param 0|positive-int $size
+     * @param int<0, max> $size
      *
      * @return self<T>
      */
@@ -486,7 +486,7 @@ final class Sequence implements \Countable
     /**
      * Return a sequence with the n last elements
      *
-     * @param 0|positive-int $size
+     * @param int<0, max> $size
      *
      * @return self<T>
      */
@@ -776,7 +776,7 @@ final class Sequence implements \Countable
     }
 
     /**
-     * @param positive-int $size
+     * @param int<1, max> $size
      *
      * @return self<self<T>>
      */

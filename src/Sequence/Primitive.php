@@ -236,7 +236,7 @@ final class Primitive implements Implementation
     /**
      * @param T $element
      *
-     * @return Maybe<0|positive-int>
+     * @return Maybe<int<0, max>>
      */
     #[\Override]
     public function indexOf($element): Maybe
@@ -244,11 +244,11 @@ final class Primitive implements Implementation
         $index = \array_search($element, $this->values, true);
 
         if ($index === false) {
-            /** @var Maybe<0|positive-int> */
+            /** @var Maybe<int<0, max>> */
             return Maybe::nothing();
         }
 
-        /** @var Maybe<0|positive-int> */
+        /** @var Maybe<int<0, max>> */
         return Maybe::just($index);
     }
 
