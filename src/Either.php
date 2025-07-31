@@ -37,6 +37,7 @@ final class Either
      *
      * @return self<A, B>
      */
+    #[\NoDiscard]
     public static function left($value): self
     {
         return new self(new Left($value));
@@ -51,6 +52,7 @@ final class Either
      *
      * @return self<A, B>
      */
+    #[\NoDiscard]
     public static function right($value): self
     {
         return new self(new Right($value));
@@ -67,6 +69,7 @@ final class Either
      *
      * @return self<A, B>
      */
+    #[\NoDiscard]
     public static function defer(callable $deferred): self
     {
         return new self(new Defer($deferred));
@@ -79,6 +82,7 @@ final class Either
      *
      * @return self<L, T>
      */
+    #[\NoDiscard]
     public function map(callable $map): self
     {
         return new self($this->either->map($map));
@@ -92,6 +96,7 @@ final class Either
      *
      * @return Either<L|A, B>
      */
+    #[\NoDiscard]
     public function flatMap(callable $map): self
     {
         return $this->either->flatMap($map);
@@ -104,6 +109,7 @@ final class Either
      *
      * @return self<T, R>
      */
+    #[\NoDiscard]
     public function leftMap(callable $map): self
     {
         return new self($this->either->leftMap($map));
@@ -117,6 +123,7 @@ final class Either
      *
      * @return T
      */
+    #[\NoDiscard]
     public function match(callable $right, callable $left)
     {
         return $this->either->match($right, $left);
@@ -130,6 +137,7 @@ final class Either
      *
      * @return Either<A, R|B>
      */
+    #[\NoDiscard]
     public function otherwise(callable $otherwise): self
     {
         return $this->either->otherwise($otherwise);
@@ -143,6 +151,7 @@ final class Either
      *
      * @return self<L|A, R>
      */
+    #[\NoDiscard]
     public function filter(callable $predicate, callable $otherwise): self
     {
         return new self($this->either->filter($predicate, $otherwise));
@@ -151,6 +160,7 @@ final class Either
     /**
      * @return Maybe<R>
      */
+    #[\NoDiscard]
     public function maybe(): Maybe
     {
         return $this->either->maybe();
@@ -161,6 +171,7 @@ final class Either
      *
      * @return Attempt<R>
      */
+    #[\NoDiscard]
     public function attempt(callable $error): Attempt
     {
         return $this->either->attempt($error);
@@ -171,6 +182,7 @@ final class Either
      *
      * @return self<L, R>
      */
+    #[\NoDiscard]
     public function memoize(): self
     {
         return $this->either->memoize();
@@ -181,6 +193,7 @@ final class Either
      *
      * @return self<R, L>
      */
+    #[\NoDiscard]
     public function flip(): self
     {
         return new self($this->either->flip());
@@ -195,6 +208,7 @@ final class Either
      *
      * @return self<A, B>
      */
+    #[\NoDiscard]
     public function eitherWay(callable $right, callable $left): self
     {
         return $this->either->eitherWay($right, $left);

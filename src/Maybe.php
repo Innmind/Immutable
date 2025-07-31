@@ -35,6 +35,7 @@ final class Maybe
      *
      * @return self<V>
      */
+    #[\NoDiscard]
     public static function just($value): self
     {
         return new self(new Just($value));
@@ -43,6 +44,7 @@ final class Maybe
     /**
      * @psalm-pure
      */
+    #[\NoDiscard]
     public static function nothing(): self
     {
         return new self(new Nothing);
@@ -56,6 +58,7 @@ final class Maybe
      *
      * @return self<V>
      */
+    #[\NoDiscard]
     public static function of($value): self
     {
         if (\is_null($value)) {
@@ -75,6 +78,7 @@ final class Maybe
      *
      * @return self<V>
      */
+    #[\NoDiscard]
     public static function defer(callable $deferred): self
     {
         return new self(new Defer($deferred));
@@ -86,6 +90,7 @@ final class Maybe
      * @psalm-pure
      * @no-named-arguments
      */
+    #[\NoDiscard]
     public static function all(self $first, self ...$rest): Maybe\Comprehension
     {
         return Maybe\Comprehension::of($first, ...$rest);
@@ -98,6 +103,7 @@ final class Maybe
      *
      * @return self<V>
      */
+    #[\NoDiscard]
     public function map(callable $map): self
     {
         return new self($this->maybe->map($map));
@@ -110,6 +116,7 @@ final class Maybe
      *
      * @return Maybe<V>
      */
+    #[\NoDiscard]
     public function flatMap(callable $map): self
     {
         return $this->maybe->flatMap($map);
@@ -123,6 +130,7 @@ final class Maybe
      *
      * @return V
      */
+    #[\NoDiscard]
     public function match(callable $just, callable $nothing)
     {
         return $this->maybe->match($just, $nothing);
@@ -135,6 +143,7 @@ final class Maybe
      *
      * @return Maybe<T|V>
      */
+    #[\NoDiscard]
     public function otherwise(callable $otherwise): self
     {
         return $this->maybe->otherwise($otherwise);
@@ -150,6 +159,7 @@ final class Maybe
      *
      * @return self<S>
      */
+    #[\NoDiscard]
     public function keep(Predicate $predicate): self
     {
         /** @var self<S> */
@@ -161,6 +171,7 @@ final class Maybe
      *
      * @return self<T>
      */
+    #[\NoDiscard]
     public function filter(callable $predicate): self
     {
         return new self($this->maybe->filter($predicate));
@@ -171,6 +182,7 @@ final class Maybe
      *
      * @return self<T>
      */
+    #[\NoDiscard]
     public function exclude(callable $predicate): self
     {
         /** @psalm-suppress MixedArgument */
@@ -180,6 +192,7 @@ final class Maybe
     /**
      * @return Either<null, T>
      */
+    #[\NoDiscard]
     public function either(): Either
     {
         return $this->maybe->either();
@@ -190,6 +203,7 @@ final class Maybe
      *
      * @return Attempt<T>
      */
+    #[\NoDiscard]
     public function attempt(callable $error): Attempt
     {
         return $this->maybe->attempt($error);
@@ -200,6 +214,7 @@ final class Maybe
      *
      * @return self<T>
      */
+    #[\NoDiscard]
     public function memoize(): self
     {
         return $this->maybe->memoize();
@@ -208,6 +223,7 @@ final class Maybe
     /**
      * @return Sequence<T>
      */
+    #[\NoDiscard]
     public function toSequence(): Sequence
     {
         return $this->maybe->toSequence();
@@ -221,6 +237,7 @@ final class Maybe
      *
      * @return self<V>
      */
+    #[\NoDiscard]
     public function eitherWay(callable $just, callable $nothing): self
     {
         return $this->maybe->eitherWay($just, $nothing);

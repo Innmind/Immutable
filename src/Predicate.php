@@ -12,5 +12,6 @@ interface Predicate
     /**
      * @psalm-assert-if-true T $value
      */
+    #[\NoDiscard]
     public function __invoke(mixed $value): bool;
 }

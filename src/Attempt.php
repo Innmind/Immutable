@@ -33,6 +33,7 @@ final class Attempt
      *
      * @return self<U>
      */
+    #[\NoDiscard]
     public static function error(\Throwable $error): self
     {
         return new self(new Error($error));
@@ -46,6 +47,7 @@ final class Attempt
      *
      * @return self<U>
      */
+    #[\NoDiscard]
     public static function result(mixed $value): self
     {
         return new self(new Result($value));
@@ -61,6 +63,7 @@ final class Attempt
      *
      * @return self<U>
      */
+    #[\NoDiscard]
     public static function defer(callable $deferred): self
     {
         return new self(new Defer($deferred));
@@ -74,6 +77,7 @@ final class Attempt
      *
      * @return self<U>
      */
+    #[\NoDiscard]
     public static function of(callable $try): self
     {
         try {
@@ -91,6 +95,7 @@ final class Attempt
      *
      * @return self<U>
      */
+    #[\NoDiscard]
     public function map(callable $map): self
     {
         return new self($this->implementation->map($map));
@@ -103,6 +108,7 @@ final class Attempt
      *
      * @return self<U>
      */
+    #[\NoDiscard]
     public function flatMap(callable $map): self
     {
         return $this->implementation->flatMap($map);
@@ -116,6 +122,7 @@ final class Attempt
      *
      * @return U
      */
+    #[\NoDiscard]
     public function match(callable $result, callable $error)
     {
         return $this->implementation->match($result, $error);
@@ -128,6 +135,7 @@ final class Attempt
      *
      * @return T
      */
+    #[\NoDiscard]
     public function unwrap(): mixed
     {
         /** @var T */
@@ -144,6 +152,7 @@ final class Attempt
      *
      * @return self<T|U>
      */
+    #[\NoDiscard]
     public function recover(callable $recover): self
     {
         return $this->implementation->recover($recover);
@@ -152,6 +161,7 @@ final class Attempt
     /**
      * @return Maybe<T>
      */
+    #[\NoDiscard]
     public function maybe(): Maybe
     {
         return $this->implementation->maybe();
@@ -160,6 +170,7 @@ final class Attempt
     /**
      * @return Either<\Throwable, T>
      */
+    #[\NoDiscard]
     public function either(): Either
     {
         return $this->implementation->either();
@@ -170,6 +181,7 @@ final class Attempt
      *
      * @return self<T>
      */
+    #[\NoDiscard]
     public function memoize(): self
     {
         return $this->implementation->memoize();
@@ -183,6 +195,7 @@ final class Attempt
      *
      * @return self<V>
      */
+    #[\NoDiscard]
     public function eitherWay(callable $result, callable $error): self
     {
         return $this->implementation->eitherWay($result, $error);

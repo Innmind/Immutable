@@ -29,6 +29,7 @@ final class RegExp
     /**
      * @psalm-pure
      */
+    #[\NoDiscard]
     public static function of(string $pattern): self
     {
         return new self($pattern);
@@ -37,6 +38,7 @@ final class RegExp
     /**
      * @throws InvalidRegex
      */
+    #[\NoDiscard]
     public function matches(Str $string): bool
     {
         /** @psalm-suppress ArgumentTypeCoercion */
@@ -55,6 +57,7 @@ final class RegExp
      *
      * @return Map<int|string, Str>
      */
+    #[\NoDiscard]
     public function capture(Str $string): Map
     {
         $matches = [];
@@ -83,6 +86,7 @@ final class RegExp
         return $map;
     }
 
+    #[\NoDiscard]
     public function toString(): string
     {
         return $this->pattern;

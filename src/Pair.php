@@ -31,6 +31,7 @@ final class Pair
     /**
      * @return T
      */
+    #[\NoDiscard]
     public function key()
     {
         return $this->key;
@@ -39,6 +40,7 @@ final class Pair
     /**
      * @return S
      */
+    #[\NoDiscard]
     public function value()
     {
         return $this->value;
