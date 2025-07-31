@@ -20,15 +20,12 @@ use Innmind\Immutable\{
  */
 final class Result implements Implementation
 {
-    /** @var R1 */
-    private mixed $result;
-
     /**
      * @param R1 $result
      */
-    public function __construct(mixed $result)
-    {
-        $this->result = $result;
+    public function __construct(
+        private mixed $result,
+    ) {
     }
 
     /**

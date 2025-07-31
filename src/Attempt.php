@@ -16,15 +16,12 @@ use Innmind\Immutable\Attempt\{
  */
 final class Attempt
 {
-    /** @var Implementation<T> */
-    private Implementation $implementation;
-
     /**
      * @param Implementation<T> $implementation
      */
-    private function __construct(Implementation $implementation)
-    {
-        $this->implementation = $implementation;
+    private function __construct(
+        private Implementation $implementation,
+    ) {
     }
 
     /**

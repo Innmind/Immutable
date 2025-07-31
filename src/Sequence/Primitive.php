@@ -19,15 +19,12 @@ use Innmind\Immutable\{
  */
 final class Primitive implements Implementation
 {
-    /** @var list<T> */
-    private array $values;
-
     /**
      * @param list<T> $values
      */
-    public function __construct(array $values = [])
-    {
-        $this->values = $values;
+    public function __construct(
+        private array $values = [],
+    ) {
     }
 
     /**

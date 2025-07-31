@@ -11,19 +11,14 @@ namespace Innmind\Immutable\State;
  */
 final class Result
 {
-    /** @var S */
-    private $state;
-    /** @var T */
-    private $value;
-
     /**
      * @param S $state
      * @param T $value
      */
-    private function __construct($state, $value)
-    {
-        $this->state = $state;
-        $this->value = $value;
+    private function __construct(
+        private mixed $state,
+        private mixed $value,
+    ) {
     }
 
     /**

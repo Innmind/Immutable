@@ -18,15 +18,12 @@ use Innmind\Immutable\{
  */
 final class Fail implements Implementation
 {
-    /** @var Sequence<F> */
-    private Sequence $failures;
-
     /**
      * @param Sequence<F> $failures
      */
-    private function __construct(Sequence $failures)
-    {
-        $this->failures = $failures;
+    private function __construct(
+        private Sequence $failures,
+    ) {
     }
 
     /**

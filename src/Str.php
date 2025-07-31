@@ -10,13 +10,10 @@ use Innmind\Immutable\Exception\InvalidRegex;
  */
 final class Str implements \Stringable
 {
-    private string $value;
-    private Str\Encoding $encoding;
-
-    private function __construct(string $value, ?Str\Encoding $encoding = null)
-    {
-        $this->value = $value;
-        $this->encoding = $encoding ?? Str\Encoding::utf8;
+    private function __construct(
+        private string $value,
+        private Str\Encoding $encoding,
+    ) {
     }
 
     #[\Override]
@@ -30,7 +27,7 @@ final class Str implements \Stringable
      */
     public static function of(string $value, ?Str\Encoding $encoding = null): self
     {
-        return new self($value, $encoding);
+        return new self($value, $encoding ?? Str\Encoding::utf8);
     }
 
     /**

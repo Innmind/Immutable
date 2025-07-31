@@ -9,15 +9,12 @@ namespace Innmind\Immutable;
  */
 final class Sequence implements \Countable
 {
-    /** @var Sequence\Implementation<T> */
-    private Sequence\Implementation $implementation;
-
     /**
      * @param Sequence\Implementation<T> $implementation
      */
-    private function __construct(Sequence\Implementation $implementation)
-    {
-        $this->implementation = $implementation;
+    private function __construct(
+        private Sequence\Implementation $implementation,
+    ) {
     }
 
     /**
