@@ -10,11 +10,12 @@ namespace Innmind\Immutable;
  */
 final class Validation
 {
-    private Validation\Implementation $implementation;
-
-    private function __construct(Validation\Implementation $implementation)
-    {
-        $this->implementation = $implementation;
+    /**
+     * @param Validation\Implementation<F, S> $implementation
+     */
+    private function __construct(
+        private Validation\Implementation $implementation,
+    ) {
     }
 
     /**

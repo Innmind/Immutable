@@ -77,7 +77,7 @@ final class ObjectKeys implements Implementation
     {
         /**
          * @psalm-suppress ImpureMethodCall
-         * @var 0|positive-int
+         * @var int<0, max>
          */
         return $this->values->count();
     }

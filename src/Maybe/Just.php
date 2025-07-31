@@ -18,15 +18,12 @@ use Innmind\Immutable\{
  */
 final class Just implements Implementation
 {
-    /** @var V */
-    private $value;
-
     /**
      * @param V $value
      */
-    public function __construct($value)
-    {
-        $this->value = $value;
+    public function __construct(
+        private mixed $value,
+    ) {
     }
 
     #[\Override]

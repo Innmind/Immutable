@@ -10,13 +10,10 @@ use Innmind\Immutable\Exception\InvalidRegex;
  */
 final class Str implements \Stringable
 {
-    private string $value;
-    private Str\Encoding $encoding;
-
-    private function __construct(string $value, ?Str\Encoding $encoding = null)
-    {
-        $this->value = $value;
-        $this->encoding = $encoding ?? Str\Encoding::utf8;
+    private function __construct(
+        private string $value,
+        private Str\Encoding $encoding,
+    ) {
     }
 
     #[\Override]
@@ -32,7 +29,7 @@ final class Str implements \Stringable
     #[\NoDiscard]
     public static function of(string $value, ?Str\Encoding $encoding = null): self
     {
-        return new self($value, $encoding);
+        return new self($value, $encoding ?? Str\Encoding::utf8);
     }
 
     /**
@@ -104,7 +101,7 @@ final class Str implements \Stringable
     /**
      * Returns a collection of the string splitted by the given chunk size
      *
-     * @param positive-int $size
+     * @param int<1, max> $size
      *
      * @return Sequence<self>
      */
@@ -125,9 +122,9 @@ final class Str implements \Stringable
     /**
      * Returns the position of the first occurence of the string
      *
-     * @param 0|positive-int $offset
+     * @param int<0, max> $offset
      *
-     * @return Maybe<0|positive-int>
+     * @return Maybe<int<0, max>>
      */
     #[\NoDiscard]
     public function position(string|\Stringable $needle, int $offset = 0): Maybe
@@ -135,11 +132,11 @@ final class Str implements \Stringable
         $position = \mb_strpos($this->value, (string) $needle, $offset, $this->encoding->toString());
 
         if ($position === false) {
-            /** @var Maybe<0|positive-int> */
+            /** @var Maybe<int<0, max>> */
             return Maybe::nothing();
         }
 
-        /** @var Maybe<0|positive-int> */
+        /** @var Maybe<int<0, max>> */
         return Maybe::just($position);
     }
 
@@ -181,7 +178,7 @@ final class Str implements \Stringable
     /**
      * Return the string length
      *
-     * @return 0|positive-int
+     * @return int<0, max>
      */
     #[\NoDiscard]
     public function length(): int
@@ -211,7 +208,7 @@ final class Str implements \Stringable
     /**
      * Pad to the right
      *
-     * @param positive-int $length
+     * @param int<1, max> $length
      */
     #[\NoDiscard]
     public function rightPad(int $length, string|\Stringable $character = ' '): self
@@ -222,7 +219,7 @@ final class Str implements \Stringable
     /**
      * Pad to the left
      *
-     * @param positive-int $length
+     * @param int<1, max> $length
      */
     #[\NoDiscard]
     public function leftPad(int $length, string|\Stringable $character = ' '): self
@@ -233,7 +230,7 @@ final class Str implements \Stringable
     /**
      * Pad both sides
      *
-     * @param positive-int $length
+     * @param int<1, max> $length
      */
     #[\NoDiscard]
     public function uniPad(int $length, string|\Stringable $character = ' '): self
@@ -244,7 +241,7 @@ final class Str implements \Stringable
     /**
      * Repeat the string n times
      *
-     * @param positive-int $repeat
+     * @param int<1, max> $repeat
      */
     #[\NoDiscard]
     public function repeat(int $repeat): self
@@ -382,7 +379,7 @@ final class Str implements \Stringable
     /**
      * Return part of the string
      *
-     * @param 0|positive-int $length
+     * @param int<0, max> $length
      */
     #[\NoDiscard]
     public function substring(int $start, ?int $length = null): self
@@ -397,7 +394,7 @@ final class Str implements \Stringable
     }
 
     /**
-     * @param 0|positive-int $size
+     * @param int<0, max> $size
      */
     #[\NoDiscard]
     public function take(int $size): self
@@ -406,7 +403,7 @@ final class Str implements \Stringable
     }
 
     /**
-     * @param 0|positive-int $size
+     * @param int<0, max> $size
      */
     #[\NoDiscard]
     public function takeEnd(int $size): self
@@ -415,7 +412,7 @@ final class Str implements \Stringable
     }
 
     /**
-     * @param 0|positive-int $size
+     * @param int<0, max> $size
      */
     #[\NoDiscard]
     public function drop(int $size): self
@@ -424,7 +421,7 @@ final class Str implements \Stringable
     }
 
     /**
-     * @param 0|positive-int $size
+     * @param int<0, max> $size
      */
     #[\NoDiscard]
     public function dropEnd(int $size): self

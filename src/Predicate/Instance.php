@@ -12,15 +12,12 @@ use Innmind\Immutable\Predicate;
  */
 final class Instance implements Predicate
 {
-    /** @var class-string<A> */
-    private string $class;
-
     /**
      * @param class-string<A> $class
      */
-    private function __construct(string $class)
-    {
-        $this->class = $class;
+    private function __construct(
+        private string $class,
+    ) {
     }
 
     #[\Override]

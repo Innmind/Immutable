@@ -16,15 +16,12 @@ use Innmind\Immutable\Maybe\{
  */
 final class Maybe
 {
-    /** @var Implementation<T> */
-    private Implementation $maybe;
-
     /**
      * @param Implementation<T> $maybe
      */
-    private function __construct(Implementation $maybe)
-    {
-        $this->maybe = $maybe;
+    private function __construct(
+        private Implementation $maybe,
+    ) {
     }
 
     /**

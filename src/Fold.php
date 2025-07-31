@@ -19,11 +19,9 @@ use Innmind\Immutable\Fold\{
  */
 final class Fold
 {
-    private Implementation $fold;
-
-    private function __construct(Implementation $fold)
-    {
-        $this->fold = $fold;
+    private function __construct(
+        private Implementation $fold,
+    ) {
     }
 
     /**

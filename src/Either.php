@@ -17,15 +17,12 @@ use Innmind\Immutable\Either\{
  */
 final class Either
 {
-    /** @var Implementation<L, R> */
-    private Implementation $either;
-
     /**
      * @param Implementation<L, R> $either
      */
-    private function __construct(Implementation $either)
-    {
-        $this->either = $either;
+    private function __construct(
+        private Implementation $either,
+    ) {
     }
 
     /**

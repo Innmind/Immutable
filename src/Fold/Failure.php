@@ -20,15 +20,12 @@ use Innmind\Immutable\{
  */
 final class Failure implements Implementation
 {
-    /** @var F1 */
-    private mixed $failure;
-
     /**
      * @param F1 $failure
      */
-    public function __construct(mixed $failure)
-    {
-        $this->failure = $failure;
+    public function __construct(
+        private mixed $failure,
+    ) {
     }
 
     /**

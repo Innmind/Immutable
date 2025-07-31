@@ -12,15 +12,12 @@ use Innmind\Immutable\Exception\LogicException;
  */
 final class Aggregate
 {
-    /** @var \Iterator<T> */
-    private \Iterator $values;
-
     /**
      * @param \Iterator<T> $values
      */
-    public function __construct(\Iterator $values)
-    {
-        $this->values = $values;
+    public function __construct(
+        private \Iterator $values,
+    ) {
     }
 
     /**

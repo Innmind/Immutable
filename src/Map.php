@@ -10,11 +10,12 @@ namespace Innmind\Immutable;
  */
 final class Map implements \Countable
 {
-    private Map\Implementation $implementation;
-
-    private function __construct(Map\Implementation $implementation)
-    {
-        $this->implementation = $implementation;
+    /**
+     * @param Map\Implementation<T, S> $implementation
+     */
+    private function __construct(
+        private Map\Implementation $implementation,
+    ) {
     }
 
     /**
@@ -60,7 +61,7 @@ final class Map implements \Countable
     }
 
     /**
-     * @return 0|positive-int
+     * @return int<0, max>
      */
     #[\NoDiscard]
     public function size(): int
@@ -69,7 +70,7 @@ final class Map implements \Countable
     }
 
     /**
-     * @return 0|positive-int
+     * @return int<0, max>
      */
     #[\Override]
     #[\NoDiscard]

@@ -13,19 +13,14 @@ use Innmind\Immutable\Predicate;
  */
 final class OrPredicate implements Predicate
 {
-    /** @var Predicate<A> */
-    private Predicate $a;
-    /** @var Predicate<B> */
-    private Predicate $b;
-
     /**
      * @param Predicate<A> $a
      * @param Predicate<B> $b
      */
-    private function __construct(Predicate $a, Predicate $b)
-    {
-        $this->a = $a;
-        $this->b = $b;
+    private function __construct(
+        private Predicate $a,
+        private Predicate $b,
+    ) {
     }
 
     #[\Override]

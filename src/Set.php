@@ -9,12 +9,12 @@ namespace Innmind\Immutable;
  */
 final class Set implements \Countable
 {
-    /** @var Sequence<T> */
-    private Sequence $implementation;
-
-    private function __construct(Sequence $implementation)
-    {
-        $this->implementation = $implementation;
+    /**
+     * @param Sequence<T> $implementation
+     */
+    private function __construct(
+        private Sequence $implementation,
+    ) {
     }
 
     /**
@@ -164,7 +164,7 @@ final class Set implements \Countable
     }
 
     /**
-     * @return 0|positive-int
+     * @return int<0, max>
      */
     #[\NoDiscard]
     public function size(): int
@@ -173,7 +173,7 @@ final class Set implements \Countable
     }
 
     /**
-     * @return 0|positive-int
+     * @return int<0, max>
      */
     #[\Override]
     #[\NoDiscard]
