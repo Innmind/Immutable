@@ -37,6 +37,7 @@ final class Fold
      *
      * @return self<T, U, V>
      */
+    #[\NoDiscard]
     public static function with(mixed $value): self
     {
         return new self(new With($value));
@@ -53,6 +54,7 @@ final class Fold
      *
      * @return self<T, U, V>
      */
+    #[\NoDiscard]
     public static function result(mixed $result): self
     {
         return new self(new Result($result));
@@ -69,6 +71,7 @@ final class Fold
      *
      * @return self<T, U, V>
      */
+    #[\NoDiscard]
     public static function fail(mixed $failure): self
     {
         return new self(new Failure($failure));
@@ -81,6 +84,7 @@ final class Fold
      *
      * @return self<F, R, A>
      */
+    #[\NoDiscard]
     public function map(callable $map): self
     {
         return new self($this->fold->map($map));
@@ -95,6 +99,7 @@ final class Fold
      *
      * @return self<F|T, R|U, V>
      */
+    #[\NoDiscard]
     public function flatMap(callable $map): self
     {
         return $this->fold->flatMap($map);
@@ -107,6 +112,7 @@ final class Fold
      *
      * @return self<F, A, C>
      */
+    #[\NoDiscard]
     public function mapResult(callable $map): self
     {
         return new self($this->fold->mapResult($map));
@@ -119,6 +125,7 @@ final class Fold
      *
      * @return self<A, R, C>
      */
+    #[\NoDiscard]
     public function mapFailure(callable $map): self
     {
         return new self($this->fold->mapFailure($map));
@@ -127,6 +134,7 @@ final class Fold
     /**
      * @return Maybe<Either<F, R>>
      */
+    #[\NoDiscard]
     public function maybe(): Maybe
     {
         return $this->fold->maybe();
@@ -141,6 +149,7 @@ final class Fold
      *
      * @return T
      */
+    #[\NoDiscard]
     public function match(
         callable $with,
         callable $result,

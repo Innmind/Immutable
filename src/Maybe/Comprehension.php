@@ -40,6 +40,7 @@ final class Comprehension
      *
      * @return Maybe<T>
      */
+    #[\NoDiscard]
     public function map(callable $map): Maybe
     {
         return $this->collapse()->map(static fn(array $args) => $map(...$args));
@@ -52,6 +53,7 @@ final class Comprehension
      *
      * @return Maybe<T>
      */
+    #[\NoDiscard]
     public function flatMap(callable $map): Maybe
     {
         return $this->collapse()->flatMap(static fn(array $args) => $map(...$args));

@@ -26,6 +26,7 @@ final class Validation
      *
      * @return self<B, A>
      */
+    #[\NoDiscard]
     public static function success($value): self
     {
         return new self(Validation\Success::of($value));
@@ -40,6 +41,7 @@ final class Validation
      *
      * @return self<A, B>
      */
+    #[\NoDiscard]
     public static function fail($value): self
     {
         return new self(Validation\Fail::of($value));
@@ -52,6 +54,7 @@ final class Validation
      *
      * @return self<F, T>
      */
+    #[\NoDiscard]
     public function map(callable $map): self
     {
         return new self($this->implementation->map($map));
@@ -65,6 +68,7 @@ final class Validation
      *
      * @return self<F|T, V>
      */
+    #[\NoDiscard]
     public function flatMap(callable $map): self
     {
         return new self($this->implementation->flatMap(
@@ -80,6 +84,7 @@ final class Validation
      *
      * @return self<T, S>
      */
+    #[\NoDiscard]
     public function mapFailures(callable $map): self
     {
         return new self($this->implementation->mapFailures($map));
@@ -93,6 +98,7 @@ final class Validation
      *
      * @return self<T, S|V>
      */
+    #[\NoDiscard]
     public function otherwise(callable $map): self
     {
         return $this->implementation->otherwise($map);
@@ -107,6 +113,7 @@ final class Validation
      *
      * @return self<F, T>
      */
+    #[\NoDiscard]
     public function and(self $other, callable $fold): self
     {
         return new self($this->implementation->and(
@@ -123,6 +130,7 @@ final class Validation
      *
      * @return T
      */
+    #[\NoDiscard]
     public function match(callable $success, callable $failure)
     {
         return $this->implementation->match($success, $failure);
@@ -131,6 +139,7 @@ final class Validation
     /**
      * @return Maybe<S>
      */
+    #[\NoDiscard]
     public function maybe(): Maybe
     {
         return $this->implementation->maybe();
@@ -139,6 +148,7 @@ final class Validation
     /**
      * @return Either<Sequence<F>, S>
      */
+    #[\NoDiscard]
     public function either(): Either
     {
         return $this->implementation->either();

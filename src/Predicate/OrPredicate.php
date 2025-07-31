@@ -44,6 +44,7 @@ final class OrPredicate implements Predicate
      *
      * @return self<T, V>
      */
+    #[\NoDiscard]
     public static function of(Predicate $a, Predicate $b): self
     {
         return new self($a, $b);
@@ -56,6 +57,7 @@ final class OrPredicate implements Predicate
      *
      * @return self<A|B, C>
      */
+    #[\NoDiscard]
     public function or(Predicate $other): self
     {
         return new self($this, $other);
@@ -68,6 +70,7 @@ final class OrPredicate implements Predicate
      *
      * @return AndPredicate<A|B, C>
      */
+    #[\NoDiscard]
     public function and(Predicate $other): AndPredicate
     {
         return AndPredicate::of($this, $other);

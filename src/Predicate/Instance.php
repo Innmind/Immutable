@@ -37,6 +37,7 @@ final class Instance implements Predicate
      *
      * @return self<T>
      */
+    #[\NoDiscard]
     public static function of(string $class): self
     {
         return new self($class);
@@ -49,6 +50,7 @@ final class Instance implements Predicate
      *
      * @return OrPredicate<A, T>
      */
+    #[\NoDiscard]
     public function or(Predicate $predicate): OrPredicate
     {
         return OrPredicate::of($this, $predicate);
@@ -61,6 +63,7 @@ final class Instance implements Predicate
      *
      * @return AndPredicate<A, T>
      */
+    #[\NoDiscard]
     public function and(Predicate $predicate): AndPredicate
     {
         return AndPredicate::of($this, $predicate);

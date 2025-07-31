@@ -12,6 +12,7 @@ interface Monoid
     /**
      * @return T
      */
+    #[\NoDiscard]
     public function identity(): mixed;
 
     /**
@@ -20,5 +21,6 @@ interface Monoid
      *
      * @return T
      */
+    #[\NoDiscard]
     public function combine(mixed $a, mixed $b): mixed;
 }

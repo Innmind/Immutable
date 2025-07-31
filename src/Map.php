@@ -32,6 +32,7 @@ final class Map implements \Countable
      *
      * @return self<T, S>
      */
+    #[\NoDiscard]
     public function __invoke($key, $value): self
     {
         return new self(($this->implementation)($key, $value));
@@ -46,6 +47,7 @@ final class Map implements \Countable
      *
      * @return self<U, V>
      */
+    #[\NoDiscard]
     public static function of(array ...$pairs): self
     {
         $self = new self(new Map\Uninitialized);
@@ -60,6 +62,7 @@ final class Map implements \Countable
     /**
      * @return 0|positive-int
      */
+    #[\NoDiscard]
     public function size(): int
     {
         return $this->implementation->size();
@@ -69,6 +72,7 @@ final class Map implements \Countable
      * @return 0|positive-int
      */
     #[\Override]
+    #[\NoDiscard]
     public function count(): int
     {
         return $this->size();
@@ -82,6 +86,7 @@ final class Map implements \Countable
      *
      * @return self<T, S>
      */
+    #[\NoDiscard]
     public function put($key, $value): self
     {
         return ($this)($key, $value);
@@ -94,6 +99,7 @@ final class Map implements \Countable
      *
      * @return Maybe<S>
      */
+    #[\NoDiscard]
     public function get($key): Maybe
     {
         return $this->implementation->get($key);
@@ -104,6 +110,7 @@ final class Map implements \Countable
      *
      * @param T $key
      */
+    #[\NoDiscard]
     public function contains($key): bool
     {
         return $this->implementation->contains($key);
@@ -114,6 +121,7 @@ final class Map implements \Countable
      *
      * @return self<T, S>
      */
+    #[\NoDiscard]
     public function clear(): self
     {
         return new self($this->implementation->clear());
@@ -124,6 +132,7 @@ final class Map implements \Countable
      *
      * @param self<T, S> $map
      */
+    #[\NoDiscard]
     public function equals(self $map): bool
     {
         return $this->implementation->equals($map->implementation);
@@ -136,6 +145,7 @@ final class Map implements \Countable
      *
      * @return self<T, S>
      */
+    #[\NoDiscard]
     public function filter(callable $predicate): self
     {
         return new self($this->implementation->filter($predicate));
@@ -148,6 +158,7 @@ final class Map implements \Countable
      *
      * @return self<T, S>
      */
+    #[\NoDiscard]
     public function exclude(callable $predicate): self
     {
         /** @psalm-suppress MixedArgument */
@@ -159,6 +170,7 @@ final class Map implements \Countable
      *
      * @param callable(T, S): void $function
      */
+    #[\NoDiscard]
     public function foreach(callable $function): SideEffect
     {
         return $this->implementation->foreach($function);
@@ -174,6 +186,7 @@ final class Map implements \Countable
      *
      * @return self<D, self<T, S>>
      */
+    #[\NoDiscard]
     public function groupBy(callable $discriminator): self
     {
         return $this->implementation->groupBy($discriminator);
@@ -184,6 +197,7 @@ final class Map implements \Countable
      *
      * @return Set<T>
      */
+    #[\NoDiscard]
     public function keys(): Set
     {
         return $this->implementation->keys();
@@ -194,6 +208,7 @@ final class Map implements \Countable
      *
      * @return Sequence<S>
      */
+    #[\NoDiscard]
     public function values(): Sequence
     {
         return $this->implementation->values();
@@ -208,6 +223,7 @@ final class Map implements \Countable
      *
      * @return self<T, B>
      */
+    #[\NoDiscard]
     public function map(callable $function): self
     {
         return new self($this->implementation->map($function));
@@ -223,6 +239,7 @@ final class Map implements \Countable
      *
      * @return self<A, B>
      */
+    #[\NoDiscard]
     public function flatMap(callable $map): self
     {
         /** @var self<A, B> */
@@ -245,6 +262,7 @@ final class Map implements \Countable
      *
      * @return self<T, S>
      */
+    #[\NoDiscard]
     public function remove($key): self
     {
         return new self($this->implementation->remove($key));
@@ -257,6 +275,7 @@ final class Map implements \Countable
      *
      * @return self<T, S>
      */
+    #[\NoDiscard]
     public function merge(self $map): self
     {
         return new self($this->implementation->merge($map->implementation));
@@ -269,6 +288,7 @@ final class Map implements \Countable
      *
      * @return self<bool, self<T, S>>
      */
+    #[\NoDiscard]
     public function partition(callable $predicate): self
     {
         return $this->implementation->partition($predicate);
@@ -285,11 +305,13 @@ final class Map implements \Countable
      *
      * @return I|R
      */
+    #[\NoDiscard]
     public function reduce($carry, callable $reducer)
     {
         return $this->implementation->reduce($carry, $reducer);
     }
 
+    #[\NoDiscard]
     public function empty(): bool
     {
         return $this->implementation->empty();
@@ -300,6 +322,7 @@ final class Map implements \Countable
      *
      * @return Maybe<Pair<T, S>>
      */
+    #[\NoDiscard]
     public function find(callable $predicate): Maybe
     {
         return $this->implementation->find($predicate);
@@ -308,6 +331,7 @@ final class Map implements \Countable
     /**
      * @param callable(T, S): bool $predicate
      */
+    #[\NoDiscard]
     public function matches(callable $predicate): bool
     {
         /** @psalm-suppress MixedArgument For some reason Psalm no longer recognize the type in `find` */
@@ -322,6 +346,7 @@ final class Map implements \Countable
     /**
      * @param callable(T, S): bool $predicate
      */
+    #[\NoDiscard]
     public function any(callable $predicate): bool
     {
         return $this->find($predicate)->match(
@@ -333,6 +358,7 @@ final class Map implements \Countable
     /**
      * @return Sequence<Pair<T, S>>
      */
+    #[\NoDiscard]
     public function toSequence(): Sequence
     {
         return $this->implementation->toSequence();

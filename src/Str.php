@@ -20,6 +20,7 @@ final class Str implements \Stringable
     }
 
     #[\Override]
+    #[\NoDiscard]
     public function __toString(): string
     {
         return $this->value;
@@ -28,6 +29,7 @@ final class Str implements \Stringable
     /**
      * @psalm-pure
      */
+    #[\NoDiscard]
     public static function of(string $value, ?Str\Encoding $encoding = null): self
     {
         return new self($value, $encoding);
@@ -38,6 +40,7 @@ final class Str implements \Stringable
      *
      * @param Set<string|\Stringable>|Sequence<string|\Stringable> $structure
      */
+    #[\NoDiscard]
     public function join(Set|Sequence $structure): self
     {
         return new self(
@@ -46,16 +49,19 @@ final class Str implements \Stringable
         );
     }
 
+    #[\NoDiscard]
     public function toString(): string
     {
         return $this->value;
     }
 
+    #[\NoDiscard]
     public function encoding(): Str\Encoding
     {
         return $this->encoding;
     }
 
+    #[\NoDiscard]
     public function toEncoding(Str\Encoding $encoding): self
     {
         return self::of($this->value, $encoding);
@@ -66,6 +72,7 @@ final class Str implements \Stringable
      *
      * @return Maybe<self>
      */
+    #[\NoDiscard]
     public function maybe(callable $filter): Maybe
     {
         return Maybe::just($this)->filter($filter);
@@ -76,6 +83,7 @@ final class Str implements \Stringable
      *
      * @return Sequence<self>
      */
+    #[\NoDiscard]
     public function split(?string $delimiter = null): Sequence
     {
         if (\is_null($delimiter) || $delimiter === '') {
@@ -100,6 +108,7 @@ final class Str implements \Stringable
      *
      * @return Sequence<self>
      */
+    #[\NoDiscard]
     public function chunk(int $size = 1): Sequence
     {
         /** @var Sequence<self> */
@@ -120,6 +129,7 @@ final class Str implements \Stringable
      *
      * @return Maybe<0|positive-int>
      */
+    #[\NoDiscard]
     public function position(string|\Stringable $needle, int $offset = 0): Maybe
     {
         $position = \mb_strpos($this->value, (string) $needle, $offset, $this->encoding->toString());
@@ -136,6 +146,7 @@ final class Str implements \Stringable
     /**
      * Replace all occurences of the search string with the replacement one
      */
+    #[\NoDiscard]
     public function replace(string|\Stringable $search, string|\Stringable $replacement): self
     {
         if (!$this->contains($search)) {
@@ -152,6 +163,7 @@ final class Str implements \Stringable
     /**
      * Return the string in upper case
      */
+    #[\NoDiscard]
     public function toUpper(): self
     {
         return new self(\mb_strtoupper($this->value), $this->encoding);
@@ -160,6 +172,7 @@ final class Str implements \Stringable
     /**
      * Return the string in lower case
      */
+    #[\NoDiscard]
     public function toLower(): self
     {
         return new self(\mb_strtolower($this->value), $this->encoding);
@@ -170,6 +183,7 @@ final class Str implements \Stringable
      *
      * @return 0|positive-int
      */
+    #[\NoDiscard]
     public function length(): int
     {
         return \mb_strlen($this->value, $this->encoding->toString());
@@ -183,6 +197,7 @@ final class Str implements \Stringable
     /**
      * Reverse the string
      */
+    #[\NoDiscard]
     public function reverse(): self
     {
         $parts = $this
@@ -198,6 +213,7 @@ final class Str implements \Stringable
      *
      * @param positive-int $length
      */
+    #[\NoDiscard]
     public function rightPad(int $length, string|\Stringable $character = ' '): self
     {
         return $this->pad($length, $character, \STR_PAD_RIGHT);
@@ -208,6 +224,7 @@ final class Str implements \Stringable
      *
      * @param positive-int $length
      */
+    #[\NoDiscard]
     public function leftPad(int $length, string|\Stringable $character = ' '): self
     {
         return $this->pad($length, $character, \STR_PAD_LEFT);
@@ -218,6 +235,7 @@ final class Str implements \Stringable
      *
      * @param positive-int $length
      */
+    #[\NoDiscard]
     public function uniPad(int $length, string|\Stringable $character = ' '): self
     {
         return $this->pad($length, $character, \STR_PAD_BOTH);
@@ -228,11 +246,13 @@ final class Str implements \Stringable
      *
      * @param positive-int $repeat
      */
+    #[\NoDiscard]
     public function repeat(int $repeat): self
     {
         return new self(\str_repeat($this->value, $repeat), $this->encoding);
     }
 
+    #[\NoDiscard]
     public function stripSlashes(): self
     {
         return new self(\stripslashes($this->value), $this->encoding);
@@ -241,6 +261,7 @@ final class Str implements \Stringable
     /**
      * Strip C-like slashes
      */
+    #[\NoDiscard]
     public function stripCSlashes(): self
     {
         return new self(\stripcslashes($this->value), $this->encoding);
@@ -249,6 +270,7 @@ final class Str implements \Stringable
     /**
      * Return the word count
      */
+    #[\NoDiscard]
     public function wordCount(string|\Stringable $charlist = ''): int
     {
         return \str_word_count(
@@ -263,6 +285,7 @@ final class Str implements \Stringable
      *
      * @return Map<int, self>
      */
+    #[\NoDiscard]
     public function words(string|\Stringable $charlist = ''): Map
     {
         /** @var list<string> */
@@ -284,6 +307,7 @@ final class Str implements \Stringable
      *
      * @return Sequence<self>
      */
+    #[\NoDiscard]
     public function pregSplit(string|\Stringable $regex, int $limit = -1): Sequence
     {
         /** @psalm-suppress ArgumentTypeCoercion */
@@ -309,6 +333,7 @@ final class Str implements \Stringable
      *
      * @throws InvalidRegex If the regex failed
      */
+    #[\NoDiscard]
     public function matches(string|\Stringable $regex): bool
     {
         return RegExp::of((string) $regex)->matches($this);
@@ -321,6 +346,7 @@ final class Str implements \Stringable
      *
      * @return Map<int|string, self>
      */
+    #[\NoDiscard]
     public function capture(string|\Stringable $regex): Map
     {
         return RegExp::of((string) $regex)->capture($this);
@@ -331,6 +357,7 @@ final class Str implements \Stringable
      *
      * @throws InvalidRegex If the regex failed
      */
+    #[\NoDiscard]
     public function pregReplace(
         string|\Stringable $regex,
         string|\Stringable $replacement,
@@ -357,6 +384,7 @@ final class Str implements \Stringable
      *
      * @param 0|positive-int $length
      */
+    #[\NoDiscard]
     public function substring(int $start, ?int $length = null): self
     {
         if ($this->empty()) {
@@ -371,6 +399,7 @@ final class Str implements \Stringable
     /**
      * @param 0|positive-int $size
      */
+    #[\NoDiscard]
     public function take(int $size): self
     {
         return $this->substring(0, $size);
@@ -379,6 +408,7 @@ final class Str implements \Stringable
     /**
      * @param 0|positive-int $size
      */
+    #[\NoDiscard]
     public function takeEnd(int $size): self
     {
         return $this->substring(-$size);
@@ -387,6 +417,7 @@ final class Str implements \Stringable
     /**
      * @param 0|positive-int $size
      */
+    #[\NoDiscard]
     public function drop(int $size): self
     {
         return $this->substring($size);
@@ -395,6 +426,7 @@ final class Str implements \Stringable
     /**
      * @param 0|positive-int $size
      */
+    #[\NoDiscard]
     public function dropEnd(int $size): self
     {
         return $this->substring(0, \max(0, $this->length() - $size));
@@ -403,6 +435,7 @@ final class Str implements \Stringable
     /**
      * Return a formatted string
      */
+    #[\NoDiscard]
     public function sprintf(string ...$values): self
     {
         return new self(\sprintf($this->value, ...$values), $this->encoding);
@@ -411,6 +444,7 @@ final class Str implements \Stringable
     /**
      * Return the string with the first letter as uppercase
      */
+    #[\NoDiscard]
     public function ucfirst(): self
     {
         return $this
@@ -422,6 +456,7 @@ final class Str implements \Stringable
     /**
      * Return the string with the first letter as lowercase
      */
+    #[\NoDiscard]
     public function lcfirst(): self
     {
         return $this
@@ -433,6 +468,7 @@ final class Str implements \Stringable
     /**
      * Return a camelCase representation of the string
      */
+    #[\NoDiscard]
     public function camelize(): self
     {
         $words = $this
@@ -447,6 +483,7 @@ final class Str implements \Stringable
     /**
      * Append a string at the end of the current one
      */
+    #[\NoDiscard]
     public function append(string|\Stringable $string): self
     {
         return new self($this->value.((string) $string), $this->encoding);
@@ -455,6 +492,7 @@ final class Str implements \Stringable
     /**
      * Prepend a string at the beginning of the current one
      */
+    #[\NoDiscard]
     public function prepend(string|\Stringable $string): self
     {
         return new self(((string) $string).$this->value, $this->encoding);
@@ -463,6 +501,7 @@ final class Str implements \Stringable
     /**
      * Check if the 2 strings are equal
      */
+    #[\NoDiscard]
     public function equals(self $string): bool
     {
         return $this->toString() === $string->toString();
@@ -471,6 +510,7 @@ final class Str implements \Stringable
     /**
      * Trim the string
      */
+    #[\NoDiscard]
     public function trim(?string $mask = null): self
     {
         return new self(
@@ -482,6 +522,7 @@ final class Str implements \Stringable
     /**
      * Trim the right side of the string
      */
+    #[\NoDiscard]
     public function rightTrim(?string $mask = null): self
     {
         return new self(
@@ -493,6 +534,7 @@ final class Str implements \Stringable
     /**
      * Trim the left side of the string
      */
+    #[\NoDiscard]
     public function leftTrim(?string $mask = null): self
     {
         return new self(
@@ -504,6 +546,7 @@ final class Str implements \Stringable
     /**
      * Check if the given string is present in the current one
      */
+    #[\NoDiscard]
     public function contains(string|\Stringable $value): bool
     {
         return \mb_strpos($this->value, (string) $value, 0, $this->encoding->toString()) !== false;
@@ -512,6 +555,7 @@ final class Str implements \Stringable
     /**
      * Check if the current string starts with the given string
      */
+    #[\NoDiscard]
     public function startsWith(string|\Stringable $value): bool
     {
         if ($value === '') {
@@ -524,6 +568,7 @@ final class Str implements \Stringable
     /**
      * Check if the current string ends with the given string
      */
+    #[\NoDiscard]
     public function endsWith(string|\Stringable $value): bool
     {
         $value = (string) $value;
@@ -540,6 +585,7 @@ final class Str implements \Stringable
     /**
      * Quote regular expression characters
      */
+    #[\NoDiscard]
     public function pregQuote(string|\Stringable $delimiter = ''): self
     {
         return new self(\preg_quote($this->value, (string) $delimiter), $this->encoding);
@@ -548,6 +594,7 @@ final class Str implements \Stringable
     /**
      * @param callable(string, Str\Encoding): string $map Second string is the encoding
      */
+    #[\NoDiscard]
     public function map(callable $map): self
     {
         /** @psalm-suppress ImpureFunctionCall */
@@ -557,6 +604,7 @@ final class Str implements \Stringable
     /**
      * @param callable(string, Str\Encoding): self $map Second string is the encoding
      */
+    #[\NoDiscard]
     public function flatMap(callable $map): self
     {
         /** @psalm-suppress ImpureFunctionCall */
