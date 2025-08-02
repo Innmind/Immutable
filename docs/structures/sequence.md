@@ -343,6 +343,43 @@ $lines; // ['foo', 'bar', 'baz', '']
 
 This better accomodates to the case where the initial `Sequence` only contains a single value.
 
+### `->windows()`
+
+This returns a sliding window (of fixed size) across all values. This is useful when parsing a Sequence of values to find an _end_ flag that's spread across multiple values.
+
+```php
+$values = Sequence::of('l', 'o', 'r', 'e', 'm', 'i', 'p', 's', 'u', 'm');
+$values->windows(3)->equals(
+    Sequence::of(
+        Sequence::of('l', 'o', 'r'),
+        Sequence::of('o', 'r', 'e'),
+        Sequence::of('r', 'e', 'm'),
+        Sequence::of('e', 'm', 'i'),
+        Sequence::of('m', 'i', 'p'),
+        Sequence::of('i', 'p', 's'),
+        Sequence::of('p', 's', 'u'),
+        Sequence::of('s', 'u', 'm'),
+    )
+); // true
+
+$values
+    ->windows(2)
+    ->takeWhile(static fn($window) => !$window->equals(Sequence::of('i', 'p')))
+    ->flatMap(static fn($window) => $window->take(1))
+    ->equals(Sequence::of('l', 'o', 'r', 'e', 'm')); // true
+```
+
+!!! warning ""
+    If the source `Sequence` contains less values than the specified size then it will return a window shorter than the specified size.
+
+    ```php
+    Sequence::of('a', 'b', 'c')->windows(10)->equals(
+        Sequence::of(
+            Sequence::of('a', 'b', 'c'),
+        ),
+    ); // true
+    ```
+
 ### `->indices()`
 
 Create a new sequence of integers representing the indices of the original sequence.
