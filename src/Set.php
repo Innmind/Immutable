@@ -9,12 +9,12 @@ namespace Innmind\Immutable;
  */
 final class Set implements \Countable
 {
-    /** @var Sequence<T> */
-    private Sequence $implementation;
-
-    private function __construct(Sequence $implementation)
-    {
-        $this->implementation = $implementation;
+    /**
+     * @param Sequence<T> $implementation
+     */
+    private function __construct(
+        private Sequence $implementation,
+    ) {
     }
 
     /**
@@ -29,6 +29,7 @@ final class Set implements \Countable
      *
      * @return self<T>
      */
+    #[\NoDiscard]
     public function __invoke($element): self
     {
         return new self(($this->implementation)($element)->distinct());
@@ -43,6 +44,7 @@ final class Set implements \Countable
      *
      * @return self<V>
      */
+    #[\NoDiscard]
     public static function of(...$values): self
     {
         return new self(Sequence::of(...$values)->distinct());
@@ -62,6 +64,7 @@ final class Set implements \Countable
      *
      * @return self<V>
      */
+    #[\NoDiscard]
     public static function defer(\Generator $generator): self
     {
         return new self(Sequence::defer($generator)->distinct());
@@ -82,6 +85,7 @@ final class Set implements \Countable
      *
      * @return self<V>
      */
+    #[\NoDiscard]
     public static function lazy(callable $generator): self
     {
         return new self(Sequence::lazy($generator)->distinct());
@@ -93,6 +97,7 @@ final class Set implements \Countable
      *
      * @return self<mixed>
      */
+    #[\NoDiscard]
     public static function mixed(mixed ...$values): self
     {
         return self::of(...$values);
@@ -104,6 +109,7 @@ final class Set implements \Countable
      *
      * @return self<int>
      */
+    #[\NoDiscard]
     public static function ints(int ...$values): self
     {
         /** @var self<int> */
@@ -118,6 +124,7 @@ final class Set implements \Countable
      *
      * @return self<float>
      */
+    #[\NoDiscard]
     public static function floats(float ...$values): self
     {
         /** @var self<float> */
@@ -132,6 +139,7 @@ final class Set implements \Countable
      *
      * @return self<string>
      */
+    #[\NoDiscard]
     public static function strings(string ...$values): self
     {
         /** @var self<string> */
@@ -146,6 +154,7 @@ final class Set implements \Countable
      *
      * @return self<object>
      */
+    #[\NoDiscard]
     public static function objects(object ...$values): self
     {
         /** @var self<object> */
@@ -155,17 +164,19 @@ final class Set implements \Countable
     }
 
     /**
-     * @return 0|positive-int
+     * @return int<0, max>
      */
+    #[\NoDiscard]
     public function size(): int
     {
         return $this->implementation->size();
     }
 
     /**
-     * @return 0|positive-int
+     * @return int<0, max>
      */
     #[\Override]
+    #[\NoDiscard]
     public function count(): int
     {
         return $this->implementation->size();
@@ -178,6 +189,7 @@ final class Set implements \Countable
      *
      * @return self<T>
      */
+    #[\NoDiscard]
     public function intersect(self $set): self
     {
         if ($this === $set) {
@@ -198,6 +210,7 @@ final class Set implements \Countable
      *
      * @return self<T>
      */
+    #[\NoDiscard]
     public function add($element): self
     {
         return ($this)($element);
@@ -208,6 +221,7 @@ final class Set implements \Countable
      *
      * @param T $element
      */
+    #[\NoDiscard]
     public function contains($element): bool
     {
         return $this->implementation->contains($element);
@@ -220,6 +234,7 @@ final class Set implements \Countable
      *
      * @return self<T>
      */
+    #[\NoDiscard]
     public function remove($element): self
     {
         return new self($this->implementation->filter(
@@ -234,6 +249,7 @@ final class Set implements \Countable
      *
      * @return self<T>
      */
+    #[\NoDiscard]
     public function diff(self $set): self
     {
         return new self($this->implementation->diff(
@@ -246,6 +262,7 @@ final class Set implements \Countable
      *
      * @param self<T> $set
      */
+    #[\NoDiscard]
     public function equals(self $set): bool
     {
         if ($this === $set) {
@@ -273,6 +290,7 @@ final class Set implements \Countable
      *
      * @return self<S>
      */
+    #[\NoDiscard]
     public function keep(Predicate $predicate): self
     {
         /** @var self<S> */
@@ -286,6 +304,7 @@ final class Set implements \Countable
      *
      * @return self<T>
      */
+    #[\NoDiscard]
     public function filter(callable $predicate): self
     {
         return new self($this->implementation->filter($predicate));
@@ -298,6 +317,7 @@ final class Set implements \Countable
      *
      * @return self<T>
      */
+    #[\NoDiscard]
     public function exclude(callable $predicate): self
     {
         /** @psalm-suppress MixedArgument */
@@ -309,6 +329,7 @@ final class Set implements \Countable
      *
      * @param callable(T): void $function
      */
+    #[\NoDiscard]
     public function foreach(callable $function): SideEffect
     {
         return $this->implementation->foreach($function);
@@ -324,6 +345,7 @@ final class Set implements \Countable
      *
      * @return Map<D, self<T>>
      */
+    #[\NoDiscard]
     public function groupBy(callable $discriminator): Map
     {
         return $this
@@ -341,6 +363,7 @@ final class Set implements \Countable
      *
      * @return self<S>
      */
+    #[\NoDiscard]
     public function map(callable $function): self
     {
         return new self(
@@ -360,6 +383,7 @@ final class Set implements \Countable
      *
      * @return self<S>
      */
+    #[\NoDiscard]
     public function flatMap(callable $map): self
     {
         /** @psalm-suppress MixedArgument */
@@ -378,6 +402,7 @@ final class Set implements \Countable
      *
      * @return Map<bool, self<T>>
      */
+    #[\NoDiscard]
     public function partition(callable $predicate): Map
     {
         return $this
@@ -393,6 +418,7 @@ final class Set implements \Countable
      *
      * @return Sequence<T>
      */
+    #[\NoDiscard]
     public function sort(callable $function): Sequence
     {
         return $this->implementation->sort($function);
@@ -403,6 +429,7 @@ final class Set implements \Countable
      *
      * @return Sequence<T>
      */
+    #[\NoDiscard]
     public function unsorted(): Sequence
     {
         return $this->implementation;
@@ -415,6 +442,7 @@ final class Set implements \Countable
      *
      * @return self<T>
      */
+    #[\NoDiscard]
     public function merge(self $set): self
     {
         return new self(
@@ -436,6 +464,7 @@ final class Set implements \Countable
      *
      * @return I|R
      */
+    #[\NoDiscard]
     public function reduce($carry, callable $reducer)
     {
         return $this->implementation->reduce($carry, $reducer);
@@ -446,11 +475,13 @@ final class Set implements \Countable
      *
      * @return self<T>
      */
+    #[\NoDiscard]
     public function clear(): self
     {
         return new self(Sequence::of());
     }
 
+    #[\NoDiscard]
     public function empty(): bool
     {
         return $this->implementation->empty();
@@ -461,6 +492,7 @@ final class Set implements \Countable
      *
      * @return Maybe<T>
      */
+    #[\NoDiscard]
     public function find(callable $predicate): Maybe
     {
         return $this->implementation->find($predicate);
@@ -474,6 +506,7 @@ final class Set implements \Countable
      *
      * @return R
      */
+    #[\NoDiscard]
     public function match(callable $match, callable $empty)
     {
         /** @psalm-suppress MixedArgument */
@@ -486,6 +519,7 @@ final class Set implements \Countable
     /**
      * @param callable(T): bool $predicate
      */
+    #[\NoDiscard]
     public function matches(callable $predicate): bool
     {
         return $this->implementation->matches($predicate);
@@ -494,6 +528,7 @@ final class Set implements \Countable
     /**
      * @param callable(T): bool $predicate
      */
+    #[\NoDiscard]
     public function any(callable $predicate): bool
     {
         return $this->implementation->any($predicate);
@@ -502,6 +537,7 @@ final class Set implements \Countable
     /**
      * @return list<T>
      */
+    #[\NoDiscard]
     public function toList(): array
     {
         return $this->implementation->toList();
@@ -522,6 +558,7 @@ final class Set implements \Countable
      *
      * @return self<T>
      */
+    #[\NoDiscard]
     public function safeguard($carry, callable $assert)
     {
         return new self($this->implementation->safeguard($carry, $assert));
@@ -532,6 +569,7 @@ final class Set implements \Countable
      *
      * @return self<T>
      */
+    #[\NoDiscard]
     public function memoize(): self
     {
         return new self($this->implementation->memoize());
@@ -547,6 +585,7 @@ final class Set implements \Countable
      *
      * @return self<T>
      */
+    #[\NoDiscard]
     public function snap(): self
     {
         return new self($this->implementation->snap());

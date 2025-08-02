@@ -10,7 +10,7 @@ use Innmind\BlackBox\Set;
 return static function() {
     yield proof(
         'Identity::unwrap()',
-        given(Set\Type::any()),
+        given(Set::type()),
         static fn($assert, $value) => $assert->same(
             $value,
             Identity::of($value)->unwrap(),
@@ -20,8 +20,8 @@ return static function() {
     yield proof(
         'Identity::map()',
         given(
-            Set\Type::any(),
-            Set\Type::any(),
+            Set::type(),
+            Set::type(),
         ),
         static fn($assert, $initial, $expected) => $assert->same(
             $expected,
@@ -38,8 +38,8 @@ return static function() {
     yield proof(
         'Identity::flatMap()',
         given(
-            Set\Type::any(),
-            Set\Type::any(),
+            Set::type(),
+            Set::type(),
         ),
         static function($assert, $initial, $expected) {
             $assert->same(
@@ -102,9 +102,9 @@ return static function() {
     yield proof(
         'Identity::map() and ::flatMap() interchangeability',
         given(
-            Set\Type::any(),
-            Set\Type::any(),
-            Set\Type::any(),
+            Set::type(),
+            Set::type(),
+            Set::type(),
         ),
         static fn($assert, $initial, $intermediate, $expected) => $assert->same(
             Identity::of($initial)
@@ -123,7 +123,7 @@ return static function() {
 
     yield proof(
         'Identity::toSequence()',
-        given(Set\Sequence::of(Set\Type::any())),
+        given(Set::sequence(Set::type())),
         static function($assert, $values) {
             $inMemory = Sequence::of(...$values);
 
@@ -185,8 +185,8 @@ return static function() {
     yield proof(
         'Identity::defer() holds intermediary values',
         given(
-            Set\Type::any(),
-            Set\Type::any(),
+            Set::type(),
+            Set::type(),
         ),
         static function($assert, $value1, $value2) {
             $m1 = Identity::defer(static function() use ($value1) {

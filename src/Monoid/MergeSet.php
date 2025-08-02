@@ -22,6 +22,7 @@ final class MergeSet implements Monoid
      *
      * @return self<C>
      */
+    #[\NoDiscard]
     public static function of(?string $class = null): self
     {
         /** @var self<C> */

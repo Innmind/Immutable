@@ -13,19 +13,14 @@ use Innmind\Immutable\Predicate;
  */
 final class OrPredicate implements Predicate
 {
-    /** @var Predicate<A> */
-    private Predicate $a;
-    /** @var Predicate<B> */
-    private Predicate $b;
-
     /**
      * @param Predicate<A> $a
      * @param Predicate<B> $b
      */
-    private function __construct(Predicate $a, Predicate $b)
-    {
-        $this->a = $a;
-        $this->b = $b;
+    private function __construct(
+        private Predicate $a,
+        private Predicate $b,
+    ) {
     }
 
     #[\Override]
@@ -44,6 +39,7 @@ final class OrPredicate implements Predicate
      *
      * @return self<T, V>
      */
+    #[\NoDiscard]
     public static function of(Predicate $a, Predicate $b): self
     {
         return new self($a, $b);
@@ -56,6 +52,7 @@ final class OrPredicate implements Predicate
      *
      * @return self<A|B, C>
      */
+    #[\NoDiscard]
     public function or(Predicate $other): self
     {
         return new self($this, $other);
@@ -68,6 +65,7 @@ final class OrPredicate implements Predicate
      *
      * @return AndPredicate<A|B, C>
      */
+    #[\NoDiscard]
     public function and(Predicate $other): AndPredicate
     {
         return AndPredicate::of($this, $other);

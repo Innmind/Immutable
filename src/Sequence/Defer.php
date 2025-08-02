@@ -214,7 +214,7 @@ final class Defer implements Implementation
     }
 
     /**
-     * @param 0|positive-int $size
+     * @param int<0, max> $size
      *
      * @return Implementation<T>
      */
@@ -392,7 +392,7 @@ final class Defer implements Implementation
     /**
      * @param T $element
      *
-     * @return Maybe<0|positive-int>
+     * @return Maybe<int<0, max>>
      */
     #[\Override]
     public function indexOf($element): Maybe
@@ -412,7 +412,7 @@ final class Defer implements Implementation
                 if ($values->current() === $element) {
                     $values->cleanup();
 
-                    /** @var Maybe<0|positive-int> */
+                    /** @var Maybe<int<0, max>> */
                     return Maybe::just($index);
                 }
 
@@ -420,7 +420,7 @@ final class Defer implements Implementation
                 $values->next();
             }
 
-            /** @var Maybe<0|positive-int> */
+            /** @var Maybe<int<0, max>> */
             return Maybe::nothing();
         });
     }
@@ -428,7 +428,7 @@ final class Defer implements Implementation
     /**
      * Return the list of indices
      *
-     * @return Implementation<0|positive-int>
+     * @return Implementation<int<0, max>>
      */
     #[\Override]
     public function indices(): Implementation
@@ -437,7 +437,7 @@ final class Defer implements Implementation
 
         /**
          * @psalm-suppress ImpureFunctionCall
-         * @var Implementation<0|positive-int>
+         * @var Implementation<int<0, max>>
          */
         return new self(
             (static function() use (&$captured): \Generator {
@@ -672,7 +672,7 @@ final class Defer implements Implementation
     }
 
     /**
-     * @param 0|positive-int $size
+     * @param int<0, max> $size
      *
      * @return Implementation<T>
      */

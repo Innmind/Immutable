@@ -9,14 +9,14 @@ use Properties\Innmind\Immutable\Monoid;
 return static function() {
     $equals = static fn($a, $b) => $a->equals($b);
     $set = FSet::of(
-        Set\Integers::between(0, 200),
-        Set\Integers::between(1, 10),
+        Set::integers()->between(0, 200),
+        Set::integers()->between(1, 10),
     );
 
     yield properties(
         'MergeSet properties',
         Monoid::properties($set, $equals),
-        Set\Elements::of(MergeSet::of()),
+        Set::of(MergeSet::of()),
     );
 
     foreach (Monoid::list($set, $equals) as $property) {

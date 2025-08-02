@@ -20,20 +20,22 @@ class SequenceTest extends TestCase
         $this->assertInstanceOf(
             Set::class,
             Sequence::of(
-                Set\Strings::madeOf(Set\Chars::any())->between(1, 2),
-                Set\Integers::between(0, 1),
+                Set::strings()
+                    ->madeOf(Set::strings()->chars())
+                    ->between(1, 2),
+                Set::integers()->between(0, 1),
             ),
         );
     }
 
-    public function testGenerate()
+    public function testGenerate(): BlackBox\Proof
     {
-        $this
+        return $this
             ->forAll(Sequence::of(
-                Set\Chars::any(),
-                Set\Integers::between(0, 5),
+                Set::strings()->chars(),
+                Set::integers()->between(0, 5),
             ))
-            ->then(function($sequence) {
+            ->prove(function($sequence) {
                 $this->assertInstanceOf(Structure::class, $sequence);
                 $this->assertLessThanOrEqual(5, $sequence->size());
             });

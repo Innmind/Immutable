@@ -16,15 +16,12 @@ use Innmind\Immutable\Identity\{
  */
 final class Identity
 {
-    /** @var Implementation<T> */
-    private Implementation $implementation;
-
     /**
      * @param Implementation<T> $implementation
      */
-    private function __construct(Implementation $implementation)
-    {
-        $this->implementation = $implementation;
+    private function __construct(
+        private Implementation $implementation,
+    ) {
     }
 
     /**
@@ -35,6 +32,7 @@ final class Identity
      *
      * @return self<A>
      */
+    #[\NoDiscard]
     public static function of(mixed $value): self
     {
         return new self(new InMemory($value));
@@ -52,6 +50,7 @@ final class Identity
      *
      * @return self<A>
      */
+    #[\NoDiscard]
     public static function lazy(callable $value): self
     {
         return new self(new Lazy($value));
@@ -69,6 +68,7 @@ final class Identity
      *
      * @return self<A>
      */
+    #[\NoDiscard]
     public static function defer(callable $value): self
     {
         return new self(new Defer($value));
@@ -81,6 +81,7 @@ final class Identity
      *
      * @return self<U>
      */
+    #[\NoDiscard]
     public function map(callable $map): self
     {
         return new self($this->implementation->map($map));
@@ -93,6 +94,7 @@ final class Identity
      *
      * @return self<U>
      */
+    #[\NoDiscard]
     public function flatMap(callable $map): self
     {
         return $this->implementation->flatMap($map);
@@ -101,6 +103,7 @@ final class Identity
     /**
      * @return Sequence<T>
      */
+    #[\NoDiscard]
     public function toSequence(): Sequence
     {
         return $this->implementation->toSequence();
@@ -109,6 +112,7 @@ final class Identity
     /**
      * @return T
      */
+    #[\NoDiscard]
     public function unwrap(): mixed
     {
         return $this->implementation->unwrap();

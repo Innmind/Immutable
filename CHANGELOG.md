@@ -1,5 +1,15 @@
 # Changelog
 
+## 5.17.0 - 2025-08-02
+
+### Added
+
+- `Innmind\Immutable\Sequence::windows()`
+
+### Removed
+
+- Support for `innmind/black-box` `5`
+
 ## 5.16.0 - 2025-06-02
 
 ### Added

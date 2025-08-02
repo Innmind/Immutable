@@ -31,7 +31,7 @@ interface Implementation extends \Countable
     public function __invoke($key, $value): self;
 
     /**
-     * @return 0|positive-int
+     * @return int<0, max>
      */
     public function size(): int;
 

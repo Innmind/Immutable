@@ -7,7 +7,7 @@ use Innmind\BlackBox\Set;
 return static function() {
     yield proof(
         'Validation::match()',
-        given(Set\Type::any()),
+        given(Set::type()),
         static function($assert, $value) {
             $assert->same(
                 $value,
@@ -29,8 +29,8 @@ return static function() {
     yield proof(
         'Validation::map()',
         given(
-            Set\Type::any(),
-            Set\Type::any(),
+            Set::type(),
+            Set::type(),
         ),
         static function($assert, $initial, $new) {
             $assert->same(
@@ -56,8 +56,8 @@ return static function() {
     yield proof(
         'Validation::flatMap()',
         given(
-            Set\Type::any(),
-            Set\Type::any(),
+            Set::type(),
+            Set::type(),
         ),
         static function($assert, $initial, $new) {
             $assert->same(
@@ -92,8 +92,8 @@ return static function() {
     yield proof(
         'Validation::mapFailures()',
         given(
-            Set\Type::any(),
-            Set\Type::any(),
+            Set::type(),
+            Set::type(),
         ),
         static function($assert, $initial, $new) {
             $assert->same(
@@ -119,8 +119,8 @@ return static function() {
     yield proof(
         'Validation::otherwise()',
         given(
-            Set\Type::any(),
-            Set\Type::any(),
+            Set::type(),
+            Set::type(),
         ),
         static function($assert, $initial, $new) {
             $assert->null(
@@ -154,7 +154,7 @@ return static function() {
 
     yield proof(
         'Validation::maybe()',
-        given(Set\Type::any()),
+        given(Set::type()),
         static function($assert, $value) {
             $assert->same(
                 $value,
@@ -178,7 +178,7 @@ return static function() {
 
     yield proof(
         'Validation::either()',
-        given(Set\Type::any()),
+        given(Set::type()),
         static function($assert, $value) {
             $assert->same(
                 $value,
@@ -204,8 +204,8 @@ return static function() {
     yield proof(
         'Validation::and()',
         given(
-            Set\Type::any(),
-            Set\Type::any(),
+            Set::type(),
+            Set::type(),
         ),
         static function($assert, $a, $b) {
             $success = Validation::success($a);

@@ -10,14 +10,12 @@ use Properties\Innmind\Immutable\Monoid;
 
 return static function() {
     $equals = static fn($a, $b) => $a === $b;
-    $set = Set\Sequence::of(
-        Set\Randomize::of( // forced to randomize as the composite will try to reuse the same key
-            Set\Composite::immutable(
-                static fn($key, $value): array => [$key, $value],
-                Set\Integers::between(0, 200),
-                Set\Integers::between(0, 200),
-            ),
-        ),
+    $set = Set::sequence(
+        Set::compose(
+            static fn($key, $value): array => [$key, $value],
+            Set::integers()->between(0, 200),
+            Set::integers()->between(0, 200),
+        )->randomize(), // forced to randomize as the composite will try to reuse the same key
     )
         ->between(1, 10)
         ->filter(static function(array $pairs): bool {
@@ -34,7 +32,7 @@ return static function() {
     yield properties(
         'ArrayMerge properties',
         Monoid::properties($set, $equals),
-        Set\Elements::of(new ArrayMerge),
+        Set::of(new ArrayMerge),
     );
 
     foreach (Monoid::list($set, $equals) as $property) {

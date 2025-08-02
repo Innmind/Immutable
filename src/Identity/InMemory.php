@@ -13,15 +13,12 @@ use Innmind\Immutable\Sequence;
  */
 final class InMemory implements Implementation
 {
-    /** @var T */
-    private mixed $value;
-
     /**
      * @param T $value
      */
-    public function __construct(mixed $value)
-    {
-        $this->value = $value;
+    public function __construct(
+        private mixed $value,
+    ) {
     }
 
     #[\Override]

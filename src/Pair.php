@@ -12,25 +12,21 @@ namespace Innmind\Immutable;
  */
 final class Pair
 {
-    /** @var T */
-    private $key;
-    /** @var S */
-    private $value;
-
     /**
      * @internal You should never have to manually create this object
      * @param T $key
      * @param S $value
      */
-    public function __construct($key, $value)
-    {
-        $this->key = $key;
-        $this->value = $value;
+    public function __construct(
+        private mixed $key,
+        private mixed $value,
+    ) {
     }
 
     /**
      * @return T
      */
+    #[\NoDiscard]
     public function key()
     {
         return $this->key;
@@ -39,6 +35,7 @@ final class Pair
     /**
      * @return S
      */
+    #[\NoDiscard]
     public function value()
     {
         return $this->value;

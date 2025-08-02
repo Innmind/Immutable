@@ -9,15 +9,12 @@ namespace Innmind\Immutable;
  */
 final class Sequence implements \Countable
 {
-    /** @var Sequence\Implementation<T> */
-    private Sequence\Implementation $implementation;
-
     /**
      * @param Sequence\Implementation<T> $implementation
      */
-    private function __construct(Sequence\Implementation $implementation)
-    {
-        $this->implementation = $implementation;
+    private function __construct(
+        private Sequence\Implementation $implementation,
+    ) {
     }
 
     /**
@@ -32,6 +29,7 @@ final class Sequence implements \Countable
      *
      * @return self<T>
      */
+    #[\NoDiscard]
     public function __invoke($element): self
     {
         return new self(($this->implementation)($element));
@@ -46,6 +44,7 @@ final class Sequence implements \Countable
      *
      * @return self<V>
      */
+    #[\NoDiscard]
     public static function of(...$values): self
     {
         return new self(new Sequence\Primitive($values));
@@ -64,6 +63,7 @@ final class Sequence implements \Countable
      *
      * @return self<V>
      */
+    #[\NoDiscard]
     public static function defer(\Generator $generator): self
     {
         return new self(new Sequence\Defer($generator));
@@ -84,6 +84,7 @@ final class Sequence implements \Countable
      *
      * @return self<V>
      */
+    #[\NoDiscard]
     public static function lazy(callable $generator): self
     {
         return new self(new Sequence\Lazy($generator));
@@ -100,6 +101,7 @@ final class Sequence implements \Countable
      *
      * @return self<V>
      */
+    #[\NoDiscard]
     public static function lazyStartingWith(...$values): self
     {
         return self::lazy(static function() use ($values) {
@@ -115,6 +117,7 @@ final class Sequence implements \Countable
      *
      * @return self<mixed>
      */
+    #[\NoDiscard]
     public static function mixed(mixed ...$values): self
     {
         return new self(new Sequence\Primitive($values));
@@ -126,6 +129,7 @@ final class Sequence implements \Countable
      *
      * @return self<int>
      */
+    #[\NoDiscard]
     public static function ints(int ...$values): self
     {
         /** @var self<int> */
@@ -140,6 +144,7 @@ final class Sequence implements \Countable
      *
      * @return self<float>
      */
+    #[\NoDiscard]
     public static function floats(float ...$values): self
     {
         /** @var self<float> */
@@ -154,6 +159,7 @@ final class Sequence implements \Countable
      *
      * @return self<string>
      */
+    #[\NoDiscard]
     public static function strings(string ...$values): self
     {
         /** @var self<string> */
@@ -168,6 +174,7 @@ final class Sequence implements \Countable
      *
      * @return self<object>
      */
+    #[\NoDiscard]
     public static function objects(object ...$values): self
     {
         /** @var self<object> */
@@ -177,17 +184,19 @@ final class Sequence implements \Countable
     }
 
     /**
-     * @return 0|positive-int
+     * @return int<0, max>
      */
+    #[\NoDiscard]
     public function size(): int
     {
         return $this->implementation->size();
     }
 
     /**
-     * @return 0|positive-int
+     * @return int<0, max>
      */
     #[\Override]
+    #[\NoDiscard]
     public function count(): int
     {
         return $this->implementation->size();
@@ -196,10 +205,11 @@ final class Sequence implements \Countable
     /**
      * Return the element at the given index
      *
-     * @param 0|positive-int $index
+     * @param int<0, max> $index
      *
      * @return Maybe<T>
      */
+    #[\NoDiscard]
     public function get(int $index): Maybe
     {
         return $this->implementation->get($index);
@@ -212,6 +222,7 @@ final class Sequence implements \Countable
      *
      * @return self<T>
      */
+    #[\NoDiscard]
     public function diff(self $sequence): self
     {
         return new self($this->implementation->diff(
@@ -224,6 +235,7 @@ final class Sequence implements \Countable
      *
      * @return self<T>
      */
+    #[\NoDiscard]
     public function distinct(): self
     {
         return new self($this->implementation->distinct());
@@ -232,10 +244,11 @@ final class Sequence implements \Countable
     /**
      * Remove the n first elements
      *
-     * @param 0|positive-int $size
+     * @param int<0, max> $size
      *
      * @return self<T>
      */
+    #[\NoDiscard]
     public function drop(int $size): self
     {
         return new self($this->implementation->drop($size));
@@ -244,10 +257,11 @@ final class Sequence implements \Countable
     /**
      * Remove the n last elements
      *
-     * @param 0|positive-int $size
+     * @param int<0, max> $size
      *
      * @return self<T>
      */
+    #[\NoDiscard]
     public function dropEnd(int $size): self
     {
         return new self($this->implementation->dropEnd($size));
@@ -258,6 +272,7 @@ final class Sequence implements \Countable
      *
      * @param self<T> $sequence
      */
+    #[\NoDiscard]
     public function equals(self $sequence): bool
     {
         if ($this === $sequence) {
@@ -281,6 +296,7 @@ final class Sequence implements \Countable
      *
      * @return self<S>
      */
+    #[\NoDiscard]
     public function keep(Predicate $predicate): self
     {
         /** @var self<S> */
@@ -294,6 +310,7 @@ final class Sequence implements \Countable
      *
      * @return self<T>
      */
+    #[\NoDiscard]
     public function filter(callable $predicate): self
     {
         return new self($this->implementation->filter($predicate));
@@ -306,6 +323,7 @@ final class Sequence implements \Countable
      *
      * @return self<T>
      */
+    #[\NoDiscard]
     public function exclude(callable $predicate): self
     {
         /** @psalm-suppress MixedArgument */
@@ -317,6 +335,7 @@ final class Sequence implements \Countable
      *
      * @param callable(T): void $function
      */
+    #[\NoDiscard]
     public function foreach(callable $function): SideEffect
     {
         return $this->implementation->foreach($function);
@@ -332,6 +351,7 @@ final class Sequence implements \Countable
      *
      * @return Map<D, self<T>>
      */
+    #[\NoDiscard]
     public function groupBy(callable $discriminator): Map
     {
         return $this->implementation->groupBy($discriminator);
@@ -342,6 +362,7 @@ final class Sequence implements \Countable
      *
      * @return Maybe<T>
      */
+    #[\NoDiscard]
     public function first(): Maybe
     {
         return $this->implementation->first();
@@ -352,6 +373,7 @@ final class Sequence implements \Countable
      *
      * @return Maybe<T>
      */
+    #[\NoDiscard]
     public function last(): Maybe
     {
         return $this->implementation->last();
@@ -362,6 +384,7 @@ final class Sequence implements \Countable
      *
      * @param T $element
      */
+    #[\NoDiscard]
     public function contains($element): bool
     {
         return $this->implementation->contains($element);
@@ -374,8 +397,9 @@ final class Sequence implements \Countable
      *
      * @param T $element
      *
-     * @return Maybe<0|positive-int>
+     * @return Maybe<int<0, max>>
      */
+    #[\NoDiscard]
     public function indexOf($element): Maybe
     {
         return $this->implementation->indexOf($element);
@@ -384,8 +408,9 @@ final class Sequence implements \Countable
     /**
      * Return the list of indices
      *
-     * @return self<0|positive-int>
+     * @return self<int<0, max>>
      */
+    #[\NoDiscard]
     public function indices(): self
     {
         return new self($this->implementation->indices());
@@ -400,6 +425,7 @@ final class Sequence implements \Countable
      *
      * @return self<S>
      */
+    #[\NoDiscard]
     public function map(callable $function): self
     {
         return new self($this->implementation->map($function));
@@ -414,6 +440,7 @@ final class Sequence implements \Countable
      *
      * @return self<S>
      */
+    #[\NoDiscard]
     public function flatMap(callable $map): self
     {
         /** @var callable(self<S>): Sequence\Implementation<S> */
@@ -429,6 +456,7 @@ final class Sequence implements \Countable
      *
      * @return self<S>
      */
+    #[\NoDiscard]
     public function via(callable $map): self
     {
         return $this->implementation->via(
@@ -437,13 +465,35 @@ final class Sequence implements \Countable
     }
 
     /**
+     * A window of size S is all the S elements bundled together as a new Sequence.
+     *
+     * Each window overlaps with the previous one. When the source Sequence
+     * contains less elements than the specified size then the window is shorter
+     * than the specified size.
+     *
+     * @param int<1, max> $size
+     *
+     * @return self<self<T>>
+     */
+    public function windows(int $size): self
+    {
+        return $this
+            ->map(static fn($value) => self::of($value))
+            ->aggregate(static fn(self $a, $b) => match ($a->size()) {
+                $size => self::of($a, $a->drop(1)->append($b)),
+                default => self::of($a->append($b)),
+            });
+    }
+
+    /**
      * Pad the sequence to a defined size with the given element
      *
-     * @param 0|positive-int $size
+     * @param int<0, max> $size
      * @param T $element
      *
      * @return self<T>
      */
+    #[\NoDiscard]
     public function pad(int $size, $element): self
     {
         return new self($this->implementation->pad($size, $element));
@@ -456,6 +506,7 @@ final class Sequence implements \Countable
      *
      * @return Map<bool, self<T>>
      */
+    #[\NoDiscard]
     public function partition(callable $predicate): Map
     {
         return $this->implementation->partition($predicate);
@@ -464,11 +515,12 @@ final class Sequence implements \Countable
     /**
      * Slice the sequence
      *
-     * @param 0|positive-int $from
-     * @param 0|positive-int $until
+     * @param int<0, max> $from
+     * @param int<0, max> $until
      *
      * @return self<T>
      */
+    #[\NoDiscard]
     public function slice(int $from, int $until): self
     {
         return new self($this->implementation->slice($from, $until));
@@ -477,10 +529,11 @@ final class Sequence implements \Countable
     /**
      * Return a sequence with the n first elements
      *
-     * @param 0|positive-int $size
+     * @param int<0, max> $size
      *
      * @return self<T>
      */
+    #[\NoDiscard]
     public function take(int $size): self
     {
         return new self($this->implementation->take($size));
@@ -489,10 +542,11 @@ final class Sequence implements \Countable
     /**
      * Return a sequence with the n last elements
      *
-     * @param 0|positive-int $size
+     * @param int<0, max> $size
      *
      * @return self<T>
      */
+    #[\NoDiscard]
     public function takeEnd(int $size): self
     {
         return new self($this->implementation->takeEnd($size));
@@ -505,6 +559,7 @@ final class Sequence implements \Countable
      *
      * @return self<T>
      */
+    #[\NoDiscard]
     public function append(self $sequence): self
     {
         return new self($this->implementation->append(
@@ -519,6 +574,7 @@ final class Sequence implements \Countable
      *
      * @return self<T>
      */
+    #[\NoDiscard]
     public function prepend(self $sequence): self
     {
         return new self($this->implementation->prepend(
@@ -534,6 +590,7 @@ final class Sequence implements \Countable
      *
      * @return self<T>
      */
+    #[\NoDiscard]
     public function intersect(self $sequence): self
     {
         return new self($this->implementation->intersect(
@@ -548,6 +605,7 @@ final class Sequence implements \Countable
      *
      * @return self<T>
      */
+    #[\NoDiscard]
     public function add($element): self
     {
         return ($this)($element);
@@ -560,6 +618,7 @@ final class Sequence implements \Countable
      *
      * @return self<T>
      */
+    #[\NoDiscard]
     public function sort(callable $function): self
     {
         return new self($this->implementation->sort($function));
@@ -570,6 +629,7 @@ final class Sequence implements \Countable
      *
      * @return T
      */
+    #[\NoDiscard]
     public function fold(Monoid $monoid)
     {
         /** @psalm-suppress MixedArgument */
@@ -590,6 +650,7 @@ final class Sequence implements \Countable
      *
      * @return I|R
      */
+    #[\NoDiscard]
     public function reduce($carry, callable $reducer)
     {
         return $this->implementation->reduce($carry, $reducer);
@@ -602,6 +663,7 @@ final class Sequence implements \Countable
      *
      * @return Sequence\Sink<T, C>
      */
+    #[\NoDiscard]
     public function sink(mixed $carry): Sequence\Sink
     {
         return Sequence\Sink::of($this->implementation, $carry);
@@ -612,6 +674,7 @@ final class Sequence implements \Countable
      *
      * @return self<T>
      */
+    #[\NoDiscard]
     public function clear(): self
     {
         return new self(new Sequence\Primitive);
@@ -622,11 +685,13 @@ final class Sequence implements \Countable
      *
      * @return self<T>
      */
+    #[\NoDiscard]
     public function reverse(): self
     {
         return new self($this->implementation->reverse());
     }
 
+    #[\NoDiscard]
     public function empty(): bool
     {
         return $this->implementation->empty();
@@ -635,6 +700,7 @@ final class Sequence implements \Countable
     /**
      * @return Set<T>
      */
+    #[\NoDiscard]
     public function toSet(): Set
     {
         return $this->implementation->toSet();
@@ -643,6 +709,7 @@ final class Sequence implements \Countable
     /**
      * @return Identity<self<T>>
      */
+    #[\NoDiscard]
     public function toIdentity(): Identity
     {
         return $this
@@ -654,6 +721,7 @@ final class Sequence implements \Countable
     /**
      * @return list<T>
      */
+    #[\NoDiscard]
     public function toList(): array
     {
         /** @var list<T> */
@@ -676,6 +744,7 @@ final class Sequence implements \Countable
      *
      * @return Maybe<T>
      */
+    #[\NoDiscard]
     public function find(callable $predicate): Maybe
     {
         return $this->implementation->find($predicate);
@@ -689,6 +758,7 @@ final class Sequence implements \Countable
      *
      * @return R
      */
+    #[\NoDiscard]
     public function match(callable $match, callable $empty)
     {
         return $this->implementation->match(
@@ -701,6 +771,7 @@ final class Sequence implements \Countable
     /**
      * @param callable(T): bool $predicate
      */
+    #[\NoDiscard]
     public function matches(callable $predicate): bool
     {
         /** @psalm-suppress MixedArgument For some reason Psalm no longer recognize the type in `find` */
@@ -715,6 +786,7 @@ final class Sequence implements \Countable
     /**
      * @param callable(T): bool $predicate
      */
+    #[\NoDiscard]
     public function any(callable $predicate): bool
     {
         return $this->find($predicate)->match(
@@ -733,6 +805,7 @@ final class Sequence implements \Countable
      *
      * @return self<array{T, S}>
      */
+    #[\NoDiscard]
     public function zip(self $sequence): self
     {
         return new self($this->implementation->zip($sequence->implementation));
@@ -753,6 +826,7 @@ final class Sequence implements \Countable
      *
      * @return self<T>
      */
+    #[\NoDiscard]
     public function safeguard($carry, callable $assert)
     {
         return new self($this->implementation->safeguard($carry, $assert));
@@ -770,6 +844,7 @@ final class Sequence implements \Countable
      *
      * @return self<T|A>
      */
+    #[\NoDiscard]
     public function aggregate(callable $map): self
     {
         /** @var callable(self<A>): Sequence\Implementation<A> */
@@ -779,10 +854,11 @@ final class Sequence implements \Countable
     }
 
     /**
-     * @param positive-int $size
+     * @param int<1, max> $size
      *
      * @return self<self<T>>
      */
+    #[\NoDiscard]
     public function chunk(int $size): self
     {
         return $this
@@ -798,6 +874,7 @@ final class Sequence implements \Countable
      *
      * @return self<T>
      */
+    #[\NoDiscard]
     public function memoize(): self
     {
         return new self($this->implementation->memoize());
@@ -808,6 +885,7 @@ final class Sequence implements \Countable
      *
      * @return self<T>
      */
+    #[\NoDiscard]
     public function dropWhile(callable $condition): self
     {
         return new self($this->implementation->dropWhile($condition));
@@ -818,6 +896,7 @@ final class Sequence implements \Countable
      *
      * @return self<T>
      */
+    #[\NoDiscard]
     public function takeWhile(callable $condition): self
     {
         return new self($this->implementation->takeWhile($condition));
@@ -833,6 +912,7 @@ final class Sequence implements \Countable
      *
      * @return self<T>
      */
+    #[\NoDiscard]
     public function snap(): self
     {
         if ($this->implementation instanceof Sequence\Primitive) {

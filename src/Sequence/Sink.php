@@ -47,6 +47,7 @@ final class Sink
      *
      * @return C
      */
+    #[\NoDiscard]
     public function until(callable $reducer): mixed
     {
         return $this->implementation->sink(
@@ -63,6 +64,7 @@ final class Sink
      *
      * @return Maybe<C>
      */
+    #[\NoDiscard]
     public function maybe(callable $reducer): Maybe
     {
         return $this->implementation->sink(
@@ -96,6 +98,7 @@ final class Sink
      *
      * @return Either<E, C>
      */
+    #[\NoDiscard]
     public function either(callable $reducer): Either
     {
         /** @var Either<E, C>  */
@@ -130,6 +133,7 @@ final class Sink
      *
      * @return Attempt<C>
      */
+    #[\NoDiscard]
     public function attempt(callable $reducer): Attempt
     {
         return $this->implementation->sink(

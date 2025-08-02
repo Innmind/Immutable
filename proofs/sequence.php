@@ -9,12 +9,13 @@ use Innmind\Immutable\{
     Str,
     Monoid\Concat,
 };
+use Properties\Innmind\Immutable\Sequence as Properties;
 use Innmind\BlackBox\Set;
 
 return static function() {
     yield proof(
         'Sequence::toIdentity()',
-        given(Set\Sequence::of(Set\Type::any())),
+        given(Set::sequence(Set::type())),
         static function($assert, $values) {
             $sequence = Sequence::of(...$values);
 
@@ -31,8 +32,8 @@ return static function() {
     yield proof(
         'Sequence::prepend()',
         given(
-            Set\Sequence::of(Set\Type::any()),
-            Set\Sequence::of(Set\Type::any()),
+            Set::sequence(Set::type()),
+            Set::sequence(Set::type()),
         ),
         static function($assert, $first, $second) {
             $assert->same(
@@ -69,8 +70,8 @@ return static function() {
     yield proof(
         'Sequence::chunk()',
         given(
-            Set\Strings::atLeast(100),
-            Set\Integers::between(1, 50),
+            Set::strings()->atLeast(100),
+            Set::integers()->between(1, 50),
         ),
         static function($assert, $string, $chunk) {
             $chunks = Str::of($string, Str\Encoding::ascii)
@@ -104,8 +105,8 @@ return static function() {
     yield proof(
         'Sequende::defer() holds intermediary values even when no longer used',
         given(
-            Set\Sequence::of(Set\Type::any()),
-            Set\Sequence::of(Set\Type::any()),
+            Set::sequence(Set::type()),
+            Set::sequence(Set::type()),
         ),
         static function($assert, $prefix, $suffix) {
             $initial = Sequence::defer((static function() use ($prefix, $suffix) {
@@ -145,7 +146,7 @@ return static function() {
 
     yield proof(
         "Sequence::defer() stack trace doesn't show intermediary sequences when not used",
-        given(Set\Integers::between(1, 10)),
+        given(Set::integers()->between(1, 10)),
         static function($assert, $calls) {
             $expected = null;
             $sequence = Sequence::defer((static function() use (&$expected) {
@@ -176,7 +177,7 @@ return static function() {
 
     yield proof(
         'Sequence::sink()->until()',
-        given(Set\Sequence::of(Set\Type::any())),
+        given(Set::sequence(Set::type())),
         static function($assert, $values) {
             $all = Sequence::of(...$values)
                 ->sink([])
@@ -198,7 +199,7 @@ return static function() {
 
     yield proof(
         'Sequence::sink()->until() when deferred',
-        given(Set\Sequence::of(Set\Type::any())),
+        given(Set::sequence(Set::type())),
         static function($assert, $values) {
             $all = Sequence::defer((static function() use ($values) {
                 yield from $values;
@@ -225,8 +226,8 @@ return static function() {
     yield proof(
         "Sequence::sink()->until() when deferred doesn't load values after stop",
         given(
-            Set\Sequence::of(Set\Type::any()),
-            Set\Sequence::of(Set\Type::any()),
+            Set::sequence(Set::type()),
+            Set::sequence(Set::type()),
         ),
         static function($assert, $prefix, $suffix) {
             $stop = new stdClass;
@@ -252,7 +253,7 @@ return static function() {
 
     yield proof(
         'Sequence::sink()->until() when lazy',
-        given(Set\Sequence::of(Set\Type::any())),
+        given(Set::sequence(Set::type())),
         static function($assert, $values) {
             $all = Sequence::lazy(static function() use ($values) {
                 yield from $values;
@@ -279,8 +280,8 @@ return static function() {
     yield proof(
         "Sequence::sink()->until() when lazy doesn't load values after stop",
         given(
-            Set\Sequence::of(Set\Type::any()),
-            Set\Sequence::of(Set\Type::any()),
+            Set::sequence(Set::type()),
+            Set::sequence(Set::type()),
         ),
         static function($assert, $prefix, $suffix) {
             $stop = new stdClass;
@@ -307,8 +308,8 @@ return static function() {
     yield proof(
         'Sequence::sink()->until() when lazy cleans up on stop',
         given(
-            Set\Sequence::of(Set\Type::any()),
-            Set\Sequence::of(Set\Type::any()),
+            Set::sequence(Set::type()),
+            Set::sequence(Set::type()),
         ),
         static function($assert, $prefix, $suffix) {
             $stop = new stdClass;
@@ -337,8 +338,8 @@ return static function() {
     yield proof(
         'Sequence::sink()->maybe()',
         given(
-            Set\Sequence::of(Set\Type::any()),
-            Set\Sequence::of(Set\Type::any()),
+            Set::sequence(Set::type()),
+            Set::sequence(Set::type()),
         ),
         static function($assert, $prefix, $suffix) {
             $all = Sequence::of(...$prefix, ...$suffix)
@@ -377,8 +378,8 @@ return static function() {
     yield proof(
         'Sequence::sink()->either()',
         given(
-            Set\Sequence::of(Set\Type::any()),
-            Set\Sequence::of(Set\Type::any()),
+            Set::sequence(Set::type()),
+            Set::sequence(Set::type()),
         ),
         static function($assert, $prefix, $suffix) {
             $all = Sequence::of(...$prefix, ...$suffix)
@@ -418,8 +419,8 @@ return static function() {
     yield proof(
         'Sequence::sink()->attempt()',
         given(
-            Set\Sequence::of(Set\Type::any()),
-            Set\Sequence::of(Set\Type::any()),
+            Set::sequence(Set::type()),
+            Set::sequence(Set::type()),
         ),
         static function($assert, $prefix, $suffix) {
             $all = Sequence::of(...$prefix, ...$suffix)
@@ -459,7 +460,7 @@ return static function() {
     yield proof(
         'Sequence::lazy()->take() should not load an extra element',
         given(
-            Set\Sequence::of(Set\Type::any()),
+            Set::sequence(Set::type()),
         ),
         static function($assert, $values) {
             $sequence = Sequence::lazy(static function() use ($values) {
@@ -480,7 +481,7 @@ return static function() {
     yield proof(
         'Sequence::defer()->take() should not load an extra element',
         given(
-            Set\Sequence::of(Set\Type::any()),
+            Set::sequence(Set::type()),
         ),
         static function($assert, $values) {
             $sequence = Sequence::defer((static function() use ($values) {
@@ -645,7 +646,7 @@ return static function() {
 
     yield proof(
         'Sequence::aggregate() should not alter the initial Sequence by default',
-        given(Set\Sequence::of(Set\type::any())),
+        given(Set::sequence(Set::type())),
         static function($assert, $values) {
             $inMemory = Sequence::of(...$values);
 
@@ -683,9 +684,9 @@ return static function() {
     yield proof(
         'Sequence::snap() loads a lazy sequence only once',
         given(
-            Set\Type::any(),
-            Set\Sequence::of(Set\Type::any()),
-            Set\Type::any(),
+            Set::type(),
+            Set::sequence(Set::type()),
+            Set::type(),
         ),
         static function($assert, $value, $rest, $last) {
             $loaded = 0;
@@ -722,9 +723,9 @@ return static function() {
     yield proof(
         'Sequence::snap() keeps in memory intermediary steps',
         given(
-            Set\Type::any(),
-            Set\Sequence::of(Set\Type::any()),
-            Set\Type::any(),
+            Set::type(),
+            Set::sequence(Set::type()),
+            Set::type(),
         ),
         static function($assert, $value, $rest, $last) {
             $loaded = 0;
@@ -769,9 +770,9 @@ return static function() {
     yield proof(
         'Sequence::snap() loads a deferred sequence at once',
         given(
-            Set\Type::any(),
-            Set\Sequence::of(Set\Type::any()),
-            Set\Type::any(),
+            Set::type(),
+            Set::sequence(Set::type()),
+            Set::type(),
         ),
         static function($assert, $value, $rest, $last) {
             $loaded = 0;
@@ -808,8 +809,8 @@ return static function() {
     yield proof(
         'Sequence::via()',
         given(
-            Set\Sequence::of(Set\Type::any()),
-            Set\Elements::of(
+            Set::sequence(Set::type()),
+            Set::of(
                 static fn(array $values) => Sequence::of(...$values),
                 static fn(array $values) => Sequence::defer(
                     (static fn() => yield from $values)(),
@@ -818,7 +819,7 @@ return static function() {
                     static fn() => yield from $values,
                 ),
             ),
-            Set\Sequence::of(Set\Type::any()),
+            Set::sequence(Set::type()),
         ),
         static function($assert, $initial, $build, $new) {
             $sequence = $build($initial);
@@ -835,8 +836,8 @@ return static function() {
     yield proof(
         "Sequence::via() doesn't load underlying generators",
         given(
-            Set\Sequence::of(Set\Type::any()),
-            Set\Elements::of(
+            Set::sequence(Set::type()),
+            Set::of(
                 static fn(bool &$loaded, array $values) => Sequence::defer(
                     (static function() use (&$loaded, $values) {
                         yield from $values;
@@ -864,7 +865,7 @@ return static function() {
     yield proof(
         'Sequence::via() on a lazy sequence calls the function everytime the sequence is unwrapped',
         given(
-            Set\Sequence::of(Set\Type::any()),
+            Set::sequence(Set::type()),
         ),
         static function($assert, $values) {
             $loaded = 0;
@@ -888,7 +889,7 @@ return static function() {
     yield proof(
         'Sequence::lazy()->snap()->via() loads the generator once',
         given(
-            Set\Sequence::of(Set\Type::any()),
+            Set::sequence(Set::type()),
         ),
         static function($assert, $values) {
             $loaded = 0;
@@ -914,7 +915,7 @@ return static function() {
     yield proof(
         'Sequence::lazy()->snap()->via() loads the initial snapped sequence only once',
         given(
-            Set\Sequence::of(Set\Type::any()),
+            Set::sequence(Set::type()),
         ),
         static function($assert, $values) {
             $loaded = 0;
@@ -939,8 +940,8 @@ return static function() {
     yield proof(
         'Sequence->snap()->toSet()',
         given(
-            Set\Sequence::of(Set\Integers::any()),
-            Set\Elements::of(
+            Set::sequence(Set\Integers::any()),
+            Set::of(
                 static fn(array $values) => Sequence::of(...$values),
                 static fn(array $values) => Sequence::defer(
                     (static fn() => yield from $values)(),
@@ -964,7 +965,7 @@ return static function() {
     yield proof(
         'Sequence::lazy()->snap()->toSet() only load the generator once',
         given(
-            Set\Sequence::of(Set\Integers::any()),
+            Set::sequence(Set::integers()),
         ),
         static function($assert, $values) {
             $loaded = 0;
@@ -987,7 +988,7 @@ return static function() {
     yield proof(
         'Sequence::lazy()->snap() should not keep the original sequence when no longer used',
         given(
-            Set\Sequence::of(Set\Integers::any()),
+            Set::sequence(Set::integers()),
         ),
         static function($assert, $values) {
             $beacon = new stdClass;
@@ -1006,7 +1007,7 @@ return static function() {
     yield proof(
         'Sequence::lazy()->snap()->toSet() should keep values in memory',
         given(
-            Set\Sequence::of(Set\Integers::any()),
+            Set::sequence(Set::integers()),
         ),
         static function($assert, $values) {
             $set = Sequence::lazy(static fn() => yield from $values)
@@ -1023,7 +1024,7 @@ return static function() {
 
     yield proof(
         'Sequence::equals() should not load its data when compared to itself',
-        given(Set\Sequence::of(Set\Type::any())),
+        given(Set::sequence(Set::type())),
         static function($assert, $values) {
             $loaded = false;
             $sequence = Sequence::lazy(static function() use (&$loaded, $values) {
@@ -1036,4 +1037,32 @@ return static function() {
             $assert->false($loaded);
         },
     );
+
+    $values = Set::sequence(Set::type());
+    $sequences = Set::either(
+        $values->map(static fn($values) => Sequence::of(...$values)),
+        $values->map(
+            static fn($values) => Sequence::lazy(
+                static fn() => yield from $values,
+            ),
+        ),
+        $values->map(
+            static fn($values) => Sequence::defer(
+                (static fn() => yield from $values)(),
+            ),
+        ),
+    );
+
+    yield properties(
+        'Sequence',
+        Properties::properties(),
+        $sequences,
+    );
+
+    foreach (Properties::list() as $property) {
+        yield property(
+            $property,
+            $sequences,
+        );
+    }
 };

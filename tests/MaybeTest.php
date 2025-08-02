@@ -27,14 +27,14 @@ class MaybeTest extends TestCase
         }));
     }
 
-    public function testMaybeNothingMatch()
+    public function testMaybeNothingMatch(): BlackBox\Proof
     {
-        $this
+        return $this
             ->forAll(
                 $this->value(),
                 $this->value(),
             )
-            ->then(function($unwanted, $nothing) {
+            ->prove(function($unwanted, $nothing) {
                 $this->assertSame(
                     $nothing,
                     Maybe::nothing()->match(
@@ -45,14 +45,14 @@ class MaybeTest extends TestCase
             });
     }
 
-    public function testMaybeOfNullReturnsANothingImplementation()
+    public function testMaybeOfNullReturnsANothingImplementation(): BlackBox\Proof
     {
-        $this
+        return $this
             ->forAll(
                 $this->value(),
                 $this->value(),
             )
-            ->then(function($unwanted, $nothing) {
+            ->prove(function($unwanted, $nothing) {
                 $this->assertSame(
                     $nothing,
                     Maybe::of(null)->match(
@@ -63,15 +63,15 @@ class MaybeTest extends TestCase
             });
     }
 
-    public function testMaybeJustMatch()
+    public function testMaybeJustMatch(): BlackBox\Proof
     {
-        $this
+        return $this
             ->forAll(
                 $this->value(),
                 $this->value(),
                 $this->value(),
             )
-            ->then(function($initial, $just, $nothing) {
+            ->prove(function($initial, $just, $nothing) {
                 $this->assertSame(
                     $just,
                     Maybe::just($initial)->match(
@@ -86,15 +86,15 @@ class MaybeTest extends TestCase
             });
     }
 
-    public function testMaybeOfValueReturnsAJustImplementation()
+    public function testMaybeOfValueReturnsAJustImplementation(): BlackBox\Proof
     {
-        $this
+        return $this
             ->forAll(
                 $this->value(),
                 $this->value(),
                 $this->value(),
             )
-            ->then(function($initial, $just, $nothing) {
+            ->prove(function($initial, $just, $nothing) {
                 $this->assertSame(
                     $just,
                     Maybe::of($initial)->match(
@@ -105,15 +105,15 @@ class MaybeTest extends TestCase
             });
     }
 
-    public function testMapIsCalledWhenThereIsAValue()
+    public function testMapIsCalledWhenThereIsAValue(): BlackBox\Proof
     {
-        $this
+        return $this
             ->forAll(
                 $this->value(),
                 $this->value(),
                 $this->value(),
             )
-            ->then(function($initial, $mapped, $unwanted) {
+            ->prove(function($initial, $mapped, $unwanted) {
                 $maybe = Maybe::just($initial);
                 $maybe2 = $maybe->map(function($value) use ($initial, $mapped) {
                     $this->assertSame($initial, $value);
@@ -140,15 +140,15 @@ class MaybeTest extends TestCase
         }));
     }
 
-    public function testFlatMapIsCalledWhenThereIsAValue()
+    public function testFlatMapIsCalledWhenThereIsAValue(): BlackBox\Proof
     {
-        $this
+        return $this
             ->forAll(
                 $this->value(),
                 $this->value(),
                 $this->value(),
             )
-            ->then(function($initial, $mapped, $nothing) {
+            ->prove(function($initial, $mapped, $nothing) {
                 $expected = Maybe::just($mapped);
                 $maybe = Maybe::just($initial)->flatMap(function($value) use ($initial, $expected) {
                     $this->assertSame($initial, $value);
@@ -167,11 +167,11 @@ class MaybeTest extends TestCase
             });
     }
 
-    public function testOtherwiseIsCalledWhenNoValue()
+    public function testOtherwiseIsCalledWhenNoValue(): BlackBox\Proof
     {
-        $this
-            ->forAll(Set\Type::any())
-            ->then(function($value) {
+        return $this
+            ->forAll(Set::type())
+            ->prove(function($value) {
                 $expected = Maybe::of($value);
 
                 $this->assertSame(
@@ -181,14 +181,14 @@ class MaybeTest extends TestCase
             });
     }
 
-    public function testOtherwiseIsNotCalledWhenThereIsAValue()
+    public function testOtherwiseIsNotCalledWhenThereIsAValue(): BlackBox\Proof
     {
-        $this
+        return $this
             ->forAll(
                 $this->value(),
                 $this->value(),
             )
-            ->then(function($initial, $nothing) {
+            ->prove(function($initial, $nothing) {
                 $maybe = Maybe::just($initial);
                 $maybe2 = $maybe->otherwise(static function() {
                     throw new \Exception;
@@ -220,14 +220,14 @@ class MaybeTest extends TestCase
         }));
     }
 
-    public function testReturnItselfWhenFilterPredicateReturnsTrue()
+    public function testReturnItselfWhenFilterPredicateReturnsTrue(): BlackBox\Proof
     {
-        $this
+        return $this
             ->forAll(
                 $this->value(),
                 $this->value(),
             )
-            ->then(function($initial, $nothing) {
+            ->prove(function($initial, $nothing) {
                 $maybe = Maybe::just($initial)->filter(function($value) use ($initial) {
                     $this->assertSame($initial, $value);
 
@@ -245,14 +245,14 @@ class MaybeTest extends TestCase
             });
     }
 
-    public function testReturnItselfWhenExcludePredicateReturnsFalse()
+    public function testReturnItselfWhenExcludePredicateReturnsFalse(): BlackBox\Proof
     {
-        $this
+        return $this
             ->forAll(
                 $this->value(),
                 $this->value(),
             )
-            ->then(function($initial, $nothing) {
+            ->prove(function($initial, $nothing) {
                 $maybe = Maybe::just($initial)->exclude(function($value) use ($initial) {
                     $this->assertSame($initial, $value);
 
@@ -270,14 +270,14 @@ class MaybeTest extends TestCase
             });
     }
 
-    public function testReturnsANothingWhenFilterPredicateReturnsFalse()
+    public function testReturnsANothingWhenFilterPredicateReturnsFalse(): BlackBox\Proof
     {
-        $this
+        return $this
             ->forAll(
                 $this->value(),
                 $this->value(),
             )
-            ->then(function($initial, $nothing) {
+            ->prove(function($initial, $nothing) {
                 $maybe = Maybe::just($initial)->filter(function($value) use ($initial) {
                     $this->assertSame($initial, $value);
 
@@ -295,14 +295,14 @@ class MaybeTest extends TestCase
             });
     }
 
-    public function testReturnsANothingWhenExcludePredicateReturnsTrue()
+    public function testReturnsANothingWhenExcludePredicateReturnsTrue(): BlackBox\Proof
     {
-        $this
+        return $this
             ->forAll(
                 $this->value(),
                 $this->value(),
             )
-            ->then(function($initial, $nothing) {
+            ->prove(function($initial, $nothing) {
                 $maybe = Maybe::just($initial)->exclude(function($value) use ($initial) {
                     $this->assertSame($initial, $value);
 
@@ -320,13 +320,13 @@ class MaybeTest extends TestCase
             });
     }
 
-    public function testAllMapKeepValuesOrder()
+    public function testAllMapKeepValuesOrder(): BlackBox\Proof
     {
-        $this
+        return $this
             ->forAll(
-                Set\Sequence::of($this->value())->between(1, 5),
+                Set::sequence($this->value())->between(1, 5),
             )
-            ->then(function($expected) {
+            ->prove(function($expected) {
                 $maybes = \array_map(
                     static fn($value) => Maybe::just($value),
                     $expected,
@@ -344,13 +344,13 @@ class MaybeTest extends TestCase
             });
     }
 
-    public function testAllFlatMapKeepValuesOrder()
+    public function testAllFlatMapKeepValuesOrder(): BlackBox\Proof
     {
-        $this
+        return $this
             ->forAll(
-                Set\Sequence::of($this->value())->between(1, 5),
+                Set::sequence($this->value())->between(1, 5),
             )
-            ->then(function($expected) {
+            ->prove(function($expected) {
                 $maybes = \array_map(
                     static fn($value) => Maybe::just($value),
                     $expected,
@@ -368,19 +368,18 @@ class MaybeTest extends TestCase
             });
     }
 
-    public function testAllMapResult()
+    public function testAllMapResult(): BlackBox\Proof
     {
-        $this
+        return $this
             ->forAll(
-                Set\Sequence::of(
-                    Set\Decorate::immutable(
+                Set::sequence(
+                    $this->value()->map(
                         static fn($value) => Maybe::just($value),
-                        $this->value(),
                     ),
                 )->between(1, 5),
                 $this->value(),
             )
-            ->then(function($maybes, $expected) {
+            ->prove(function($maybes, $expected) {
                 $comprehension = Maybe::all(...$maybes);
 
                 $this->assertInstanceOf(Maybe\Comprehension::class, $comprehension);
@@ -392,25 +391,23 @@ class MaybeTest extends TestCase
             });
     }
 
-    public function testAllFlatMapResult()
+    public function testAllFlatMapResult(): BlackBox\Proof
     {
-        $this
+        return $this
             ->forAll(
-                Set\Sequence::of(
-                    Set\Decorate::immutable(
+                Set::sequence(
+                    $this->value()->map(
                         static fn($value) => Maybe::just($value),
-                        $this->value(),
                     ),
                 )->between(1, 5),
-                Set\Either::any(
-                    Set\Elements::of(Maybe::nothing()),
-                    Set\Decorate::immutable(
+                Set::either(
+                    Set::of(Maybe::nothing()),
+                    $this->value()->map(
                         static fn($value) => Maybe::just($value),
-                        $this->value(),
                     ),
                 ),
             )
-            ->then(function($maybes, $expected) {
+            ->prove(function($maybes, $expected) {
                 $comprehension = Maybe::all(...$maybes);
 
                 $this->assertInstanceOf(Maybe\Comprehension::class, $comprehension);
@@ -419,16 +416,15 @@ class MaybeTest extends TestCase
             });
     }
 
-    public function testAllMapNotCalledWhenOneNothingIsPresent()
+    public function testAllMapNotCalledWhenOneNothingIsPresent(): BlackBox\Proof
     {
-        $this
-            ->forAll(Set\Sequence::of(
-                Set\Decorate::immutable(
+        return $this
+            ->forAll(Set::sequence(
+                $this->value()->map(
                     static fn($value) => Maybe::just($value),
-                    $this->value(),
                 ),
             )->between(1, 5))
-            ->then(function($maybes) {
+            ->prove(function($maybes) {
                 $maybes[] = Maybe::nothing();
                 $comprehension = Maybe::all(...$maybes);
 
@@ -443,16 +439,15 @@ class MaybeTest extends TestCase
             });
     }
 
-    public function testAllFlatMapNotCalledWhenOneNothingIsPresent()
+    public function testAllFlatMapNotCalledWhenOneNothingIsPresent(): BlackBox\Proof
     {
-        $this
-            ->forAll(Set\Sequence::of(
-                Set\Decorate::immutable(
+        return $this
+            ->forAll(Set::sequence(
+                $this->value()->map(
                     static fn($value) => Maybe::just($value),
-                    $this->value(),
                 ),
             )->between(1, 5))
-            ->then(function($maybes) {
+            ->prove(function($maybes) {
                 $maybes[] = Maybe::nothing();
                 $comprehension = Maybe::all(...$maybes);
 
@@ -467,11 +462,11 @@ class MaybeTest extends TestCase
             });
     }
 
-    public function testEither()
+    public function testEither(): BlackBox\Proof
     {
-        $this
-            ->forAll(Set\Type::any())
-            ->then(function($value) {
+        return $this
+            ->forAll(Set::type())
+            ->prove(function($value) {
                 $this->assertInstanceOf(Either::class, Maybe::just($value)->either());
                 $this->assertInstanceOf(Either::class, Maybe::nothing()->either());
                 $this->assertSame(
@@ -488,11 +483,11 @@ class MaybeTest extends TestCase
             });
     }
 
-    public function testKeep()
+    public function testKeep(): BlackBox\Proof
     {
-        $this
-            ->forAll(Set\Type::any())
-            ->then(function($value) {
+        return $this
+            ->forAll(Set::type())
+            ->prove(function($value) {
                 $this->assertNull(
                     Maybe::just($value)
                         ->keep(Predicate\Instance::of(self::class))
@@ -502,6 +497,10 @@ class MaybeTest extends TestCase
                         ),
                 );
             });
+    }
+
+    public function testKeepAbsolutes()
+    {
         $this->assertSame(
             $this,
             Maybe::just($this)
@@ -557,7 +556,7 @@ class MaybeTest extends TestCase
     public function testMemoize()
     {
         $this
-            ->forAll(Set\Type::any())
+            ->forAll(Set::type())
             ->then(function($value) {
                 $this->assertEquals(
                     Maybe::just($value),
@@ -582,9 +581,9 @@ class MaybeTest extends TestCase
         );
 
         $this
-            ->forAll(Set\Either::any(
-                Set\Type::any(),
-                Set\Elements::of(null),
+            ->forAll(Set::either(
+                Set::type(),
+                Set::of(null),
             ))
             ->then(function($value) {
                 $maybe = Maybe::defer(static function() use ($value) {
@@ -690,6 +689,6 @@ class MaybeTest extends TestCase
 
     private function value(): Set
     {
-        return Set\Type::any()->filter(static fn($value) => $value !== null);
+        return Set::type()->filter(static fn($value) => $value !== null);
     }
 }

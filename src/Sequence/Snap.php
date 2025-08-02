@@ -67,7 +67,7 @@ final class Snap implements Implementation
     }
 
     /**
-     * @param 0|positive-int $index
+     * @param int<0, max> $index
      *
      * @return Maybe<T>
      */
@@ -98,7 +98,7 @@ final class Snap implements Implementation
     }
 
     /**
-     * @param 0|positive-int $size
+     * @param int<0, max> $size
      *
      * @return Implementation<T>
      */
@@ -109,7 +109,7 @@ final class Snap implements Implementation
     }
 
     /**
-     * @param 0|positive-int $size
+     * @param int<0, max> $size
      *
      * @return Implementation<T>
      */
@@ -191,7 +191,7 @@ final class Snap implements Implementation
     /**
      * @param T $element
      *
-     * @return Maybe<0|positive-int>
+     * @return Maybe<int<0, max>>
      */
     #[\Override]
     public function indexOf($element): Maybe
@@ -202,7 +202,7 @@ final class Snap implements Implementation
     /**
      * Return the list of indices
      *
-     * @return Implementation<0|positive-int>
+     * @return Implementation<int<0, max>>
      */
     #[\Override]
     public function indices(): Implementation
@@ -271,7 +271,7 @@ final class Snap implements Implementation
     }
 
     /**
-     * @param 0|positive-int $size
+     * @param int<0, max> $size
      * @param T $element
      *
      * @return Implementation<T>
@@ -295,8 +295,8 @@ final class Snap implements Implementation
     }
 
     /**
-     * @param 0|positive-int $from
-     * @param 0|positive-int $until
+     * @param int<0, max> $from
+     * @param int<0, max> $until
      *
      * @return Implementation<T>
      */
@@ -307,7 +307,7 @@ final class Snap implements Implementation
     }
 
     /**
-     * @param 0|positive-int $size
+     * @param int<0, max> $size
      *
      * @return Implementation<T>
      */
@@ -318,7 +318,7 @@ final class Snap implements Implementation
     }
 
     /**
-     * @param 0|positive-int $size
+     * @param int<0, max> $size
      *
      * @return Implementation<T>
      */

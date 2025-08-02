@@ -16,6 +16,7 @@ enum Encoding
     /**
      * @return non-empty-string
      */
+    #[\NoDiscard]
     public function toString(): string
     {
         return match ($this) {

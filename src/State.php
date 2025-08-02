@@ -34,6 +34,7 @@ final class State
      *
      * @return self<A, B>
      */
+    #[\NoDiscard]
     public static function of(callable $run): self
     {
         return new self($run);
@@ -46,6 +47,7 @@ final class State
      *
      * @return self<S, U>
      */
+    #[\NoDiscard]
     public function map(callable $map): self
     {
         $run = $this->run;
@@ -65,6 +67,7 @@ final class State
      *
      * @return self<S, A>
      */
+    #[\NoDiscard]
     public function flatMap(callable $map): self
     {
         $run = $this->run;
@@ -82,6 +85,7 @@ final class State
      *
      * @return Result<S, T>
      */
+    #[\NoDiscard]
     public function run($state): Result
     {
         /** @psalm-suppress ImpureFunctionCall */

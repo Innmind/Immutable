@@ -23,6 +23,7 @@ final class SideEffect
     /**
      * @psalm-pure
      */
+    #[\NoDiscard]
     public static function identity(): self
     {
         /** @psalm-suppress ImpureStaticProperty This will become an enum in the future */
