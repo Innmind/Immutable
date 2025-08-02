@@ -465,6 +465,27 @@ final class Sequence implements \Countable
     }
 
     /**
+     * A window of size S is all the S elements bundled together as a new Sequence.
+     *
+     * Each window overlaps with the previous one. When the source Sequence
+     * contains less elements than the specified size then the window is shorter
+     * than the specified size.
+     *
+     * @param int<1, max> $size
+     *
+     * @return self<self<T>>
+     */
+    public function windows(int $size): self
+    {
+        return $this
+            ->map(static fn($value) => self::of($value))
+            ->aggregate(static fn(self $a, $b) => match ($a->size()) {
+                $size => self::of($a, $a->drop(1)->append($b)),
+                default => self::of($a->append($b)),
+            });
+    }
+
+    /**
      * Pad the sequence to a defined size with the given element
      *
      * @param int<0, max> $size

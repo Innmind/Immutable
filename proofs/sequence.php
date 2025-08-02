@@ -9,6 +9,7 @@ use Innmind\Immutable\{
     Str,
     Monoid\Concat,
 };
+use Properties\Innmind\Immutable\Sequence as Properties;
 use Innmind\BlackBox\Set;
 
 return static function() {
@@ -1036,4 +1037,37 @@ return static function() {
             $assert->false($loaded);
         },
     );
+
+    $values = Set\Sequence::of(Set\Type::any());
+    $sequences = Set\Either::any(
+        Set\Decorate::immutable(
+            static fn($values) => Sequence::of(...$values),
+            $values,
+        ),
+        Set\Decorate::immutable(
+            static fn($values) => Sequence::lazy(
+                static fn() => yield from $values,
+            ),
+            $values,
+        ),
+        Set\Decorate::immutable(
+            static fn($values) => Sequence::defer(
+                (static fn() => yield from $values)(),
+            ),
+            $values,
+        ),
+    );
+
+    yield properties(
+        'Sequence',
+        Properties::properties(),
+        $sequences,
+    );
+
+    foreach (Properties::list() as $property) {
+        yield property(
+            $property,
+            $sequences,
+        );
+    }
 };
