@@ -17,15 +17,15 @@ class StateTest extends TestCase
 {
     use BlackBox;
 
-    public function testMapDoesntChangeState()
+    public function testMapDoesntChangeState(): BlackBox\Proof
     {
-        $this
+        return $this
             ->forAll(
-                Set\Type::any(),
-                Set\Type::any(),
-                Set\Type::any(),
+                Set::type(),
+                Set::type(),
+                Set::type(),
             )
-            ->then(function($state, $initialValue, $newValue) {
+            ->prove(function($state, $initialValue, $newValue) {
                 $monad = State::of(static fn($state) => Result::of($state, $initialValue));
                 $monad2 = $monad->map(function($value) use ($initialValue, $newValue) {
                     $this->assertSame($initialValue, $value);
@@ -42,16 +42,16 @@ class StateTest extends TestCase
             });
     }
 
-    public function testFlatMap()
+    public function testFlatMap(): BlackBox\Proof
     {
-        $this
+        return $this
             ->forAll(
-                Set\Type::any(),
-                Set\Type::any(),
-                Set\Type::any(),
-                Set\Type::any(),
+                Set::type(),
+                Set::type(),
+                Set::type(),
+                Set::type(),
             )
-            ->then(function($initialState, $newState, $initialValue, $newValue) {
+            ->prove(function($initialState, $newState, $initialValue, $newValue) {
                 $monad = State::of(static fn($state) => Result::of($state, $initialValue));
                 $monad2 = $monad->flatMap(function($value) use ($initialValue, $initialState, $newState, $newValue) {
                     $this->assertSame($initialValue, $value);

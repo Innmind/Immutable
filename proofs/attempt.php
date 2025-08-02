@@ -5,7 +5,7 @@ use Innmind\Immutable\Attempt;
 use Innmind\BlackBox\Set;
 
 return static function() {
-    $exceptions = Set\Elements::of(
+    $exceptions = Set::of(
         new RuntimeException,
         new LogicException,
         new Exception,
@@ -32,8 +32,8 @@ return static function() {
     yield proof(
         'Attempt::map()',
         given(
-            Set\Type::any(),
-            Set\Type::any(),
+            Set::type(),
+            Set::type(),
             $exceptions,
         ),
         static function($assert, $start, $end, $e) {
@@ -68,8 +68,8 @@ return static function() {
     yield proof(
         'Attempt::flatMap()',
         given(
-            Set\Type::any(),
-            Set\Type::any(),
+            Set::type(),
+            Set::type(),
             $exceptions,
         ),
         static function($assert, $start, $end, $e) {
@@ -121,7 +121,7 @@ return static function() {
         given(
             $exceptions,
             $exceptions,
-            Set\Type::any(),
+            Set::type(),
         ),
         static function($assert, $start, $end, $value) {
             $attempt = Attempt::error($start)
@@ -170,7 +170,7 @@ return static function() {
     yield proof(
         'Attempt::maybe()',
         given(
-            Set\Type::any(),
+            Set::type(),
             $exceptions,
         ),
         static function($assert, $result, $e) {
@@ -197,7 +197,7 @@ return static function() {
     yield proof(
         'Attempt::either()',
         given(
-            Set\Type::any(),
+            Set::type(),
             $exceptions,
         ),
         static function($assert, $result, $e) {
@@ -225,7 +225,7 @@ return static function() {
     yield proof(
         'Attempt::memoize()',
         given(
-            Set\Type::any(),
+            Set::type(),
             $exceptions,
         ),
         static function($assert, $result, $e) {
@@ -293,8 +293,8 @@ return static function() {
     yield proof(
         'Attempt::defer()',
         given(
-            Set\Type::any(),
-            Set\Type::any(),
+            Set::type(),
+            Set::type(),
             $exceptions,
             $exceptions,
         ),
@@ -344,7 +344,7 @@ return static function() {
     yield proof(
         'Attempt::unwrap()',
         given(
-            Set\Type::any(),
+            Set::type(),
             $exceptions,
         ),
         static function($assert, $result, $e) {
@@ -363,8 +363,8 @@ return static function() {
     yield proof(
         'Attempt::eitherWay()',
         given(
-            Set\Type::any(),
-            Set\Type::any(),
+            Set::type(),
+            Set::type(),
             $exceptions,
             $exceptions,
         ),
@@ -435,8 +435,8 @@ return static function() {
     yield proof(
         'Attempt::defer()->eitherWay()',
         given(
-            Set\Type::any(),
-            Set\Type::any(),
+            Set::type(),
+            Set::type(),
             $exceptions,
             $exceptions,
         ),

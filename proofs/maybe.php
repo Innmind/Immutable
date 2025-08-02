@@ -8,8 +8,8 @@ return static function() {
     yield proof(
         'Maybe::defer() holds intermediary values',
         given(
-            Set\Type::any(),
-            Set\Type::any(),
+            Set::type(),
+            Set::type(),
         ),
         static function($assert, $value1, $value2) {
             $m1 = Maybe::defer(static function() use ($value1) {
@@ -46,7 +46,7 @@ return static function() {
 
     yield proof(
         'Maybe::memoize() any composition',
-        given(Set\Type::any()->filter(static fn($value) => !\is_null($value))),
+        given(Set::type()->filter(static fn($value) => !\is_null($value))),
         static function($assert, $value) {
             $loaded = false;
             $maybe = Maybe::defer(static fn() => Maybe::just($value))
@@ -66,7 +66,7 @@ return static function() {
 
     yield proof(
         'Maybe->attempt()',
-        given(Set\Type::any()),
+        given(Set::type()),
         static function($assert, $value) {
             $assert->same(
                 $value,
@@ -90,7 +90,7 @@ return static function() {
 
     yield proof(
         'Maybe::defer()->attempt()',
-        given(Set\Type::any()),
+        given(Set::type()),
         static function($assert, $value) {
             $loaded = false;
             $attempt = Maybe::defer(static function() use (&$loaded, $value) {

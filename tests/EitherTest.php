@@ -14,14 +14,14 @@ class EitherTest extends TestCase
 {
     use BlackBox;
 
-    public function testMatchLeft()
+    public function testMatchLeft(): BlackBox\Proof
     {
-        $this
+        return $this
             ->forAll(
-                Set\Type::any(),
-                Set\Type::any(),
+                Set::type(),
+                Set::type(),
             )
-            ->then(function($left, $right) {
+            ->prove(function($left, $right) {
                 $either = Either::left($left);
 
                 $this->assertSame(
@@ -38,14 +38,14 @@ class EitherTest extends TestCase
             });
     }
 
-    public function testMatchRight()
+    public function testMatchRight(): BlackBox\Proof
     {
-        $this
+        return $this
             ->forAll(
-                Set\Type::any(),
-                Set\Type::any(),
+                Set::type(),
+                Set::type(),
             )
-            ->then(function($left, $right) {
+            ->prove(function($left, $right) {
                 $either = Either::right($right);
 
                 $this->assertSame(
@@ -62,11 +62,11 @@ class EitherTest extends TestCase
             });
     }
 
-    public function testLeftValueIsNotMapped()
+    public function testLeftValueIsNotMapped(): BlackBox\Proof
     {
-        $this
-            ->forAll(Set\Type::any())
-            ->then(function($initial) {
+        return $this
+            ->forAll(Set::type())
+            ->prove(function($initial) {
                 $either = Either::left($initial)->map(static function() {
                     throw new \Exception;
                 });
@@ -82,14 +82,14 @@ class EitherTest extends TestCase
             });
     }
 
-    public function testRightValueIsMapped()
+    public function testRightValueIsMapped(): BlackBox\Proof
     {
-        $this
+        return $this
             ->forAll(
-                Set\Type::any(),
-                Set\Type::any(),
+                Set::type(),
+                Set::type(),
             )
-            ->then(function($initial, $mapped) {
+            ->prove(function($initial, $mapped) {
                 $either = Either::right($initial)->map(function($value) use ($initial, $mapped) {
                     $this->assertSame($initial, $value);
 
@@ -107,11 +107,11 @@ class EitherTest extends TestCase
             });
     }
 
-    public function testLeftValueIsNotFlatMapped()
+    public function testLeftValueIsNotFlatMapped(): BlackBox\Proof
     {
-        $this
-            ->forAll(Set\Type::any())
-            ->then(function($left) {
+        return $this
+            ->forAll(Set::type())
+            ->prove(function($left) {
                 $either = Either::left($left)->flatMap(static function() {
                     throw new \Exception;
                 });
@@ -127,23 +127,21 @@ class EitherTest extends TestCase
             });
     }
 
-    public function testRightValueIsFlatMapped()
+    public function testRightValueIsFlatMapped(): BlackBox\Proof
     {
-        $this
+        return $this
             ->forAll(
-                Set\Type::any(),
-                Set\Either::any(
-                    Set\Decorate::immutable(
+                Set::type(),
+                Set::either(
+                    Set::type()->map(
                         static fn($value) => Either::left($value),
-                        Set\Type::any(),
                     ),
-                    Set\Decorate::immutable(
+                    Set::type()->map(
                         static fn($value) => Either::right($value),
-                        Set\Type::any(),
                     ),
                 ),
             )
-            ->then(function($right, $expected) {
+            ->prove(function($right, $expected) {
                 $either = Either::right($right)->flatMap(function($value) use ($right, $expected) {
                     $this->assertSame($right, $value);
 
@@ -154,37 +152,35 @@ class EitherTest extends TestCase
             });
     }
 
-    public function testOtherwiseIsCalledWhenLeftValue()
+    public function testOtherwiseIsCalledWhenLeftValue(): BlackBox\Proof
     {
-        $this
+        return $this
             ->forAll(
-                Set\Type::any(),
-                Set\Either::any(
-                    Set\Decorate::immutable(
+                Set::type(),
+                Set::either(
+                    Set::type()->map(
                         static fn($value) => Either::left($value),
-                        Set\Type::any(),
                     ),
-                    Set\Decorate::immutable(
+                    Set::type()->map(
                         static fn($value) => Either::right($value),
-                        Set\Type::any(),
                     ),
                 ),
             )
-            ->then(function($left, $expected) {
+            ->prove(function($left, $expected) {
                 $either = Either::left($left)->otherwise(static fn() => $expected);
 
                 $this->assertSame($expected, $either);
             });
     }
 
-    public function testOtherwiseIsNotCalledWhenRightValue()
+    public function testOtherwiseIsNotCalledWhenRightValue(): BlackBox\Proof
     {
-        $this
+        return $this
             ->forAll(
-                Set\Type::any(),
-                Set\Type::any(),
+                Set::type(),
+                Set::type(),
             )
-            ->then(function($right, $left) {
+            ->prove(function($right, $left) {
                 $either = Either::right($right)->otherwise(static function() {
                     throw new \Exception;
                 });
@@ -200,16 +196,16 @@ class EitherTest extends TestCase
             });
     }
 
-    public function testKeepSameValueWhenFilteringLeftValue()
+    public function testKeepSameValueWhenFilteringLeftValue(): BlackBox\Proof
     {
-        $this
+        return $this
             ->forAll(
-                Set\Type::any(),
-                Set\Type::any(),
-                Set\Elements::of(true, false),
-                Set\Type::any(),
+                Set::type(),
+                Set::type(),
+                Set::of(true, false),
+                Set::type(),
             )
-            ->then(function($left, $right, $predicate, $otherwise) {
+            ->prove(function($left, $right, $predicate, $otherwise) {
                 $either = Either::left($left)->filter(
                     static fn() => $predicate,
                     static fn() => $otherwise,
@@ -226,15 +222,15 @@ class EitherTest extends TestCase
             });
     }
 
-    public function testKeepSameValueWhenRightValueMatchPredicate()
+    public function testKeepSameValueWhenRightValueMatchPredicate(): BlackBox\Proof
     {
-        $this
+        return $this
             ->forAll(
-                Set\Type::any(),
-                Set\Type::any(),
-                Set\Type::any(),
+                Set::type(),
+                Set::type(),
+                Set::type(),
             )
-            ->then(function($right, $left, $otherwise) {
+            ->prove(function($right, $left, $otherwise) {
                 $either = Either::right($right)->filter(
                     function($value) use ($right) {
                         $this->assertSame($right, $value);
@@ -255,15 +251,15 @@ class EitherTest extends TestCase
             });
     }
 
-    public function testUseOtherValueWhenRightValueDoesntMatchPredicate()
+    public function testUseOtherValueWhenRightValueDoesntMatchPredicate(): BlackBox\Proof
     {
-        $this
+        return $this
             ->forAll(
-                Set\Type::any(),
-                Set\Type::any(),
-                Set\Type::any(),
+                Set::type(),
+                Set::type(),
+                Set::type(),
             )
-            ->then(function($right, $unwanted, $otherwise) {
+            ->prove(function($right, $unwanted, $otherwise) {
                 $either = Either::right($right)->filter(
                     function($value) use ($right) {
                         $this->assertSame($right, $value);
@@ -284,11 +280,11 @@ class EitherTest extends TestCase
             });
     }
 
-    public function testRightValueIsNotLeftMapped()
+    public function testRightValueIsNotLeftMapped(): BlackBox\Proof
     {
-        $this
-            ->forAll(Set\Type::any())
-            ->then(function($initial) {
+        return $this
+            ->forAll(Set::type())
+            ->prove(function($initial) {
                 $either = Either::right($initial)->leftMap(static function() {
                     throw new \Exception;
                 });
@@ -304,14 +300,14 @@ class EitherTest extends TestCase
             });
     }
 
-    public function testLeftValueIsLeftMapped()
+    public function testLeftValueIsLeftMapped(): BlackBox\Proof
     {
-        $this
+        return $this
             ->forAll(
-                Set\Type::any(),
-                Set\Type::any(),
+                Set::type(),
+                Set::type(),
             )
-            ->then(function($initial, $mapped) {
+            ->prove(function($initial, $mapped) {
                 $either = Either::left($initial)->leftMap(function($value) use ($initial, $mapped) {
                     $this->assertSame($initial, $value);
 
@@ -329,14 +325,14 @@ class EitherTest extends TestCase
             });
     }
 
-    public function testMaybe()
+    public function testMaybe(): BlackBox\Proof
     {
-        $this
+        return $this
             ->forAll(
-                Set\Type::any(),
-                Set\Type::any(),
+                Set::type(),
+                Set::type(),
             )
-            ->then(function($left, $right) {
+            ->prove(function($left, $right) {
                 $this->assertSame(
                     $right,
                     Either::right($right)->maybe()->match(
@@ -390,11 +386,11 @@ class EitherTest extends TestCase
         $this->assertSame(1, $loaded);
     }
 
-    public function testMemoize()
+    public function testMemoize(): BlackBox\Proof
     {
-        $this
-            ->forAll(Set\Type::any())
-            ->then(function($value) {
+        return $this
+            ->forAll(Set::type())
+            ->prove(function($value) {
                 $this->assertEquals(
                     Either::right($value),
                     Either::right($value)->memoize(),
@@ -436,11 +432,11 @@ class EitherTest extends TestCase
             });
     }
 
-    public function testFlip()
+    public function testFlip(): BlackBox\Proof
     {
-        $this
-            ->forAll(Set\Type::any())
-            ->then(function($data) {
+        return $this
+            ->forAll(Set::type())
+            ->prove(function($data) {
                 $left = Either::left($data);
 
                 $this->assertSame(
@@ -491,14 +487,14 @@ class EitherTest extends TestCase
             });
     }
 
-    public function testEitherWay()
+    public function testEitherWay(): BlackBox\Proof
     {
-        $this
+        return $this
             ->forAll(
-                Set\Type::any(),
-                Set\Type::any(),
+                Set::type(),
+                Set::type(),
             )
-            ->then(function($initial, $new) {
+            ->prove(function($initial, $new) {
                 $this->assertSame(
                     $new,
                     Either::left($initial)

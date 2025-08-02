@@ -20,20 +20,24 @@ class SetTest extends TestCase
         $this->assertInstanceOf(
             DataSet::class,
             Set::of(
-                DataSet\Strings::madeOf(DataSet\Chars::any())->between(1, 2),
-                DataSet\Integers::between(0, 1),
+                DataSet::strings()
+                    ->madeOf(DataSet::strings()->chars())
+                    ->between(1, 2),
+                DataSet::integers()->between(0, 1),
             ),
         );
     }
 
-    public function testGenerate()
+    public function testGenerate(): BlackBox\Proof
     {
-        $this
+        return $this
             ->forAll(Set::of(
-                DataSet\Strings::madeOf(DataSet\Chars::any())->between(1, 2),
+                DataSet::strings()
+                    ->madeOf(DataSet::strings()->chars())
+                    ->between(1, 2),
                 DataSet\Integers::between(0, 5),
             ))
-            ->then(function($set) {
+            ->prove(function($set) {
                 $this->assertInstanceOf(Structure::class, $set);
                 $this->assertLessThanOrEqual(5, $set->size());
             });

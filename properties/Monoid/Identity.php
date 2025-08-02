@@ -46,9 +46,8 @@ final class Identity implements Property
      */
     public static function of(Set $values, callable $equals): Set
     {
-        return Set\Decorate::immutable(
+        return $values->map(
             static fn($value) => new self($value, $equals),
-            $values,
         );
     }
 

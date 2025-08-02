@@ -11,8 +11,8 @@ return static function() {
     yield proof(
         'Set::match()',
         given(
-            DataSet\Type::any(),
-            DataSet\Sequence::of(DataSet\Type::any())
+            DataSet::type(),
+            DataSet::sequence(DataSet::type())
                 ->map(static fn($values) => Sequence::of(...$values)->distinct()->toList()),
         )->filter(static fn($first, $rest) => !\in_array($first, $rest, true)),
         static function($assert, $first, $rest) {
@@ -38,7 +38,7 @@ return static function() {
     yield proof(
         'Set::unsorted()',
         given(
-            DataSet\Sequence::of(DataSet\Type::any()),
+            DataSet::sequence(DataSet::type()),
         ),
         static function($assert, $values) {
             $set = Set::of(...$values);
@@ -182,8 +182,8 @@ return static function() {
     yield proof(
         'Set::snap() loads a lazy set only once',
         given(
-            DataSet\Type::any(),
-            DataSet\Sequence::of(DataSet\Type::any()),
+            DataSet::type(),
+            DataSet::sequence(DataSet::type()),
         )->filter(static fn($value, $rest) => !\in_array($value, $rest, true)),
         static function($assert, $value, $rest) {
             $loaded = 0;
@@ -219,8 +219,8 @@ return static function() {
     yield proof(
         'Set::snap() loads a deferred set at once',
         given(
-            DataSet\Type::any(),
-            DataSet\Sequence::of(DataSet\Type::any()),
+            DataSet::type(),
+            DataSet::sequence(DataSet::type()),
         )->filter(static fn($value, $rest) => !\in_array($value, $rest, true)),
         static function($assert, $value, $rest) {
             $loaded = 0;
@@ -255,7 +255,7 @@ return static function() {
 
     yield proof(
         'Set::equals() should not load its data when compared to itself',
-        given(DataSet\Sequence::of(DataSet\Type::any())),
+        given(DataSet::sequence(DataSet::type())),
         static function($assert, $values) {
             $loaded = false;
             $set = Set::lazy(static function() use (&$loaded, $values) {

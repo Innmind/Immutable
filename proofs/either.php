@@ -7,7 +7,7 @@ use Innmind\BlackBox\Set;
 return static function() {
     yield proof(
         'Either::memoize() any composition',
-        given(Set\Type::any()->filter(static fn($value) => !\is_null($value))),
+        given(Set::type()->filter(static fn($value) => !\is_null($value))),
         static function($assert, $value) {
             $loaded = false;
             $either = Either::defer(static fn() => Either::right($value))
@@ -28,8 +28,8 @@ return static function() {
     yield proof(
         'Either->attempt()',
         given(
-            Set\Type::any(),
-            Set\Type::any(),
+            Set::type(),
+            Set::type(),
         ),
         static function($assert, $right, $left) {
             $assert->same(
@@ -59,8 +59,8 @@ return static function() {
     yield proof(
         'Either::defer()->attempt()',
         given(
-            Set\Type::any(),
-            Set\Type::any(),
+            Set::type(),
+            Set::type(),
         ),
         static function($assert, $right, $left) {
             $loaded = false;

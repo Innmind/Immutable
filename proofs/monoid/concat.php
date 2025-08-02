@@ -10,12 +10,12 @@ use Properties\Innmind\Immutable\Monoid;
 
 return static function() {
     $equals = static fn($a, $b) => $a->toString() === $b->toString();
-    $set = Set\Unicode::strings()->map(Str::of(...));
+    $set = Set::strings()->unicode()->map(Str::of(...));
 
     yield properties(
         'Concat properties',
         Monoid::properties($set, $equals),
-        Set\Elements::of(new Concat),
+        Set::of(new Concat),
     );
 
     foreach (Monoid::list($set, $equals) as $property) {

@@ -10,14 +10,14 @@ use Properties\Innmind\Immutable\Monoid;
 
 return static function() {
     $equals = static fn($a, $b) => $a->equals($b);
-    $set = Set\Sequence::of(Set\Type::any())->map(
+    $set = Set::sequence(Set::type())->map(
         static fn($values) => Sequence::of(...$values),
     );
 
     yield properties(
         'Append properties',
         Monoid::properties($set, $equals),
-        Set\Elements::of(Append::of()),
+        Set::of(Append::of()),
     );
 
     foreach (Monoid::list($set, $equals) as $property) {

@@ -6,6 +6,10 @@
 
 - `Innmind\Immutable\Sequence::windows()`
 
+### Removed
+
+- Support for `innmind/black-box` `5`
+
 ## 5.16.0 - 2025-06-02
 
 ### Added
