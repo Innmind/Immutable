@@ -1177,13 +1177,13 @@ class SequenceTest extends TestCase
         }
     }
 
-    public function testMemoize()
+    public function testMemoize(): BlackBox\Proof
     {
-        $this
+        return $this
             ->forAll(DataSet\Sequence::of(
                 DataSet\Type::any(),
             ))
-            ->then(function($values) {
+            ->prove(function($values) {
                 $sequence = Sequence::of(...$values);
 
                 $this->assertEquals($sequence, $sequence->memoize());

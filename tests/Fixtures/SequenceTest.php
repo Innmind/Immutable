@@ -26,14 +26,14 @@ class SequenceTest extends TestCase
         );
     }
 
-    public function testGenerate()
+    public function testGenerate(): BlackBox\Proof
     {
-        $this
+        return $this
             ->forAll(Sequence::of(
                 Set\Chars::any(),
                 Set\Integers::between(0, 5),
             ))
-            ->then(function($sequence) {
+            ->prove(function($sequence) {
                 $this->assertInstanceOf(Structure::class, $sequence);
                 $this->assertLessThanOrEqual(5, $sequence->size());
             });

@@ -26,14 +26,14 @@ class SetTest extends TestCase
         );
     }
 
-    public function testGenerate()
+    public function testGenerate(): BlackBox\Proof
     {
-        $this
+        return $this
             ->forAll(Set::of(
                 DataSet\Strings::madeOf(DataSet\Chars::any())->between(1, 2),
                 DataSet\Integers::between(0, 5),
             ))
-            ->then(function($set) {
+            ->prove(function($set) {
                 $this->assertInstanceOf(Structure::class, $set);
                 $this->assertLessThanOrEqual(5, $set->size());
             });

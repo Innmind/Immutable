@@ -14,14 +14,14 @@ class FoldTest extends TestCase
 {
     use BlackBox;
 
-    public function testMap()
+    public function testMap(): BlackBox\Proof
     {
-        $this
+        return $this
             ->forAll(
                 Set\Type::any(),
                 Set\Type::any(),
             )
-            ->then(function($source, $mapped) {
+            ->prove(function($source, $mapped) {
                 $fold = Fold::with($source)
                     ->map(function($in) use ($source, $mapped) {
                         $this->assertSame($source, $in);
@@ -58,9 +58,9 @@ class FoldTest extends TestCase
             });
     }
 
-    public function testFlatMap()
+    public function testFlatMap(): BlackBox\Proof
     {
-        $this
+        return $this
             ->forAll(
                 Set\Type::any(),
                 Set\Composite::immutable(
@@ -73,7 +73,7 @@ class FoldTest extends TestCase
                     ),
                 ),
             )
-            ->then(function($source, $mapped) {
+            ->prove(function($source, $mapped) {
                 $fold = Fold::with($source)
                     ->flatMap(function($in) use ($source, $mapped) {
                         $this->assertSame($source, $in);
@@ -105,11 +105,11 @@ class FoldTest extends TestCase
             });
     }
 
-    public function testMaybe()
+    public function testMaybe(): BlackBox\Proof
     {
-        $this
+        return $this
             ->forAll(Set\Type::any())
-            ->then(function($source) {
+            ->prove(function($source) {
                 $this->assertFalse(
                     Fold::with($source)
                         ->maybe()
@@ -145,14 +145,14 @@ class FoldTest extends TestCase
             });
     }
 
-    public function testMapResult()
+    public function testMapResult(): BlackBox\Proof
     {
-        $this
+        return $this
             ->forAll(
                 Set\Type::any(),
                 Set\Type::any(),
             )
-            ->then(function($source, $mapped) {
+            ->prove(function($source, $mapped) {
                 $fold = Fold::with($source)
                     ->mapResult(static fn() => $mapped)
                     ->match(
@@ -189,14 +189,14 @@ class FoldTest extends TestCase
             });
     }
 
-    public function testMapFailure()
+    public function testMapFailure(): BlackBox\Proof
     {
-        $this
+        return $this
             ->forAll(
                 Set\Type::any(),
                 Set\Type::any(),
             )
-            ->then(function($source, $mapped) {
+            ->prove(function($source, $mapped) {
                 $fold = Fold::with($source)
                     ->mapFailure(static fn() => $mapped)
                     ->match(
