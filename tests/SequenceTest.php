@@ -1105,7 +1105,7 @@ class SequenceTest extends TestCase
     public function testAggregate()
     {
         $this
-            ->forAll(DataSet\Integers::between(1, 9))
+            ->forAll(DataSet::integers()->between(1, 9))
             ->then(function($size) {
                 $lines = Str::of("foo\nbar\nbaz\nwatev")
                     ->chunk($size)
@@ -1119,7 +1119,7 @@ class SequenceTest extends TestCase
                 );
             });
         $this
-            ->forAll(DataSet\Integers::between(1, 9))
+            ->forAll(DataSet::integers()->between(1, 9))
             ->then(function($size) {
                 $loaded = false;
                 $sequence = Sequence::defer((static function() use ($size, &$loaded) {
@@ -1140,7 +1140,7 @@ class SequenceTest extends TestCase
                 $this->assertTrue($loaded);
             });
         $this
-            ->forAll(DataSet\Integers::between(1, 9))
+            ->forAll(DataSet::integers()->between(1, 9))
             ->then(function($size) {
                 $loaded = 0;
                 $sequence = Sequence::lazy(static function() use ($size, &$loaded) {
@@ -1180,8 +1180,8 @@ class SequenceTest extends TestCase
     public function testMemoize(): BlackBox\Proof
     {
         return $this
-            ->forAll(DataSet\Sequence::of(
-                DataSet\Type::any(),
+            ->forAll(DataSet::sequence(
+                DataSet::type(),
             ))
             ->prove(function($values) {
                 $sequence = Sequence::of(...$values);

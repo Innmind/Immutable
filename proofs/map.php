@@ -8,8 +8,8 @@ return static function() {
     yield proof(
         'Map::toSequence()',
         given(
-            Set\Sequence::of(Set\Type::any()),
-            Set\Sequence::of(Set\Type::any()),
+            Set::sequence(Set::type()),
+            Set::sequence(Set::type()),
         ),
         static function($assert, $keys, $values) {
             $map = Map::of();

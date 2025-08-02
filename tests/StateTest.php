@@ -21,9 +21,9 @@ class StateTest extends TestCase
     {
         return $this
             ->forAll(
-                Set\Type::any(),
-                Set\Type::any(),
-                Set\Type::any(),
+                Set::type(),
+                Set::type(),
+                Set::type(),
             )
             ->prove(function($state, $initialValue, $newValue) {
                 $monad = State::of(static fn($state) => Result::of($state, $initialValue));
@@ -46,10 +46,10 @@ class StateTest extends TestCase
     {
         return $this
             ->forAll(
-                Set\Type::any(),
-                Set\Type::any(),
-                Set\Type::any(),
-                Set\Type::any(),
+                Set::type(),
+                Set::type(),
+                Set::type(),
+                Set::type(),
             )
             ->prove(function($initialState, $newState, $initialValue, $newValue) {
                 $monad = State::of(static fn($state) => Result::of($state, $initialValue));

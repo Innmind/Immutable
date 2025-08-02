@@ -170,7 +170,7 @@ class MaybeTest extends TestCase
     public function testOtherwiseIsCalledWhenNoValue(): BlackBox\Proof
     {
         return $this
-            ->forAll(Set\Type::any())
+            ->forAll(Set::type())
             ->prove(function($value) {
                 $expected = Maybe::of($value);
 
@@ -324,7 +324,7 @@ class MaybeTest extends TestCase
     {
         return $this
             ->forAll(
-                Set\Sequence::of($this->value())->between(1, 5),
+                Set::sequence($this->value())->between(1, 5),
             )
             ->prove(function($expected) {
                 $maybes = \array_map(
@@ -348,7 +348,7 @@ class MaybeTest extends TestCase
     {
         return $this
             ->forAll(
-                Set\Sequence::of($this->value())->between(1, 5),
+                Set::sequence($this->value())->between(1, 5),
             )
             ->prove(function($expected) {
                 $maybes = \array_map(
@@ -372,10 +372,9 @@ class MaybeTest extends TestCase
     {
         return $this
             ->forAll(
-                Set\Sequence::of(
-                    Set\Decorate::immutable(
+                Set::sequence(
+                    $this->value()->map(
                         static fn($value) => Maybe::just($value),
-                        $this->value(),
                     ),
                 )->between(1, 5),
                 $this->value(),
@@ -396,17 +395,15 @@ class MaybeTest extends TestCase
     {
         return $this
             ->forAll(
-                Set\Sequence::of(
-                    Set\Decorate::immutable(
+                Set::sequence(
+                    $this->value()->map(
                         static fn($value) => Maybe::just($value),
-                        $this->value(),
                     ),
                 )->between(1, 5),
-                Set\Either::any(
-                    Set\Elements::of(Maybe::nothing()),
-                    Set\Decorate::immutable(
+                Set::either(
+                    Set::of(Maybe::nothing()),
+                    $this->value()->map(
                         static fn($value) => Maybe::just($value),
-                        $this->value(),
                     ),
                 ),
             )
@@ -422,10 +419,9 @@ class MaybeTest extends TestCase
     public function testAllMapNotCalledWhenOneNothingIsPresent(): BlackBox\Proof
     {
         return $this
-            ->forAll(Set\Sequence::of(
-                Set\Decorate::immutable(
+            ->forAll(Set::sequence(
+                $this->value()->map(
                     static fn($value) => Maybe::just($value),
-                    $this->value(),
                 ),
             )->between(1, 5))
             ->prove(function($maybes) {
@@ -446,10 +442,9 @@ class MaybeTest extends TestCase
     public function testAllFlatMapNotCalledWhenOneNothingIsPresent(): BlackBox\Proof
     {
         return $this
-            ->forAll(Set\Sequence::of(
-                Set\Decorate::immutable(
+            ->forAll(Set::sequence(
+                $this->value()->map(
                     static fn($value) => Maybe::just($value),
-                    $this->value(),
                 ),
             )->between(1, 5))
             ->prove(function($maybes) {
@@ -470,7 +465,7 @@ class MaybeTest extends TestCase
     public function testEither(): BlackBox\Proof
     {
         return $this
-            ->forAll(Set\Type::any())
+            ->forAll(Set::type())
             ->prove(function($value) {
                 $this->assertInstanceOf(Either::class, Maybe::just($value)->either());
                 $this->assertInstanceOf(Either::class, Maybe::nothing()->either());
@@ -491,7 +486,7 @@ class MaybeTest extends TestCase
     public function testKeep(): BlackBox\Proof
     {
         return $this
-            ->forAll(Set\Type::any())
+            ->forAll(Set::type())
             ->prove(function($value) {
                 $this->assertNull(
                     Maybe::just($value)
@@ -561,7 +556,7 @@ class MaybeTest extends TestCase
     public function testMemoize()
     {
         $this
-            ->forAll(Set\Type::any())
+            ->forAll(Set::type())
             ->then(function($value) {
                 $this->assertEquals(
                     Maybe::just($value),
@@ -586,9 +581,9 @@ class MaybeTest extends TestCase
         );
 
         $this
-            ->forAll(Set\Either::any(
-                Set\Type::any(),
-                Set\Elements::of(null),
+            ->forAll(Set::either(
+                Set::type(),
+                Set::of(null),
             ))
             ->then(function($value) {
                 $maybe = Maybe::defer(static function() use ($value) {
@@ -694,6 +689,6 @@ class MaybeTest extends TestCase
 
     private function value(): Set
     {
-        return Set\Type::any()->filter(static fn($value) => $value !== null);
+        return Set::type()->filter(static fn($value) => $value !== null);
     }
 }

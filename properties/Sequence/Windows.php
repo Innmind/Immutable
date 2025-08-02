@@ -23,10 +23,9 @@ final class Windows implements Property
     {
         // Upper bound is 100 to avoid having too large windows as it would
         // reduce the probability to create multiple windows.
-        return Set\Decorate::immutable(
-            static fn($size) => new self($size),
-            Set\Integers::between(1, 100),
-        );
+        return Set::integers()
+            ->between(1, 100)
+            ->map(static fn($size) => new self($size));
     }
 
     public function applicableTo(object $systemUnderTest): bool
