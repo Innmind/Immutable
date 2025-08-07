@@ -3,6 +3,7 @@ declare(strict_types = 1);
 
 namespace Properties\Innmind\Immutable\Sequence;
 
+use Innmind\Immutable\Sequence;
 use Innmind\BlackBox\{
     Set,
     Property,
@@ -62,6 +63,18 @@ final class Windows implements Property
                 ->flatMap(static fn($window) => match ($window->contains($end)) {
                     true => $window->dropEnd(1),
                     false => $window->take(1),
+                })
+                ->exclude(static fn($value) => $value === $end)
+                ->toList(),
+        );
+        $assert->same(
+            $systemUnderTest->toList(),
+            $systemUnderTest
+                ->prepend(Sequence::of($end))
+                ->windows($this->size)
+                ->flatMap(static fn($window) => match ($window->contains($end)) {
+                    true => $window->drop(1),
+                    false => $window->takeEnd(1),
                 })
                 ->exclude(static fn($value) => $value === $end)
                 ->toList(),
