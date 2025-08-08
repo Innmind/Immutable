@@ -143,6 +143,17 @@ final class Attempt
     }
 
     /**
+     * @param callable(\Throwable): \Throwable $map
+     *
+     * @return self<T>
+     */
+    #[\NoDiscard]
+    public function mapError(callable $map): self
+    {
+        return new self($this->implementation->mapError($map));
+    }
+
+    /**
      * @template U
      *
      * @param callable(\Throwable): self<U> $recover

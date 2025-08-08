@@ -1,5 +1,11 @@
 # Changelog
 
+## 5.18.0 - 2025-08-08
+
+### Added
+
+- `Innmind\Immutable\Attempt::mapError()`
+
 ## 5.17.0 - 2025-08-02
 
 ### Added

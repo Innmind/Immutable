@@ -45,6 +45,13 @@ interface Implementation
     public function match(callable $result, callable $error);
 
     /**
+     * @param callable(\Throwable): \Throwable $map
+     *
+     * @return self<T>
+     */
+    public function mapError(callable $map): self;
+
+    /**
      * @template U
      *
      * @param callable(\Throwable): Attempt<U> $recover
