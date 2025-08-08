@@ -124,6 +124,17 @@ $result = Attempt::of(static fn() => 2 / $reduction)->match(
 
 If `#!php $reduction` is `#!php 0` then `#!php $result` will be an instance of `DivisionByZeroError`, otherwise it will be a fraction of `#!php 2`.
 
+## `->mapError()`
+
+This will allow you to change the error or wrap the previous one.
+
+```php
+$attempt = Attempt::of(static fn() => 1/0)
+    ->mapError(static fn(\Throwable $e) => new \Exception('something bad happened', 0, $e));
+```
+
+Here `#!php $attempt` contains an `\Exception` because the first `Attempt` raised a `DivisionByZeroError`.
+
 ## `->recover()`
 
 This will allow you to recover in case of a previous error.
