@@ -53,6 +53,14 @@ final class Defer implements Implementation
     }
 
     #[\Override]
+    public function mapError(callable $map): self
+    {
+        $captured = $this->capture();
+
+        return new self(static fn() => self::detonate($captured)->mapError($map));
+    }
+
+    #[\Override]
     public function recover(callable $recover): Attempt
     {
         $captured = $this->capture();

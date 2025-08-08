@@ -50,6 +50,13 @@ final class Error implements Implementation
     }
 
     #[\Override]
+    public function mapError(callable $map): self
+    {
+        /** @psalm-suppress ImpureFunctionCall */
+        return new self($map($this->value));
+    }
+
+    #[\Override]
     public function recover(callable $recover): Attempt
     {
         /** @psalm-suppress ImpureFunctionCall */

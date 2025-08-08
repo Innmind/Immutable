@@ -117,6 +117,42 @@ return static function() {
     );
 
     yield proof(
+        'Attempt::mapError()',
+        given(
+            $exceptions,
+            $exceptions,
+            Set::type(),
+        ),
+        static function($assert, $start, $end, $value) {
+            $attempt = Attempt::error($start)
+                ->mapError(static function($e) use ($assert, $start, $end) {
+                    $assert->same($start, $e);
+
+                    return $end;
+                });
+
+            $assert->same(
+                $end,
+                $attempt->match(
+                    static fn() => null,
+                    static fn($value) => $value,
+                ),
+            );
+
+            $attempt = Attempt::result($value)
+                ->mapError(static fn() => $end);
+
+            $assert->same(
+                $value,
+                $attempt->match(
+                    static fn($value) => $value,
+                    static fn() => null,
+                ),
+            );
+        },
+    );
+
+    yield proof(
         'Attempt::recover()',
         given(
             $exceptions,

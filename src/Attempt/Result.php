@@ -47,6 +47,12 @@ final class Result implements Implementation
     }
 
     #[\Override]
+    public function mapError(callable $map): self
+    {
+        return $this;
+    }
+
+    #[\Override]
     public function recover(callable $recover): Attempt
     {
         return Attempt::result($this->value);
