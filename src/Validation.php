@@ -80,6 +80,23 @@ final class Validation
 
     /**
      * @template T
+     * @template V
+     *
+     * @param callable(S): self<T, V> $map
+     *
+     * @return self<F|T, V>
+     */
+    #[\NoDiscard]
+    public function guard(callable $map): self
+    {
+        return new self($this->implementation->guard(
+            $map,
+            static fn(self $self) => $self->implementation,
+        ));
+    }
+
+    /**
+     * @template T
      *
      * @param callable(F): T $map
      *
@@ -103,6 +120,25 @@ final class Validation
     public function otherwise(callable $map): self
     {
         return $this->implementation->otherwise($map);
+    }
+
+    /**
+     * This prevents guarded failures from being recovered.
+     *
+     * @template T
+     * @template V
+     *
+     * @param callable(Sequence<F>): self<T, V> $map
+     *
+     * @return self<F|T, S|V>
+     */
+    #[\NoDiscard]
+    public function xotherwise(callable $map): self
+    {
+        return $this->implementation->xotherwise(
+            $map,
+            static fn(Validation\Implementation $implementation) => new self($implementation),
+        );
     }
 
     /**

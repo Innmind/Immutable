@@ -261,4 +261,58 @@ return static function() {
             );
         },
     );
+
+    yield proof(
+        'Validation::guard()',
+        given(
+            Set::integers()->above(1),
+            Set::integers()->below(-1),
+            Set::type(),
+        ),
+        static function($assert, $positive, $negative, $fail) {
+            $assert->same(
+                $positive,
+                Validation::success($positive)
+                    ->guard(static fn() => Validation::success($positive))
+                    ->otherwise(static fn() => Validation::success($negative))
+                    ->match(
+                        static fn($value) => $value,
+                        static fn() => null,
+                    ),
+            );
+
+            $assert->same(
+                $negative,
+                Validation::success($positive)
+                    ->guard(static fn() => Validation::fail($fail))
+                    ->otherwise(static fn() => Validation::success($negative))
+                    ->match(
+                        static fn($value) => $value,
+                        static fn() => null,
+                    ),
+            );
+
+            $assert->same(
+                [$fail],
+                Validation::success($positive)
+                    ->guard(static fn() => Validation::fail($fail))
+                    ->xotherwise(static fn() => Validation::success($negative))
+                    ->match(
+                        static fn($value) => $value,
+                        static fn($failures) => $failures->toList(),
+                    ),
+            );
+
+            $assert->same(
+                $negative,
+                Validation::success($positive)
+                    ->flatMap(static fn() => Validation::fail($fail))
+                    ->xotherwise(static fn() => Validation::success($negative))
+                    ->match(
+                        static fn($value) => $value,
+                        static fn($failures) => $failures->toList(),
+                    ),
+            );
+        },
+    );
 };
