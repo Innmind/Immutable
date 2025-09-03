@@ -39,6 +39,22 @@ interface Implementation
 
     /**
      * @template T
+     * @template V
+     *
+     * @param callable(S): Validation<T, V> $map
+     * @param pure-callable(Validation<T, V>): self<T, V> $exfiltrate
+     *
+     * @return self<F|T, V>
+     */
+    public function guard(callable $map, callable $exfiltrate): self;
+
+    /**
+     * @return self<F, S>
+     */
+    public function guardFailures(): self;
+
+    /**
+     * @template T
      *
      * @param callable(F): T $map
      *
@@ -55,6 +71,20 @@ interface Implementation
      * @return Validation<T, S|V>
      */
     public function otherwise(callable $map): Validation;
+
+    /**
+     * @template T
+     * @template V
+     *
+     * @param callable(Sequence<F>): Validation<T, V> $map
+     * @param callable(self<F|T, S|V>): Validation<F|T, S|V> $wrap
+     *
+     * @return Validation<F|T, S|V>
+     */
+    public function xotherwise(
+        callable $map,
+        callable $wrap,
+    ): Validation;
 
     /**
      * @template A

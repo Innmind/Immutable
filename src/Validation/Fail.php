@@ -19,10 +19,10 @@ use Innmind\Immutable\{
 final class Fail implements Implementation
 {
     /**
-     * @param Sequence<F> $failures
+     * @param Sequence<F>|Guard<F> $failures
      */
     private function __construct(
-        private Sequence $failures,
+        private Sequence|Guard $failures,
     ) {
     }
 
@@ -72,6 +72,34 @@ final class Fail implements Implementation
 
     /**
      * @template T
+     * @template V
+     *
+     * @param callable(S): Validation<T, V> $map
+     * @param pure-callable(Validation<T, V>): Implementation<T, V> $exfiltrate
+     *
+     * @return Implementation<F|T, V>
+     */
+    #[\Override]
+    public function guard(callable $map, callable $exfiltrate): Implementation
+    {
+        /** @var Implementation<F|T, V> */
+        return $this;
+    }
+
+    #[\Override]
+    public function guardFailures(): self
+    {
+        if ($this->failures instanceof Guard) {
+            return $this;
+        }
+
+        return new self(new Guard(
+            $this->failures,
+        ));
+    }
+
+    /**
+     * @template T
      *
      * @param callable(F): T $map
      *
@@ -94,6 +122,34 @@ final class Fail implements Implementation
     #[\Override]
     public function otherwise(callable $map): Validation
     {
+        if ($this->failures instanceof Guard) {
+            /** @psalm-suppress ImpureFunctionCall */
+            return $map($this->failures->unwrap());
+        }
+
+        /** @psalm-suppress ImpureFunctionCall */
+        return $map($this->failures);
+    }
+
+    /**
+     * @template T
+     * @template V
+     *
+     * @param callable(Sequence<F>): Validation<T, V> $map
+     * @param callable(Implementation<F|T, S|V>): Validation<F|T, S|V> $wrap
+     *
+     * @return Validation<F|T, S|V>
+     */
+    #[\Override]
+    public function xotherwise(
+        callable $map,
+        callable $wrap,
+    ): Validation {
+        if ($this->failures instanceof Guard) {
+            /** @psalm-suppress ImpureFunctionCall */
+            return $wrap($this);
+        }
+
         /** @psalm-suppress ImpureFunctionCall */
         return $map($this->failures);
     }
@@ -133,6 +189,11 @@ final class Fail implements Implementation
     #[\Override]
     public function match(callable $success, callable $failure)
     {
+        if ($this->failures instanceof Guard) {
+            /** @psalm-suppress ImpureFunctionCall */
+            return $failure($this->failures->unwrap());
+        }
+
         /** @psalm-suppress ImpureFunctionCall */
         return $failure($this->failures);
     }
@@ -152,6 +213,10 @@ final class Fail implements Implementation
     #[\Override]
     public function either(): Either
     {
+        if ($this->failures instanceof Guard) {
+            return Either::left($this->failures->unwrap());
+        }
+
         return Either::left($this->failures);
     }
 }

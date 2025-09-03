@@ -71,6 +71,10 @@ $validation = isEmail('foo@example.com');
 $localEmail = $either->flatMap(fn(string $email): Validation => isLocal($email));
 ```
 
+## `->guard()`
+
+This behaves like [`->flatMap()`](#-flatmap) except any failure contained in the validation returned by the callable won't be recovered when calling [`->xotherwise()`](#-xotherwise).
+
 ## `->match()`
 
 This is the only way to extract the wrapped value.
@@ -97,6 +101,30 @@ This is like `->flatMap()` but is called when the instance contains failures. Th
 $email = isEmail('invalid value')
     ->otherwise(fn() => isEmail('foo@example.com'));
 ```
+
+## `->xotherwise()`
+
+This behaves like [`->otherwise()`](#-otherwise) except when conjointly used with [`->guard()`](#-guard). Guarded failures can't be recovered.
+
+An example of this problem is an HTTP router with 2 validations. One tries to validate it's a `POST` request, then validates the request body, the other tries to validate a `GET` request. It would look something like this:
+
+```php
+$result = validatePost($request)
+    ->flatMap(static fn() => validateBody($request))
+    ->otherwise(static fn() => validateGet($request));
+```
+
+The problem here is that if the request is indeed a `POST` we try to validate the body. But if the latter fails then we try to validate it's a `GET` query. In this case the failure would indicate the request is not a `GET`, which doesn't make sense.
+
+The correct approach is:
+
+```php
+$result = validatePost($request)
+    ->guard(static fn() => validateBody($request))
+    ->xotherwise(static fn() => validateGet($request));
+```
+
+This way if the body validation fails it will return this failure and not that it's not a `GET`.
 
 ## `->mapFailures()`
 
