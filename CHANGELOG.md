@@ -1,5 +1,12 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+
+- `Innmind\Immutable\Validation::guard()`
+- `Innmind\Immutable\Validation::xotherwise()`
+
 ## 5.18.0 - 2025-08-08
 
 ### Added

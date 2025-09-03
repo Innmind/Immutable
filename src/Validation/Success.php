@@ -72,6 +72,28 @@ final class Success implements Implementation
 
     /**
      * @template T
+     * @template V
+     *
+     * @param callable(S): Validation<T, V> $map
+     * @param pure-callable(Validation<T, V>): Implementation<T, V> $exfiltrate
+     *
+     * @return Implementation<F|T, V>
+     */
+    #[\Override]
+    public function guard(callable $map, callable $exfiltrate): Implementation
+    {
+        /** @psalm-suppress ImpureFunctionCall */
+        return $exfiltrate($map($this->value))->guardFailures();
+    }
+
+    #[\Override]
+    public function guardFailures(): self
+    {
+        return $this;
+    }
+
+    /**
+     * @template T
      *
      * @param callable(F): T $map
      *
@@ -95,6 +117,23 @@ final class Success implements Implementation
     #[\Override]
     public function otherwise(callable $map): Validation
     {
+        return Validation::success($this->value);
+    }
+
+    /**
+     * @template T
+     * @template V
+     *
+     * @param callable(Sequence<F>): Validation<T, V> $map
+     * @param callable(Implementation<F|T, S|V>): Validation<F|T, S|V> $wrap
+     *
+     * @return Validation<F|T, S|V>
+     */
+    #[\Override]
+    public function xotherwise(
+        callable $map,
+        callable $wrap,
+    ): Validation {
         return Validation::success($this->value);
     }
 
