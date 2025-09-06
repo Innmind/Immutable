@@ -1,0 +1,2085 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../set/">
+      
+      
+        <link rel="next" href="../str/">
+      
+      
+      <link rel="icon" href="../../assets/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.18">
+    
+    
+      
+        <title>Map - Innmind/Immutable</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.7e37652d.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="blue" data-md-color-accent="deep-orange">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#map" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Innmind/Immutable" class="md-header__button md-logo" aria-label="Innmind/Immutable" data-md-component="logo">
+      
+  <img src="../../assets/logo.svg" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Innmind/Immutable
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Map
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme)" data-md-color-scheme="default" data-md-color-primary="blue" data-md-color-accent="deep-orange"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m14.3 16-.7-2h-3.2l-.7 2H7.8L11 7h2l3.2 9zM20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12zm-9.15 3.96h2.3L12 9z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="blue" data-md-color-accent="deep-orange"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_2" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="blue" data-md-color-accent="deep-orange"  aria-label="Switch to system preference"  type="radio" name="__palette" id="__palette_2">
+    
+      <label class="md-header__button md-icon" title="Switch to system preference" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Getting Started
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../PHILOSOPHY/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Philosophy
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Structures
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../MONOIDS/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Monoids
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../use-cases/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Use cases
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../testing/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Testing
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Innmind/Immutable" class="md-nav__button md-logo" aria-label="Innmind/Immutable" data-md-component="logo">
+      
+  <img src="../../assets/logo.svg" alt="logo">
+
+    </a>
+    Innmind/Immutable
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Getting Started
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../PHILOSOPHY/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Philosophy
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    Structures
+    
+  </span>
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3" id="__nav_3_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Structures
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sequence/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Sequence
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../set/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Set
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    Map
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    Map
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#named-constructors" class="md-nav__link">
+    <span class="md-ellipsis">
+      Named constructors
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Named constructors">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#of" class="md-nav__link">
+    <span class="md-ellipsis">
+      ::of()
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#add-values" class="md-nav__link">
+    <span class="md-ellipsis">
+      Add values
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Add values">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#-__invoke" class="md-nav__link">
+    <span class="md-ellipsis">
+      -&gt;__invoke()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-put" class="md-nav__link">
+    <span class="md-ellipsis">
+      -&gt;put()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-merge" class="md-nav__link">
+    <span class="md-ellipsis">
+      -&gt;merge()
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#access-values" class="md-nav__link">
+    <span class="md-ellipsis">
+      Access values
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Access values">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#-size" class="md-nav__link">
+    <span class="md-ellipsis">
+      -&gt;size()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-count" class="md-nav__link">
+    <span class="md-ellipsis">
+      -&gt;count()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-get" class="md-nav__link">
+    <span class="md-ellipsis">
+      -&gt;get()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-contains" class="md-nav__link">
+    <span class="md-ellipsis">
+      -&gt;contains()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-keys" class="md-nav__link">
+    <span class="md-ellipsis">
+      -&gt;keys()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-values" class="md-nav__link">
+    <span class="md-ellipsis">
+      -&gt;values()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-find" class="md-nav__link">
+    <span class="md-ellipsis">
+      -&gt;find()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-matches" class="md-nav__link">
+    <span class="md-ellipsis">
+      -&gt;matches()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-any" class="md-nav__link">
+    <span class="md-ellipsis">
+      -&gt;any()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-empty" class="md-nav__link">
+    <span class="md-ellipsis">
+      -&gt;empty()
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#transform-values" class="md-nav__link">
+    <span class="md-ellipsis">
+      Transform values
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Transform values">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#-map" class="md-nav__link">
+    <span class="md-ellipsis">
+      -&gt;map()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-flatmap" class="md-nav__link">
+    <span class="md-ellipsis">
+      -&gt;flatMap()
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#filter-values" class="md-nav__link">
+    <span class="md-ellipsis">
+      Filter values
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Filter values">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#-filter" class="md-nav__link">
+    <span class="md-ellipsis">
+      -&gt;filter()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-exclude" class="md-nav__link">
+    <span class="md-ellipsis">
+      -&gt;exclude()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-remove" class="md-nav__link">
+    <span class="md-ellipsis">
+      -&gt;remove()
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#extract-values" class="md-nav__link">
+    <span class="md-ellipsis">
+      Extract values
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Extract values">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#-reduce" class="md-nav__link">
+    <span class="md-ellipsis">
+      -&gt;reduce()
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#misc" class="md-nav__link">
+    <span class="md-ellipsis">
+      Misc.
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Misc.">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#-equals" class="md-nav__link">
+    <span class="md-ellipsis">
+      -&gt;equals()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-foreach" class="md-nav__link">
+    <span class="md-ellipsis">
+      -&gt;foreach()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-groupby" class="md-nav__link">
+    <span class="md-ellipsis">
+      -&gt;groupBy()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-partition" class="md-nav__link">
+    <span class="md-ellipsis">
+      -&gt;partition()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-clear" class="md-nav__link">
+    <span class="md-ellipsis">
+      -&gt;clear()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-tosequence" class="md-nav__link">
+    <span class="md-ellipsis">
+      -&gt;toSequence()
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../str/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Str
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../regexp/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    RegExp
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../maybe/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Maybe
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../either/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Either
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../attempt/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Attempt
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../validation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Validation
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../identity/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Identity
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../state/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    State
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../fold/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Fold
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../MONOIDS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Monoids
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../use-cases/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    Use cases
+    
+  </span>
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_5" id="__nav_5_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            Use cases
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../use-cases/lazy-file/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    How to read a file
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../use-cases/parsing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Parsing strings
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../testing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Testing
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#named-constructors" class="md-nav__link">
+    <span class="md-ellipsis">
+      Named constructors
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Named constructors">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#of" class="md-nav__link">
+    <span class="md-ellipsis">
+      ::of()
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#add-values" class="md-nav__link">
+    <span class="md-ellipsis">
+      Add values
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Add values">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#-__invoke" class="md-nav__link">
+    <span class="md-ellipsis">
+      -&gt;__invoke()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-put" class="md-nav__link">
+    <span class="md-ellipsis">
+      -&gt;put()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-merge" class="md-nav__link">
+    <span class="md-ellipsis">
+      -&gt;merge()
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#access-values" class="md-nav__link">
+    <span class="md-ellipsis">
+      Access values
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Access values">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#-size" class="md-nav__link">
+    <span class="md-ellipsis">
+      -&gt;size()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-count" class="md-nav__link">
+    <span class="md-ellipsis">
+      -&gt;count()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-get" class="md-nav__link">
+    <span class="md-ellipsis">
+      -&gt;get()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-contains" class="md-nav__link">
+    <span class="md-ellipsis">
+      -&gt;contains()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-keys" class="md-nav__link">
+    <span class="md-ellipsis">
+      -&gt;keys()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-values" class="md-nav__link">
+    <span class="md-ellipsis">
+      -&gt;values()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-find" class="md-nav__link">
+    <span class="md-ellipsis">
+      -&gt;find()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-matches" class="md-nav__link">
+    <span class="md-ellipsis">
+      -&gt;matches()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-any" class="md-nav__link">
+    <span class="md-ellipsis">
+      -&gt;any()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-empty" class="md-nav__link">
+    <span class="md-ellipsis">
+      -&gt;empty()
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#transform-values" class="md-nav__link">
+    <span class="md-ellipsis">
+      Transform values
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Transform values">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#-map" class="md-nav__link">
+    <span class="md-ellipsis">
+      -&gt;map()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-flatmap" class="md-nav__link">
+    <span class="md-ellipsis">
+      -&gt;flatMap()
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#filter-values" class="md-nav__link">
+    <span class="md-ellipsis">
+      Filter values
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Filter values">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#-filter" class="md-nav__link">
+    <span class="md-ellipsis">
+      -&gt;filter()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-exclude" class="md-nav__link">
+    <span class="md-ellipsis">
+      -&gt;exclude()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-remove" class="md-nav__link">
+    <span class="md-ellipsis">
+      -&gt;remove()
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#extract-values" class="md-nav__link">
+    <span class="md-ellipsis">
+      Extract values
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Extract values">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#-reduce" class="md-nav__link">
+    <span class="md-ellipsis">
+      -&gt;reduce()
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#misc" class="md-nav__link">
+    <span class="md-ellipsis">
+      Misc.
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Misc.">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#-equals" class="md-nav__link">
+    <span class="md-ellipsis">
+      -&gt;equals()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-foreach" class="md-nav__link">
+    <span class="md-ellipsis">
+      -&gt;foreach()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-groupby" class="md-nav__link">
+    <span class="md-ellipsis">
+      -&gt;groupBy()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-partition" class="md-nav__link">
+    <span class="md-ellipsis">
+      -&gt;partition()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-clear" class="md-nav__link">
+    <span class="md-ellipsis">
+      -&gt;clear()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-tosequence" class="md-nav__link">
+    <span class="md-ellipsis">
+      -&gt;toSequence()
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="map"><code>Map</code><a class="headerlink" href="#map" title="Permanent link">&para;</a></h1>
+<p>A map is an unordered list of pair of elements, think of it like an associative array or an <code>array&lt;T, S&gt;</code> in the <a href="http://psalm.dev">Psalm</a> nomenclature. But with the added benefit that the keys can be of any type, even objects!</p>
+<h2 id="named-constructors">Named constructors<a class="headerlink" href="#named-constructors" title="Permanent link">&para;</a></h2>
+<h3 id="of"><code>::of()</code><a class="headerlink" href="#of" title="Permanent link">&para;</a></h3>
+<div class="language-php highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">use</span> <span class="nx">Innmind\Immutable\Map</span><span class="p">;</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="sd">/** @var Map&lt;object, int&gt; */</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="nv">$map</span> <span class="o">=</span> <span class="nx">Map</span><span class="o">::</span><span class="na">of</span><span class="p">();</span>
+</span></code></pre></div>
+<p>The first type is for the keys and the second one for the values. This order is the same for all the methods below.</p>
+<h2 id="add-values">Add values<a class="headerlink" href="#add-values" title="Permanent link">&para;</a></h2>
+<h3 id="-__invoke"><code>-&gt;__invoke()</code><a class="headerlink" href="#-__invoke" title="Permanent link">&para;</a></h3>
+<p>Augment the map with a new pair of elements. If the key already exist it will replace the value.</p>
+<div class="language-php highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nv">$map</span> <span class="o">=</span> <span class="nx">Map</span><span class="o">::</span><span class="na">of</span><span class="p">();</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="nv">$map</span> <span class="o">=</span> <span class="p">(</span><span class="nv">$map</span><span class="p">)(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="nv">$map</span><span class="o">-&gt;</span><span class="na">equals</span><span class="p">(</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>    <span class="nx">Map</span><span class="o">::</span><span class="na">of</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]),</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="p">);</span>
+</span></code></pre></div>
+<h3 id="-put"><code>-&gt;put()</code><a class="headerlink" href="#-put" title="Permanent link">&para;</a></h3>
+<p>This is an alias for <code>-&gt;__invoke()</code>.</p>
+<h3 id="-merge"><code>-&gt;merge()</code><a class="headerlink" href="#-merge" title="Permanent link">&para;</a></h3>
+<p>Create a new map with all pairs from both maps. Pairs from the map in the argument will replace existing pairs from the original map.</p>
+<div class="language-php highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nv">$a</span> <span class="o">=</span> <span class="nx">Map</span><span class="o">::</span><span class="na">of</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]);</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="nv">$b</span> <span class="o">=</span> <span class="nx">Map</span><span class="o">::</span><span class="na">of</span><span class="p">([</span><span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">7</span><span class="p">]);</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="nv">$a</span><span class="o">-&gt;</span><span class="na">merge</span><span class="p">(</span><span class="nv">$b</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">equals</span><span class="p">(</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>    <span class="nx">Map</span><span class="o">::</span><span class="na">of</span><span class="p">(</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>        <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>        <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">],</span>
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>        <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">7</span><span class="p">],</span>
+</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>    <span class="p">),</span>
+</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="p">);</span> <span class="c1">// true</span>
+</span></code></pre></div>
+<h2 id="access-values">Access values<a class="headerlink" href="#access-values" title="Permanent link">&para;</a></h2>
+<h3 id="-size"><code>-&gt;size()</code><a class="headerlink" href="#-size" title="Permanent link">&para;</a></h3>
+<p>This returns the number of elements in the map.</p>
+<div class="language-php highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nv">$map</span> <span class="o">=</span> <span class="nx">Map</span><span class="o">::</span><span class="na">of</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]);</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="nv">$map</span><span class="o">-&gt;</span><span class="na">size</span><span class="p">();</span> <span class="c1">// 1</span>
+</span></code></pre></div>
+<h3 id="-count"><code>-&gt;count()</code><a class="headerlink" href="#-count" title="Permanent link">&para;</a></h3>
+<p>This is an alias for <code>-&gt;size()</code>, but you can also use the PHP function <code>\count</code> if you prefer.</p>
+<div class="language-php highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nv">$map</span> <span class="o">=</span> <span class="nx">Map</span><span class="o">::</span><span class="na">of</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]);</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="nv">$map</span><span class="o">-&gt;</span><span class="na">size</span><span class="p">();</span> <span class="c1">// 1</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="nx">\count</span><span class="p">(</span><span class="nv">$map</span><span class="p">);</span> <span class="c1">// 1</span>
+</span></code></pre></div>
+<h3 id="-get"><code>-&gt;get()</code><a class="headerlink" href="#-get" title="Permanent link">&para;</a></h3>
+<p>Return an instance of <a href="../maybe/"><code>Maybe</code></a> that may contain the value associated to the given key (if it exists).</p>
+<div class="language-php highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="nv">$map</span> <span class="o">=</span> <span class="nx">Map</span><span class="o">::</span><span class="na">of</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]);</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="nv">$map</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span> <span class="c1">// Maybe::just(2)</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="nv">$map</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span> <span class="c1">// Maybe::nothing()</span>
+</span></code></pre></div>
+<h3 id="-contains"><code>-&gt;contains()</code><a class="headerlink" href="#-contains" title="Permanent link">&para;</a></h3>
+<p>Check if the map contains a given key.</p>
+<div class="language-php highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nv">$map</span> <span class="o">=</span> <span class="nx">Map</span><span class="o">::</span><span class="na">of</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]);</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="nv">$map</span><span class="o">-&gt;</span><span class="na">contains</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span> <span class="c1">// true</span>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="nv">$map</span><span class="o">-&gt;</span><span class="na">contains</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span> <span class="c1">// false</span>
+</span></code></pre></div>
+<h3 id="-keys"><code>-&gt;keys()</code><a class="headerlink" href="#-keys" title="Permanent link">&para;</a></h3>
+<p>Return a <a href="../set/"><code>Set</code></a> of all the keys of the map.</p>
+<div class="language-php highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="nv">$keys</span> <span class="o">=</span> <span class="nx">Map</span><span class="o">::</span><span class="na">of</span><span class="p">([</span><span class="mi">24</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">42</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span><span class="o">-&gt;</span><span class="na">keys</span><span class="p">();</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="nv">$keys</span><span class="o">-&gt;</span><span class="na">equals</span><span class="p">(</span><span class="nx">Set</span><span class="o">::</span><span class="na">of</span><span class="p">(</span><span class="mi">24</span><span class="p">,</span> <span class="mi">42</span><span class="p">));</span> <span class="c1">// true</span>
+</span></code></pre></div>
+<h3 id="-values"><code>-&gt;values()</code><a class="headerlink" href="#-values" title="Permanent link">&para;</a></h3>
+<p>Return a <a href="../sequence/"><code>Sequence</code></a> of all the values of the map.</p>
+<div class="language-php highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="nv">$values</span> <span class="o">=</span> <span class="nx">Map</span><span class="o">::</span><span class="na">of</span><span class="p">([</span><span class="mi">24</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">42</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span><span class="o">-&gt;</span><span class="na">values</span><span class="p">();</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="nv">$values</span><span class="o">-&gt;</span><span class="na">equals</span><span class="p">(</span><span class="nx">Sequence</span><span class="o">::</span><span class="na">of</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">));</span> <span class="c1">// true</span>
+</span></code></pre></div>
+<div class="admonition note">
+<p>It returns a <code>Sequence</code> because it can contain duplicates, the order is not guaranteed as a map is not ordered.</p>
+</div>
+<h3 id="-find"><code>-&gt;find()</code><a class="headerlink" href="#-find" title="Permanent link">&para;</a></h3>
+<p>This will return the first pair that matches the given predicate (remember that the map is not ordered).</p>
+<div class="language-php highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="k">use</span> <span class="nx">Innmind\Immutable\Pair</span><span class="p">;</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="nx">Map</span><span class="o">::</span><span class="na">of</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">],</span> <span class="p">[</span><span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">])</span><span class="o">-&gt;</span><span class="na">find</span><span class="p">(</span>
+</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>    <span class="nx">fn</span><span class="p">(</span><span class="nv">$key</span><span class="p">,</span> <span class="nv">$value</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">(</span><span class="nv">$key</span> <span class="o">+</span> <span class="nv">$value</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">10</span><span class="p">,</span>
+</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="p">);</span> <span class="c1">// Maybe::just(new Pair(5, 6))</span>
+</span></code></pre></div>
+<h3 id="-matches"><code>-&gt;matches()</code><a class="headerlink" href="#-matches" title="Permanent link">&para;</a></h3>
+<p>Check if all the pairs of the map matches the given predicate.</p>
+<div class="language-php highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="nv">$isOdd</span> <span class="o">=</span> <span class="nx">fn</span><span class="p">(</span><span class="nv">$i</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nv">$i</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">===</span> <span class="mi">1</span><span class="p">;</span>
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="nx">Map</span><span class="o">::</span><span class="na">of</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">])</span><span class="o">-&gt;</span><span class="na">matches</span><span class="p">(</span><span class="nx">fn</span><span class="p">(</span><span class="nv">$key</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nv">$isOdd</span><span class="p">(</span><span class="nv">$key</span><span class="p">));</span> <span class="c1">// true</span>
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="nx">Map</span><span class="o">::</span><span class="na">of</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">])</span><span class="o">-&gt;</span><span class="na">matches</span><span class="p">(</span><span class="nx">fn</span><span class="p">(</span><span class="nv">$key</span><span class="p">,</span> <span class="nv">$value</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nv">$isOdd</span><span class="p">(</span><span class="nv">$value</span><span class="p">));</span> <span class="c1">// false</span>
+</span></code></pre></div>
+<h3 id="-any"><code>-&gt;any()</code><a class="headerlink" href="#-any" title="Permanent link">&para;</a></h3>
+<p>Check if at least one pair of the map matches the given predicate.</p>
+<div class="language-php highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="nv">$isOdd</span> <span class="o">=</span> <span class="nx">fn</span><span class="p">(</span><span class="nv">$i</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nv">$i</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">===</span> <span class="mi">1</span><span class="p">;</span>
+</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="nx">Map</span><span class="o">::</span><span class="na">of</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">])</span><span class="o">-&gt;</span><span class="na">any</span><span class="p">(</span><span class="nx">fn</span><span class="p">(</span><span class="nv">$key</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nv">$isOdd</span><span class="p">(</span><span class="nv">$key</span><span class="p">));</span> <span class="c1">// true</span>
+</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="nx">Map</span><span class="o">::</span><span class="na">of</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">])</span><span class="o">-&gt;</span><span class="na">any</span><span class="p">(</span><span class="nx">fn</span><span class="p">(</span><span class="nv">$key</span><span class="p">,</span> <span class="nv">$value</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nv">$isOdd</span><span class="p">(</span><span class="nv">$value</span><span class="p">));</span> <span class="c1">// true</span>
+</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="nx">Map</span><span class="o">::</span><span class="na">of</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">])</span><span class="o">-&gt;</span><span class="na">any</span><span class="p">(</span><span class="nx">fn</span><span class="p">(</span><span class="nv">$key</span><span class="p">,</span> <span class="nv">$value</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nv">$isOdd</span><span class="p">(</span><span class="nv">$value</span><span class="p">));</span> <span class="c1">// false</span>
+</span></code></pre></div>
+<h3 id="-empty"><code>-&gt;empty()</code><a class="headerlink" href="#-empty" title="Permanent link">&para;</a></h3>
+<p>Tells whether there is at least one pair or not.</p>
+<div class="language-php highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="nx">Map</span><span class="o">::</span><span class="na">of</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">empty</span><span class="p">();</span> <span class="c1">// true</span>
+</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="nx">Map</span><span class="o">::</span><span class="na">of</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span><span class="o">-&gt;</span><span class="na">empty</span><span class="p">();</span> <span class="c1">// false</span>
+</span></code></pre></div>
+<h2 id="transform-values">Transform values<a class="headerlink" href="#transform-values" title="Permanent link">&para;</a></h2>
+<h3 id="-map"><code>-&gt;map()</code><a class="headerlink" href="#-map" title="Permanent link">&para;</a></h3>
+<p>Create a new map of the same type with the exact same number of pairs but modified by the given function.</p>
+<div class="language-php highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="nv">$urls</span> <span class="o">=</span> <span class="nx">Map</span><span class="o">::</span><span class="na">of</span><span class="p">(</span>
+</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>    <span class="p">[</span><span class="s1">&#39;example.com&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>    <span class="p">[</span><span class="s1">&#39;github.com&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+</span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>    <span class="p">[</span><span class="s1">&#39;news.ycombinator.com&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+</span><span id="__span-13-5"><a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a>    <span class="p">[</span><span class="s1">&#39;reddit.com&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+</span><span id="__span-13-6"><a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a><span class="p">);</span>
+</span><span id="__span-13-7"><a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a><span class="nv">$incremented</span> <span class="o">=</span> <span class="nv">$map</span><span class="o">-&gt;</span><span class="na">map</span><span class="p">(</span><span class="nx">fn</span><span class="p">(</span><span class="nv">$key</span><span class="p">,</span> <span class="nv">$value</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nv">$value</span> <span class="o">+</span> <span class="mi">1</span><span class="p">);</span>
+</span><span id="__span-13-8"><a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a><span class="nv">$incremented</span><span class="o">-&gt;</span><span class="na">equals</span><span class="p">(</span>
+</span><span id="__span-13-9"><a id="__codelineno-13-9" name="__codelineno-13-9" href="#__codelineno-13-9"></a>    <span class="nx">Map</span><span class="o">::</span><span class="na">of</span><span class="p">(</span>
+</span><span id="__span-13-10"><a id="__codelineno-13-10" name="__codelineno-13-10" href="#__codelineno-13-10"></a>        <span class="p">[</span><span class="s1">&#39;example.com&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
+</span><span id="__span-13-11"><a id="__codelineno-13-11" name="__codelineno-13-11" href="#__codelineno-13-11"></a>        <span class="p">[</span><span class="s1">&#39;github.com&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
+</span><span id="__span-13-12"><a id="__codelineno-13-12" name="__codelineno-13-12" href="#__codelineno-13-12"></a>        <span class="p">[</span><span class="s1">&#39;news.ycombinator.com&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
+</span><span id="__span-13-13"><a id="__codelineno-13-13" name="__codelineno-13-13" href="#__codelineno-13-13"></a>        <span class="p">[</span><span class="s1">&#39;reddit.com&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
+</span><span id="__span-13-14"><a id="__codelineno-13-14" name="__codelineno-13-14" href="#__codelineno-13-14"></a>    <span class="p">),</span>
+</span><span id="__span-13-15"><a id="__codelineno-13-15" name="__codelineno-13-15" href="#__codelineno-13-15"></a><span class="p">);</span>
+</span></code></pre></div>
+<h3 id="-flatmap"><code>-&gt;flatMap()</code><a class="headerlink" href="#-flatmap" title="Permanent link">&para;</a></h3>
+<p>This is similar to <code>-&gt;map()</code> but instead of returning a new value it returns a new <code>Map</code> for each value, all maps are merged to form only one <code>Map</code>.</p>
+<p>This is usefull to generate multiple pairs for each initial pair or to modify the keys.</p>
+<div class="language-php highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="nv">$urls</span> <span class="o">=</span> <span class="nx">Map</span><span class="o">::</span><span class="na">of</span><span class="p">(</span>
+</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>    <span class="p">[</span><span class="s1">&#39;example.com&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>    <span class="p">[</span><span class="s1">&#39;github.com&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a>    <span class="p">[</span><span class="s1">&#39;news.ycombinator.com&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+</span><span id="__span-14-5"><a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a>    <span class="p">[</span><span class="s1">&#39;reddit.com&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+</span><span id="__span-14-6"><a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a><span class="p">);</span>
+</span><span id="__span-14-7"><a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a><span class="nv">$withScheme</span> <span class="o">=</span> <span class="nv">$map</span><span class="o">-&gt;</span><span class="na">map</span><span class="p">(</span><span class="nx">fn</span><span class="p">(</span><span class="nv">$key</span><span class="p">,</span> <span class="nv">$value</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nx">Map</span><span class="o">::</span><span class="na">of</span><span class="p">(</span>
+</span><span id="__span-14-8"><a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a>    <span class="p">[</span><span class="s2">&quot;http://</span><span class="si">$key</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nv">$value</span><span class="p">],</span>
+</span><span id="__span-14-9"><a id="__codelineno-14-9" name="__codelineno-14-9" href="#__codelineno-14-9"></a>    <span class="p">[</span><span class="s2">&quot;https://</span><span class="si">$key</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nv">$value</span><span class="p">],</span>
+</span><span id="__span-14-10"><a id="__codelineno-14-10" name="__codelineno-14-10" href="#__codelineno-14-10"></a><span class="p">));</span>
+</span><span id="__span-14-11"><a id="__codelineno-14-11" name="__codelineno-14-11" href="#__codelineno-14-11"></a><span class="nv">$withScheme</span><span class="o">-&gt;</span><span class="na">equals</span><span class="p">(</span>
+</span><span id="__span-14-12"><a id="__codelineno-14-12" name="__codelineno-14-12" href="#__codelineno-14-12"></a>    <span class="nx">Map</span><span class="o">::</span><span class="na">of</span><span class="p">(</span>
+</span><span id="__span-14-13"><a id="__codelineno-14-13" name="__codelineno-14-13" href="#__codelineno-14-13"></a>        <span class="p">[</span><span class="s1">&#39;http://example.com&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+</span><span id="__span-14-14"><a id="__codelineno-14-14" name="__codelineno-14-14" href="#__codelineno-14-14"></a>        <span class="p">[</span><span class="s1">&#39;https://example.com&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+</span><span id="__span-14-15"><a id="__codelineno-14-15" name="__codelineno-14-15" href="#__codelineno-14-15"></a>        <span class="p">[</span><span class="s1">&#39;http://github.com&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+</span><span id="__span-14-16"><a id="__codelineno-14-16" name="__codelineno-14-16" href="#__codelineno-14-16"></a>        <span class="p">[</span><span class="s1">&#39;https://github.com&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+</span><span id="__span-14-17"><a id="__codelineno-14-17" name="__codelineno-14-17" href="#__codelineno-14-17"></a>        <span class="p">[</span><span class="s1">&#39;http://news.ycombinator.com&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+</span><span id="__span-14-18"><a id="__codelineno-14-18" name="__codelineno-14-18" href="#__codelineno-14-18"></a>        <span class="p">[</span><span class="s1">&#39;https://news.ycombinator.com&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+</span><span id="__span-14-19"><a id="__codelineno-14-19" name="__codelineno-14-19" href="#__codelineno-14-19"></a>        <span class="p">[</span><span class="s1">&#39;http://reddit.com&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+</span><span id="__span-14-20"><a id="__codelineno-14-20" name="__codelineno-14-20" href="#__codelineno-14-20"></a>        <span class="p">[</span><span class="s1">&#39;https://reddit.com&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+</span><span id="__span-14-21"><a id="__codelineno-14-21" name="__codelineno-14-21" href="#__codelineno-14-21"></a>    <span class="p">),</span>
+</span><span id="__span-14-22"><a id="__codelineno-14-22" name="__codelineno-14-22" href="#__codelineno-14-22"></a><span class="p">);</span>
+</span></code></pre></div>
+<h2 id="filter-values">Filter values<a class="headerlink" href="#filter-values" title="Permanent link">&para;</a></h2>
+<h3 id="-filter"><code>-&gt;filter()</code><a class="headerlink" href="#-filter" title="Permanent link">&para;</a></h3>
+<p>Removes the pairs from the map that don't match the given predicate.</p>
+<div class="language-php highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="nv">$map</span> <span class="o">=</span> <span class="nx">Map</span><span class="o">::</span><span class="na">of</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">]);</span>
+</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="nv">$map</span> <span class="o">=</span> <span class="nv">$map</span><span class="o">-&gt;</span><span class="na">filter</span><span class="p">(</span><span class="nx">fn</span><span class="p">(</span><span class="nv">$key</span><span class="p">,</span> <span class="nv">$value</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">(</span><span class="nv">$key</span> <span class="o">+</span> <span class="nv">$value</span><span class="p">)</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">===</span> <span class="mi">0</span><span class="p">);</span>
+</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="nv">$map</span><span class="o">-&gt;</span><span class="na">equals</span><span class="p">(</span><span class="nx">Map</span><span class="o">::</span><span class="na">of</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]));</span>
+</span></code></pre></div>
+<h3 id="-exclude"><code>-&gt;exclude()</code><a class="headerlink" href="#-exclude" title="Permanent link">&para;</a></h3>
+<p>Removes the pairs from the map that match the given predicate.</p>
+<div class="language-php highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="nv">$map</span> <span class="o">=</span> <span class="nx">Map</span><span class="o">::</span><span class="na">of</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">]);</span>
+</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="nv">$map</span> <span class="o">=</span> <span class="nv">$map</span><span class="o">-&gt;</span><span class="na">exclude</span><span class="p">(</span><span class="nx">fn</span><span class="p">(</span><span class="nv">$key</span><span class="p">,</span> <span class="nv">$value</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">(</span><span class="nv">$key</span> <span class="o">+</span> <span class="nv">$value</span><span class="p">)</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">===</span> <span class="mi">0</span><span class="p">);</span>
+</span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="nv">$map</span><span class="o">-&gt;</span><span class="na">equals</span><span class="p">(</span><span class="nx">Map</span><span class="o">::</span><span class="na">of</span><span class="p">([</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">]));</span>
+</span></code></pre></div>
+<h3 id="-remove"><code>-&gt;remove()</code><a class="headerlink" href="#-remove" title="Permanent link">&para;</a></h3>
+<p>Remove the pair from the map with the given key.</p>
+<div class="language-php highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="nv">$map</span> <span class="o">=</span> <span class="nx">Map</span><span class="o">::</span><span class="na">of</span><span class="p">([</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]);</span>
+</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="nv">$map</span><span class="o">-&gt;</span><span class="na">remove</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">equals</span><span class="p">(</span><span class="nx">Map</span><span class="o">::</span><span class="na">of</span><span class="p">([</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]));</span> <span class="c1">// true</span>
+</span></code></pre></div>
+<h2 id="extract-values">Extract values<a class="headerlink" href="#extract-values" title="Permanent link">&para;</a></h2>
+<h3 id="-reduce"><code>-&gt;reduce()</code><a class="headerlink" href="#-reduce" title="Permanent link">&para;</a></h3>
+<p>Iteratively compute a value for all the pairs in the map.</p>
+<div class="language-php highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="nv">$map</span> <span class="o">=</span> <span class="nx">Map</span><span class="o">::</span><span class="na">of</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">]);</span>
+</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="nv">$sum</span> <span class="o">=</span> <span class="nv">$map</span><span class="o">-&gt;</span><span class="na">reduce</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nx">fn</span><span class="p">(</span><span class="nv">$sum</span><span class="p">,</span> <span class="nv">$key</span><span class="p">,</span> <span class="nv">$value</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nv">$sum</span> <span class="o">+</span> <span class="nv">$key</span> <span class="o">+</span> <span class="nv">$value</span><span class="p">);</span>
+</span><span id="__span-18-3"><a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="nv">$sum</span><span class="p">;</span> <span class="c1">// 14</span>
+</span></code></pre></div>
+<h2 id="misc">Misc.<a class="headerlink" href="#misc" title="Permanent link">&para;</a></h2>
+<h3 id="-equals"><code>-&gt;equals()</code><a class="headerlink" href="#-equals" title="Permanent link">&para;</a></h3>
+<p>Check if two maps are identical.</p>
+<div class="language-php highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="nv">$a</span> <span class="o">=</span> <span class="nx">Map</span><span class="o">::</span><span class="na">of</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]);</span>
+</span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="nv">$b</span> <span class="o">=</span> <span class="nx">Map</span><span class="o">::</span><span class="na">of</span><span class="p">([</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]);</span>
+</span><span id="__span-19-3"><a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a><span class="nv">$a</span><span class="o">-&gt;</span><span class="na">equals</span><span class="p">(</span><span class="nv">$b</span><span class="p">);</span> <span class="c1">// true</span>
+</span><span id="__span-19-4"><a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a><span class="nv">$a</span><span class="o">-&gt;</span><span class="na">equals</span><span class="p">(</span><span class="nx">Map</span><span class="o">::</span><span class="na">of</span><span class="p">();</span> <span class="c1">// false</span>
+</span></code></pre></div>
+<h3 id="-foreach"><code>-&gt;foreach()</code><a class="headerlink" href="#-foreach" title="Permanent link">&para;</a></h3>
+<p>Use this method to call a function for each pair of the map. Since this structure is immutable it returns a <code>SideEffect</code> object, as its name suggest it is the only place acceptable to create side effects.</p>
+<div class="language-php highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="nv">$sideEffect</span> <span class="o">=</span> <span class="nx">Map</span><span class="o">::</span><span class="na">of</span><span class="p">([</span><span class="s1">&#39;hello&#39;</span><span class="p">,</span> <span class="s1">&#39;world&#39;</span><span class="p">])</span><span class="o">-&gt;</span><span class="na">foreach</span><span class="p">(</span>
+</span><span id="__span-20-2"><a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a>    <span class="k">function</span><span class="p">(</span><span class="nx">string</span> <span class="nv">$key</span><span class="p">,</span> <span class="nx">string</span> <span class="nv">$value</span><span class="p">)</span><span class="o">:</span> <span class="nx">void</span> <span class="p">{</span>
+</span><span id="__span-20-3"><a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a>        <span class="k">echo</span> <span class="s2">&quot;</span><span class="si">$key</span><span class="s2"> </span><span class="si">$value</span><span class="s2">&quot;</span><span class="p">;</span> <span class="c1">// will print &quot;hello world&quot;</span>
+</span><span id="__span-20-4"><a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a>    <span class="p">},</span>
+</span><span id="__span-20-5"><a id="__codelineno-20-5" name="__codelineno-20-5" href="#__codelineno-20-5"></a><span class="p">);</span>
+</span></code></pre></div>
+<p>In itself the <code>SideEffect</code> object has no use except to avoid psalm complaining that the <code>foreach</code> method is not used.</p>
+<h3 id="-groupby"><code>-&gt;groupBy()</code><a class="headerlink" href="#-groupby" title="Permanent link">&para;</a></h3>
+<p>This will create multiples maps with elements regrouped under the same key computed by the given function.</p>
+<div class="language-php highlight"><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="nv">$urls</span> <span class="o">=</span> <span class="nx">Map</span><span class="o">::</span><span class="na">of</span><span class="p">(</span>
+</span><span id="__span-21-2"><a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a>    <span class="p">[</span><span class="s1">&#39;http://example.com&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+</span><span id="__span-21-3"><a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a>    <span class="p">[</span><span class="s1">&#39;http://example.com/foo&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+</span><span id="__span-21-4"><a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a>    <span class="p">[</span><span class="s1">&#39;https://example.com&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>
+</span><span id="__span-21-5"><a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a>    <span class="p">[</span><span class="s1">&#39;ftp://example.com&#39;</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span>
+</span><span id="__span-21-6"><a id="__codelineno-21-6" name="__codelineno-21-6" href="#__codelineno-21-6"></a><span class="p">);</span>
+</span><span id="__span-21-7"><a id="__codelineno-21-7" name="__codelineno-21-7" href="#__codelineno-21-7"></a><span class="sd">/** @var Innmind\Immutable\Map&lt;string, Sequence&lt;string&gt;&gt; */</span>
+</span><span id="__span-21-8"><a id="__codelineno-21-8" name="__codelineno-21-8" href="#__codelineno-21-8"></a><span class="nv">$map</span> <span class="o">=</span> <span class="nv">$urls</span><span class="o">-&gt;</span><span class="na">groupBy</span><span class="p">(</span><span class="nx">fn</span><span class="p">(</span><span class="nx">string</span> <span class="nv">$url</span><span class="p">,</span> <span class="nx">int</span> <span class="nv">$whatever</span><span class="p">)</span><span class="o">:</span> <span class="nx">string</span> <span class="o">=&gt;</span> <span class="nx">\parse_url</span><span class="p">(</span><span class="nv">$url</span><span class="p">)[</span><span class="s1">&#39;scheme&#39;</span><span class="p">]);</span>
+</span><span id="__span-21-9"><a id="__codelineno-21-9" name="__codelineno-21-9" href="#__codelineno-21-9"></a><span class="nv">$map</span>
+</span><span id="__span-21-10"><a id="__codelineno-21-10" name="__codelineno-21-10" href="#__codelineno-21-10"></a>    <span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;http&#39;</span><span class="p">)</span>
+</span><span id="__span-21-11"><a id="__codelineno-21-11" name="__codelineno-21-11" href="#__codelineno-21-11"></a>    <span class="o">-&gt;</span><span class="na">match</span><span class="p">(</span>
+</span><span id="__span-21-12"><a id="__codelineno-21-12" name="__codelineno-21-12" href="#__codelineno-21-12"></a>        <span class="k">static</span> <span class="nx">fn</span><span class="p">(</span><span class="nv">$group</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nv">$group</span><span class="p">,</span>
+</span><span id="__span-21-13"><a id="__codelineno-21-13" name="__codelineno-21-13" href="#__codelineno-21-13"></a>        <span class="k">static</span> <span class="nx">fn</span><span class="p">()</span> <span class="o">=&gt;</span> <span class="nx">Map</span><span class="o">::</span><span class="na">of</span><span class="p">(),</span>
+</span><span id="__span-21-14"><a id="__codelineno-21-14" name="__codelineno-21-14" href="#__codelineno-21-14"></a>    <span class="p">)</span>
+</span><span id="__span-21-15"><a id="__codelineno-21-15" name="__codelineno-21-15" href="#__codelineno-21-15"></a>    <span class="o">-&gt;</span><span class="na">equals</span><span class="p">(</span><span class="nx">Map</span><span class="o">::</span><span class="na">of</span><span class="p">(</span>
+</span><span id="__span-21-16"><a id="__codelineno-21-16" name="__codelineno-21-16" href="#__codelineno-21-16"></a>        <span class="p">[</span><span class="s1">&#39;http://example.com&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+</span><span id="__span-21-17"><a id="__codelineno-21-17" name="__codelineno-21-17" href="#__codelineno-21-17"></a>        <span class="p">[</span><span class="s1">&#39;http://example.com/foo&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+</span><span id="__span-21-18"><a id="__codelineno-21-18" name="__codelineno-21-18" href="#__codelineno-21-18"></a>    <span class="p">));</span> <span class="c1">// true</span>
+</span><span id="__span-21-19"><a id="__codelineno-21-19" name="__codelineno-21-19" href="#__codelineno-21-19"></a><span class="nv">$map</span>
+</span><span id="__span-21-20"><a id="__codelineno-21-20" name="__codelineno-21-20" href="#__codelineno-21-20"></a>    <span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;https&#39;</span><span class="p">)</span>
+</span><span id="__span-21-21"><a id="__codelineno-21-21" name="__codelineno-21-21" href="#__codelineno-21-21"></a>    <span class="o">-&gt;</span><span class="na">match</span><span class="p">(</span>
+</span><span id="__span-21-22"><a id="__codelineno-21-22" name="__codelineno-21-22" href="#__codelineno-21-22"></a>        <span class="k">static</span> <span class="nx">fn</span><span class="p">(</span><span class="nv">$group</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nv">$group</span><span class="p">,</span>
+</span><span id="__span-21-23"><a id="__codelineno-21-23" name="__codelineno-21-23" href="#__codelineno-21-23"></a>        <span class="k">static</span> <span class="nx">fn</span><span class="p">()</span> <span class="o">=&gt;</span> <span class="nx">Map</span><span class="o">::</span><span class="na">of</span><span class="p">(),</span>
+</span><span id="__span-21-24"><a id="__codelineno-21-24" name="__codelineno-21-24" href="#__codelineno-21-24"></a>    <span class="p">)</span>
+</span><span id="__span-21-25"><a id="__codelineno-21-25" name="__codelineno-21-25" href="#__codelineno-21-25"></a>    <span class="o">-&gt;</span><span class="na">equals</span><span class="p">(</span><span class="nx">Map</span><span class="o">::</span><span class="na">of</span><span class="p">([</span><span class="s1">&#39;https://example.com&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">]));</span> <span class="c1">// true</span>
+</span><span id="__span-21-26"><a id="__codelineno-21-26" name="__codelineno-21-26" href="#__codelineno-21-26"></a><span class="nv">$map</span>
+</span><span id="__span-21-27"><a id="__codelineno-21-27" name="__codelineno-21-27" href="#__codelineno-21-27"></a>    <span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;ftp&#39;</span><span class="p">)</span>
+</span><span id="__span-21-28"><a id="__codelineno-21-28" name="__codelineno-21-28" href="#__codelineno-21-28"></a>    <span class="o">-&gt;</span><span class="na">match</span><span class="p">(</span>
+</span><span id="__span-21-29"><a id="__codelineno-21-29" name="__codelineno-21-29" href="#__codelineno-21-29"></a>        <span class="k">static</span> <span class="nx">fn</span><span class="p">(</span><span class="nv">$group</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nv">$group</span><span class="p">,</span>
+</span><span id="__span-21-30"><a id="__codelineno-21-30" name="__codelineno-21-30" href="#__codelineno-21-30"></a>        <span class="k">static</span> <span class="nx">fn</span><span class="p">()</span> <span class="o">=&gt;</span> <span class="nx">Map</span><span class="o">::</span><span class="na">of</span><span class="p">(),</span>
+</span><span id="__span-21-31"><a id="__codelineno-21-31" name="__codelineno-21-31" href="#__codelineno-21-31"></a>    <span class="p">)</span>
+</span><span id="__span-21-32"><a id="__codelineno-21-32" name="__codelineno-21-32" href="#__codelineno-21-32"></a>    <span class="o">-&gt;</span><span class="na">equals</span><span class="p">(</span><span class="nx">Map</span><span class="o">::</span><span class="na">of</span><span class="p">([</span><span class="s1">&#39;ftp://example.com&#39;</span><span class="p">,</span> <span class="mi">4</span><span class="p">]));</span> <span class="c1">// true</span>
+</span></code></pre></div>
+<h3 id="-partition"><code>-&gt;partition()</code><a class="headerlink" href="#-partition" title="Permanent link">&para;</a></h3>
+<p>This method is similar to <code>-&gt;groupBy()</code> method but the map keys are always booleans. The difference is that here the 2 keys are always present whereas with <code>-&gt;groupBy()</code> it will depend on the original map.</p>
+<div class="language-php highlight"><pre><span></span><code><span id="__span-22-1"><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="nv">$map</span> <span class="o">=</span> <span class="nx">Map</span><span class="o">::</span><span class="na">of</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">]);</span>
+</span><span id="__span-22-2"><a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a><span class="sd">/** @var Map&lt;bool, Map&lt;int, int&gt;&gt; */</span>
+</span><span id="__span-22-3"><a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a><span class="nv">$map</span> <span class="o">=</span> <span class="nv">$map</span><span class="o">-&gt;</span><span class="na">partition</span><span class="p">(</span><span class="nx">fn</span><span class="p">(</span><span class="nv">$key</span><span class="p">,</span> <span class="nv">$value</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="p">(</span><span class="nv">$key</span> <span class="o">+</span> <span class="nv">$value</span><span class="p">)</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">===</span> <span class="mi">0</span><span class="p">);</span>
+</span><span id="__span-22-4"><a id="__codelineno-22-4" name="__codelineno-22-4" href="#__codelineno-22-4"></a><span class="nv">$map</span>
+</span><span id="__span-22-5"><a id="__codelineno-22-5" name="__codelineno-22-5" href="#__codelineno-22-5"></a>    <span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="k">true</span><span class="p">)</span>
+</span><span id="__span-22-6"><a id="__codelineno-22-6" name="__codelineno-22-6" href="#__codelineno-22-6"></a>    <span class="o">-&gt;</span><span class="na">match</span><span class="p">(</span>
+</span><span id="__span-22-7"><a id="__codelineno-22-7" name="__codelineno-22-7" href="#__codelineno-22-7"></a>        <span class="k">static</span> <span class="nx">fn</span><span class="p">(</span><span class="nv">$partition</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nv">$partition</span><span class="p">,</span>
+</span><span id="__span-22-8"><a id="__codelineno-22-8" name="__codelineno-22-8" href="#__codelineno-22-8"></a>        <span class="k">static</span> <span class="nx">fn</span><span class="p">()</span> <span class="o">=&gt;</span> <span class="nx">Map</span><span class="o">::</span><span class="na">of</span><span class="p">(),</span>
+</span><span id="__span-22-9"><a id="__codelineno-22-9" name="__codelineno-22-9" href="#__codelineno-22-9"></a>    <span class="p">)</span>
+</span><span id="__span-22-10"><a id="__codelineno-22-10" name="__codelineno-22-10" href="#__codelineno-22-10"></a>    <span class="o">-&gt;</span><span class="na">equals</span><span class="p">(</span><span class="nx">Map</span><span class="o">::</span><span class="na">of</span><span class="p">([</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">]));</span> <span class="c1">// true</span>
+</span><span id="__span-22-11"><a id="__codelineno-22-11" name="__codelineno-22-11" href="#__codelineno-22-11"></a><span class="nv">$map</span>
+</span><span id="__span-22-12"><a id="__codelineno-22-12" name="__codelineno-22-12" href="#__codelineno-22-12"></a>    <span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="k">false</span><span class="p">)</span>
+</span><span id="__span-22-13"><a id="__codelineno-22-13" name="__codelineno-22-13" href="#__codelineno-22-13"></a>    <span class="o">-&gt;</span><span class="na">match</span><span class="p">(</span>
+</span><span id="__span-22-14"><a id="__codelineno-22-14" name="__codelineno-22-14" href="#__codelineno-22-14"></a>        <span class="k">static</span> <span class="nx">fn</span><span class="p">(</span><span class="nv">$partition</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="nv">$partition</span><span class="p">,</span>
+</span><span id="__span-22-15"><a id="__codelineno-22-15" name="__codelineno-22-15" href="#__codelineno-22-15"></a>        <span class="k">static</span> <span class="nx">fn</span><span class="p">()</span> <span class="o">=&gt;</span> <span class="nx">Map</span><span class="o">::</span><span class="na">of</span><span class="p">(),</span>
+</span><span id="__span-22-16"><a id="__codelineno-22-16" name="__codelineno-22-16" href="#__codelineno-22-16"></a>    <span class="p">)</span>
+</span><span id="__span-22-17"><a id="__codelineno-22-17" name="__codelineno-22-17" href="#__codelineno-22-17"></a>    <span class="o">-&gt;</span><span class="na">equals</span><span class="p">(</span><span class="nx">Map</span><span class="o">::</span><span class="na">of</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]));</span> <span class="c1">// true</span>
+</span></code></pre></div>
+<h3 id="-clear"><code>-&gt;clear()</code><a class="headerlink" href="#-clear" title="Permanent link">&para;</a></h3>
+<p>Return an empty new map of the same type. Useful to avoid to respecify the templates types of the map in a new docblock annotation.</p>
+<div class="language-php highlight"><pre><span></span><code><span id="__span-23-1"><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="nv">$map</span> <span class="o">=</span> <span class="nx">Map</span><span class="o">::</span><span class="na">of</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]);</span>
+</span><span id="__span-23-2"><a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a><span class="nv">$map</span><span class="o">-&gt;</span><span class="na">clear</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">size</span><span class="p">();</span> <span class="c1">// 0</span>
+</span></code></pre></div>
+<h3 id="-tosequence"><code>-&gt;toSequence()</code><a class="headerlink" href="#-tosequence" title="Permanent link">&para;</a></h3>
+<p>Returns an unsorted <code>Sequence</code> with all value pairs.</p>
+<div class="language-php highlight"><pre><span></span><code><span id="__span-24-1"><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="nv">$map</span> <span class="o">=</span> <span class="nx">Map</span><span class="o">::</span><span class="na">of</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]);</span>
+</span><span id="__span-24-2"><a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a><span class="nv">$map</span>
+</span><span id="__span-24-3"><a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a>    <span class="o">-&gt;</span><span class="na">toSequence</span><span class="p">()</span>
+</span><span id="__span-24-4"><a id="__codelineno-24-4" name="__codelineno-24-4" href="#__codelineno-24-4"></a>    <span class="o">-&gt;</span><span class="na">equals</span><span class="p">(</span><span class="nx">Sequence</span><span class="o">::</span><span class="na">of</span><span class="p">(</span>
+</span><span id="__span-24-5"><a id="__codelineno-24-5" name="__codelineno-24-5" href="#__codelineno-24-5"></a>        <span class="k">new</span> <span class="nx">Pair</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+</span><span id="__span-24-6"><a id="__codelineno-24-6" name="__codelineno-24-6" href="#__codelineno-24-6"></a>        <span class="k">new</span> <span class="nx">Pair</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
+</span><span id="__span-24-7"><a id="__codelineno-24-7" name="__codelineno-24-7" href="#__codelineno-24-7"></a>    <span class="p">));</span> <span class="c1">// true</span>
+</span></code></pre></div>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../set/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Set">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Set
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../str/" class="md-footer__link md-footer__link--next" aria-label="Next: Str">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                Str
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/Innmind/immutable" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.0.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path fill="currentColor" d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://twitter.com/Baptouuuu" target="_blank" rel="noopener" title="twitter.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.0.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path fill="currentColor" d="M357.2 48h70.6L273.6 224.2 455 464H313L201.7 318.6 74.5 464H3.8l164.9-188.5L-5.2 48h145.6l100.5 132.9zm-24.8 373.8h39.1L119.1 88h-42z"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      <script id="__config" type="application/json">{"base": "../..", "features": ["content.code.copy", "content.code.annotate", "navigation.tracking", "navigation.tabs", "navigation.tabs.sticky", "navigation.sections", "navigation.expand", "navigation.indexes", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.action.edit"], "search": "../../assets/javascripts/workers/search.973d3a69.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.92b07e13.min.js"></script>
+      
+        <script src="../../assets/external/unpkg.com/mermaid@11/dist/mermaid.min.js"></script>
+      
+    
+  </body>
+</html>
