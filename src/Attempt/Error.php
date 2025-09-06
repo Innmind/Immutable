@@ -4,7 +4,6 @@ declare(strict_types = 1);
 namespace Innmind\Immutable\Attempt;
 
 use Innmind\Immutable\{
-    Attempt,
     Maybe,
     Either,
 };
@@ -18,7 +17,7 @@ use Innmind\Immutable\{
 final class Error implements Implementation
 {
     public function __construct(
-        private \Throwable $value,
+        private \Throwable|Guard $value,
     ) {
     }
 
@@ -37,14 +36,39 @@ final class Error implements Implementation
     }
 
     #[\Override]
-    public function flatMap(callable $map): Attempt
+    public function flatMap(
+        callable $map,
+        callable $exfiltrate,
+    ): self {
+        return $this;
+    }
+
+    #[\Override]
+    public function guard(
+        callable $map,
+        callable $exfiltrate,
+    ): self {
+        return $this;
+    }
+
+    #[\Override]
+    public function guardError(): self
     {
-        return Attempt::error($this->value);
+        if ($this->value instanceof Guard) {
+            return $this;
+        }
+
+        return new self(new Guard($this->value));
     }
 
     #[\Override]
     public function match(callable $result, callable $error)
     {
+        if ($this->value instanceof Guard) {
+            /** @psalm-suppress ImpureFunctionCall */
+            return $error($this->value->unwrap());
+        }
+
         /** @psalm-suppress ImpureFunctionCall */
         return $error($this->value);
     }
@@ -52,15 +76,42 @@ final class Error implements Implementation
     #[\Override]
     public function mapError(callable $map): self
     {
+        if ($this->value instanceof Guard) {
+            /** @psalm-suppress ImpureFunctionCall */
+            return new self(new Guard(
+                $map($this->value->unwrap()),
+            ));
+        }
+
         /** @psalm-suppress ImpureFunctionCall */
         return new self($map($this->value));
     }
 
     #[\Override]
-    public function recover(callable $recover): Attempt
-    {
+    public function recover(
+        callable $recover,
+        callable $exfiltrate,
+    ): Implementation {
+        if ($this->value instanceof Guard) {
+            /** @psalm-suppress ImpureFunctionCall */
+            return $exfiltrate($recover($this->value->unwrap()));
+        }
+
         /** @psalm-suppress ImpureFunctionCall */
-        return $recover($this->value);
+        return $exfiltrate($recover($this->value));
+    }
+
+    #[\Override]
+    public function xrecover(
+        callable $recover,
+        callable $exfiltrate,
+    ): Implementation {
+        if ($this->value instanceof Guard) {
+            return $this;
+        }
+
+        /** @psalm-suppress ImpureFunctionCall */
+        return $exfiltrate($recover($this->value));
     }
 
     #[\Override]
@@ -72,22 +123,31 @@ final class Error implements Implementation
     #[\Override]
     public function either(): Either
     {
+        if ($this->value instanceof Guard) {
+            return Either::left($this->value->unwrap());
+        }
+
         return Either::left($this->value);
     }
 
-    /**
-     * @return Attempt<R1>
-     */
     #[\Override]
-    public function memoize(): Attempt
+    public function memoize(callable $exfiltrate): self
     {
-        return Attempt::error($this->value);
+        return $this;
     }
 
     #[\Override]
-    public function eitherWay(callable $result, callable $error): Attempt
-    {
+    public function eitherWay(
+        callable $result,
+        callable $error,
+        callable $exfiltrate,
+    ): Implementation {
+        if ($this->value instanceof Guard) {
+            /** @psalm-suppress ImpureFunctionCall */
+            return $exfiltrate($error($this->value->unwrap()));
+        }
+
         /** @psalm-suppress ImpureFunctionCall */
-        return $error($this->value);
+        return $exfiltrate($error($this->value));
     }
 }

@@ -29,10 +29,32 @@ interface Implementation
      * @template U
      *
      * @param callable(T): Attempt<U> $map
+     * @param pure-callable(Attempt<U>): self<U> $exfiltrate
      *
-     * @return Attempt<U>
+     * @return self<U>
      */
-    public function flatMap(callable $map): Attempt;
+    public function flatMap(
+        callable $map,
+        callable $exfiltrate,
+    ): self;
+
+    /**
+     * @template U
+     *
+     * @param callable(T): Attempt<U> $map
+     * @param pure-callable(Attempt<U>): self<U> $exfiltrate
+     *
+     * @return self<U>
+     */
+    public function guard(
+        callable $map,
+        callable $exfiltrate,
+    ): self;
+
+    /**
+     * @return self<T>
+     */
+    public function guardError(): self;
 
     /**
      * @template U
@@ -55,10 +77,27 @@ interface Implementation
      * @template U
      *
      * @param callable(\Throwable): Attempt<U> $recover
+     * @param pure-callable(Attempt<U>): self<U> $exfiltrate
      *
-     * @return Attempt<T|U>
+     * @return self<T|U>
      */
-    public function recover(callable $recover): Attempt;
+    public function recover(
+        callable $recover,
+        callable $exfiltrate,
+    ): self;
+
+    /**
+     * @template U
+     *
+     * @param callable(\Throwable): Attempt<U> $recover
+     * @param pure-callable(Attempt<U>): self<U> $exfiltrate
+     *
+     * @return self<T|U>
+     */
+    public function xrecover(
+        callable $recover,
+        callable $exfiltrate,
+    ): self;
 
     /**
      * @return Maybe<T>
@@ -71,17 +110,24 @@ interface Implementation
     public function either(): Either;
 
     /**
-     * @return Attempt<T>
+     * @param pure-callable(Attempt<T>): self<T> $exfiltrate
+     *
+     * @return self<T>
      */
-    public function memoize(): Attempt;
+    public function memoize(callable $exfiltrate): self;
 
     /**
      * @template V
      *
      * @param callable(T): Attempt<V> $result
      * @param callable(\Throwable): Attempt<V> $error
+     * @param pure-callable(Attempt<V>): self<V> $exfiltrate
      *
-     * @return Attempt<V>
+     * @return self<V>
      */
-    public function eitherWay(callable $result, callable $error): Attempt;
+    public function eitherWay(
+        callable $result,
+        callable $error,
+        callable $exfiltrate,
+    ): self;
 }

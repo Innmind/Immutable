@@ -108,7 +108,26 @@ final class Attempt
     #[\NoDiscard]
     public function flatMap(callable $map): self
     {
-        return $this->implementation->flatMap($map);
+        return new self($this->implementation->flatMap(
+            $map,
+            static fn(self $self) => $self->implementation,
+        ));
+    }
+
+    /**
+     * @template U
+     *
+     * @param callable(T): self<U> $map
+     *
+     * @return self<U>
+     */
+    #[\NoDiscard]
+    public function guard(callable $map): self
+    {
+        return new self($this->implementation->guard(
+            $map,
+            static fn(self $self) => $self->implementation,
+        ));
     }
 
     /**
@@ -163,7 +182,28 @@ final class Attempt
     #[\NoDiscard]
     public function recover(callable $recover): self
     {
-        return $this->implementation->recover($recover);
+        return new self($this->implementation->recover(
+            $recover,
+            static fn(self $self) => $self->implementation,
+        ));
+    }
+
+    /**
+     * This prevents guarded errors from being recovered.
+     *
+     * @template U
+     *
+     * @param callable(\Throwable): self<U> $recover
+     *
+     * @return self<T|U>
+     */
+    #[\NoDiscard]
+    public function xrecover(callable $recover): self
+    {
+        return new self($this->implementation->xrecover(
+            $recover,
+            static fn(self $self) => $self->implementation,
+        ));
     }
 
     /**
@@ -192,7 +232,9 @@ final class Attempt
     #[\NoDiscard]
     public function memoize(): self
     {
-        return $this->implementation->memoize();
+        return new self($this->implementation->memoize(
+            static fn(self $self) => $self->implementation,
+        ));
     }
 
     /**
@@ -206,6 +248,10 @@ final class Attempt
     #[\NoDiscard]
     public function eitherWay(callable $result, callable $error): self
     {
-        return $this->implementation->eitherWay($result, $error);
+        return new self($this->implementation->eitherWay(
+            $result,
+            $error,
+            static fn(self $self) => $self->implementation,
+        ));
     }
 }
