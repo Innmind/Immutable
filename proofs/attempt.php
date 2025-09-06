@@ -633,7 +633,7 @@ return static function() {
             $fail = new Exception;
             $assert->same(
                 $positive,
-                Atttempt::defer(static fn() => Attempt::result($positive))
+                Attempt::defer(static fn() => Attempt::result($positive))
                     ->guard(static fn() => Attempt::result($positive))
                     ->recover(static fn() => Attempt::result($negative))
                     ->match(
@@ -644,7 +644,7 @@ return static function() {
 
             $assert->same(
                 $negative,
-                Atttempt::defer(static fn() => Attempt::result($positive))
+                Attempt::defer(static fn() => Attempt::result($positive))
                     ->guard(static fn() => Attempt::error($fail))
                     ->recover(static fn() => Attempt::result($negative))
                     ->match(
@@ -655,7 +655,7 @@ return static function() {
 
             $assert->same(
                 $fail,
-                Atttempt::defer(static fn() => Attempt::result($positive))
+                Attempt::defer(static fn() => Attempt::result($positive))
                     ->guard(static fn() => Attempt::error($fail))
                     ->xrecover(static fn() => Attempt::result($negative))
                     ->match(
@@ -666,7 +666,7 @@ return static function() {
 
             $assert->same(
                 $negative,
-                Atttempt::defer(static fn() => Attempt::result($positive))
+                Attempt::defer(static fn() => Attempt::result($positive))
                     ->flatMap(static fn() => Attempt::error($fail))
                     ->xrecover(static fn() => Attempt::result($negative))
                     ->match(
