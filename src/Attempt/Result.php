@@ -41,6 +41,21 @@ final class Result implements Implementation
     }
 
     #[\Override]
+    public function guard(
+        callable $map,
+        callable $exfiltrate,
+    ): Implementation {
+        /** @psalm-suppress ImpureFunctionCall */
+        return $exfiltrate($map($this->value))->guardError();
+    }
+
+    #[\Override]
+    public function guardError(): self
+    {
+        return $this;
+    }
+
+    #[\Override]
     public function match(callable $result, callable $error)
     {
         /** @psalm-suppress ImpureFunctionCall */
@@ -55,6 +70,14 @@ final class Result implements Implementation
 
     #[\Override]
     public function recover(
+        callable $recover,
+        callable $exfiltrate,
+    ): self {
+        return $this;
+    }
+
+    #[\Override]
+    public function xrecover(
         callable $recover,
         callable $exfiltrate,
     ): self {

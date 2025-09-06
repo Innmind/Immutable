@@ -49,6 +49,22 @@ final class Defer implements Implementation
     }
 
     #[\Override]
+    public function guard(
+        callable $map,
+        callable $exfiltrate,
+    ): self {
+        $captured = $this->capture();
+
+        return new self(static fn() => self::detonate($captured)->guard($map));
+    }
+
+    #[\Override]
+    public function guardError(): self
+    {
+        return $this;
+    }
+
+    #[\Override]
     public function match(callable $result, callable $error)
     {
         return $this->unwrap()->match($result, $error);
@@ -70,6 +86,16 @@ final class Defer implements Implementation
         $captured = $this->capture();
 
         return new self(static fn() => self::detonate($captured)->recover($recover));
+    }
+
+    #[\Override]
+    public function xrecover(
+        callable $recover,
+        callable $exfiltrate,
+    ): self {
+        $captured = $this->capture();
+
+        return new self(static fn() => self::detonate($captured)->xrecover($recover));
     }
 
     #[\Override]

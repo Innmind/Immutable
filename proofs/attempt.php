@@ -568,4 +568,58 @@ return static function() {
             );
         },
     );
+
+    yield proof(
+        'Attempt::guard()',
+        given(
+            Set::integers()->above(1),
+            Set::integers()->below(-1),
+        ),
+        static function($assert, $positive, $negative) {
+            $fail = new Exception;
+            $assert->same(
+                $positive,
+                Attempt::result($positive)
+                    ->guard(static fn() => Attempt::result($positive))
+                    ->recover(static fn() => Attempt::result($negative))
+                    ->match(
+                        static fn($value) => $value,
+                        static fn() => null,
+                    ),
+            );
+
+            $assert->same(
+                $negative,
+                Attempt::result($positive)
+                    ->guard(static fn() => Attempt::error($fail))
+                    ->recover(static fn() => Attempt::result($negative))
+                    ->match(
+                        static fn($value) => $value,
+                        static fn() => null,
+                    ),
+            );
+
+            $assert->same(
+                $fail,
+                Attempt::result($positive)
+                    ->guard(static fn() => Attempt::error($fail))
+                    ->xrecover(static fn() => Attempt::result($negative))
+                    ->match(
+                        static fn($value) => $value,
+                        static fn($e) => $e,
+                    ),
+            );
+
+            $assert->same(
+                $negative,
+                Attempt::result($positive)
+                    ->flatMap(static fn() => Attempt::error($fail))
+                    ->xrecover(static fn() => Attempt::result($negative))
+                    ->match(
+                        static fn($value) => $value,
+                        static fn($e) => $e,
+                    ),
+            );
+        },
+    );
 };

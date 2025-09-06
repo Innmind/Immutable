@@ -41,6 +41,24 @@ interface Implementation
     /**
      * @template U
      *
+     * @param callable(T): Attempt<U> $map
+     * @param pure-callable(Attempt<U>): self<U> $exfiltrate
+     *
+     * @return self<U>
+     */
+    public function guard(
+        callable $map,
+        callable $exfiltrate,
+    ): self;
+
+    /**
+     * @return self<T>
+     */
+    public function guardError(): self;
+
+    /**
+     * @template U
+     *
      * @param callable(T): U $result
      * @param callable(\Throwable): U $error
      *
@@ -64,6 +82,19 @@ interface Implementation
      * @return self<T|U>
      */
     public function recover(
+        callable $recover,
+        callable $exfiltrate,
+    ): self;
+
+    /**
+     * @template U
+     *
+     * @param callable(\Throwable): Attempt<U> $recover
+     * @param pure-callable(Attempt<U>): self<U> $exfiltrate
+     *
+     * @return self<T|U>
+     */
+    public function xrecover(
         callable $recover,
         callable $exfiltrate,
     ): self;

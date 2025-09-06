@@ -117,6 +117,22 @@ final class Attempt
     /**
      * @template U
      *
+     * @param callable(T): self<U> $map
+     *
+     * @return self<U>
+     */
+    #[\NoDiscard]
+    public function guard(callable $map): self
+    {
+        return new self($this->implementation->guard(
+            $map,
+            static fn(self $self) => $self->implementation,
+        ));
+    }
+
+    /**
+     * @template U
+     *
      * @param callable(T): U $result
      * @param callable(\Throwable): U $error
      *
@@ -167,6 +183,24 @@ final class Attempt
     public function recover(callable $recover): self
     {
         return new self($this->implementation->recover(
+            $recover,
+            static fn(self $self) => $self->implementation,
+        ));
+    }
+
+    /**
+     * This prevents guarded errors from being recovered.
+     *
+     * @template U
+     *
+     * @param callable(\Throwable): self<U> $recover
+     *
+     * @return self<T|U>
+     */
+    #[\NoDiscard]
+    public function xrecover(callable $recover): self
+    {
+        return new self($this->implementation->xrecover(
             $recover,
             static fn(self $self) => $self->implementation,
         ));
