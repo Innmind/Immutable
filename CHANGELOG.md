@@ -1,5 +1,12 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+
+- `Innmind\Immutable\Attempt::guard()`
+- `Innmind\Immutable\Attempt::xrecover()`
+
 ## 5.19.0 - 2025-09-03
 
 ### Added

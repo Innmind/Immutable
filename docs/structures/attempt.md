@@ -111,6 +111,10 @@ $attempt = Attempt::result(2 - $reduction)
 
 If `#!php $reduction` is `#!php 2` then `#!php $attempt` will contain a `DivisionByZeroError` otherwise for any other value it will contain a fraction of `#!php 42`.
 
+## `->guard()`
+
+This behaves like [`->flatMap()`](#-flatmap) except any error contained in the attempt returned by the callable won't be recovered when calling [`->xrecover()`](#-xrecover).
+
 ## `->match()`
 
 This extracts the result value but also forces you to deal with any potential error.
@@ -145,6 +149,30 @@ $attempt = Attempt::of(static fn() => 1/0)
 ```
 
 Here `#!php $attempt` is `#!php 42` because the first `Attempt` raised a `DivisionByZeroError`.
+
+## `->xrecover()`
+
+This behaves like [`->recover()`](#-recover) except when conjointly used with [`->guard()`](#-guard). Guarded errors can't be recovered.
+
+An example of this problem is an HTTP router with 2 routes. One tries to handle a `POST` request, then do some logging, the other tries to handle a `GET` request. It would look something like this:
+
+```php
+$response = handlePost($request)
+    ->flatMap(static fn($response) => log($response))
+    ->recover(static fn() => handleGet($request));
+```
+
+The problem here is that if the request is indeed a `POST` we handle it then log the response. But if the logging fails then we try to handle it as a `GET` request. In this case we handle the request twice, which isn't good.
+
+The correct approach is:
+
+```php
+$response = handlePost($request)
+    ->guard(static fn($response) => log($response))
+    ->xrecover(static fn() => handleGet($request));
+```
+
+This way if the logging fails it will return this failure and not call `handleGet()`.
 
 ## `->maybe()`
 
