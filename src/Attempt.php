@@ -108,7 +108,10 @@ final class Attempt
     #[\NoDiscard]
     public function flatMap(callable $map): self
     {
-        return $this->implementation->flatMap($map);
+        return new self($this->implementation->flatMap(
+            $map,
+            static fn(self $self) => $self->implementation,
+        ));
     }
 
     /**
@@ -163,7 +166,10 @@ final class Attempt
     #[\NoDiscard]
     public function recover(callable $recover): self
     {
-        return $this->implementation->recover($recover);
+        return new self($this->implementation->recover(
+            $recover,
+            static fn(self $self) => $self->implementation,
+        ));
     }
 
     /**
@@ -192,7 +198,9 @@ final class Attempt
     #[\NoDiscard]
     public function memoize(): self
     {
-        return $this->implementation->memoize();
+        return new self($this->implementation->memoize(
+            static fn(self $self) => $self->implementation,
+        ));
     }
 
     /**
@@ -206,6 +214,10 @@ final class Attempt
     #[\NoDiscard]
     public function eitherWay(callable $result, callable $error): self
     {
-        return $this->implementation->eitherWay($result, $error);
+        return new self($this->implementation->eitherWay(
+            $result,
+            $error,
+            static fn(self $self) => $self->implementation,
+        ));
     }
 }

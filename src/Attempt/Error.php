@@ -4,7 +4,6 @@ declare(strict_types = 1);
 namespace Innmind\Immutable\Attempt;
 
 use Innmind\Immutable\{
-    Attempt,
     Maybe,
     Either,
 };
@@ -37,9 +36,11 @@ final class Error implements Implementation
     }
 
     #[\Override]
-    public function flatMap(callable $map): Attempt
-    {
-        return Attempt::error($this->value);
+    public function flatMap(
+        callable $map,
+        callable $exfiltrate,
+    ): self {
+        return $this;
     }
 
     #[\Override]
@@ -57,10 +58,12 @@ final class Error implements Implementation
     }
 
     #[\Override]
-    public function recover(callable $recover): Attempt
-    {
+    public function recover(
+        callable $recover,
+        callable $exfiltrate,
+    ): Implementation {
         /** @psalm-suppress ImpureFunctionCall */
-        return $recover($this->value);
+        return $exfiltrate($recover($this->value));
     }
 
     #[\Override]
@@ -75,19 +78,19 @@ final class Error implements Implementation
         return Either::left($this->value);
     }
 
-    /**
-     * @return Attempt<R1>
-     */
     #[\Override]
-    public function memoize(): Attempt
+    public function memoize(callable $exfiltrate): self
     {
-        return Attempt::error($this->value);
+        return $this;
     }
 
     #[\Override]
-    public function eitherWay(callable $result, callable $error): Attempt
-    {
+    public function eitherWay(
+        callable $result,
+        callable $error,
+        callable $exfiltrate,
+    ): Implementation {
         /** @psalm-suppress ImpureFunctionCall */
-        return $error($this->value);
+        return $exfiltrate($error($this->value));
     }
 }

@@ -39,11 +39,13 @@ final class Defer implements Implementation
     }
 
     #[\Override]
-    public function flatMap(callable $map): Attempt
-    {
+    public function flatMap(
+        callable $map,
+        callable $exfiltrate,
+    ): self {
         $captured = $this->capture();
 
-        return Attempt::defer(static fn() => self::detonate($captured)->flatMap($map));
+        return new self(static fn() => self::detonate($captured)->flatMap($map));
     }
 
     #[\Override]
@@ -61,11 +63,13 @@ final class Defer implements Implementation
     }
 
     #[\Override]
-    public function recover(callable $recover): Attempt
-    {
+    public function recover(
+        callable $recover,
+        callable $exfiltrate,
+    ): self {
         $captured = $this->capture();
 
-        return Attempt::defer(static fn() => self::detonate($captured)->recover($recover));
+        return new self(static fn() => self::detonate($captured)->recover($recover));
     }
 
     #[\Override]
@@ -84,21 +88,21 @@ final class Defer implements Implementation
         return Either::defer(static fn() => self::detonate($captured)->either());
     }
 
-    /**
-     * @return Attempt<R1>
-     */
     #[\Override]
-    public function memoize(): Attempt
+    public function memoize(callable $exfiltrate): Implementation
     {
-        return $this->unwrap();
+        return $exfiltrate($this->unwrap());
     }
 
     #[\Override]
-    public function eitherWay(callable $result, callable $error): Attempt
-    {
+    public function eitherWay(
+        callable $result,
+        callable $error,
+        callable $exfiltrate,
+    ): self {
         $captured = $this->capture();
 
-        return Attempt::defer(
+        return new self(
             static fn() => self::detonate($captured)->eitherWay($result, $error),
         );
     }
