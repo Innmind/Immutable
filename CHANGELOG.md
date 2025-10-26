@@ -6,6 +6,7 @@
 
 - `Innmind\Immutable\Map::partition()` now returns an array to allow for destructuring
 - `Innmind\Immutable\Sequence::partition()` now returns an array to allow for destructuring
+- `Innmind\Immutable\Set::partition()` now returns an array to allow for destructuring
 
 ### Removed
 

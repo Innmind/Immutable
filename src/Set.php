@@ -376,21 +376,23 @@ final class Set implements \Countable
     }
 
     /**
-     * Return a sequence of 2 sets partitioned according to the given predicate
+     * Return 2 Sets partitioned according to the given predicate
+     *
+     * The first Set contains values that matched the predicate.
      *
      * @param callable(T): bool $predicate
      *
-     * @return Map<bool, self<T>>
+     * @return array{self<T>, self<T>}
      */
     #[\NoDiscard]
-    public function partition(callable $predicate): Map
+    public function partition(callable $predicate): array
     {
         [$true, $false] = $this->implementation->partition($predicate);
 
-        return Map::of(
-            [true, $true->toSet()],
-            [false, $false->toSet()],
-        );
+        return [
+            $true->toSet(),
+            $false->toSet(),
+        ];
     }
 
     /**

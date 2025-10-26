@@ -323,16 +323,12 @@ class SetTest extends TestCase
             ->add(3)
             ->add(4);
 
-        $s2 = $s->partition(static function(int $v) {
+        [$true, $false] = $s->partition(static function(int $v) {
             return $v % 2 === 0;
         });
-        $this->assertNotSame($s, $s2);
-        $this->assertInstanceOf(Map::class, $s2);
         $this->assertSame([1, 2, 3, 4], $s->toList());
-        $this->assertInstanceOf(Set::class, $this->get($s2, true));
-        $this->assertInstanceOf(Set::class, $this->get($s2, false));
-        $this->assertSame([2, 4], $this->get($s2, true)->toList());
-        $this->assertSame([1, 3], $this->get($s2, false)->toList());
+        $this->assertSame([2, 4], $true->toList());
+        $this->assertSame([1, 3], $false->toList());
     }
 
     public function testSort()
