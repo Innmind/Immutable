@@ -311,31 +311,25 @@ class DoubleIndexTest extends TestCase
             (3, 4)
             (4, 5);
 
-        $p = $m->partition(static function(int $i, int $v) {
+        [$true, $false] = $m->partition(static function(int $i, int $v) {
             return ($i + $v) % 3 === 0;
         });
 
-        $this->assertInstanceOf(Map::class, $p);
-        $this->assertNotSame($p, $m);
-        $this->assertSame(
-            [true, false],
-            $p->keys()->toList(),
-        );
         $this->assertSame(
             [1, 4],
-            $this->get($p, true)->keys()->toList(),
+            $true->keys()->toList(),
         );
         $this->assertSame(
             [2, 5],
-            $this->get($p, true)->values()->toList(),
+            $true->values()->toList(),
         );
         $this->assertSame(
             [0, 2, 3],
-            $this->get($p, false)->keys()->toList(),
+            $false->keys()->toList(),
         );
         $this->assertSame(
             [1, 3, 4],
-            $this->get($p, false)->values()->toList(),
+            $false->values()->toList(),
         );
     }
 

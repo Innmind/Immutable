@@ -141,9 +141,9 @@ interface Implementation extends \Countable
      *
      * @param callable(T, S): bool $predicate
      *
-     * @return Map<bool, Map<T, S>>
+     * @return array{Map<T, S>, Map<T, S>}
      */
-    public function partition(callable $predicate): Map;
+    public function partition(callable $predicate): array;
 
     /**
      * Reduce the map to a single value

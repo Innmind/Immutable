@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Changed
+
+- `Innmind\Immutable\Map::partition()` now returns an array to allow for destructuring
+
 ### Removed
 
 - `Innmind\Immutable\Fold`

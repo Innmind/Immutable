@@ -283,14 +283,16 @@ final class Map implements \Countable
     }
 
     /**
-     * Return a map of 2 maps partitioned according to the given predicate
+     * Return 2 Maps partitioned according to the given predicate.
+     *
+     * The first Map contains values that matched the predicate.
      *
      * @param callable(T, S): bool $predicate
      *
-     * @return self<bool, self<T, S>>
+     * @return array{self<T, S>, self<T, S>}
      */
     #[\NoDiscard]
-    public function partition(callable $predicate): self
+    public function partition(callable $predicate): array
     {
         return $this->implementation->partition($predicate);
     }

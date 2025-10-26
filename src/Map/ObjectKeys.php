@@ -356,10 +356,10 @@ final class ObjectKeys implements Implementation
     /**
      * @param callable(T, S): bool $predicate
      *
-     * @return Map<bool, Map<T, S>>
+     * @return array{Map<T, S>, Map<T, S>}
      */
     #[\Override]
-    public function partition(callable $predicate): Map
+    public function partition(callable $predicate): array
     {
         $truthy = $this->clearMap();
         $falsy = $this->clearMap();
@@ -384,7 +384,7 @@ final class ObjectKeys implements Implementation
             }
         }
 
-        return Map::of([true, $truthy], [false, $falsy]);
+        return [$truthy, $falsy];
     }
 
     /**
