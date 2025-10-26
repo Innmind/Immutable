@@ -4,15 +4,13 @@ on: [push]
 
 jobs:
   blackbox:
-    uses: innmind/github-workflows/.github/workflows/black-box-matrix.yml@main
+    uses: innmind/github-workflows/.github/workflows/black-box-matrix.yml@next
     with:
       scenarii: 20
   coverage:
-    uses: innmind/github-workflows/.github/workflows/coverage-matrix.yml@main
+    uses: innmind/github-workflows/.github/workflows/coverage-matrix.yml@next
     secrets: inherit
   psalm:
-    uses: innmind/github-workflows/.github/workflows/psalm-matrix.yml@main
+    uses: innmind/github-workflows/.github/workflows/psalm-matrix.yml@next
   cs:
-    uses: innmind/github-workflows/.github/workflows/cs.yml@main
-    with:
-      php-version: '8.2'
+    uses: innmind/github-workflows/.github/workflows/cs.yml@next
