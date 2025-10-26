@@ -444,10 +444,10 @@ final class Str implements \Stringable
     #[\NoDiscard]
     public function ucfirst(): self
     {
-        return $this
-            ->substring(0, 1)
-            ->toUpper()
-            ->append($this->substring(1)->toString());
+        return new self(
+            \mb_ucfirst($this->value, $this->encoding->toString()),
+            $this->encoding,
+        );
     }
 
     /**
@@ -456,10 +456,10 @@ final class Str implements \Stringable
     #[\NoDiscard]
     public function lcfirst(): self
     {
-        return $this
-            ->substring(0, 1)
-            ->toLower()
-            ->append($this->substring(1)->toString());
+        return new self(
+            \mb_lcfirst($this->value, $this->encoding->toString()),
+            $this->encoding,
+        );
     }
 
     /**
@@ -511,7 +511,7 @@ final class Str implements \Stringable
     public function trim(?string $mask = null): self
     {
         return new self(
-            $mask === null ? \trim($this->value) : \trim($this->value, $mask),
+            \mb_trim($this->value, $mask, $this->encoding->toString()),
             $this->encoding,
         );
     }
@@ -523,7 +523,7 @@ final class Str implements \Stringable
     public function rightTrim(?string $mask = null): self
     {
         return new self(
-            $mask === null ? \rtrim($this->value) : \rtrim($this->value, $mask),
+            \mb_rtrim($this->value, $mask, $this->encoding->toString()),
             $this->encoding,
         );
     }
@@ -535,7 +535,7 @@ final class Str implements \Stringable
     public function leftTrim(?string $mask = null): self
     {
         return new self(
-            $mask === null ? \ltrim($this->value) : \ltrim($this->value, $mask),
+            \mb_ltrim($this->value, $mask, $this->encoding->toString()),
             $this->encoding,
         );
     }
@@ -613,11 +613,12 @@ final class Str implements \Stringable
      */
     private function pad(int $length, string|\Stringable $character, int $direction): self
     {
-        return new self(\str_pad(
+        return new self(\mb_str_pad(
             $this->value,
             $length,
             (string) $character,
             $direction,
+            $this->encoding->toString(),
         ), $this->encoding);
     }
 }
