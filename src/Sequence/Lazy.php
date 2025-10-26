@@ -360,39 +360,6 @@ final class Lazy implements Implementation
     }
 
     /**
-     * @param T $element
-     *
-     * @return Maybe<int<0, max>>
-     */
-    #[\Override]
-    public function indexOf($element): Maybe
-    {
-        $values = $this->values;
-
-        return Maybe::defer(static function() use ($values, $element) {
-            $index = 0;
-            $register = RegisterCleanup::noop();
-            $iterator = $values($register);
-            $iterator->rewind();
-
-            while ($iterator->valid()) {
-                if ($iterator->current() === $element) {
-                    $register->cleanup();
-
-                    /** @var Maybe<int<0, max>> */
-                    return Maybe::just($index);
-                }
-
-                ++$index;
-                $iterator->next();
-            }
-
-            /** @var Maybe<int<0, max>> */
-            return Maybe::nothing();
-        });
-    }
-
-    /**
      * Return the list of indices
      *
      * @return Implementation<int<0, max>>

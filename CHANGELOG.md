@@ -6,6 +6,7 @@
 
 - `Innmind\Immutable\Fold`
 - `Innmind\Immutable\State`
+- `Innmind\Immutable\Sequence::indexOf()`
 
 ## 5.20.0 - 2025-09-06
 

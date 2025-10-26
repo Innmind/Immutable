@@ -391,21 +391,6 @@ final class Sequence implements \Countable
     }
 
     /**
-     * Return the index for the given element
-     *
-     * @deprecated
-     *
-     * @param T $element
-     *
-     * @return Maybe<int<0, max>>
-     */
-    #[\NoDiscard]
-    public function indexOf($element): Maybe
-    {
-        return $this->implementation->indexOf($element);
-    }
-
-    /**
      * Return the list of indices
      *
      * @return self<int<0, max>>

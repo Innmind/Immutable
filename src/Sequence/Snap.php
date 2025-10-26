@@ -189,17 +189,6 @@ final class Snap implements Implementation
     }
 
     /**
-     * @param T $element
-     *
-     * @return Maybe<int<0, max>>
-     */
-    #[\Override]
-    public function indexOf($element): Maybe
-    {
-        return $this->memoize()->indexOf($element);
-    }
-
-    /**
      * Return the list of indices
      *
      * @return Implementation<int<0, max>>

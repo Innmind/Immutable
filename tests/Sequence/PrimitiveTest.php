@@ -191,36 +191,6 @@ class PrimitiveTest extends TestCase
         $this->assertFalse($sequence->contains(4));
     }
 
-    public function testIndexOf()
-    {
-        $sequence = new Primitive([1, 2, 4]);
-
-        $this->assertSame(
-            1,
-            $sequence->indexOf(2)->match(
-                static fn($value) => $value,
-                static fn() => null,
-            ),
-        );
-        $this->assertSame(
-            2,
-            $sequence->indexOf(4)->match(
-                static fn($value) => $value,
-                static fn() => null,
-            ),
-        );
-    }
-
-    public function testReturnNothingWhenTryingToAccessIndexOfUnknownValue()
-    {
-        $this->assertNull(
-            (new Primitive)->indexOf(1)->match(
-                static fn($value) => $value,
-                static fn() => null,
-            ),
-        );
-    }
-
     public function testIndices()
     {
         $a = new Primitive(['1', '2']);

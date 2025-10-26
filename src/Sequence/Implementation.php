@@ -136,15 +136,6 @@ interface Implementation extends \Countable
     public function contains($element): bool;
 
     /**
-     * Return the index for the given element
-     *
-     * @param T $element
-     *
-     * @return Maybe<int<0, max>>
-     */
-    public function indexOf($element): Maybe;
-
-    /**
      * Return the list of indices
      *
      * @return self<int<0, max>>

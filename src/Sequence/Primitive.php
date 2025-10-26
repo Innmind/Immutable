@@ -233,25 +233,6 @@ final class Primitive implements Implementation
         return \in_array($element, $this->values, true);
     }
 
-    /**
-     * @param T $element
-     *
-     * @return Maybe<int<0, max>>
-     */
-    #[\Override]
-    public function indexOf($element): Maybe
-    {
-        $index = \array_search($element, $this->values, true);
-
-        if ($index === false) {
-            /** @var Maybe<int<0, max>> */
-            return Maybe::nothing();
-        }
-
-        /** @var Maybe<int<0, max>> */
-        return Maybe::just($index);
-    }
-
     #[\Override]
     public function indices(): self
     {

@@ -370,30 +370,6 @@ class SequenceTest extends TestCase
         $this->assertFalse($sequence->contains(5));
     }
 
-    public function testIndexOf()
-    {
-        $sequence = Sequence::of()
-            ->add(1)
-            ->add(2)
-            ->add(3)
-            ->add(4);
-
-        $this->assertSame(
-            0,
-            $sequence->indexOf(1)->match(
-                static fn($value) => $value,
-                static fn() => null,
-            ),
-        );
-        $this->assertSame(
-            3,
-            $sequence->indexOf(4)->match(
-                static fn($value) => $value,
-                static fn() => null,
-            ),
-        );
-    }
-
     public function testIndices()
     {
         $sequence = Sequence::of()

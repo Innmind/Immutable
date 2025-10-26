@@ -390,42 +390,6 @@ final class Defer implements Implementation
     }
 
     /**
-     * @param T $element
-     *
-     * @return Maybe<int<0, max>>
-     */
-    #[\Override]
-    public function indexOf($element): Maybe
-    {
-        $captured = $this->capture();
-
-        return Maybe::defer(static function() use (&$captured, $element) {
-            $index = 0;
-            /**
-             * @psalm-suppress PossiblyNullArgument
-             * @var Iterator<T>
-             */
-            $values = self::detonate($captured);
-            $values->rewind();
-
-            while ($values->valid()) {
-                if ($values->current() === $element) {
-                    $values->cleanup();
-
-                    /** @var Maybe<int<0, max>> */
-                    return Maybe::just($index);
-                }
-
-                ++$index;
-                $values->next();
-            }
-
-            /** @var Maybe<int<0, max>> */
-            return Maybe::nothing();
-        });
-    }
-
-    /**
      * Return the list of indices
      *
      * @return Implementation<int<0, max>>

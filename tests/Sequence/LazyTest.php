@@ -347,46 +347,6 @@ class LazyTest extends TestCase
         $this->assertFalse($sequence->contains(4));
     }
 
-    public function testIndexOf()
-    {
-        $sequence = new Lazy(static function() {
-            yield 1;
-            yield 2;
-            yield 4;
-        });
-
-        $this->assertSame(
-            1,
-            $sequence->indexOf(2)->match(
-                static fn($value) => $value,
-                static fn() => null,
-            ),
-        );
-        $this->assertSame(
-            2,
-            $sequence->indexOf(4)->match(
-                static fn($value) => $value,
-                static fn() => null,
-            ),
-        );
-    }
-
-    public function testReturnNothingWhenTryingToAccessIndexOfUnknownValue()
-    {
-        $sequence = new Lazy(static function() {
-            if (false) {
-                yield 1;
-            }
-        });
-
-        $this->assertNull(
-            $sequence->indexOf(1)->match(
-                static fn($value) => $value,
-                static fn() => null,
-            ),
-        );
-    }
-
     public function testIndices()
     {
         $loaded = false;
@@ -787,28 +747,6 @@ class LazyTest extends TestCase
 
         $this->assertFalse($cleanupCalled);
         $this->assertTrue($sequence->contains(3));
-        $this->assertTrue($cleanupCalled);
-    }
-
-    public function testCallCleanupWhenIndexOfElementBeingLookedForIsFoundBeforeTheEndOfGenerator()
-    {
-        $cleanupCalled = false;
-        $sequence = new Lazy(static function($registerCleanup) use (&$cleanupCalled) {
-            $registerCleanup(static function() use (&$cleanupCalled) {
-                $cleanupCalled = true;
-            });
-            yield 2;
-            yield 3;
-            yield 4;
-            yield 5;
-        });
-
-        $this->assertFalse($cleanupCalled);
-        $index = $sequence->indexOf(3)->match(
-            static fn($index) => $index,
-            static fn() => null,
-        );
-        $this->assertSame(1, $index);
         $this->assertTrue($cleanupCalled);
     }
 

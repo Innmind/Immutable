@@ -341,46 +341,6 @@ class DeferTest extends TestCase
         $this->assertFalse($sequence->contains(4));
     }
 
-    public function testIndexOf()
-    {
-        $sequence = new Defer((static function() {
-            yield 1;
-            yield 2;
-            yield 4;
-        })());
-
-        $this->assertSame(
-            1,
-            $sequence->indexOf(2)->match(
-                static fn($value) => $value,
-                static fn() => null,
-            ),
-        );
-        $this->assertSame(
-            2,
-            $sequence->indexOf(4)->match(
-                static fn($value) => $value,
-                static fn() => null,
-            ),
-        );
-    }
-
-    public function testReturnNothingWhenTryingToAccessIndexOfUnknownValue()
-    {
-        $sequence = new Defer((static function() {
-            if (false) {
-                yield 1;
-            }
-        })());
-
-        $this->assertNull(
-            $sequence->indexOf(1)->match(
-                static fn($value) => $value,
-                static fn() => null,
-            ),
-        );
-    }
-
     public function testIndices()
     {
         $loaded = false;
