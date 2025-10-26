@@ -16,8 +16,6 @@ nav:
     - Attempt: structures/attempt.md
     - Validation: structures/validation.md
     - Identity: structures/identity.md
-    - State: structures/state.md
-    - Fold: structures/fold.md
   - Monoids: MONOIDS.md
   - Use cases:
     - use-cases/index.md

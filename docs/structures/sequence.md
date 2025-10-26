@@ -124,16 +124,6 @@ $sequence = Sequence::ints(1, 4, 6);
 $sequence->size(); // 3
 ```
 
-### `->count()` :material-memory-arrow-down:
-
-This is an alias for `->size()`, but you can also use the PHP function `\count` if you prefer.
-
-```php
-$sequence = Sequence::ints(1, 4, 6);
-$sequence->count(); // 3
-\count($sequence); // 3
-```
-
 ### `->get()`
 
 This method will return a [`Maybe`](maybe.md) object containing the element at the given index in the sequence. If the index doesn't exist it will an empty `Maybe` object.
@@ -162,19 +152,6 @@ $sequence->contains(2); // false
 $sequence->contains(42); // true
 $sequence->contains('42'); // false but psalm will raise an error
 ```
-
-### `->indexOf()`
-
-This will return a [`Maybe`](maybe.md) object containing the index number at which the first occurence of the element was found.
-
-```php
-$sequence = Sequence::ints(1, 2, 3, 2);
-$sequence->indexOf(2); // Maybe::just(1)
-$sequence->indexOf(4); // Maybe::nothing()
-```
-
-??? warning "Deprecated"
-    This method will be remove in the next major version.
 
 ### `->find()`
 
@@ -739,26 +716,14 @@ $sequence->pad(5, 0)->equals(Sequence::ints(1, 2, 3, 0, 0)); // true
 
 ### `->partition()` :material-memory-arrow-down:
 
-This method is similar to `->groupBy()` method but the map keys are always booleans. The difference is that here the 2 keys are always present whereas with `->groupBy()` it will depend on the original sequence.
+This method is similar to `->groupBy()` except it always return 2 `Sequence`s. The first one contains elements that match the predicate and the second the ones that don't.
 
 ```php
 $sequence = Sequence::ints(1, 2, 3);
-/** @var Map<bool, Sequence<int>> */
-$map = $sequence->partition(fn($int) => $int % 2 === 0);
-$map
-    ->get(true)
-    ->match(
-        static fn($partition) => $partition,
-        static fn() => Sequence::ints(),
-    )
-    ->equals(Sequence::ints(2)); // true
-$map
-    ->get(false)
-    ->match(
-        static fn($partition) => $partition,
-        static fn() => Sequence::ints(),
-    )
-    ->equals(Sequence::ints(1, 3)); // true
+/** @var array{Sequence<int>, Sequence<int>} */
+[$true, $false] = $sequence->partition(fn($int) => $int % 2 === 0);
+$true->equals(Sequence::ints(2)); // true
+$false->equals(Sequence::ints(1, 3)); // true
 ```
 
 ### `->sort()`

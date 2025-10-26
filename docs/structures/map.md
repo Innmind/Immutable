@@ -60,16 +60,6 @@ $map = Map::of([1, 2]);
 $map->size(); // 1
 ```
 
-### `->count()`
-
-This is an alias for `->size()`, but you can also use the PHP function `\count` if you prefer.
-
-```php
-$map = Map::of([1, 2]);
-$map->size(); // 1
-\count($map); // 1
-```
-
 ### `->get()`
 
 Return an instance of [`Maybe`](maybe.md) that may contain the value associated to the given key (if it exists).
@@ -319,26 +309,14 @@ $map
 
 ### `->partition()`
 
-This method is similar to `->groupBy()` method but the map keys are always booleans. The difference is that here the 2 keys are always present whereas with `->groupBy()` it will depend on the original map.
+This method is similar to `->groupBy()` except it always return 2 `Map`s. The first one contains elements that match the predicate and the second the ones that don't.
 
 ```php
 $map = Map::of([1, 2], [2, 3], [3, 3]);
-/** @var Map<bool, Map<int, int>> */
-$map = $map->partition(fn($key, $value) => ($key + $value) % 2 === 0);
-$map
-    ->get(true)
-    ->match(
-        static fn($partition) => $partition,
-        static fn() => Map::of(),
-    )
-    ->equals(Map::of([3, 3])); // true
-$map
-    ->get(false)
-    ->match(
-        static fn($partition) => $partition,
-        static fn() => Map::of(),
-    )
-    ->equals(Map::of([1, 2], [2, 3])); // true
+/** @var array{Map<int, int>, Map<int, int>} */
+[$true, $false] = $map->partition(fn($key, $value) => ($key + $value) % 2 === 0);
+$true->equals(Map::of([3, 3])); // true
+$false->equals(Map::of([1, 2], [2, 3])); // true
 ```
 
 ### `->clear()`

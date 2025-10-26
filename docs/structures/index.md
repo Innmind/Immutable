@@ -12,8 +12,6 @@ This library provides the following structures:
 - [`Attempt`](attempt.md)
 - [`Validation`](validation.md)
 - [`Identity`](identity.md)
-- [`State`](state.md)
-- [`Fold`](fold.md)
 
 See the documentation for each structure to understand how to use them.
 
