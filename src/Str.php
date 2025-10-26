@@ -555,11 +555,7 @@ final class Str implements \Stringable
     #[\NoDiscard]
     public function startsWith(string|\Stringable $value): bool
     {
-        if ($value === '') {
-            return true;
-        }
-
-        return \mb_strpos($this->value, (string) $value, 0, $this->encoding->toString()) === 0;
+        return \str_starts_with($this->value, (string) $value);
     }
 
     /**
@@ -568,15 +564,7 @@ final class Str implements \Stringable
     #[\NoDiscard]
     public function endsWith(string|\Stringable $value): bool
     {
-        $value = (string) $value;
-
-        if ($value === '') {
-            return true;
-        }
-
-        $length = self::of($value, $this->encoding)->length();
-
-        return $this->takeEnd($length)->toString() === $value;
+        return \str_ends_with($this->value, (string) $value);
     }
 
     /**
