@@ -599,8 +599,8 @@ class MaybeTest extends TestCase
 
     public function testToSequence()
     {
-        $this->assertCount(0, Maybe::nothing()->toSequence());
-        $this->assertCount(0, Maybe::defer(static fn() => Maybe::nothing())->toSequence());
+        $this->assertSame(0, Maybe::nothing()->toSequence()->size());
+        $this->assertSame(0, Maybe::defer(static fn() => Maybe::nothing())->toSequence()->size());
 
         $this
             ->forAll($this->value())

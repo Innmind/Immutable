@@ -67,12 +67,6 @@ final class DoubleIndex implements Implementation
         return $this->pairs->size();
     }
 
-    #[\Override]
-    public function count(): int
-    {
-        return $this->size();
-    }
-
     /**
      * @param T $key
      *

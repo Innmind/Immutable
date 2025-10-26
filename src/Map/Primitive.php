@@ -90,12 +90,6 @@ final class Primitive implements Implementation
         return \count($this->values);
     }
 
-    #[\Override]
-    public function count(): int
-    {
-        return $this->size();
-    }
-
     /**
      * @param T $key
      *

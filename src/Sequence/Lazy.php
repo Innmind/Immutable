@@ -73,12 +73,6 @@ final class Lazy implements Implementation
         return $size;
     }
 
-    #[\Override]
-    public function count(): int
-    {
-        return $this->size();
-    }
-
     /**
      * @return Iterator<T>
      */

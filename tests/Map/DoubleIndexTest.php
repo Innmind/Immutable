@@ -19,7 +19,6 @@ class DoubleIndexTest extends TestCase
         $m = new DoubleIndex;
 
         $this->assertInstanceOf(Implementation::class, $m);
-        $this->assertInstanceOf(\Countable::class, $m);
     }
 
     public function testPut()

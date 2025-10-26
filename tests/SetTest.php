@@ -13,11 +13,6 @@ use Innmind\BlackBox\PHPUnit\Framework\TestCase;
 
 class SetTest extends TestCase
 {
-    public function testInterface()
-    {
-        $this->assertInstanceOf(\Countable::class, Set::of());
-    }
-
     public function testOf()
     {
         $this->assertTrue(
@@ -96,7 +91,6 @@ class SetTest extends TestCase
         $s = Set::of()->add(42);
 
         $this->assertSame(1, $s->size());
-        $this->assertSame(1, $s->count());
         $s->add(24);
         $this->assertSame(1, $s->size());
         $s = $s->add(24);
@@ -503,7 +497,7 @@ class SetTest extends TestCase
                 static fn() => null,
             );
 
-        $this->assertSame('public function testInterface()', $line);
+        $this->assertSame('public function testOf()', $line);
         $this->assertSame(1, $started);
         $this->assertTrue($cleanupCalled);
         $this->assertFalse($endReached);

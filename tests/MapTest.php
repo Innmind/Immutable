@@ -12,13 +12,6 @@ use Innmind\BlackBox\PHPUnit\Framework\TestCase;
 
 class MapTest extends TestCase
 {
-    public function testInterface()
-    {
-        $m = Map::of();
-
-        $this->assertInstanceOf(\Countable::class, $m);
-    }
-
     public function testOf()
     {
         $map = Map::of()

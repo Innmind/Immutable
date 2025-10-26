@@ -8,7 +8,7 @@ namespace Innmind\Immutable;
  * @template-covariant S
  * @psalm-immutable
  */
-final class Map implements \Countable
+final class Map
 {
     /**
      * @param Map\Implementation<T, S> $implementation
@@ -67,16 +67,6 @@ final class Map implements \Countable
     public function size(): int
     {
         return $this->implementation->size();
-    }
-
-    /**
-     * @return int<0, max>
-     */
-    #[\Override]
-    #[\NoDiscard]
-    public function count(): int
-    {
-        return $this->size();
     }
 
     /**

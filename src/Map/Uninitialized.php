@@ -58,12 +58,6 @@ final class Uninitialized implements Implementation
         return 0;
     }
 
-    #[\Override]
-    public function count(): int
-    {
-        return $this->size();
-    }
-
     /**
      * @param T $key
      *

@@ -20,7 +20,6 @@ class ObjectKeysTest extends TestCase
         $m = new ObjectKeys;
 
         $this->assertInstanceOf(Implementation::class, $m);
-        $this->assertInstanceOf(\Countable::class, $m);
     }
 
     public function testPut()
@@ -330,7 +329,7 @@ class ObjectKeysTest extends TestCase
         $map = (new ObjectKeys)(1, 2);
 
         $this->assertInstanceOf(DoubleIndex::class, $map);
-        $this->assertCount(1, $map);
+        $this->assertSame(1, $map->size());
     }
 
     public function testFind()

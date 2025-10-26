@@ -18,7 +18,7 @@ use Innmind\Immutable\{
  * @internal Dot not code against this interface
  * @psalm-immutable
  */
-interface Implementation extends \Countable
+interface Implementation
 {
     /**
      * Set a new key/value pair

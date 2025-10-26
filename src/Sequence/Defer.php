@@ -79,12 +79,6 @@ final class Defer implements Implementation
         return $this->memoize()->size();
     }
 
-    #[\Override]
-    public function count(): int
-    {
-        return $this->size();
-    }
-
     /**
      * @return Iterator<T>
      */

@@ -82,12 +82,6 @@ final class ObjectKeys implements Implementation
         return $this->values->count();
     }
 
-    #[\Override]
-    public function count(): int
-    {
-        return $this->size();
-    }
-
     /**
      * @param T $key
      *

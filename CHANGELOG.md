@@ -7,6 +7,9 @@
 - `Innmind\Immutable\Map::partition()` now returns an array to allow for destructuring
 - `Innmind\Immutable\Sequence::partition()` now returns an array to allow for destructuring
 - `Innmind\Immutable\Set::partition()` now returns an array to allow for destructuring
+- `Innmind\Immutable\Map` no longer implements `Countable`
+- `Innmind\Immutable\Sequence` no longer implements `Countable`
+- `Innmind\Immutable\Set` no longer implements `Countable`
 
 ### Removed
 
@@ -15,6 +18,9 @@
 - `Innmind\Immutable\Sequence::indexOf()`
 - `Innmind\Immutable\Set::defer()`
 - `Innmind\Immutable\SideEffect::__construct()`
+- `Innmind\Immutable\Sequence::count()`
+- `Innmind\Immutable\Set::count()`
+- `Innmind\Immutable\Map::count()`
 
 ## 5.20.0 - 2025-09-06
 

@@ -41,7 +41,6 @@ class LazyTest extends TestCase
         });
 
         $this->assertSame(2, $sequence->size());
-        $this->assertSame(2, $sequence->count());
     }
 
     public function testIterator()
@@ -247,7 +246,7 @@ class LazyTest extends TestCase
 
         $this->assertSame([1, 2, 3, 4], \iterator_to_array($sequence->iterator()));
         $this->assertInstanceOf(Map::class, $groups);
-        $this->assertCount(2, $groups);
+        $this->assertSame(2, $groups->size());
         $this->assertSame([2, 4], $this->get($groups, 0)->toList());
         $this->assertSame([1, 3], $this->get($groups, 1)->toList());
     }

@@ -7,7 +7,7 @@ namespace Innmind\Immutable;
  * @template-covariant T
  * @psalm-immutable
  */
-final class Set implements \Countable
+final class Set
 {
     /**
      * @param Sequence<T> $implementation
@@ -148,16 +148,6 @@ final class Set implements \Countable
      */
     #[\NoDiscard]
     public function size(): int
-    {
-        return $this->implementation->size();
-    }
-
-    /**
-     * @return int<0, max>
-     */
-    #[\Override]
-    #[\NoDiscard]
-    public function count(): int
     {
         return $this->implementation->size();
     }

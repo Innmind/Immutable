@@ -16,7 +16,7 @@ use Innmind\Immutable\{
  * @template T
  * @psalm-immutable
  */
-interface Implementation extends \Countable
+interface Implementation
 {
     /**
      * Add the given element at the end of the sequence

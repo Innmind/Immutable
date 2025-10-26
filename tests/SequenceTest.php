@@ -26,7 +26,6 @@ class SequenceTest extends TestCase
     {
         $sequence = Sequence::of();
 
-        $this->assertInstanceOf(\Countable::class, $sequence);
         $this->assertSame([], $sequence->toList());
     }
 
@@ -146,11 +145,12 @@ class SequenceTest extends TestCase
 
     public function testCount()
     {
-        $this->assertCount(
+        $this->assertSame(
             2,
             Sequence::of()
                 ->add(1)
-                ->add(2),
+                ->add(2)
+                ->size(),
         );
     }
 
@@ -309,7 +309,7 @@ class SequenceTest extends TestCase
         });
 
         $this->assertInstanceOf(Map::class, $map);
-        $this->assertCount(3, $map);
+        $this->assertSame(3, $map->size());
         $this->assertSame([3], $this->get($map, 0)->toList());
         $this->assertSame([1, 4], $this->get($map, 1)->toList());
         $this->assertSame([2], $this->get($map, 2)->toList());

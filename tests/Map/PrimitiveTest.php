@@ -19,7 +19,6 @@ class PrimitiveTest extends TestCase
         $m = new Primitive;
 
         $this->assertInstanceOf(Implementation::class, $m);
-        $this->assertInstanceOf(\Countable::class, $m);
     }
 
     public function testPut()
