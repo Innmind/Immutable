@@ -7,6 +7,7 @@
 - `Innmind\Immutable\Fold`
 - `Innmind\Immutable\State`
 - `Innmind\Immutable\Sequence::indexOf()`
+- `Innmind\Immutable\Set::defer()`
 
 ## 5.20.0 - 2025-09-06
 

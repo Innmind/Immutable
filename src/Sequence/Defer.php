@@ -908,10 +908,9 @@ final class Defer implements Implementation
 
         /**
          * @psalm-suppress ImpureFunctionCall
-         * @psalm-suppress DeprecatedMethod
          */
-        return Set::defer(
-            (static function() use (&$captured): \Generator {
+        return Set::lazy(
+            static function() use (&$captured): \Generator {
                 /**
                  * @psalm-suppress PossiblyNullArgument
                  * @var Iterator<T>
@@ -923,8 +922,8 @@ final class Defer implements Implementation
                     yield $values->current();
                     $values->next();
                 }
-            })(),
-        );
+            },
+        )->snap();
     }
 
     #[\Override]

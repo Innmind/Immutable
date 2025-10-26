@@ -51,26 +51,6 @@ final class Set implements \Countable
     }
 
     /**
-     * It will load the values inside the generator only upon the first use
-     * of the set
-     *
-     * Use this mode when the amount of data may not fit in memory
-     *
-     * @template V
-     * @psalm-pure
-     * @deprecated You should use ::snap() instead
-     *
-     * @param \Generator<V> $generator
-     *
-     * @return self<V>
-     */
-    #[\NoDiscard]
-    public static function defer(\Generator $generator): self
-    {
-        return new self(Sequence::defer($generator)->distinct());
-    }
-
-    /**
      * It will call the given function every time a new operation is done on the
      * set. This means the returned structure may not be truly immutable as
      * between the calls the underlying source may change.

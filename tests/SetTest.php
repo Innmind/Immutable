@@ -30,22 +30,6 @@ class SetTest extends TestCase
         );
     }
 
-    public function testDefer()
-    {
-        $loaded = false;
-        $set = Set::defer((static function() use (&$loaded) {
-            yield 1;
-            yield 2;
-            yield 3;
-            $loaded = true;
-        })());
-
-        $this->assertInstanceOf(Set::class, $set);
-        $this->assertFalse($loaded);
-        $this->assertSame([1, 2, 3], $set->toList());
-        $this->assertTrue($loaded);
-    }
-
     public function testLazy()
     {
         $loaded = false;
@@ -316,12 +300,14 @@ class SetTest extends TestCase
         $this->assertTrue($loaded);
 
         $loaded = false;
-        $set = Set::defer((static function() use (&$loaded) {
+        $set = Set::lazy(static function() use (&$loaded) {
             yield 1;
             yield 2;
             yield 3;
             $loaded = true;
-        })())->flatMap(static fn($i) => Set::of($i, $i + 1));
+        })
+            ->snap()
+            ->flatMap(static fn($i) => Set::of($i, $i + 1));
 
         $this->assertInstanceOf(Set::class, $set);
         $this->assertFalse($loaded);
@@ -595,19 +581,21 @@ class SetTest extends TestCase
 
         try {
             $loaded = false;
-            $set = Set::defer((static function() use (&$loaded) {
+            $set = Set::lazy(static function() use (&$loaded) {
                 $loaded = true;
                 yield new \ArrayObject([1]);
                 yield new \ArrayObject([2]);
                 yield new \ArrayObject([3]);
                 yield new \ArrayObject([1]);
-            })())->safeguard(
-                Set::of(),
-                static fn($unique, $value) => match ($unique->contains($value[0])) {
-                    true => throw $stop,
-                    false => ($unique)($value[0]),
-                },
-            );
+            })
+                ->snap()
+                ->safeguard(
+                    Set::of(),
+                    static fn($unique, $value) => match ($unique->contains($value[0])) {
+                        true => throw $stop,
+                        false => ($unique)($value[0]),
+                    },
+                );
             $this->assertFalse($loaded);
             $set->toList();
             $this->fail('it should throw');
@@ -648,13 +636,13 @@ class SetTest extends TestCase
         $this->assertSame([1, 2, 3, 4], $set->memoize()->toList());
 
         $loaded = false;
-        $set = Set::defer((static function() use (&$loaded) {
+        $set = Set::lazy(static function() use (&$loaded) {
             yield 1;
             yield 2;
             yield 3;
             yield 4;
             $loaded = true;
-        })());
+        })->snap();
         $this->assertFalse($loaded);
         $memoized = $set->memoize();
         $this->assertTrue($loaded);
