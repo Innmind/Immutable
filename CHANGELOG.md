@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+### Added
+
+- `Innmind\Immutable\Predicate::and()`
+- `Innmind\Immutable\Predicate::or()`
+
 ### Changed
 
 - `Innmind\Immutable\Map::partition()` now returns an array to allow for destructuring
@@ -11,6 +16,7 @@
 - `Innmind\Immutable\Sequence` no longer implements `Countable`
 - `Innmind\Immutable\Set` no longer implements `Countable`
 - Requires PHP `8.4`
+- `Innmind\Immutable\Predicate` is now a final class
 
 ### Removed
 
