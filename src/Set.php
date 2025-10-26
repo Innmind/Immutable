@@ -385,10 +385,12 @@ final class Set implements \Countable
     #[\NoDiscard]
     public function partition(callable $predicate): Map
     {
-        return $this
-            ->implementation
-            ->partition($predicate)
-            ->map(static fn($_, $sequence) => $sequence->toSet());
+        [$true, $false] = $this->implementation->partition($predicate);
+
+        return Map::of(
+            [true, $true->toSet()],
+            [false, $false->toSet()],
+        );
     }
 
     /**

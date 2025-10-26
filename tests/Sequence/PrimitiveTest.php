@@ -237,13 +237,11 @@ class PrimitiveTest extends TestCase
     public function testPartition()
     {
         $sequence = new Primitive([1, 2, 3, 4]);
-        $partition = $sequence->partition(static fn($i) => $i % 2 === 0);
+        [$true, $false] = $sequence->partition(static fn($i) => $i % 2 === 0);
 
         $this->assertSame([1, 2, 3, 4], \iterator_to_array($sequence->iterator()));
-        $this->assertInstanceOf(Map::class, $partition);
-        $this->assertCount(2, $partition);
-        $this->assertSame([2, 4], $this->get($partition, true)->toList());
-        $this->assertSame([1, 3], $this->get($partition, false)->toList());
+        $this->assertSame([2, 4], $true->toList());
+        $this->assertSame([1, 3], $false->toList());
     }
 
     public function testSlice()

@@ -497,12 +497,12 @@ final class Lazy implements Implementation
     /**
      * @param callable(T): bool $predicate
      *
-     * @return Map<bool, Sequence<T>>
+     * @return array{Sequence<T>, Sequence<T>}
      */
     #[\Override]
-    public function partition(callable $predicate): Map
+    public function partition(callable $predicate): array
     {
-        /** @var Map<bool, Sequence<T>> */
+        /** @var array{Sequence<T>, Sequence<T>} */
         return $this->load()->partition($predicate);
     }
 

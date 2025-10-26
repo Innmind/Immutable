@@ -470,7 +470,7 @@ class SequenceTest extends TestCase
 
     public function testPartition()
     {
-        $map = Sequence::of()
+        [$true, $false] = Sequence::of()
             ->add(1)
             ->add(2)
             ->add(3)
@@ -479,9 +479,8 @@ class SequenceTest extends TestCase
                 return $value % 2 === 0;
             });
 
-        $this->assertInstanceOf(Map::class, $map);
-        $this->assertSame([2, 4], $this->get($map, true)->toList());
-        $this->assertSame([1, 3], $this->get($map, false)->toList());
+        $this->assertSame([2, 4], $true->toList());
+        $this->assertSame([1, 3], $false->toList());
     }
 
     public function testSlice()

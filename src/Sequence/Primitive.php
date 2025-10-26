@@ -311,10 +311,10 @@ final class Primitive implements Implementation
     /**
      * @param callable(T): bool $predicate
      *
-     * @return Map<bool, Sequence<T>>
+     * @return array{Sequence<T>, Sequence<T>}
      */
     #[\Override]
-    public function partition(callable $predicate): Map
+    public function partition(callable $predicate): array
     {
         /** @var list<T> */
         $truthy = [];
@@ -330,10 +330,10 @@ final class Primitive implements Implementation
             }
         }
 
-        $true = Sequence::of(...$truthy);
-        $false = Sequence::of(...$falsy);
-
-        return Map::of([true, $true], [false, $false]);
+        return [
+            Sequence::of(...$truthy),
+            Sequence::of(...$falsy),
+        ];
     }
 
     /**

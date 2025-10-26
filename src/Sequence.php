@@ -485,14 +485,16 @@ final class Sequence implements \Countable
     }
 
     /**
-     * Return a sequence of 2 sequences partitioned according to the given predicate
+     * Return 2 Sequences partitioned according to the given predicate
+     *
+     * The first Sequence contains values that matched the predicate.
      *
      * @param callable(T): bool $predicate
      *
-     * @return Map<bool, self<T>>
+     * @return array{self<T>, self<T>}
      */
     #[\NoDiscard]
-    public function partition(callable $predicate): Map
+    public function partition(callable $predicate): array
     {
         return $this->implementation->partition($predicate);
     }
