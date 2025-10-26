@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Removed
+
+- `Innmind\Immutable\Fold`
+
 ## 5.20.0 - 2025-09-06
 
 ### Added
