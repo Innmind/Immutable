@@ -8,6 +8,7 @@
 - `Innmind\Immutable\State`
 - `Innmind\Immutable\Sequence::indexOf()`
 - `Innmind\Immutable\Set::defer()`
+- `Innmind\Immutable\SideEffect::__construct()`
 
 ## 5.20.0 - 2025-09-06
 
