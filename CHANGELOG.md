@@ -10,6 +10,7 @@
 - `Innmind\Immutable\Map` no longer implements `Countable`
 - `Innmind\Immutable\Sequence` no longer implements `Countable`
 - `Innmind\Immutable\Set` no longer implements `Countable`
+- Requires PHP `8.4`
 
 ### Removed
 
