@@ -5,6 +5,7 @@
 ### Removed
 
 - `Innmind\Immutable\Fold`
+- `Innmind\Immutable\State`
 
 ## 5.20.0 - 2025-09-06
 
