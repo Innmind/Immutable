@@ -164,6 +164,78 @@ $firstOdd; // Maybe::just(9)
 $sequence->find(static fn() => false); // Maybe::nothing()
 ```
 
+### `->lookup()`
+
+This is similar to `->find()` except it allows to return a computed value while searching for it. This is useful when parsing content.
+
+=== "`->maybe()`"
+    ```php
+    final class Email
+    {
+        /**
+         * @return Maybe<self>
+         */
+        public static function of(string $email): Maybe
+        {
+        }
+    }
+
+    $email = Sequence::of('foo', 'valid-email@example.com', 'invalid')
+        ->lookup()
+        ->first()
+        ->maybe(Email::of(...));
+    $email == Maybe::just(new Email('valid-email@example.com')); // true
+    ```
+
+=== "`->attempt()`"
+    ```php
+    final class Email
+    {
+        /**
+         * @return Attempt<self>
+         */
+        public static function of(string $email): Attempt
+        {
+        }
+    }
+
+    $email = Sequence::of('foo', 'valid-email@example.com', 'invalid')
+        ->lookup()
+        ->first()
+        ->attempt(
+            new \RuntimeException('No valid email found'),
+            Email::of(...),
+        );
+    $email == Attempt::result(new Email('valid-email@example.com')); // true
+    ```
+
+=== "`->either()`"
+    ```php
+    final class Email
+    {
+        /**
+         * @return Either<string, self>
+         */
+        public static function of(string $email): Either
+        {
+        }
+    }
+
+    $email = Sequence::of('foo', 'valid-email@example.com', 'invalid')
+        ->lookup()
+        ->first()
+        ->attempt(
+            'No valid email found', #(1)
+            Email::of(...),
+        );
+    $email == Either::right(new Email('valid-email@example.com')); // true
+    ```
+
+    1. Must be of the same type as the left side returned by `Email::of()`
+
+!!! note ""
+    If you need to access the last value that matches the predicate you can use `#!php ->lookup()->last()` instead of `#!php ->lookup()->first()`.
+
 ### `->matches()` :material-memory-arrow-down:
 
 Check if all the elements of the sequence matches the given predicate.

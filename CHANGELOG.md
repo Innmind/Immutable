@@ -6,6 +6,12 @@
 
 - `Innmind\Immutable\Predicate::and()`
 - `Innmind\Immutable\Predicate::or()`
+- `Innmind\Immutable\Sequence->lookup()->first()->maybe()`
+- `Innmind\Immutable\Sequence->lookup()->first()->attempt()`
+- `Innmind\Immutable\Sequence->lookup()->first()->either()`
+- `Innmind\Immutable\Sequence->lookup()->last()->maybe()`
+- `Innmind\Immutable\Sequence->lookup()->last()->attempt()`
+- `Innmind\Immutable\Sequence->lookup()->last()->either()`
 
 ### Changed
 

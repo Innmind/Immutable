@@ -728,6 +728,15 @@ final class Sequence
     }
 
     /**
+     * @return Sequence\Lookup<T>
+     */
+    #[\NoDiscard]
+    public function lookup(): Sequence\Lookup
+    {
+        return Sequence\Lookup::of($this->implementation);
+    }
+
+    /**
      * @template R
      *
      * @param callable(T, self<T>): R $match

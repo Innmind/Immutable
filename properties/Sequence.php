@@ -34,6 +34,12 @@ final class Sequence
     {
         return [
             Sequence\Windows::class,
+            Sequence\LookupFirstMaybe::class,
+            Sequence\LookupFirstAttempt::class,
+            Sequence\LookupFirstEither::class,
+            Sequence\LookupLastMaybe::class,
+            Sequence\LookupLastAttempt::class,
+            Sequence\LookupLastEither::class,
         ];
     }
 }
