@@ -32,7 +32,7 @@ class RegExpTest extends TestCase
     {
         $this->expectException(LogicException::class);
 
-        RegExp::of('/foo');
+        $_ = RegExp::of('/foo');
     }
 
     public function testMatches()

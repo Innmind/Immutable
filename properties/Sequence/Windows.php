@@ -36,7 +36,7 @@ final class Windows implements Property
 
     public function ensureHeldBy(Assert $assert, object $systemUnderTest): object
     {
-        $systemUnderTest
+        $_ = $systemUnderTest
             ->windows($this->size)
             ->foreach(
                 fn($window) => $assert
@@ -46,7 +46,7 @@ final class Windows implements Property
             );
 
         if ($systemUnderTest->size() >= $this->size) {
-            $systemUnderTest
+            $_ = $systemUnderTest
                 ->windows($this->size)
                 ->foreach(fn($window) => $assert->same(
                     $this->size,

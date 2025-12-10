@@ -187,7 +187,7 @@ class MapTest extends TestCase
             ->put(3, 4);
         $count = 0;
 
-        $m->foreach(function(int $key, int $value) use (&$count) {
+        $_ = $m->foreach(function(int $key, int $value) use (&$count) {
             $this->assertSame($count, $key);
             $this->assertSame($value, $key + 1);
             ++$count;

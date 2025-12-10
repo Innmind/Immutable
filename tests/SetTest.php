@@ -91,7 +91,7 @@ class SetTest extends TestCase
         $s = Set::of()->add(42);
 
         $this->assertSame(1, $s->size());
-        $s->add(24);
+        $_ = $s->add(24);
         $this->assertSame(1, $s->size());
         $s = $s->add(24);
         $this->assertInstanceOf(Set::class, $s);
@@ -231,7 +231,7 @@ class SetTest extends TestCase
             ->add(4);
         $count = 0;
 
-        $s->foreach(function(int $v) use (&$count) {
+        $_ = $s->foreach(function(int $v) use (&$count) {
             $this->assertSame(++$count, $v);
         });
         $this->assertSame(4, $count);
@@ -557,7 +557,7 @@ class SetTest extends TestCase
         $stop = new \Exception;
 
         try {
-            Set::of(new \ArrayObject([1]), new \ArrayObject([2]), new \ArrayObject([3]), new \ArrayObject([1]))->safeguard(
+            $_ = Set::of(new \ArrayObject([1]), new \ArrayObject([2]), new \ArrayObject([3]), new \ArrayObject([1]))->safeguard(
                 Set::of(),
                 static fn($unique, $value) => match ($unique->contains($value[0])) {
                     true => throw $stop,
@@ -587,7 +587,7 @@ class SetTest extends TestCase
                     },
                 );
             $this->assertFalse($loaded);
-            $set->toList();
+            $_ = $set->toList();
             $this->fail('it should throw');
         } catch (\Exception $e) {
             $this->assertSame($stop, $e);
@@ -609,7 +609,7 @@ class SetTest extends TestCase
                 },
             );
             $this->assertFalse($loaded);
-            $set->toList();
+            $_ = $set->toList();
             $this->fail('it should throw');
         } catch (\Exception $e) {
             $this->assertSame($stop, $e);
