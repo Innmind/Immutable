@@ -35,6 +35,10 @@
 - `Innmind\Immutable\Set::count()`
 - `Innmind\Immutable\Map::count()`
 
+### Fixed
+
+- PHP `8.5` deprecation
+
 ## 5.20.0 - 2025-09-06
 
 ### Added

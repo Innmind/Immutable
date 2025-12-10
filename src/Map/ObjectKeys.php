@@ -326,7 +326,7 @@ final class ObjectKeys implements Implementation
          * @psalm-suppress MixedArgumentTypeCoercion
          * @psalm-suppress ImpureMethodCall
          */
-        $values->detach($key);
+        $values->offsetUnset($key);
         /** @psalm-suppress ImpureMethodCall */
         $values->rewind();
 
