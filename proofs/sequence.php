@@ -96,7 +96,7 @@ return static function() {
                 $string,
                 $chunks
                     ->flatMap(static fn($chars) => $chars)
-                    ->fold(new Concat)
+                    ->fold(Concat::monoid)
                     ->toString(),
             );
         },

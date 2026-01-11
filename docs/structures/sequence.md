@@ -598,7 +598,7 @@ use Innmind\Immutable\Monoid\Concat;
 
 $lines = Sequence::of("foo\n", "bar\n", 'baz')
     ->map(fn($line) => Str::of($line))
-    ->fold(new Concat);
+    ->fold(Concat::monoid);
 
 $lines->equals("foo\nbar\nbaz"); // true
 ```

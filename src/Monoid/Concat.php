@@ -12,8 +12,10 @@ use Innmind\Immutable\{
  * @psalm-immutable
  * @implements Monoid<Str>
  */
-final class Concat implements Monoid
+enum Concat implements Monoid
 {
+    case monoid;
+
     #[\Override]
     public function identity(): Str
     {
