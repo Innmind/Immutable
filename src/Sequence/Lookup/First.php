@@ -51,11 +51,16 @@ final class First
          * @psalm-suppress MixedArgument
          * @var Maybe<U>
          */
-        return $this->implementation->reduce(
+        return $this->implementation->sink(
             Maybe::nothing(),
-            static fn(Maybe $found, $value) => $found->otherwise(
-                static fn() => $find($value),
-            ),
+            static function($_, $value, $continuation) use ($find) {
+                $found = $find($value);
+
+                return $found->match(
+                    static fn() => $continuation->stop($found),
+                    static fn() => $continuation->continue($_),
+                );
+            },
         );
     }
 
@@ -70,13 +75,19 @@ final class First
     {
         /**
          * @psalm-suppress MixedArgument
+         * @psalm-suppress MixedArgumentTypeCoercion
          * @var Attempt<U>
          */
-        return $this->implementation->reduce(
+        return $this->implementation->sink(
             Attempt::error($default),
-            static fn(Attempt $found, $value) => $found->recover(
-                static fn() => $find($value),
-            ),
+            static function($_, $value, $continuation) use ($find) {
+                $found = $find($value);
+
+                return $found->match(
+                    static fn() => $continuation->stop($found),
+                    static fn() => $continuation->continue($_),
+                );
+            },
         );
     }
 
@@ -93,13 +104,19 @@ final class First
     {
         /**
          * @psalm-suppress MixedArgument
+         * @psalm-suppress MixedArgumentTypeCoercion
          * @var Either<L, U>
          */
-        return $this->implementation->reduce(
+        return $this->implementation->sink(
             Either::left($left),
-            static fn(Either $found, $value) => $found->otherwise(
-                static fn() => $find($value),
-            ),
+            static function($_, $value, $continuation) use ($find) {
+                $found = $find($value);
+
+                return $found->match(
+                    static fn() => $continuation->stop($found),
+                    static fn() => $continuation->continue($_),
+                );
+            },
         );
     }
 }
