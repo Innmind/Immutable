@@ -8,7 +8,7 @@ namespace Innmind\Immutable;
  * @template-covariant S
  * @psalm-immutable
  */
-final class Map implements \Countable
+final class Map
 {
     /**
      * @param Map\Implementation<T, S> $implementation
@@ -67,16 +67,6 @@ final class Map implements \Countable
     public function size(): int
     {
         return $this->implementation->size();
-    }
-
-    /**
-     * @return int<0, max>
-     */
-    #[\Override]
-    #[\NoDiscard]
-    public function count(): int
-    {
-        return $this->size();
     }
 
     /**
@@ -283,14 +273,16 @@ final class Map implements \Countable
     }
 
     /**
-     * Return a map of 2 maps partitioned according to the given predicate
+     * Return 2 Maps partitioned according to the given predicate.
+     *
+     * The first Map contains values that matched the predicate.
      *
      * @param callable(T, S): bool $predicate
      *
-     * @return self<bool, self<T, S>>
+     * @return array{self<T, S>, self<T, S>}
      */
     #[\NoDiscard]
-    public function partition(callable $predicate): self
+    public function partition(callable $predicate): array
     {
         return $this->implementation->partition($predicate);
     }

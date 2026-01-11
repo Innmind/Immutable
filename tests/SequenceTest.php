@@ -26,7 +26,6 @@ class SequenceTest extends TestCase
     {
         $sequence = Sequence::of();
 
-        $this->assertInstanceOf(\Countable::class, $sequence);
         $this->assertSame([], $sequence->toList());
     }
 
@@ -146,11 +145,12 @@ class SequenceTest extends TestCase
 
     public function testCount()
     {
-        $this->assertCount(
+        $this->assertSame(
             2,
             Sequence::of()
                 ->add(1)
-                ->add(2),
+                ->add(2)
+                ->size(),
         );
     }
 
@@ -309,7 +309,7 @@ class SequenceTest extends TestCase
         });
 
         $this->assertInstanceOf(Map::class, $map);
-        $this->assertCount(3, $map);
+        $this->assertSame(3, $map->size());
         $this->assertSame([3], $this->get($map, 0)->toList());
         $this->assertSame([1, 4], $this->get($map, 1)->toList());
         $this->assertSame([2], $this->get($map, 2)->toList());
@@ -368,30 +368,6 @@ class SequenceTest extends TestCase
 
         $this->assertTrue($sequence->contains(2));
         $this->assertFalse($sequence->contains(5));
-    }
-
-    public function testIndexOf()
-    {
-        $sequence = Sequence::of()
-            ->add(1)
-            ->add(2)
-            ->add(3)
-            ->add(4);
-
-        $this->assertSame(
-            0,
-            $sequence->indexOf(1)->match(
-                static fn($value) => $value,
-                static fn() => null,
-            ),
-        );
-        $this->assertSame(
-            3,
-            $sequence->indexOf(4)->match(
-                static fn($value) => $value,
-                static fn() => null,
-            ),
-        );
     }
 
     public function testIndices()
@@ -494,7 +470,7 @@ class SequenceTest extends TestCase
 
     public function testPartition()
     {
-        $map = Sequence::of()
+        [$true, $false] = Sequence::of()
             ->add(1)
             ->add(2)
             ->add(3)
@@ -503,9 +479,8 @@ class SequenceTest extends TestCase
                 return $value % 2 === 0;
             });
 
-        $this->assertInstanceOf(Map::class, $map);
-        $this->assertSame([2, 4], $this->get($map, true)->toList());
-        $this->assertSame([1, 3], $this->get($map, false)->toList());
+        $this->assertSame([2, 4], $true->toList());
+        $this->assertSame([1, 3], $false->toList());
     }
 
     public function testSlice()
@@ -1045,7 +1020,7 @@ class SequenceTest extends TestCase
         $stop = new \Exception;
 
         try {
-            Sequence::of(1, 2, 3, 1)->safeguard(
+            $_ = Sequence::of(1, 2, 3, 1)->safeguard(
                 Set::of(),
                 static fn($unique, $value) => match ($unique->contains($value)) {
                     true => throw $stop,
@@ -1073,7 +1048,7 @@ class SequenceTest extends TestCase
                 },
             );
             $this->assertFalse($loaded);
-            $sequence->toList();
+            $_ = $sequence->toList();
             $this->fail('it should throw');
         } catch (\Exception $e) {
             $this->assertSame($stop, $e);
@@ -1095,7 +1070,7 @@ class SequenceTest extends TestCase
                 },
             );
             $this->assertFalse($loaded);
-            $sequence->toList();
+            $_ = $sequence->toList();
             $this->fail('it should throw');
         } catch (\Exception $e) {
             $this->assertSame($stop, $e);
@@ -1159,12 +1134,12 @@ class SequenceTest extends TestCase
                     $lines->toList(),
                 );
                 $this->assertSame(1, $loaded);
-                $lines->toList();
+                $_ = $lines->toList();
                 $this->assertSame(2, $loaded);
             });
 
         try {
-            Str::of("foo\nbar\nbaz")
+            $_ = Str::of("foo\nbar\nbaz")
                 ->chunk(1)
                 ->aggregate(static fn() => Sequence::of())
                 ->toList();

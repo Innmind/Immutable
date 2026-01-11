@@ -14,5 +14,3 @@ jobs:
     uses: innmind/github-workflows/.github/workflows/psalm-matrix.yml@main
   cs:
     uses: innmind/github-workflows/.github/workflows/cs.yml@main
-    with:
-      php-version: '8.2'

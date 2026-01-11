@@ -20,7 +20,6 @@ class ObjectKeysTest extends TestCase
         $m = new ObjectKeys;
 
         $this->assertInstanceOf(Implementation::class, $m);
-        $this->assertInstanceOf(\Countable::class, $m);
     }
 
     public function testPut()
@@ -281,31 +280,25 @@ class ObjectKeysTest extends TestCase
             ($d = new \stdClass, 4)
             ($e = new \stdClass, 5);
 
-        $p = $m->partition(static function(\stdClass $i, int $v) {
+        [$true, $false] = $m->partition(static function(\stdClass $i, int $v) {
             return $v % 2 === 0;
         });
 
-        $this->assertInstanceOf(Map::class, $p);
-        $this->assertNotSame($p, $m);
-        $this->assertSame(
-            [true, false],
-            $p->keys()->toList(),
-        );
         $this->assertSame(
             [$b, $d],
-            $this->get($p, true)->keys()->toList(),
+            $true->keys()->toList(),
         );
         $this->assertSame(
             [2, 4],
-            $this->get($p, true)->values()->toList(),
+            $true->values()->toList(),
         );
         $this->assertSame(
             [$a, $c, $e],
-            $this->get($p, false)->keys()->toList(),
+            $false->keys()->toList(),
         );
         $this->assertSame(
             [1, 3, 5],
-            $this->get($p, false)->values()->toList(),
+            $false->values()->toList(),
         );
     }
 
@@ -336,7 +329,7 @@ class ObjectKeysTest extends TestCase
         $map = (new ObjectKeys)(1, 2);
 
         $this->assertInstanceOf(DoubleIndex::class, $map);
-        $this->assertCount(1, $map);
+        $this->assertSame(1, $map->size());
     }
 
     public function testFind()

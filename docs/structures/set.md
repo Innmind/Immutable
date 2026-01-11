@@ -13,26 +13,6 @@ use Innmind\Immutable\Set;
 Set::of(1, 2, 3, $etc);
 ```
 
-### `::defer()`
-
-This named constructor is for advanced use cases where you want the data of your set to be loaded upon use only and not initialisation.
-
-An example for such a use case is a set of log lines coming from a file:
-
-```php
-$set = Set::defer((function() {
-    yield from readSomeFile('apache.log');
-})());
-```
-
-The method ask a generator that will provide the elements. Once the elements are loaded they are kept in memory so you can run multiple operations on it without loading the file twice.
-
-!!! warning ""
-    Beware of the case where the source you read the elements is not altered before the first use of the set.
-
-??? warning "Deprecated"
-    This constructor is deprecated. You should use `Set::lazy()->snap()` instead.
-
 ### `::lazy()`
 
 This is similar to `::defer()` with the exception that the elements are not kept in memory but reloaded upon each use.
@@ -100,16 +80,6 @@ This returns the number of elements in the set.
 ```php
 $set = Set::ints(1, 4, 6);
 $set->size(); // 3
-```
-
-### `->count()`
-
-This is an alias for `->size()`, but you can also use the PHP function `\count` if you prefer.
-
-```php
-$set = Set::ints(1, 4, 6);
-$set->count(); // 3
-\count($set); // 3
 ```
 
 ### `->contains()`
@@ -341,26 +311,14 @@ $map
 
 ### `->partition()`
 
-This method is similar to `->groupBy()` method but the map keys are always booleans. The difference is that here the 2 keys are always present whereas with `->groupBy()` it will depend on the original set.
+This method is similar to `->groupBy()` except it always return 2 `Set`s. The first one contains elements that match the predicate and the second the ones that don't.
 
 ```php
 $set = Set::ints(1, 2, 3);
-/** @var Map<bool, Set<int>> */
-$map = $set->partition(fn($int) => $int % 2 === 0);
-$map
-    ->get(true)
-    ->match(
-        static fn($partition) => $partition,
-        static fn() => Set::ints(),
-    )
-    ->equals(Set::ints(2)); // true
-$map
-    ->get(false)
-    ->match(
-        static fn($partition) => $partition,
-        static fn() => Set::ints(),
-    )
-    ->equals(Set::ints(1, 3)); // true
+/** @var array{Set<int>, Set<int>} */
+[$true, $false] = $set->partition(fn($int) => $int % 2 === 0);
+$true->equals(Set::ints(2)); // true
+$false->equals(Set::ints(1, 3)); // true
 ```
 
 ### `->sort()`

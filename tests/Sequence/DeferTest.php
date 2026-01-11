@@ -41,7 +41,6 @@ class DeferTest extends TestCase
         })());
 
         $this->assertSame(2, $sequence->size());
-        $this->assertSame(2, $sequence->count());
     }
 
     public function testIterator()
@@ -241,7 +240,7 @@ class DeferTest extends TestCase
 
         $this->assertSame([1, 2, 3, 4], \iterator_to_array($sequence->iterator()));
         $this->assertInstanceOf(Map::class, $groups);
-        $this->assertCount(2, $groups);
+        $this->assertSame(2, $groups->size());
         $this->assertSame([2, 4], $this->get($groups, 0)->toList());
         $this->assertSame([1, 3], $this->get($groups, 1)->toList());
     }
@@ -341,46 +340,6 @@ class DeferTest extends TestCase
         $this->assertFalse($sequence->contains(4));
     }
 
-    public function testIndexOf()
-    {
-        $sequence = new Defer((static function() {
-            yield 1;
-            yield 2;
-            yield 4;
-        })());
-
-        $this->assertSame(
-            1,
-            $sequence->indexOf(2)->match(
-                static fn($value) => $value,
-                static fn() => null,
-            ),
-        );
-        $this->assertSame(
-            2,
-            $sequence->indexOf(4)->match(
-                static fn($value) => $value,
-                static fn() => null,
-            ),
-        );
-    }
-
-    public function testReturnNothingWhenTryingToAccessIndexOfUnknownValue()
-    {
-        $sequence = new Defer((static function() {
-            if (false) {
-                yield 1;
-            }
-        })());
-
-        $this->assertNull(
-            $sequence->indexOf(1)->match(
-                static fn($value) => $value,
-                static fn() => null,
-            ),
-        );
-    }
-
     public function testIndices()
     {
         $loaded = false;
@@ -458,13 +417,11 @@ class DeferTest extends TestCase
             yield 3;
             yield 4;
         })());
-        $partition = $sequence->partition(static fn($i) => $i % 2 === 0);
+        [$true, $false] = $sequence->partition(static fn($i) => $i % 2 === 0);
 
         $this->assertSame([1, 2, 3, 4], \iterator_to_array($sequence->iterator()));
-        $this->assertInstanceOf(Map::class, $partition);
-        $this->assertCount(2, $partition);
-        $this->assertSame([2, 4], $this->get($partition, true)->toList());
-        $this->assertSame([1, 3], $this->get($partition, false)->toList());
+        $this->assertSame([2, 4], $true->toList());
+        $this->assertSame([1, 3], $false->toList());
     }
 
     public function testSlice()

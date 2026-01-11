@@ -20,7 +20,7 @@ return static function() {
                 });
 
             $assert->false($loaded);
-            $either->memoize();
+            $_ = $either->memoize();
             $assert->true($loaded);
         },
     );

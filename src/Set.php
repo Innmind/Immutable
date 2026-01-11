@@ -7,7 +7,7 @@ namespace Innmind\Immutable;
  * @template-covariant T
  * @psalm-immutable
  */
-final class Set implements \Countable
+final class Set
 {
     /**
      * @param Sequence<T> $implementation
@@ -48,26 +48,6 @@ final class Set implements \Countable
     public static function of(...$values): self
     {
         return new self(Sequence::of(...$values)->distinct());
-    }
-
-    /**
-     * It will load the values inside the generator only upon the first use
-     * of the set
-     *
-     * Use this mode when the amount of data may not fit in memory
-     *
-     * @template V
-     * @psalm-pure
-     * @deprecated You should use ::snap() instead
-     *
-     * @param \Generator<V> $generator
-     *
-     * @return self<V>
-     */
-    #[\NoDiscard]
-    public static function defer(\Generator $generator): self
-    {
-        return new self(Sequence::defer($generator)->distinct());
     }
 
     /**
@@ -168,16 +148,6 @@ final class Set implements \Countable
      */
     #[\NoDiscard]
     public function size(): int
-    {
-        return $this->implementation->size();
-    }
-
-    /**
-     * @return int<0, max>
-     */
-    #[\Override]
-    #[\NoDiscard]
-    public function count(): int
     {
         return $this->implementation->size();
     }
@@ -396,19 +366,23 @@ final class Set implements \Countable
     }
 
     /**
-     * Return a sequence of 2 sets partitioned according to the given predicate
+     * Return 2 Sets partitioned according to the given predicate
+     *
+     * The first Set contains values that matched the predicate.
      *
      * @param callable(T): bool $predicate
      *
-     * @return Map<bool, self<T>>
+     * @return array{self<T>, self<T>}
      */
     #[\NoDiscard]
-    public function partition(callable $predicate): Map
+    public function partition(callable $predicate): array
     {
-        return $this
-            ->implementation
-            ->partition($predicate)
-            ->map(static fn($_, $sequence) => $sequence->toSet());
+        [$true, $false] = $this->implementation->partition($predicate);
+
+        return [
+            $true->toSet(),
+            $false->toSet(),
+        ];
     }
 
     /**

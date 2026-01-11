@@ -13,11 +13,6 @@ use Innmind\BlackBox\PHPUnit\Framework\TestCase;
 
 class SetTest extends TestCase
 {
-    public function testInterface()
-    {
-        $this->assertInstanceOf(\Countable::class, Set::of());
-    }
-
     public function testOf()
     {
         $this->assertTrue(
@@ -28,22 +23,6 @@ class SetTest extends TestCase
                     ->add(3),
             ),
         );
-    }
-
-    public function testDefer()
-    {
-        $loaded = false;
-        $set = Set::defer((static function() use (&$loaded) {
-            yield 1;
-            yield 2;
-            yield 3;
-            $loaded = true;
-        })());
-
-        $this->assertInstanceOf(Set::class, $set);
-        $this->assertFalse($loaded);
-        $this->assertSame([1, 2, 3], $set->toList());
-        $this->assertTrue($loaded);
     }
 
     public function testLazy()
@@ -112,8 +91,7 @@ class SetTest extends TestCase
         $s = Set::of()->add(42);
 
         $this->assertSame(1, $s->size());
-        $this->assertSame(1, $s->count());
-        $s->add(24);
+        $_ = $s->add(24);
         $this->assertSame(1, $s->size());
         $s = $s->add(24);
         $this->assertInstanceOf(Set::class, $s);
@@ -253,7 +231,7 @@ class SetTest extends TestCase
             ->add(4);
         $count = 0;
 
-        $s->foreach(function(int $v) use (&$count) {
+        $_ = $s->foreach(function(int $v) use (&$count) {
             $this->assertSame(++$count, $v);
         });
         $this->assertSame(4, $count);
@@ -316,12 +294,14 @@ class SetTest extends TestCase
         $this->assertTrue($loaded);
 
         $loaded = false;
-        $set = Set::defer((static function() use (&$loaded) {
+        $set = Set::lazy(static function() use (&$loaded) {
             yield 1;
             yield 2;
             yield 3;
             $loaded = true;
-        })())->flatMap(static fn($i) => Set::of($i, $i + 1));
+        })
+            ->snap()
+            ->flatMap(static fn($i) => Set::of($i, $i + 1));
 
         $this->assertInstanceOf(Set::class, $set);
         $this->assertFalse($loaded);
@@ -337,16 +317,12 @@ class SetTest extends TestCase
             ->add(3)
             ->add(4);
 
-        $s2 = $s->partition(static function(int $v) {
+        [$true, $false] = $s->partition(static function(int $v) {
             return $v % 2 === 0;
         });
-        $this->assertNotSame($s, $s2);
-        $this->assertInstanceOf(Map::class, $s2);
         $this->assertSame([1, 2, 3, 4], $s->toList());
-        $this->assertInstanceOf(Set::class, $this->get($s2, true));
-        $this->assertInstanceOf(Set::class, $this->get($s2, false));
-        $this->assertSame([2, 4], $this->get($s2, true)->toList());
-        $this->assertSame([1, 3], $this->get($s2, false)->toList());
+        $this->assertSame([2, 4], $true->toList());
+        $this->assertSame([1, 3], $false->toList());
     }
 
     public function testSort()
@@ -521,7 +497,7 @@ class SetTest extends TestCase
                 static fn() => null,
             );
 
-        $this->assertSame('public function testInterface()', $line);
+        $this->assertSame('public function testOf()', $line);
         $this->assertSame(1, $started);
         $this->assertTrue($cleanupCalled);
         $this->assertFalse($endReached);
@@ -581,7 +557,7 @@ class SetTest extends TestCase
         $stop = new \Exception;
 
         try {
-            Set::of(new \ArrayObject([1]), new \ArrayObject([2]), new \ArrayObject([3]), new \ArrayObject([1]))->safeguard(
+            $_ = Set::of(new \ArrayObject([1]), new \ArrayObject([2]), new \ArrayObject([3]), new \ArrayObject([1]))->safeguard(
                 Set::of(),
                 static fn($unique, $value) => match ($unique->contains($value[0])) {
                     true => throw $stop,
@@ -595,21 +571,23 @@ class SetTest extends TestCase
 
         try {
             $loaded = false;
-            $set = Set::defer((static function() use (&$loaded) {
+            $set = Set::lazy(static function() use (&$loaded) {
                 $loaded = true;
                 yield new \ArrayObject([1]);
                 yield new \ArrayObject([2]);
                 yield new \ArrayObject([3]);
                 yield new \ArrayObject([1]);
-            })())->safeguard(
-                Set::of(),
-                static fn($unique, $value) => match ($unique->contains($value[0])) {
-                    true => throw $stop,
-                    false => ($unique)($value[0]),
-                },
-            );
+            })
+                ->snap()
+                ->safeguard(
+                    Set::of(),
+                    static fn($unique, $value) => match ($unique->contains($value[0])) {
+                        true => throw $stop,
+                        false => ($unique)($value[0]),
+                    },
+                );
             $this->assertFalse($loaded);
-            $set->toList();
+            $_ = $set->toList();
             $this->fail('it should throw');
         } catch (\Exception $e) {
             $this->assertSame($stop, $e);
@@ -631,7 +609,7 @@ class SetTest extends TestCase
                 },
             );
             $this->assertFalse($loaded);
-            $set->toList();
+            $_ = $set->toList();
             $this->fail('it should throw');
         } catch (\Exception $e) {
             $this->assertSame($stop, $e);
@@ -648,13 +626,13 @@ class SetTest extends TestCase
         $this->assertSame([1, 2, 3, 4], $set->memoize()->toList());
 
         $loaded = false;
-        $set = Set::defer((static function() use (&$loaded) {
+        $set = Set::lazy(static function() use (&$loaded) {
             yield 1;
             yield 2;
             yield 3;
             yield 4;
             $loaded = true;
-        })());
+        })->snap();
         $this->assertFalse($loaded);
         $memoized = $set->memoize();
         $this->assertTrue($loaded);

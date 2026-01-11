@@ -1,5 +1,44 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+
+- `Innmind\Immutable\Predicate::and()`
+- `Innmind\Immutable\Predicate::or()`
+- `Innmind\Immutable\Sequence->lookup()->first()->maybe()`
+- `Innmind\Immutable\Sequence->lookup()->first()->attempt()`
+- `Innmind\Immutable\Sequence->lookup()->first()->either()`
+- `Innmind\Immutable\Sequence->lookup()->last()->maybe()`
+- `Innmind\Immutable\Sequence->lookup()->last()->attempt()`
+- `Innmind\Immutable\Sequence->lookup()->last()->either()`
+
+### Changed
+
+- `Innmind\Immutable\Map::partition()` now returns an array to allow for destructuring
+- `Innmind\Immutable\Sequence::partition()` now returns an array to allow for destructuring
+- `Innmind\Immutable\Set::partition()` now returns an array to allow for destructuring
+- `Innmind\Immutable\Map` no longer implements `Countable`
+- `Innmind\Immutable\Sequence` no longer implements `Countable`
+- `Innmind\Immutable\Set` no longer implements `Countable`
+- Requires PHP `8.4`
+- `Innmind\Immutable\Predicate` is now a final class
+
+### Removed
+
+- `Innmind\Immutable\Fold`
+- `Innmind\Immutable\State`
+- `Innmind\Immutable\Sequence::indexOf()`
+- `Innmind\Immutable\Set::defer()`
+- `Innmind\Immutable\SideEffect::__construct()`
+- `Innmind\Immutable\Sequence::count()`
+- `Innmind\Immutable\Set::count()`
+- `Innmind\Immutable\Map::count()`
+
+### Fixed
+
+- PHP `8.5` deprecation
+
 ## 5.20.0 - 2025-09-06
 
 ### Added

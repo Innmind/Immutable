@@ -58,12 +58,6 @@ final class Uninitialized implements Implementation
         return 0;
     }
 
-    #[\Override]
-    public function count(): int
-    {
-        return $this->size();
-    }
-
     /**
      * @param T $key
      *
@@ -194,15 +188,15 @@ final class Uninitialized implements Implementation
     /**
      * @param callable(T, S): bool $predicate
      *
-     * @return Map<bool, Map<T, S>>
+     * @return array{Map<T, S>, Map<T, S>}
      */
     #[\Override]
-    public function partition(callable $predicate): Map
+    public function partition(callable $predicate): array
     {
-        return Map::of(
-            [true, $this->clearMap()],
-            [false, $this->clearMap()],
-        );
+        return [
+            $this->clearMap(),
+            $this->clearMap(),
+        ];
     }
 
     /**

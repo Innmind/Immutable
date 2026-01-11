@@ -7,7 +7,7 @@ namespace Innmind\Immutable;
  * @template-covariant T
  * @psalm-immutable
  */
-final class Sequence implements \Countable
+final class Sequence
 {
     /**
      * @param Sequence\Implementation<T> $implementation
@@ -188,16 +188,6 @@ final class Sequence implements \Countable
      */
     #[\NoDiscard]
     public function size(): int
-    {
-        return $this->implementation->size();
-    }
-
-    /**
-     * @return int<0, max>
-     */
-    #[\Override]
-    #[\NoDiscard]
-    public function count(): int
     {
         return $this->implementation->size();
     }
@@ -391,21 +381,6 @@ final class Sequence implements \Countable
     }
 
     /**
-     * Return the index for the given element
-     *
-     * @deprecated
-     *
-     * @param T $element
-     *
-     * @return Maybe<int<0, max>>
-     */
-    #[\NoDiscard]
-    public function indexOf($element): Maybe
-    {
-        return $this->implementation->indexOf($element);
-    }
-
-    /**
      * Return the list of indices
      *
      * @return self<int<0, max>>
@@ -500,14 +475,16 @@ final class Sequence implements \Countable
     }
 
     /**
-     * Return a sequence of 2 sequences partitioned according to the given predicate
+     * Return 2 Sequences partitioned according to the given predicate
+     *
+     * The first Sequence contains values that matched the predicate.
      *
      * @param callable(T): bool $predicate
      *
-     * @return Map<bool, self<T>>
+     * @return array{self<T>, self<T>}
      */
     #[\NoDiscard]
-    public function partition(callable $predicate): Map
+    public function partition(callable $predicate): array
     {
         return $this->implementation->partition($predicate);
     }
@@ -748,6 +725,15 @@ final class Sequence implements \Countable
     public function find(callable $predicate): Maybe
     {
         return $this->implementation->find($predicate);
+    }
+
+    /**
+     * @return Sequence\Lookup<T>
+     */
+    #[\NoDiscard]
+    public function lookup(): Sequence\Lookup
+    {
+        return Sequence\Lookup::of($this->implementation);
     }
 
     /**
