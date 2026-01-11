@@ -15,14 +15,14 @@ return static function() {
     yield properties(
         'Concat properties',
         Monoid::properties($set, $equals),
-        Set::of(new Concat),
+        Set::of(Concat::monoid),
     );
 
     foreach (Monoid::list($set, $equals) as $property) {
         yield proof(
             'Concat property',
             given($property),
-            static fn($assert, $property) => $property->ensureHeldBy($assert, new Concat),
+            static fn($assert, $property) => $property->ensureHeldBy($assert, Concat::monoid),
         );
     }
 };

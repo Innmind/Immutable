@@ -14,8 +14,10 @@ use Innmind\Immutable\{
  * @psalm-immutable
  * @implements Monoid<Map<T, U>>
  */
-final class MergeMap implements Monoid
+enum MergeMap implements Monoid
 {
+    case monoid;
+
     /**
      * @template A of object
      * @template B of object
@@ -29,7 +31,7 @@ final class MergeMap implements Monoid
     public static function of(?string $key = null, ?string $value = null): self
     {
         /** @var self<A, B> */
-        return new self;
+        return self::monoid;
     }
 
     #[\Override]

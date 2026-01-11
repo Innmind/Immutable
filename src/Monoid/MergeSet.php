@@ -13,8 +13,10 @@ use Innmind\Immutable\{
  * @psalm-immutable
  * @implements Monoid<Set<T>>
  */
-final class MergeSet implements Monoid
+enum MergeSet implements Monoid
 {
+    case monoid;
+
     /**
      * @template C of object
      *
@@ -26,7 +28,7 @@ final class MergeSet implements Monoid
     public static function of(?string $class = null): self
     {
         /** @var self<C> */
-        return new self;
+        return self::monoid;
     }
 
     #[\Override]

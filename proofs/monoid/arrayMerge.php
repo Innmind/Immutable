@@ -32,14 +32,14 @@ return static function() {
     yield properties(
         'ArrayMerge properties',
         Monoid::properties($set, $equals),
-        Set::of(new ArrayMerge),
+        Set::of(ArrayMerge::monoid),
     );
 
     foreach (Monoid::list($set, $equals) as $property) {
         yield proof(
             'ArrayMerge property',
             given($property),
-            static fn($assert, $property) => $property->ensureHeldBy($assert, new ArrayMerge),
+            static fn($assert, $property) => $property->ensureHeldBy($assert, ArrayMerge::monoid),
         );
     }
 };

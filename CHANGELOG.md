@@ -23,6 +23,7 @@
 - `Innmind\Immutable\Set` no longer implements `Countable`
 - Requires PHP `8.4`
 - `Innmind\Immutable\Predicate` is now a final class
+- `Innmind\Immutable\Monoid\*` are now enums with a single case called `monoid`
 
 ### Removed
 
