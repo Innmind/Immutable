@@ -852,12 +852,12 @@ class SequenceTest extends TestCase
 
     public function testFold()
     {
-        $str = Sequence::of(Str::of('foo'), Str::of('bar'), Str::of('baz'))->fold(new Concat);
+        $str = Sequence::of(Str::of('foo'), Str::of('bar'), Str::of('baz'))->fold(Concat::monoid);
 
         $this->assertInstanceOf(Str::class, $str);
         $this->assertSame('foobarbaz', $str->toString());
 
-        $str = Sequence::of(Str::of('baz'), Str::of('foo'), Str::of('bar'))->fold(new Concat);
+        $str = Sequence::of(Str::of('baz'), Str::of('foo'), Str::of('bar'))->fold(Concat::monoid);
 
         $this->assertInstanceOf(Str::class, $str);
         $this->assertSame('bazfoobar', $str->toString());

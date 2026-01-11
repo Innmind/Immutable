@@ -14,12 +14,12 @@ class ConcatTest extends TestCase
 {
     public function testInterface()
     {
-        $this->assertInstanceOf(Monoid::class, new Concat);
+        $this->assertInstanceOf(Monoid::class, Concat::monoid);
     }
 
     public function testCombine()
     {
-        $str = (new Concat)->combine(Str::of('foo'), Str::of('bar'));
+        $str = Concat::monoid->combine(Str::of('foo'), Str::of('bar'));
 
         $this->assertInstanceOf(Str::class, $str);
         $this->assertSame(
