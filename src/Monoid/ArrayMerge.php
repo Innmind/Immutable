@@ -11,8 +11,10 @@ use Innmind\Immutable\Monoid;
  * @psalm-immutable
  * @implements Monoid<array<T, U>>
  */
-final class ArrayMerge implements Monoid
+enum ArrayMerge implements Monoid
 {
+    case monoid;
+
     #[\Override]
     public function identity(): mixed
     {

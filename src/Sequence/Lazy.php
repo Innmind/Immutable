@@ -73,12 +73,6 @@ final class Lazy implements Implementation
         return $size;
     }
 
-    #[\Override]
-    public function count(): int
-    {
-        return $this->size();
-    }
-
     /**
      * @return Iterator<T>
      */
@@ -360,39 +354,6 @@ final class Lazy implements Implementation
     }
 
     /**
-     * @param T $element
-     *
-     * @return Maybe<int<0, max>>
-     */
-    #[\Override]
-    public function indexOf($element): Maybe
-    {
-        $values = $this->values;
-
-        return Maybe::defer(static function() use ($values, $element) {
-            $index = 0;
-            $register = RegisterCleanup::noop();
-            $iterator = $values($register);
-            $iterator->rewind();
-
-            while ($iterator->valid()) {
-                if ($iterator->current() === $element) {
-                    $register->cleanup();
-
-                    /** @var Maybe<int<0, max>> */
-                    return Maybe::just($index);
-                }
-
-                ++$index;
-                $iterator->next();
-            }
-
-            /** @var Maybe<int<0, max>> */
-            return Maybe::nothing();
-        });
-    }
-
-    /**
      * Return the list of indices
      *
      * @return Implementation<int<0, max>>
@@ -530,12 +491,12 @@ final class Lazy implements Implementation
     /**
      * @param callable(T): bool $predicate
      *
-     * @return Map<bool, Sequence<T>>
+     * @return array{Sequence<T>, Sequence<T>}
      */
     #[\Override]
-    public function partition(callable $predicate): Map
+    public function partition(callable $predicate): array
     {
-        /** @var Map<bool, Sequence<T>> */
+        /** @var array{Sequence<T>, Sequence<T>} */
         return $this->load()->partition($predicate);
     }
 

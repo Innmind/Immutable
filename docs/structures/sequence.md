@@ -124,16 +124,6 @@ $sequence = Sequence::ints(1, 4, 6);
 $sequence->size(); // 3
 ```
 
-### `->count()` :material-memory-arrow-down:
-
-This is an alias for `->size()`, but you can also use the PHP function `\count` if you prefer.
-
-```php
-$sequence = Sequence::ints(1, 4, 6);
-$sequence->count(); // 3
-\count($sequence); // 3
-```
-
 ### `->get()`
 
 This method will return a [`Maybe`](maybe.md) object containing the element at the given index in the sequence. If the index doesn't exist it will an empty `Maybe` object.
@@ -163,19 +153,6 @@ $sequence->contains(42); // true
 $sequence->contains('42'); // false but psalm will raise an error
 ```
 
-### `->indexOf()`
-
-This will return a [`Maybe`](maybe.md) object containing the index number at which the first occurence of the element was found.
-
-```php
-$sequence = Sequence::ints(1, 2, 3, 2);
-$sequence->indexOf(2); // Maybe::just(1)
-$sequence->indexOf(4); // Maybe::nothing()
-```
-
-??? warning "Deprecated"
-    This method will be remove in the next major version.
-
 ### `->find()`
 
 Returns a [`Maybe`](maybe.md) object containing the first element that matches the predicate.
@@ -186,6 +163,78 @@ $firstOdd = $sequence->find(fn($i) => $i % 2 === 1);
 $firstOdd; // Maybe::just(9)
 $sequence->find(static fn() => false); // Maybe::nothing()
 ```
+
+### `->lookup()`
+
+This is similar to `->find()` except it allows to return a computed value while searching for it. This is useful when parsing content.
+
+=== "`->maybe()`"
+    ```php
+    final class Email
+    {
+        /**
+         * @return Maybe<self>
+         */
+        public static function of(string $email): Maybe
+        {
+        }
+    }
+
+    $email = Sequence::of('foo', 'valid-email@example.com', 'invalid')
+        ->lookup()
+        ->first()
+        ->maybe(Email::of(...));
+    $email == Maybe::just(new Email('valid-email@example.com')); // true
+    ```
+
+=== "`->attempt()`"
+    ```php
+    final class Email
+    {
+        /**
+         * @return Attempt<self>
+         */
+        public static function of(string $email): Attempt
+        {
+        }
+    }
+
+    $email = Sequence::of('foo', 'valid-email@example.com', 'invalid')
+        ->lookup()
+        ->first()
+        ->attempt(
+            new \RuntimeException('No valid email found'),
+            Email::of(...),
+        );
+    $email == Attempt::result(new Email('valid-email@example.com')); // true
+    ```
+
+=== "`->either()`"
+    ```php
+    final class Email
+    {
+        /**
+         * @return Either<string, self>
+         */
+        public static function of(string $email): Either
+        {
+        }
+    }
+
+    $email = Sequence::of('foo', 'valid-email@example.com', 'invalid')
+        ->lookup()
+        ->first()
+        ->attempt(
+            'No valid email found', #(1)
+            Email::of(...),
+        );
+    $email == Either::right(new Email('valid-email@example.com')); // true
+    ```
+
+    1. Must be of the same type as the left side returned by `Email::of()`
+
+!!! note ""
+    If you need to access the last value that matches the predicate you can use `#!php ->lookup()->last()` instead of `#!php ->lookup()->first()`.
 
 ### `->matches()` :material-memory-arrow-down:
 
@@ -549,7 +598,7 @@ use Innmind\Immutable\Monoid\Concat;
 
 $lines = Sequence::of("foo\n", "bar\n", 'baz')
     ->map(fn($line) => Str::of($line))
-    ->fold(new Concat);
+    ->fold(Concat::monoid);
 
 $lines->equals("foo\nbar\nbaz"); // true
 ```
@@ -739,26 +788,14 @@ $sequence->pad(5, 0)->equals(Sequence::ints(1, 2, 3, 0, 0)); // true
 
 ### `->partition()` :material-memory-arrow-down:
 
-This method is similar to `->groupBy()` method but the map keys are always booleans. The difference is that here the 2 keys are always present whereas with `->groupBy()` it will depend on the original sequence.
+This method is similar to `->groupBy()` except it always return 2 `Sequence`s. The first one contains elements that match the predicate and the second the ones that don't.
 
 ```php
 $sequence = Sequence::ints(1, 2, 3);
-/** @var Map<bool, Sequence<int>> */
-$map = $sequence->partition(fn($int) => $int % 2 === 0);
-$map
-    ->get(true)
-    ->match(
-        static fn($partition) => $partition,
-        static fn() => Sequence::ints(),
-    )
-    ->equals(Sequence::ints(2)); // true
-$map
-    ->get(false)
-    ->match(
-        static fn($partition) => $partition,
-        static fn() => Sequence::ints(),
-    )
-    ->equals(Sequence::ints(1, 3)); // true
+/** @var array{Sequence<int>, Sequence<int>} */
+[$true, $false] = $sequence->partition(fn($int) => $int % 2 === 0);
+$true->equals(Sequence::ints(2)); // true
+$false->equals(Sequence::ints(1, 3)); // true
 ```
 
 ### `->sort()`

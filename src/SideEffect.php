@@ -9,16 +9,9 @@ namespace Innmind\Immutable;
  *
  * @psalm-immutable
  */
-final class SideEffect
+enum SideEffect
 {
-    private static ?self $instance = null;
-
-    /**
-     * @deprecated Use self::identity() instead
-     */
-    public function __construct()
-    {
-    }
+    case identity;
 
     /**
      * @psalm-pure
@@ -26,7 +19,6 @@ final class SideEffect
     #[\NoDiscard]
     public static function identity(): self
     {
-        /** @psalm-suppress ImpureStaticProperty This will become an enum in the future */
-        return self::$instance ??= new self;
+        return self::identity;
     }
 }

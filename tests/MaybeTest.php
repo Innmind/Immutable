@@ -430,7 +430,7 @@ class MaybeTest extends TestCase
 
                 $this->assertInstanceOf(Maybe\Comprehension::class, $comprehension);
                 $called = false;
-                $comprehension->map(static function(...$args) use (&$called) {
+                $_ = $comprehension->map(static function(...$args) use (&$called) {
                     $called = true;
 
                     return $args[0];
@@ -453,7 +453,7 @@ class MaybeTest extends TestCase
 
                 $this->assertInstanceOf(Maybe\Comprehension::class, $comprehension);
                 $called = false;
-                $comprehension->flatMap(static function(...$args) use (&$called) {
+                $_ = $comprehension->flatMap(static function(...$args) use (&$called) {
                     $called = true;
 
                     return Maybe::just($args[0]);
@@ -599,8 +599,8 @@ class MaybeTest extends TestCase
 
     public function testToSequence()
     {
-        $this->assertCount(0, Maybe::nothing()->toSequence());
-        $this->assertCount(0, Maybe::defer(static fn() => Maybe::nothing())->toSequence());
+        $this->assertSame(0, Maybe::nothing()->toSequence()->size());
+        $this->assertSame(0, Maybe::defer(static fn() => Maybe::nothing())->toSequence()->size());
 
         $this
             ->forAll($this->value())

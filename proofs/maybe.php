@@ -59,7 +59,7 @@ return static function() {
                 });
 
             $assert->false($loaded);
-            $maybe->memoize();
+            $_ = $maybe->memoize();
             $assert->true($loaded);
         },
     );

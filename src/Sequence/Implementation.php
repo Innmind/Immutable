@@ -16,7 +16,7 @@ use Innmind\Immutable\{
  * @template T
  * @psalm-immutable
  */
-interface Implementation extends \Countable
+interface Implementation
 {
     /**
      * Add the given element at the end of the sequence
@@ -136,15 +136,6 @@ interface Implementation extends \Countable
     public function contains($element): bool;
 
     /**
-     * Return the index for the given element
-     *
-     * @param T $element
-     *
-     * @return Maybe<int<0, max>>
-     */
-    public function indexOf($element): Maybe;
-
-    /**
      * Return the list of indices
      *
      * @return self<int<0, max>>
@@ -193,13 +184,13 @@ interface Implementation extends \Countable
     public function pad(int $size, $element): self;
 
     /**
-     * Return a sequence of 2 sequences partitioned according to the given predicate
+     * Return 2 Sequences partitioned according to the given predicate
      *
      * @param callable(T): bool $predicate
      *
-     * @return Map<bool, Sequence<T>>
+     * @return array{Sequence<T>, Sequence<T>}
      */
-    public function partition(callable $predicate): Map;
+    public function partition(callable $predicate): array;
 
     /**
      * Slice the sequence

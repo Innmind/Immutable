@@ -67,12 +67,6 @@ final class DoubleIndex implements Implementation
         return $this->pairs->size();
     }
 
-    #[\Override]
-    public function count(): int
-    {
-        return $this->size();
-    }
-
     /**
      * @param T $key
      *
@@ -256,15 +250,15 @@ final class DoubleIndex implements Implementation
     /**
      * @param callable(T, S): bool $predicate
      *
-     * @return Map<bool, Map<T, S>>
+     * @return array{Map<T, S>, Map<T, S>}
      */
     #[\Override]
-    public function partition(callable $predicate): Map
+    public function partition(callable $predicate): array
     {
         $truthy = $this->clearMap();
         $falsy = $this->clearMap();
 
-        [$truthy, $falsy] = $this->pairs->reduce(
+        return $this->pairs->reduce(
             [$truthy, $falsy],
             static function(array $carry, $pair) use ($predicate) {
                 /**
@@ -288,8 +282,6 @@ final class DoubleIndex implements Implementation
                 return [$truthy, $falsy];
             },
         );
-
-        return Map::of([true, $truthy], [false, $falsy]);
     }
 
     /**

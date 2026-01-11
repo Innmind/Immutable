@@ -24,7 +24,6 @@ class PrimitiveTest extends TestCase
     public function testSize()
     {
         $this->assertSame(2, Set::of(1, 2)->size());
-        $this->assertSame(2, Set::of(1, 2)->count());
     }
 
     public function testIterator()
@@ -128,7 +127,7 @@ class PrimitiveTest extends TestCase
 
         $this->assertSame([1, 2, 3, 4], $set->unsorted()->toList());
         $this->assertInstanceOf(Map::class, $groups);
-        $this->assertCount(2, $groups);
+        $this->assertSame(2, $groups->size());
         $this->assertSame([2, 4], $this->get($groups, 0)->toList());
         $this->assertSame([1, 3], $this->get($groups, 1)->toList());
     }
@@ -146,13 +145,11 @@ class PrimitiveTest extends TestCase
     public function testPartition()
     {
         $set = Set::of(1, 2, 3, 4);
-        $groups = $set->partition(static fn($i) => $i % 2 === 0);
+        [$true, $false] = $set->partition(static fn($i) => $i % 2 === 0);
 
         $this->assertSame([1, 2, 3, 4], $set->unsorted()->toList());
-        $this->assertInstanceOf(Map::class, $groups);
-        $this->assertCount(2, $groups);
-        $this->assertSame([2, 4], $this->get($groups, true)->toList());
-        $this->assertSame([1, 3], $this->get($groups, false)->toList());
+        $this->assertSame([2, 4], $true->toList());
+        $this->assertSame([1, 3], $false->toList());
     }
 
     public function testSort()

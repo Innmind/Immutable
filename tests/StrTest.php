@@ -53,7 +53,7 @@ class StrTest extends TestCase
 
         $sequence = $str->split();
         $this->assertInstanceOf(Sequence::class, $sequence);
-        $this->assertCount(3, $sequence);
+        $this->assertSame(3, $sequence->size());
 
         foreach ($sequence->toList() as $part) {
             $this->assertInstanceOf(S::class, $part);
@@ -75,7 +75,7 @@ class StrTest extends TestCase
 
         $sequence = $str->split('');
         $this->assertInstanceOf(Sequence::class, $sequence);
-        $this->assertCount(3, $sequence);
+        $this->assertSame(3, $sequence->size());
 
         foreach ($sequence->toList() as $part) {
             $this->assertInstanceOf(S::class, $part);
@@ -88,7 +88,7 @@ class StrTest extends TestCase
         $str = S::of('f|o|o');
         $sequence = $str->split('|');
         $this->assertInstanceOf(Sequence::class, $sequence);
-        $this->assertCount(3, $sequence);
+        $this->assertSame(3, $sequence->size());
 
         foreach ($sequence->toList() as $part) {
             $this->assertInstanceOf(S::class, $part);
@@ -103,7 +103,7 @@ class StrTest extends TestCase
     {
         $parts = S::of('10101')->split('0');
 
-        $this->assertCount(3, $parts);
+        $this->assertSame(3, $parts->size());
         $this->assertSame('1', $this->get($parts, 0)->toString());
         $this->assertSame('1', $this->get($parts, 1)->toString());
         $this->assertSame('1', $this->get($parts, 2)->toString());
@@ -516,13 +516,13 @@ class StrTest extends TestCase
 
         $map = $str->capture('@^(?:http://)?(?P<host>[^/]+)@i');
         $this->assertInstanceOf(Map::class, $map);
-        $this->assertCount(3, $map);
+        $this->assertSame(3, $map->size());
         $this->assertSame('http://www.php.net', $this->get($map, 0)->toString());
         $this->assertSame('www.php.net', $this->get($map, 1)->toString());
         $this->assertSame('www.php.net', $this->get($map, 'host')->toString());
 
         $map = $str->capture(S::of('@^(?:http://)?(?P<host>[^/]+)@i'));
-        $this->assertCount(3, $map);
+        $this->assertSame(3, $map->size());
     }
 
     public function testCastNullValuesWhenCapturing()
@@ -531,7 +531,7 @@ class StrTest extends TestCase
 
         $matches = $str->capture('~(?<lang>([a-zA-Z0-9]+(-[a-zA-Z0-9]+)*|\*))(; ?q=(?<quality>\d+(\.\d+)?))?~');
         $this->assertInstanceOf(Map::class, $matches);
-        $this->assertCount(9, $matches);
+        $this->assertSame(9, $matches->size());
         $this->assertSame('en;q=0.7', $this->get($matches, 0)->toString());
         $this->assertSame('en', $this->get($matches, 1)->toString());
         $this->assertSame('en', $this->get($matches, 2)->toString());

@@ -56,11 +56,11 @@ return static function() {
     yield test(
         'Set defer nesting calls',
         static function($assert) {
-            $set = Set::defer((static function() {
+            $set = Set::lazy(static function() {
                 yield 1;
                 yield 2;
                 yield 3;
-            })());
+            })->snap();
 
             $assert->same(
                 [
@@ -154,11 +154,11 @@ return static function() {
     yield test(
         'Set defer partial nesting calls',
         static function($assert) {
-            $set = Set::defer((static function() {
+            $set = Set::lazy(static function() {
                 yield 1;
                 yield 2;
                 yield 3;
-            })());
+            })->snap();
 
             $assert->same(
                 [
@@ -193,43 +193,6 @@ return static function() {
 
                 ++$loaded;
             })
-                ->snap()
-                ->map(static fn($value) => [$value]);
-
-            $assert->same(0, $loaded);
-            $assert->same(
-                [$value],
-                $sequence->find(static fn() => true)->match(
-                    static fn($value) => $value,
-                    static fn() => null,
-                ),
-            );
-            $assert->same(1, $loaded);
-            $assert->same(
-                [$value],
-                $sequence->find(static fn() => true)->match(
-                    static fn($value) => $value,
-                    static fn() => null,
-                ),
-            );
-            $assert->same(1, $loaded);
-        },
-    );
-
-    yield proof(
-        'Set::snap() loads a deferred set at once',
-        given(
-            DataSet::type(),
-            DataSet::sequence(DataSet::type()),
-        )->filter(static fn($value, $rest) => !\in_array($value, $rest, true)),
-        static function($assert, $value, $rest) {
-            $loaded = 0;
-            $sequence = Set::defer((static function() use (&$loaded, $value, $rest) {
-                yield $value;
-                yield from $rest;
-
-                ++$loaded;
-            })())
                 ->snap()
                 ->map(static fn($value) => [$value]);
 

@@ -301,7 +301,7 @@ return static function() {
                         static fn() => null,
                     ),
             );
-            $attempt->memoize();
+            $_ = $attempt->memoize();
             $assert->same(1, $called);
 
             $called = 0;
@@ -321,7 +321,7 @@ return static function() {
                         static fn($value) => $value,
                     ),
             );
-            $attempt->memoize();
+            $_ = $attempt->memoize();
             $assert->same(1, $called);
         },
     );
@@ -346,12 +346,12 @@ return static function() {
                 ->recover(static fn() => Attempt::error($e2));
 
             $assert->false($loaded);
-            $attempt->maybe();
+            $_ = $attempt->maybe();
             $assert->false($loaded);
-            $attempt->either();
+            $_ = $attempt->either();
             $assert->false($loaded);
 
-            $attempt->memoize();
+            $_ = $attempt->memoize();
             $assert->true($loaded);
 
             $assert->same(

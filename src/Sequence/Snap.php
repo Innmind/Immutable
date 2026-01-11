@@ -51,12 +51,6 @@ final class Snap implements Implementation
         return $this->memoize()->size();
     }
 
-    #[\Override]
-    public function count(): int
-    {
-        return $this->size();
-    }
-
     /**
      * @return Iterator<T>
      */
@@ -189,17 +183,6 @@ final class Snap implements Implementation
     }
 
     /**
-     * @param T $element
-     *
-     * @return Maybe<int<0, max>>
-     */
-    #[\Override]
-    public function indexOf($element): Maybe
-    {
-        return $this->memoize()->indexOf($element);
-    }
-
-    /**
      * Return the list of indices
      *
      * @return Implementation<int<0, max>>
@@ -285,12 +268,12 @@ final class Snap implements Implementation
     /**
      * @param callable(T): bool $predicate
      *
-     * @return Map<bool, Sequence<T>>
+     * @return array{Sequence<T>, Sequence<T>}
      */
     #[\Override]
-    public function partition(callable $predicate): Map
+    public function partition(callable $predicate): array
     {
-        /** @var Map<bool, Sequence<T>> */
+        /** @var array{Sequence<T>, Sequence<T>} */
         return $this->memoize()->partition($predicate);
     }
 

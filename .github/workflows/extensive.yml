@@ -1,0 +1,12 @@
+name: Extensive CI
+
+on:
+  push:
+    tags:
+      - '*'
+    paths:
+      - '.github/workflows/extensive.yml'
+
+jobs:
+  blackbox:
+    uses: innmind/github-workflows/.github/workflows/extensive.yml@main

@@ -79,12 +79,6 @@ final class Defer implements Implementation
         return $this->memoize()->size();
     }
 
-    #[\Override]
-    public function count(): int
-    {
-        return $this->size();
-    }
-
     /**
      * @return Iterator<T>
      */
@@ -390,42 +384,6 @@ final class Defer implements Implementation
     }
 
     /**
-     * @param T $element
-     *
-     * @return Maybe<int<0, max>>
-     */
-    #[\Override]
-    public function indexOf($element): Maybe
-    {
-        $captured = $this->capture();
-
-        return Maybe::defer(static function() use (&$captured, $element) {
-            $index = 0;
-            /**
-             * @psalm-suppress PossiblyNullArgument
-             * @var Iterator<T>
-             */
-            $values = self::detonate($captured);
-            $values->rewind();
-
-            while ($values->valid()) {
-                if ($values->current() === $element) {
-                    $values->cleanup();
-
-                    /** @var Maybe<int<0, max>> */
-                    return Maybe::just($index);
-                }
-
-                ++$index;
-                $values->next();
-            }
-
-            /** @var Maybe<int<0, max>> */
-            return Maybe::nothing();
-        });
-    }
-
-    /**
      * Return the list of indices
      *
      * @return Implementation<int<0, max>>
@@ -586,12 +544,12 @@ final class Defer implements Implementation
     /**
      * @param callable(T): bool $predicate
      *
-     * @return Map<bool, Sequence<T>>
+     * @return array{Sequence<T>, Sequence<T>}
      */
     #[\Override]
-    public function partition(callable $predicate): Map
+    public function partition(callable $predicate): array
     {
-        /** @var Map<bool, Sequence<T>> */
+        /** @var array{Sequence<T>, Sequence<T>} */
         return $this->memoize()->partition($predicate);
     }
 
@@ -944,10 +902,9 @@ final class Defer implements Implementation
 
         /**
          * @psalm-suppress ImpureFunctionCall
-         * @psalm-suppress DeprecatedMethod
          */
-        return Set::defer(
-            (static function() use (&$captured): \Generator {
+        return Set::lazy(
+            static function() use (&$captured): \Generator {
                 /**
                  * @psalm-suppress PossiblyNullArgument
                  * @var Iterator<T>
@@ -959,8 +916,8 @@ final class Defer implements Implementation
                     yield $values->current();
                     $values->next();
                 }
-            })(),
-        );
+            },
+        )->snap();
     }
 
     #[\Override]
