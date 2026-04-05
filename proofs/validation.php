@@ -315,4 +315,46 @@ return static function() {
             );
         },
     );
+
+    yield proof(
+        'Validation::attempt()',
+        given(
+            Set::type(),
+            Set::sequence(Set::type())->atLeast(1),
+        ),
+        static function($assert, $success, $errors) {
+            $assert->same(
+                $success,
+                Validation::success($success)
+                    ->attempt(static fn() => new Exception)
+                    ->unwrap(),
+            );
+
+            $rest = $errors;
+            $first = \array_shift($rest);
+            $failure = Validation::fail($first);
+
+            foreach ($rest as $value) {
+                $failure = $failure->and(
+                    Validation::fail($value),
+                    static fn() => null,
+                );
+            }
+
+            $exception = new Exception;
+            $assert->same(
+                $exception,
+                $failure
+                    ->attempt(static function($failures) use ($assert, $errors, $exception) {
+                        $assert->same($errors, $failures->toList());
+
+                        return $exception;
+                    })
+                    ->match(
+                        static fn() => null,
+                        static fn($e) => $e,
+                    ),
+            );
+        },
+    );
 };

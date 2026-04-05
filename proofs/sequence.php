@@ -3,6 +3,7 @@ declare(strict_types = 1);
 
 use Innmind\Immutable\{
     Sequence,
+    Sequence\Union\Both,
     Maybe,
     Either,
     Attempt,
@@ -1035,6 +1036,62 @@ return static function() {
 
             $assert->true($sequence->equals($sequence));
             $assert->false($loaded);
+        },
+    );
+
+    yield test(
+        'Sequence::union()',
+        static function($assert) {
+            $assert->same(
+                [1, 2, 3],
+                Sequence::of(1, 2, 3)
+                    ->union(Sequence::of())
+                    ->map(static fn($left) => $left->unwrap())
+                    ->toList(),
+            );
+            $assert->same(
+                [1, 2, 3],
+                Sequence::of()
+                    ->union(Sequence::of(1, 2, 3))
+                    ->map(static fn($right) => $right->unwrap())
+                    ->toList(),
+            );
+            $assert->same(
+                [[1, 4], [2, 5], [3, 6]],
+                Sequence::of(1, 2, 3)
+                    ->union(Sequence::of(4, 5, 6))
+                    ->map(static fn($both) => [
+                        $both->left(),
+                        $both->right(),
+                    ])
+                    ->toList(),
+            );
+            $assert->same(
+                [[1, 4], [2, 5], [3, null]],
+                Sequence::of(1, 2, 3)
+                    ->union(Sequence::of(4, 5))
+                    ->map(static fn($both) => [
+                        $both->left(),
+                        match (true) {
+                            $both instanceof Both => $both->right(),
+                            default => null,
+                        },
+                    ])
+                    ->toList(),
+            );
+            $assert->same(
+                [[1, 4], [2, 5], [null, 6]],
+                Sequence::of(1, 2)
+                    ->union(Sequence::of(4, 5, 6))
+                    ->map(static fn($both) => [
+                        match (true) {
+                            $both instanceof Both => $both->left(),
+                            default => null,
+                        },
+                        $both->right(),
+                    ])
+                    ->toList(),
+            );
         },
     );
 

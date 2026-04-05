@@ -8,6 +8,7 @@ use Innmind\Immutable\{
     Maybe,
     Either,
     Sequence,
+    Attempt,
 };
 
 /**
@@ -218,5 +219,17 @@ final class Fail implements Implementation
         }
 
         return Either::left($this->failures);
+    }
+
+    #[\Override]
+    public function attempt(callable $error): Attempt
+    {
+        if ($this->failures instanceof Guard) {
+            /** @psalm-suppress ImpureFunctionCall */
+            return Attempt::error($error($this->failures->unwrap()));
+        }
+
+        /** @psalm-suppress ImpureFunctionCall */
+        return Attempt::error($error($this->failures));
     }
 }

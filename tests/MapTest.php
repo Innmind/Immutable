@@ -199,7 +199,8 @@ class MapTest extends TestCase
     {
         $this->assertTrue(
             Map::of()
-                ->groupBy(static function() {})
+                ->groupBy(static function() {
+                })
                 ->equals(Map::of()),
         );
     }

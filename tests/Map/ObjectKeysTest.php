@@ -133,7 +133,8 @@ class ObjectKeysTest extends TestCase
     {
         $this->assertTrue(
             (new ObjectKeys)
-                ->groupBy(static function() {})
+                ->groupBy(static function() {
+                })
                 ->equals(Map::of()),
         );
     }

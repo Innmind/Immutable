@@ -6,6 +6,9 @@ namespace Innmind\Immutable\Sequence;
 use Innmind\Immutable\{
     Map,
     Sequence,
+    Sequence\Union\Left,
+    Sequence\Union\Right,
+    Sequence\Union\Both,
     Set,
     Maybe,
     SideEffect,
@@ -587,6 +590,47 @@ final class Primitive implements Implementation
         }
 
         /** @var Implementation<array{T, S}> */
+        return new self($values);
+    }
+
+    /**
+     * @template S
+     *
+     * @param Implementation<S> $sequence
+     *
+     * @return self<Left<T>|Right<S>|Both<T, S>>
+     */
+    #[\Override]
+    public function union(Implementation $sequence): self
+    {
+        /** @var list<Left<T>|Right<S>|Both<T, S>> */
+        $values = [];
+        $other = $sequence->iterator();
+        /** @psalm-suppress ImpureMethodCall */
+        $other->rewind();
+
+        foreach ($this->values as $value) {
+            /** @psalm-suppress ImpureMethodCall */
+            if (!$other->valid()) {
+                $values[] = Left::of($value);
+
+                continue;
+            }
+
+            /** @psalm-suppress ImpureMethodCall */
+            $values[] = Both::of($value, $other->current());
+            /** @psalm-suppress ImpureMethodCall */
+            $other->next();
+        }
+
+        /** @psalm-suppress ImpureMethodCall */
+        while ($other->valid()) {
+            /** @psalm-suppress ImpureMethodCall */
+            $values[] = Right::of($other->current());
+            /** @psalm-suppress ImpureMethodCall */
+            $other->next();
+        }
+
         return new self($values);
     }
 

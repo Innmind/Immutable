@@ -162,7 +162,8 @@ class DoubleIndexTest extends TestCase
     {
         $this->assertTrue(
             (new DoubleIndex)
-                ->groupBy(static function() {})
+                ->groupBy(static function() {
+                })
                 ->equals(Map::of()),
         );
     }

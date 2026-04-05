@@ -190,4 +190,15 @@ final class Validation
     {
         return $this->implementation->either();
     }
+
+    /**
+     * @param callable(Sequence<F>): \Throwable $error
+     *
+     * @return Attempt<S>
+     */
+    #[\NoDiscard]
+    public function attempt(callable $error): Attempt
+    {
+        return $this->implementation->attempt($error);
+    }
 }

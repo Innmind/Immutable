@@ -6,6 +6,9 @@ namespace Innmind\Immutable\Sequence;
 use Innmind\Immutable\{
     Map,
     Sequence,
+    Sequence\Union\Left,
+    Sequence\Union\Right,
+    Sequence\Union\Both,
     Set,
     Maybe,
     SideEffect,
@@ -335,6 +338,15 @@ interface Implementation
      * @return self<array{T, S}>
      */
     public function zip(self $sequence): self;
+
+    /**
+     * @template S
+     *
+     * @param Implementation<S> $sequence
+     *
+     * @return self<Left<T>|Right<S>|Both<T, S>>
+     */
+    public function union(self $sequence): self;
 
     /**
      * Make sure every value conforms to the assertion

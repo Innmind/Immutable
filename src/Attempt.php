@@ -173,6 +173,23 @@ final class Attempt
     }
 
     /**
+     * @template E of \Throwable
+     *
+     * @param class-string<E> $case
+     * @param callable(E): \Throwable $map
+     *
+     * @return self<T>
+     */
+    #[\NoDiscard]
+    public function mapErrorCase(string $case, callable $map): self
+    {
+        return $this->mapError(static fn($e) => match (true) {
+            $e instanceof $case => $map($e),
+            default => $e,
+        });
+    }
+
+    /**
      * @template U
      *
      * @param callable(\Throwable): self<U> $recover
@@ -186,6 +203,24 @@ final class Attempt
             $recover,
             static fn(self $self) => $self->implementation,
         ));
+    }
+
+    /**
+     * @template E of \Throwable
+     * @template U
+     *
+     * @param class-string<E> $case
+     * @param callable(E): self<U> $recover
+     *
+     * @return self<T|U>
+     */
+    #[\NoDiscard]
+    public function recoverCase(string $case, callable $recover): self
+    {
+        return $this->recover(static fn($e) => match (true) {
+            $e instanceof $case => $recover($e),
+            default => self::error($e),
+        });
     }
 
     /**

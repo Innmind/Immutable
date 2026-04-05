@@ -151,7 +151,8 @@ class PrimitiveTest extends TestCase
     {
         $this->assertTrue(
             (new Primitive)
-                ->groupBy(static function() {})
+                ->groupBy(static function() {
+                })
                 ->equals(Map::of()),
         );
     }
