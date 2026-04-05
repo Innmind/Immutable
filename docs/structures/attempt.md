@@ -139,6 +139,24 @@ $attempt = Attempt::of(static fn() => 1/0)
 
 Here `#!php $attempt` contains an `\Exception` because the first `Attempt` raised a `DivisionByZeroError`.
 
+## `->mapErrorCase()`
+
+This is similar to `mapError` except you can specify the type of error you want to change (like in a `catch` statement).
+
+```php
+$attempt = Attempt::of(static fn() => 1/0)
+    ->mapErrorCase(
+        \DivisionByZeroError::class,
+        static fn(\DivisionByZeroError $e) => new \Exception('Division by zero, fix the code'),
+    )
+    ->mapError(static fn(\Throwable $e) => new \Exception('something bad happened', 0, $e));
+```
+
+!!! warning ""
+    It uses `instanceof` to check the error case. This means the order in which you apply these calls is important!
+
+    This is to match the behaviour of the `catch` statement.
+
 ## `->recover()`
 
 This will allow you to recover in case of a previous error.
@@ -149,6 +167,26 @@ $attempt = Attempt::of(static fn() => 1/0)
 ```
 
 Here `#!php $attempt` is `#!php 42` because the first `Attempt` raised a `DivisionByZeroError`.
+
+## `->recoverCase()`
+
+This is similar to `recover` except you can specify the type of error you want to recover (like in a `catch` statement).
+
+```php
+$attempt = Attempt::of(static fn() => 1/0)
+    ->recoverCase(
+        \DivisionByZeroError::class,
+        static fn(\DivisionByZeroError $e) => Attempt::result(0),
+    )
+    ->recover(static fn(\Throwable $e) => Attempt::result(42));
+```
+
+Here `#!php $attempt` is `#!php 0` because the first `Attempt` raised a `DivisionByZeroError`.
+
+!!! warning ""
+    It uses `instanceof` to check the error case. This means the order in which you apply these calls is important!
+
+    This is to match the behaviour of the `catch` statement.
 
 ## `->xrecover()`
 
