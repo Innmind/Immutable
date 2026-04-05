@@ -6,6 +6,9 @@ namespace Innmind\Immutable\Sequence;
 use Innmind\Immutable\{
     Map,
     Sequence,
+    Sequence\Union\Left,
+    Sequence\Union\Right,
+    Sequence\Union\Both,
     Set,
     Maybe,
     SideEffect,
@@ -911,6 +914,52 @@ final class Lazy implements Implementation
                 }
 
                 $otherRegister->cleanup();
+            },
+        );
+    }
+
+    /**
+     * @template S
+     *
+     * @param Implementation<S> $sequence
+     *
+     * @return Implementation<Left<T>|Right<S>|Both<T, S>>
+     */
+    #[\Override]
+    public function union(Implementation $sequence): Implementation
+    {
+        $values = $this->values;
+
+        /** @var Implementation<Left<T>|Right<S>|Both<T, S>> */
+        return new self(
+            static function(RegisterCleanup $register) use ($values, $sequence) {
+                $otherRegister = $register->push();
+                $self = $values($register);
+                $other = self::open($sequence, $otherRegister);
+                $self->rewind();
+                $other->rewind();
+
+                while ($self->valid()) {
+                    $value = $self->current();
+
+                    if (!$other->valid()) {
+                        $register->pop();
+
+                        yield Left::of($value);
+                        $self->next();
+
+                        continue;
+                    }
+
+                    yield Both::of($value, $other->current());
+                    $self->next();
+                    $other->next();
+                }
+
+                while ($other->valid()) {
+                    yield Right::of($other->current());
+                    $other->next();
+                }
             },
         );
     }

@@ -40,6 +40,7 @@ final class Sequence
             Sequence\LookupLastMaybe::class,
             Sequence\LookupLastAttempt::class,
             Sequence\LookupLastEither::class,
+            Sequence\Union::class,
         ];
     }
 }

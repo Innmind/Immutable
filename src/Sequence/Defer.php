@@ -6,6 +6,9 @@ namespace Innmind\Immutable\Sequence;
 use Innmind\Immutable\{
     Map,
     Sequence,
+    Sequence\Union\Left,
+    Sequence\Union\Right,
+    Sequence\Union\Both,
     Set,
     Maybe,
     Accumulate,
@@ -1002,6 +1005,53 @@ final class Defer implements Implementation
 
                 if ($other->valid()) {
                     $other->cleanup();
+                }
+            })($sequence->iterator()),
+        );
+    }
+
+    /**
+     * @template S
+     *
+     * @param Implementation<S> $sequence
+     *
+     * @return Implementation<Left<T>|Right<S>|Both<T, S>>
+     */
+    #[\Override]
+    public function union(Implementation $sequence): Implementation
+    {
+        $captured = $this->capture();
+
+        /**
+         * @psalm-suppress ImpureFunctionCall
+         * @var Implementation<Left<T>|Right<S>|Both<T, S>>
+         */
+        return new self(
+            (static function(Iterator $other) use (&$captured) {
+                /**
+                 * @psalm-suppress PossiblyNullArgument
+                 * @var Iterator<T>
+                 */
+                $self = self::detonate($captured);
+                $self->rewind();
+                $other->rewind();
+
+                while ($self->valid()) {
+                    if (!$other->valid()) {
+                        yield Left::of($self->current());
+                        $self->next();
+
+                        continue;
+                    }
+
+                    yield Both::of($self->current(), $other->current());
+                    $self->next();
+                    $other->next();
+                }
+
+                while ($other->valid()) {
+                    yield Right::of($other->current());
+                    $other->next();
                 }
             })($sequence->iterator()),
         );

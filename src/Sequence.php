@@ -3,6 +3,12 @@ declare(strict_types = 1);
 
 namespace Innmind\Immutable;
 
+use Innmind\Immutable\Sequence\Union\{
+    Left,
+    Right,
+    Both,
+};
+
 /**
  * @template-covariant T
  * @psalm-immutable
@@ -795,6 +801,18 @@ final class Sequence
     public function zip(self $sequence): self
     {
         return new self($this->implementation->zip($sequence->implementation));
+    }
+
+    /**
+     * @template S
+     *
+     * @param self<S> $sequence
+     *
+     * @return self<Left<T>|Right<S>|Both<T, S>>
+     */
+    public function union(self $sequence): self
+    {
+        return new self($this->implementation->union($sequence->implementation));
     }
 
     /**
