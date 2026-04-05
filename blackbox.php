@@ -10,13 +10,9 @@ use Innmind\BlackBox\{
 };
 
 Application::new($argv)
-    ->when(
-        \getenv('BLACKBOX_SET_SIZE') !== false,
-        static fn(Application $app) => $app->scenariiPerProof((int) \getenv('BLACKBOX_SET_SIZE')),
-    )
-    ->when(
-        \getenv('ENABLE_COVERAGE') !== false,
-        static fn(Application $app) => $app
+    ->map(static fn($app) => match (\getenv('BLACKBOX_ENV')) {
+        'extensive' => $app->scenariiPerProof(1_000),
+        'coverage' => $app
             ->codeCoverage(
                 CodeCoverage::of(
                     __DIR__.'/src/',
@@ -27,6 +23,7 @@ Application::new($argv)
                     ->enableWhen(true),
             )
             ->scenariiPerProof(50),
-    )
+        default => $app,
+    })
     ->tryToProve(Load::everythingIn(__DIR__.'/proofs/'))
     ->exit();
