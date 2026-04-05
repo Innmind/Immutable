@@ -153,6 +153,35 @@ return static function() {
     );
 
     yield proof(
+        'Attempt::mapErrorCase()',
+        given(
+            $exceptions,
+            $exceptions,
+            $exceptions,
+        )->filter(static fn($a, $b, $c) => !($a instanceof $c)),
+        static function($assert, $start, $end, $other) {
+            $assert->same(
+                $end,
+                Attempt::error($start)
+                    ->mapErrorCase($start::class, static fn() => $end)
+                    ->match(
+                        static fn() => null,
+                        static fn($e) => $e,
+                    ),
+            );
+            $assert->same(
+                $start,
+                Attempt::error($start)
+                    ->mapErrorCase($other::class, static fn() => $end)
+                    ->match(
+                        static fn() => null,
+                        static fn($e) => $e,
+                    ),
+            );
+        },
+    );
+
+    yield proof(
         'Attempt::recover()',
         given(
             $exceptions,
@@ -199,6 +228,33 @@ return static function() {
                     static fn($value) => $value,
                     static fn() => null,
                 ),
+            );
+        },
+    );
+
+    yield proof(
+        'Attempt::recoverCase()',
+        given(
+            $exceptions,
+            $exceptions,
+            $exceptions,
+            Set::type(),
+        )->filter(static fn($a, $b, $c) => !($a instanceof $c)),
+        static function($assert, $start, $end, $other, $value) {
+            $assert->same(
+                $value,
+                Attempt::error($start)
+                    ->recoverCase($start::class, static fn() => Attempt::result($value))
+                    ->unwrap(),
+            );
+            $assert->same(
+                $start,
+                Attempt::error($start)
+                    ->recoverCase($other::class, static fn() => Attempt::result($value))
+                    ->match(
+                        static fn() => null,
+                        static fn($e) => $e,
+                    ),
             );
         },
     );

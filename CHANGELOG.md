@@ -5,6 +5,8 @@
 ### Added
 
 - `Innmind\Immutable\Validation::attempt()`
+- `Innmind\Immutable\Attempt::mapErrorCase()`
+- `Innmind\Immutable\Attempt::recoverCase()`
 
 ## 6.0.0 - 2026-01-11
 
