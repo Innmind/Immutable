@@ -463,6 +463,12 @@ final class Snap implements Implementation
         return $this->will(static fn($self) => $self->zip($sequence));
     }
 
+    #[\Override]
+    public function union(Implementation $sequence): Implementation
+    {
+        return $this->will(static fn($self) => $self->union($sequence));
+    }
+
     /**
      * @template R
      * @param R $carry

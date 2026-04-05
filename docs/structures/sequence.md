@@ -347,6 +347,34 @@ $pairs = $firnames
 $pairs; // [['John', 'Doe'], ['Luke', 'Skywalker'], ['James', 'Kirk']]
 ```
 
+### `->union()`
+
+This method allows to merge 2 sequences into a new one by combining the values of the 2. The values are wrapped in `Left`, `Right` and `Both` objects, this is in case sequences are not of the same length.
+
+```php
+use Innmind\Immutable\Sequence\Union\{
+    Left,
+    Right,
+    Both,
+};
+
+$firnames = Sequence::of('John', 'Luke', 'James');
+$lastnames = Sequence::of('Doe', 'Skywalker', 'Kirk');
+
+$firnames
+    ->union($lastnames)
+    ->toList(); // [Both::of('John', 'Doe'), Both::of('Luke', 'Skywalker'), Both::of('James', 'Kirk')]
+
+$firstname
+    ->add('Catherine')
+    ->union($lastnames)
+    ->toList(); // [Both::of('John', 'Doe'), Both::of('Luke', 'Skywalker'), Both::of('James', 'Kirk'), Left('Catherine')]
+
+$firstname
+    ->union($lastnames->add('Halsey'))
+    ->toList(); // [Both::of('John', 'Doe'), Both::of('Luke', 'Skywalker'), Both::of('James', 'Kirk'), Right('Halsey')]
+```
+
 ### `->aggregate()`
 
 This methods allows to rearrange the elements of the Sequence. This is especially useful for parsers.

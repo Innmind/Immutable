@@ -7,6 +7,10 @@
 - `Innmind\Immutable\Validation::attempt()`
 - `Innmind\Immutable\Attempt::mapErrorCase()`
 - `Innmind\Immutable\Attempt::recoverCase()`
+- `Innmind\Immutable\Sequence::union()`
+- `Innmind\Immutable\Sequence\Union\Left`
+- `Innmind\Immutable\Sequence\Union\Right`
+- `Innmind\Immutable\Sequence\Union\Both`
 
 ## 6.0.0 - 2026-01-11
 
