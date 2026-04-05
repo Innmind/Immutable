@@ -204,3 +204,21 @@ Validation::fail('something')->either()->match(
     static fn($value) => $value,
 ); // returns Sequence<string>
 ```
+
+## `->attempt()`
+
+This returns an [`Attempt`](attempt.md) containing the success value as the result, in case of failures it calls the passed callable to transform them into a `Throwable`.
+
+```php
+Validation::success('something')
+    ->attempt(static fn(Sequence $failures) => new \Exception)
+    ->unwrap(); // returns 'something'
+Validation::fail('something')
+    ->attempt(static fn(Sequence $failures) => new \Exception(
+        $failures
+            ->map(Str::of(...))
+            ->fold(Concat::monoid)
+            ->toString(),
+    ))
+    ->unwrap(); // throws new Exception('something')
+```

@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+
+- `Innmind\Immutable\Validation::attempt()`
+
 ## 6.0.0 - 2026-01-11
 
 ### Added
