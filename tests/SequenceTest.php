@@ -319,7 +319,8 @@ class SequenceTest extends TestCase
     {
         $this->assertTrue(
             Sequence::of()
-                ->groupBy(static function() {})
+                ->groupBy(static function() {
+                })
                 ->equals(Map::of()),
         );
     }
