@@ -1,4 +1,8 @@
+/.github export-ignore
 /.gitattributes export-ignore
 /.gitignore export-ignore
-/phpunit.xml.dist export-ignore
+/proofs export-ignore
 /tests export-ignore
+/blackbox.php export-ignore
+/.php-cs-fixer.dist.php export-ignore
+/psalm.xml export-ignore
