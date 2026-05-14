@@ -31,16 +31,16 @@
     },
     "require-dev": {
         "innmind/static-analysis": "~1.3",
-        "innmind/black-box": "^6.4.1",
+        "innmind/black-box": "~7.0",
         "innmind/coding-standard": "~2.0"
     },
     "conflict": {
-        "innmind/black-box": "<6.0|~7.0"
+        "innmind/black-box": "<7.0|~8.0"
     },
     "suggest": {
         "innmind/black-box": "For property based testing"
     },
     "provide": {
-        "innmind/black-box-sets": "6.0"
+        "innmind/black-box-sets": "7.0"
     }
 }

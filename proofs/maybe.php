@@ -4,14 +4,14 @@ declare(strict_types = 1);
 use Innmind\Immutable\Maybe;
 use Innmind\BlackBox\Set;
 
-return static function() {
-    yield proof(
-        'Maybe::defer() holds intermediary values',
-        given(
+return static function($prove) {
+    yield $prove
+        ->proof('Maybe::defer() holds intermediary values')
+        ->given(
             Set::type(),
             Set::type(),
-        ),
-        static function($assert, $value1, $value2) {
+        )
+        ->test(static function($assert, $value1, $value2) {
             $m1 = Maybe::defer(static function() use ($value1) {
                 static $loaded = false;
 
@@ -41,13 +41,12 @@ return static function() {
                     ),
                 ),
             );
-        },
-    );
+        });
 
-    yield proof(
-        'Maybe::memoize() any composition',
-        given(Set::type()->filter(static fn($value) => !\is_null($value))),
-        static function($assert, $value) {
+    yield $prove
+        ->proof('Maybe::memoize() any composition')
+        ->given(Set::type()->filter(static fn($value) => !\is_null($value)))
+        ->test(static function($assert, $value) {
             $loaded = false;
             $maybe = Maybe::defer(static fn() => Maybe::just($value))
                 ->flatMap(static function() use ($value, &$loaded) {
@@ -61,13 +60,12 @@ return static function() {
             $assert->false($loaded);
             $_ = $maybe->memoize();
             $assert->true($loaded);
-        },
-    );
+        });
 
-    yield proof(
-        'Maybe->attempt()',
-        given(Set::type()),
-        static function($assert, $value) {
+    yield $prove
+        ->proof('Maybe->attempt()')
+        ->given(Set::type())
+        ->test(static function($assert, $value) {
             $assert->same(
                 $value,
                 Maybe::just($value)
@@ -85,13 +83,12 @@ return static function() {
                         static fn($error) => $error,
                     ),
             );
-        },
-    );
+        });
 
-    yield proof(
-        'Maybe::defer()->attempt()',
-        given(Set::type()),
-        static function($assert, $value) {
+    yield $prove
+        ->proof('Maybe::defer()->attempt()')
+        ->given(Set::type())
+        ->test(static function($assert, $value) {
             $loaded = false;
             $attempt = Maybe::defer(static function() use (&$loaded, $value) {
                 $loaded = true;
@@ -123,6 +120,5 @@ return static function() {
                 ),
             );
             $assert->true($loaded);
-        },
-    );
+        });
 };

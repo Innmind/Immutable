@@ -9,7 +9,7 @@ use Innmind\Immutable\{
 use Innmind\BlackBox\Set;
 use Properties\Innmind\Immutable\Monoid;
 
-return static function() {
+return static function($prove) {
     $equals = static fn($a, $b) => $a->equals($b);
     $set = Set::sequence(
         Set::compose(
@@ -27,17 +27,16 @@ return static function() {
         })
         ->map(static fn($pairs) => Map::of(...$pairs));
 
-    yield properties(
+    yield $prove->properties(
         'MergeMap properties',
         Monoid::properties($set, $equals),
-        Set::of(MergeMap::of()),
+        Set::of(static fn() => MergeMap::of()),
     );
 
     foreach (Monoid::list($set, $equals) as $property) {
-        yield proof(
-            'MergeMap property',
-            given($property),
-            static fn($assert, $property) => $property->ensureHeldBy($assert, MergeMap::of()),
-        );
+        yield $prove
+            ->proof('MergeMap property')
+            ->given($property)
+            ->test(static fn($assert, $property) => $property->ensureHeldBy($assert, MergeMap::of()));
     }
 };

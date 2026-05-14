@@ -4,11 +4,11 @@ declare(strict_types = 1);
 use Innmind\Immutable\Validation;
 use Innmind\BlackBox\Set;
 
-return static function() {
-    yield proof(
-        'Validation::match()',
-        given(Set::type()),
-        static function($assert, $value) {
+return static function($prove) {
+    yield $prove
+        ->proof('Validation::match()')
+        ->given(Set::type())
+        ->test(static function($assert, $value) {
             $assert->same(
                 $value,
                 Validation::success($value)->match(
@@ -23,16 +23,15 @@ return static function() {
                     static fn($value) => $value->toList(),
                 ),
             );
-        },
-    );
+        });
 
-    yield proof(
-        'Validation::map()',
-        given(
+    yield $prove
+        ->proof('Validation::map()')
+        ->given(
             Set::type(),
             Set::type(),
-        ),
-        static function($assert, $initial, $new) {
+        )
+        ->test(static function($assert, $initial, $new) {
             $assert->same(
                 [$initial, $new],
                 Validation::success($initial)
@@ -50,16 +49,15 @@ return static function() {
                         static fn() => null,
                     ),
             );
-        },
-    );
+        });
 
-    yield proof(
-        'Validation::flatMap()',
-        given(
+    yield $prove
+        ->proof('Validation::flatMap()')
+        ->given(
             Set::type(),
             Set::type(),
-        ),
-        static function($assert, $initial, $new) {
+        )
+        ->test(static function($assert, $initial, $new) {
             $assert->same(
                 [$initial, $new],
                 Validation::success($initial)
@@ -86,16 +84,15 @@ return static function() {
                         static fn() => null,
                     ),
             );
-        },
-    );
+        });
 
-    yield proof(
-        'Validation::mapFailures()',
-        given(
+    yield $prove
+        ->proof('Validation::mapFailures()')
+        ->given(
             Set::type(),
             Set::type(),
-        ),
-        static function($assert, $initial, $new) {
+        )
+        ->test(static function($assert, $initial, $new) {
             $assert->same(
                 [[$initial, $new]],
                 Validation::fail($initial)
@@ -113,16 +110,15 @@ return static function() {
                         static fn($value) => $value->toList(),
                     ),
             );
-        },
-    );
+        });
 
-    yield proof(
-        'Validation::otherwise()',
-        given(
+    yield $prove
+        ->proof('Validation::otherwise()')
+        ->given(
             Set::type(),
             Set::type(),
-        ),
-        static function($assert, $initial, $new) {
+        )
+        ->test(static function($assert, $initial, $new) {
             $assert->null(
                 Validation::success($initial)
                     ->otherwise(static fn($value) => Validation::success([$value, $new]))
@@ -149,13 +145,12 @@ return static function() {
                         static fn() => null,
                     ),
             );
-        },
-    );
+        });
 
-    yield proof(
-        'Validation::maybe()',
-        given(Set::type()),
-        static function($assert, $value) {
+    yield $prove
+        ->proof('Validation::maybe()')
+        ->given(Set::type())
+        ->test(static function($assert, $value) {
             $assert->same(
                 $value,
                 Validation::success($value)
@@ -173,13 +168,12 @@ return static function() {
                         static fn() => null,
                     ),
             );
-        },
-    );
+        });
 
-    yield proof(
-        'Validation::either()',
-        given(Set::type()),
-        static function($assert, $value) {
+    yield $prove
+        ->proof('Validation::either()')
+        ->given(Set::type())
+        ->test(static function($assert, $value) {
             $assert->same(
                 $value,
                 Validation::success($value)
@@ -198,16 +192,15 @@ return static function() {
                         static fn($value) => $value->toList(),
                     ),
             );
-        },
-    );
+        });
 
-    yield proof(
-        'Validation::and()',
-        given(
+    yield $prove
+        ->proof('Validation::and()')
+        ->given(
             Set::type(),
             Set::type(),
-        ),
-        static function($assert, $a, $b) {
+        )
+        ->test(static function($assert, $a, $b) {
             $success = Validation::success($a);
             $fail = Validation::fail($b);
 
@@ -259,17 +252,16 @@ return static function() {
                         static fn($value) => $value->toList(),
                     ),
             );
-        },
-    );
+        });
 
-    yield proof(
-        'Validation::guard()',
-        given(
+    yield $prove
+        ->proof('Validation::guard()')
+        ->given(
             Set::integers()->above(1),
             Set::integers()->below(-1),
             Set::type(),
-        ),
-        static function($assert, $positive, $negative, $fail) {
+        )
+        ->test(static function($assert, $positive, $negative, $fail) {
             $assert->same(
                 $positive,
                 Validation::success($positive)
@@ -313,16 +305,15 @@ return static function() {
                         static fn($failures) => $failures->toList(),
                     ),
             );
-        },
-    );
+        });
 
-    yield proof(
-        'Validation::attempt()',
-        given(
+    yield $prove
+        ->proof('Validation::attempt()')
+        ->given(
             Set::type(),
             Set::sequence(Set::type())->atLeast(1),
-        ),
-        static function($assert, $success, $errors) {
+        )
+        ->test(static function($assert, $success, $errors) {
             $assert->same(
                 $success,
                 Validation::success($success)
@@ -355,6 +346,5 @@ return static function() {
                         static fn($e) => $e,
                     ),
             );
-        },
-    );
+        });
 };

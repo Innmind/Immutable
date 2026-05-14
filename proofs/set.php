@@ -7,15 +7,16 @@ use Innmind\Immutable\{
 };
 use Innmind\BlackBox\Set as DataSet;
 
-return static function() {
-    yield proof(
-        'Set::match()',
-        given(
+return static function($prove) {
+    yield $prove
+        ->proof('Set::match()')
+        ->given(
             DataSet::type(),
             DataSet::sequence(DataSet::type())
                 ->map(static fn($values) => Sequence::of(...$values)->distinct()->toList()),
-        )->filter(static fn($first, $rest) => !\in_array($first, $rest, true)),
-        static function($assert, $first, $rest) {
+        )
+        ->filter(static fn($first, $rest) => !\in_array($first, $rest, true))
+        ->test(static function($assert, $first, $rest) {
             $assert->same(
                 $first,
                 Set::of()->match(
@@ -32,15 +33,14 @@ return static function() {
             $assert->not()->null($packed);
             $assert->same($first, $packed[0]);
             $assert->same($rest, $packed[1]->toList());
-        },
-    );
+        });
 
-    yield proof(
-        'Set::unsorted()',
-        given(
+    yield $prove
+        ->proof('Set::unsorted()')
+        ->given(
             DataSet::sequence(DataSet::type()),
-        ),
-        static function($assert, $values) {
+        )
+        ->test(static function($assert, $values) {
             $set = Set::of(...$values);
             $sequence = $set->unsorted();
 
@@ -50,10 +50,9 @@ return static function() {
             $assert->true(
                 $set->matches($sequence->contains(...)),
             );
-        },
-    );
+        });
 
-    yield test(
+    yield $prove->test(
         'Set defer nesting calls',
         static function($assert) {
             $set = Set::lazy(static function() {
@@ -104,7 +103,7 @@ return static function() {
         },
     );
 
-    yield test(
+    yield $prove->test(
         'Set nesting calls',
         static function($assert) {
             $set = Set::of(1, 2, 3);
@@ -151,7 +150,7 @@ return static function() {
         },
     );
 
-    yield test(
+    yield $prove->test(
         'Set defer partial nesting calls',
         static function($assert) {
             $set = Set::lazy(static function() {
@@ -179,13 +178,14 @@ return static function() {
         },
     );
 
-    yield proof(
-        'Set::snap() loads a lazy set only once',
-        given(
+    yield $prove
+        ->proof('Set::snap() loads a lazy set only once')
+        ->given(
             DataSet::type(),
             DataSet::sequence(DataSet::type()),
-        )->filter(static fn($value, $rest) => !\in_array($value, $rest, true)),
-        static function($assert, $value, $rest) {
+        )
+        ->filter(static fn($value, $rest) => !\in_array($value, $rest, true))
+        ->test(static function($assert, $value, $rest) {
             $loaded = 0;
             $sequence = Set::lazy(static function() use (&$loaded, $value, $rest) {
                 yield $value;
@@ -213,13 +213,12 @@ return static function() {
                 ),
             );
             $assert->same(1, $loaded);
-        },
-    );
+        });
 
-    yield proof(
-        'Set::equals() should not load its data when compared to itself',
-        given(DataSet::sequence(DataSet::type())),
-        static function($assert, $values) {
+    yield $prove
+        ->proof('Set::equals() should not load its data when compared to itself')
+        ->given(DataSet::sequence(DataSet::type()))
+        ->test(static function($assert, $values) {
             $loaded = false;
             $set = Set::lazy(static function() use (&$loaded, $values) {
                 $loaded = true;
@@ -229,6 +228,5 @@ return static function() {
 
             $assert->true($set->equals($set));
             $assert->false($loaded);
-        },
-    );
+        });
 };
