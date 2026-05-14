@@ -50,9 +50,9 @@ final class Associativity implements Property
      * @param Set<A> $values
      * @param callable(A, A): bool $equals
      *
-     * @return Set\Provider<self<A>>
+     * @return Set<self<A>>
      */
-    public static function of(Set $values, callable $equals): Set\Provider
+    public static function of(Set $values, callable $equals): Set
     {
         return Set::compose(
             static fn($a, $b, $c) => new self($a, $b, $c, $equals),

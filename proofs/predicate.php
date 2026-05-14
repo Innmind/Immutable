@@ -3,8 +3,8 @@ declare(strict_types = 1);
 
 use Innmind\Immutable\Predicate\Instance;
 
-return static function() {
-    yield test(
+return static function($prove) {
+    yield $prove->test(
         'Or predicate',
         static function($assert) {
             $array = new SplFixedArray;
@@ -27,7 +27,7 @@ return static function() {
         },
     );
 
-    yield test(
+    yield $prove->test(
         'Or predicate is chainable',
         static function($assert) {
             $array = new SplFixedArray;
@@ -59,7 +59,7 @@ return static function() {
         },
     );
 
-    yield test(
+    yield $prove->test(
         'And predicate',
         static function($assert) {
             $array = new SplFixedArray;
@@ -82,7 +82,7 @@ return static function() {
         },
     );
 
-    yield test(
+    yield $prove->test(
         'And predicate is chainable',
         static function($assert) {
             $array = new SplFixedArray;

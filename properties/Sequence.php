@@ -19,7 +19,7 @@ final class Sequence
      */
     public static function properties(): Set|Set\Provider
     {
-        return Set\Properties::any(
+        return Set::properties(
             ...\array_map(
                 static fn($class) => $class::any(),
                 self::list(),

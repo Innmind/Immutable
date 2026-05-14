@@ -1,5 +1,11 @@
 # Changelog
 
+## 6.2.0 - 2026-05-14
+
+### Changed
+
+- Requires `innmind/blackbox:~7.0`
+
 ## 6.1.0 - 2026-04-05
 
 ### Added

@@ -30,9 +30,12 @@ class RegExpTest extends TestCase
 
     public function testThrowWhenInvalidRegexp()
     {
-        $this->expectException(LogicException::class);
-
-        $_ = RegExp::of('/foo');
+        $this
+            ->assert()
+            ->throws(
+                static fn() => RegExp::of('/foo'),
+                LogicException::class,
+            );
     }
 
     public function testMatches()

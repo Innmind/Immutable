@@ -8,23 +8,22 @@ use Innmind\Immutable\{
 use Innmind\BlackBox\Set;
 use Properties\Innmind\Immutable\Monoid;
 
-return static function() {
+return static function($prove) {
     $equals = static fn($a, $b) => $a->equals($b);
     $set = Set::sequence(Set::type())->map(
         static fn($values) => Sequence::of(...$values),
     );
 
-    yield properties(
+    yield $prove->properties(
         'Append properties',
         Monoid::properties($set, $equals),
-        Set::of(Append::of()),
+        Set::of(static fn() => Append::of()),
     );
 
     foreach (Monoid::list($set, $equals) as $property) {
-        yield proof(
-            'Append property',
-            given($property),
-            static fn($assert, $property) => $property->ensureHeldBy($assert, Append::of()),
-        );
+        yield $prove
+            ->proof('Append property')
+            ->given($property)
+            ->test(static fn($assert, $property) => $property->ensureHeldBy($assert, Append::of()));
     }
 };
