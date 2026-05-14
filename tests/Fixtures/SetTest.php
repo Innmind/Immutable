@@ -35,7 +35,7 @@ class SetTest extends TestCase
                 DataSet::strings()
                     ->madeOf(DataSet::strings()->chars())
                     ->between(1, 2),
-                DataSet\Integers::between(0, 5),
+                DataSet::integers()->between(0, 5),
             ))
             ->prove(function($set) {
                 $this->assertInstanceOf(Structure::class, $set);

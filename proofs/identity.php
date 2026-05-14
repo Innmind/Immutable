@@ -7,23 +7,22 @@ use Innmind\Immutable\{
 };
 use Innmind\BlackBox\Set;
 
-return static function() {
-    yield proof(
-        'Identity::unwrap()',
-        given(Set::type()),
-        static fn($assert, $value) => $assert->same(
+return static function($prove) {
+    yield $prove
+        ->proof('Identity::unwrap()')
+        ->given(Set::type())
+        ->test(static fn($assert, $value) => $assert->same(
             $value,
             Identity::of($value)->unwrap(),
-        ),
-    );
+        ));
 
-    yield proof(
-        'Identity::map()',
-        given(
+    yield $prove
+        ->proof('Identity::map()')
+        ->given(
             Set::type(),
             Set::type(),
-        ),
-        static fn($assert, $initial, $expected) => $assert->same(
+        )
+        ->test(static fn($assert, $initial, $expected) => $assert->same(
             $expected,
             Identity::of($initial)
                 ->map(static function($value) use ($assert, $initial, $expected) {
@@ -32,16 +31,15 @@ return static function() {
                     return $expected;
                 })
                 ->unwrap(),
-        ),
-    );
+        ));
 
-    yield proof(
-        'Identity::flatMap()',
-        given(
+    yield $prove
+        ->proof('Identity::flatMap()')
+        ->given(
             Set::type(),
             Set::type(),
-        ),
-        static function($assert, $initial, $expected) {
+        )
+        ->test(static function($assert, $initial, $expected) {
             $assert->same(
                 $expected,
                 Identity::of($initial)
@@ -96,17 +94,16 @@ return static function() {
                 $identity->unwrap(),
             );
             $assert->same(2, $loaded);
-        },
-    );
+        });
 
-    yield proof(
-        'Identity::map() and ::flatMap() interchangeability',
-        given(
+    yield $prove
+        ->proof('Identity::map() and ::flatMap() interchangeability')
+        ->given(
             Set::type(),
             Set::type(),
             Set::type(),
-        ),
-        static fn($assert, $initial, $intermediate, $expected) => $assert->same(
+        )
+        ->test(static fn($assert, $initial, $intermediate, $expected) => $assert->same(
             Identity::of($initial)
                 ->flatMap(static fn() => Identity::of($intermediate))
                 ->map(static fn() => $expected)
@@ -118,13 +115,12 @@ return static function() {
                     ),
                 )
                 ->unwrap(),
-        ),
-    );
+        ));
 
-    yield proof(
-        'Identity::toSequence()',
-        given(Set::sequence(Set::type())),
-        static function($assert, $values) {
+    yield $prove
+        ->proof('Identity::toSequence()')
+        ->given(Set::sequence(Set::type()))
+        ->test(static function($assert, $values) {
             $inMemory = Sequence::of(...$values);
 
             $assert->same(
@@ -179,16 +175,15 @@ return static function() {
                 $sequence->toList(),
             );
             $assert->same(2, $loaded);
-        },
-    );
+        });
 
-    yield proof(
-        'Identity::defer() holds intermediary values',
-        given(
+    yield $prove
+        ->proof('Identity::defer() holds intermediary values')
+        ->given(
             Set::type(),
             Set::type(),
-        ),
-        static function($assert, $value1, $value2) {
+        )
+        ->test(static function($assert, $value1, $value2) {
             $m1 = Identity::defer(static function() use ($value1) {
                 static $loaded = false;
 
@@ -212,6 +207,5 @@ return static function() {
                     $m1->unwrap(),
                 ),
             );
-        },
-    );
+        });
 };

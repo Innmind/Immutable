@@ -4,11 +4,11 @@ declare(strict_types = 1);
 use Innmind\Immutable\Either;
 use Innmind\BlackBox\Set;
 
-return static function() {
-    yield proof(
-        'Either::memoize() any composition',
-        given(Set::type()->filter(static fn($value) => !\is_null($value))),
-        static function($assert, $value) {
+return static function($prove) {
+    yield $prove
+        ->proof('Either::memoize() any composition')
+        ->given(Set::type()->filter(static fn($value) => !\is_null($value)))
+        ->test(static function($assert, $value) {
             $loaded = false;
             $either = Either::defer(static fn() => Either::right($value))
                 ->flatMap(static function() use ($value, &$loaded) {
@@ -22,16 +22,15 @@ return static function() {
             $assert->false($loaded);
             $_ = $either->memoize();
             $assert->true($loaded);
-        },
-    );
+        });
 
-    yield proof(
-        'Either->attempt()',
-        given(
+    yield $prove
+        ->proof('Either->attempt()')
+        ->given(
             Set::type(),
             Set::type(),
-        ),
-        static function($assert, $right, $left) {
+        )
+        ->test(static function($assert, $right, $left) {
             $assert->same(
                 $right,
                 Either::right($right)
@@ -53,16 +52,15 @@ return static function() {
                         static fn($error) => $error,
                     ),
             );
-        },
-    );
+        });
 
-    yield proof(
-        'Either::defer()->attempt()',
-        given(
+    yield $prove
+        ->proof('Either::defer()->attempt()')
+        ->given(
             Set::type(),
             Set::type(),
-        ),
-        static function($assert, $right, $left) {
+        )
+        ->test(static function($assert, $right, $left) {
             $loaded = false;
             $attempt = Either::defer(static function() use (&$loaded, $right) {
                 $loaded = true;
@@ -98,6 +96,5 @@ return static function() {
                 ),
             );
             $assert->true($loaded);
-        },
-    );
+        });
 };

@@ -8,7 +8,7 @@ use Innmind\Immutable\{
 use Innmind\BlackBox\Set;
 use Properties\Innmind\Immutable\Monoid;
 
-return static function() {
+return static function($prove) {
     $equals = static fn($a, $b) => $a === $b;
     $set = Set::sequence(
         Set::compose(
@@ -29,17 +29,16 @@ return static function() {
             \array_column($pairs, 1),
         ));
 
-    yield properties(
+    yield $prove->properties(
         'ArrayMerge properties',
         Monoid::properties($set, $equals),
-        Set::of(ArrayMerge::monoid),
+        Set::of(static fn() => ArrayMerge::monoid),
     );
 
     foreach (Monoid::list($set, $equals) as $property) {
-        yield proof(
-            'ArrayMerge property',
-            given($property),
-            static fn($assert, $property) => $property->ensureHeldBy($assert, ArrayMerge::monoid),
-        );
+        yield $prove
+            ->proof('ArrayMerge property')
+            ->given($property)
+            ->test(static fn($assert, $property) => $property->ensureHeldBy($assert, ArrayMerge::monoid));
     }
 };

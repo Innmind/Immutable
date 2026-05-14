@@ -4,7 +4,7 @@ declare(strict_types = 1);
 use Innmind\Immutable\Attempt;
 use Innmind\BlackBox\Set;
 
-return static function() {
+return static function($prove) {
     $exceptions = Set::of(
         new RuntimeException,
         new LogicException,
@@ -13,10 +13,10 @@ return static function() {
         new Error,
     );
 
-    yield proof(
-        'Attempt::of() catches exceptions',
-        given($exceptions),
-        static function($assert, $e) {
+    yield $prove
+        ->proof('Attempt::of() catches exceptions')
+        ->given($exceptions)
+        ->test(static function($assert, $e) {
             $attempt = Attempt::of(static fn() => throw $e);
 
             $assert->same(
@@ -26,17 +26,16 @@ return static function() {
                     static fn($e) => $e,
                 ),
             );
-        },
-    );
+        });
 
-    yield proof(
-        'Attempt::map()',
-        given(
+    yield $prove
+        ->proof('Attempt::map()')
+        ->given(
             Set::type(),
             Set::type(),
             $exceptions,
-        ),
-        static function($assert, $start, $end, $e) {
+        )
+        ->test(static function($assert, $start, $end, $e) {
             $attempt = Attempt::result($start)
                 ->map(static function($value) use ($assert, $start, $end) {
                     $assert->same($start, $value);
@@ -62,17 +61,16 @@ return static function() {
                     static fn($value) => $value,
                 ),
             );
-        },
-    );
+        });
 
-    yield proof(
-        'Attempt::flatMap()',
-        given(
+    yield $prove
+        ->proof('Attempt::flatMap()')
+        ->given(
             Set::type(),
             Set::type(),
             $exceptions,
-        ),
-        static function($assert, $start, $end, $e) {
+        )
+        ->test(static function($assert, $start, $end, $e) {
             $attempt = Attempt::result($start)
                 ->flatMap(static function($value) use ($assert, $start, $end) {
                     $assert->same($start, $value);
@@ -113,17 +111,16 @@ return static function() {
                     static fn($value) => $value,
                 ),
             );
-        },
-    );
+        });
 
-    yield proof(
-        'Attempt::mapError()',
-        given(
+    yield $prove
+        ->proof('Attempt::mapError()')
+        ->given(
             $exceptions,
             $exceptions,
             Set::type(),
-        ),
-        static function($assert, $start, $end, $value) {
+        )
+        ->test(static function($assert, $start, $end, $value) {
             $attempt = Attempt::error($start)
                 ->mapError(static function($e) use ($assert, $start, $end) {
                     $assert->same($start, $e);
@@ -149,17 +146,17 @@ return static function() {
                     static fn() => null,
                 ),
             );
-        },
-    );
+        });
 
-    yield proof(
-        'Attempt::mapErrorCase()',
-        given(
+    yield $prove
+        ->proof('Attempt::mapErrorCase()')
+        ->given(
             $exceptions,
             $exceptions,
             $exceptions,
-        )->filter(static fn($a, $b, $c) => !($a instanceof $c)),
-        static function($assert, $start, $end, $other) {
+        )
+        ->filter(static fn($a, $b, $c) => !($a instanceof $c))
+        ->test(static function($assert, $start, $end, $other) {
             $assert->same(
                 $end,
                 Attempt::error($start)
@@ -178,17 +175,16 @@ return static function() {
                         static fn($e) => $e,
                     ),
             );
-        },
-    );
+        });
 
-    yield proof(
-        'Attempt::recover()',
-        given(
+    yield $prove
+        ->proof('Attempt::recover()')
+        ->given(
             $exceptions,
             $exceptions,
             Set::type(),
-        ),
-        static function($assert, $start, $end, $value) {
+        )
+        ->test(static function($assert, $start, $end, $value) {
             $attempt = Attempt::error($start)
                 ->recover(static function($e) use ($assert, $start, $end) {
                     $assert->same($start, $e);
@@ -229,18 +225,18 @@ return static function() {
                     static fn() => null,
                 ),
             );
-        },
-    );
+        });
 
-    yield proof(
-        'Attempt::recoverCase()',
-        given(
+    yield $prove
+        ->proof('Attempt::recoverCase()')
+        ->given(
             $exceptions,
             $exceptions,
             $exceptions,
             Set::type(),
-        )->filter(static fn($a, $b, $c) => !($a instanceof $c)),
-        static function($assert, $start, $end, $other, $value) {
+        )
+        ->filter(static fn($a, $b, $c) => !($a instanceof $c))
+        ->test(static function($assert, $start, $end, $other, $value) {
             $assert->same(
                 $value,
                 Attempt::error($start)
@@ -256,16 +252,15 @@ return static function() {
                         static fn($e) => $e,
                     ),
             );
-        },
-    );
+        });
 
-    yield proof(
-        'Attempt::maybe()',
-        given(
+    yield $prove
+        ->proof('Attempt::maybe()')
+        ->given(
             Set::type(),
             $exceptions,
-        ),
-        static function($assert, $result, $e) {
+        )
+        ->test(static function($assert, $result, $e) {
             $assert->same(
                 $result,
                 Attempt::result($result)
@@ -283,16 +278,15 @@ return static function() {
                         static fn() => true,
                     ),
             );
-        },
-    );
+        });
 
-    yield proof(
-        'Attempt::either()',
-        given(
+    yield $prove
+        ->proof('Attempt::either()')
+        ->given(
             Set::type(),
             $exceptions,
-        ),
-        static function($assert, $result, $e) {
+        )
+        ->test(static function($assert, $result, $e) {
             $assert->same(
                 $result,
                 Attempt::result($result)
@@ -311,16 +305,15 @@ return static function() {
                         static fn($value) => $value,
                     ),
             );
-        },
-    );
+        });
 
-    yield proof(
-        'Attempt::memoize()',
-        given(
+    yield $prove
+        ->proof('Attempt::memoize()')
+        ->given(
             Set::type(),
             $exceptions,
-        ),
-        static function($assert, $result, $e) {
+        )
+        ->test(static function($assert, $result, $e) {
             $assert->same(
                 $result,
                 Attempt::result($result)
@@ -379,18 +372,17 @@ return static function() {
             );
             $_ = $attempt->memoize();
             $assert->same(1, $called);
-        },
-    );
+        });
 
-    yield proof(
-        'Attempt::defer()',
-        given(
+    yield $prove
+        ->proof('Attempt::defer()')
+        ->given(
             Set::type(),
             Set::type(),
             $exceptions,
             $exceptions,
-        ),
-        static function($assert, $result1, $result2, $e1, $e2) {
+        )
+        ->test(static function($assert, $result1, $result2, $e1, $e2) {
             $loaded = false;
             $attempt = Attempt::defer(static function() use ($result1, &$loaded) {
                 $loaded = true;
@@ -430,16 +422,15 @@ return static function() {
                     static fn($value) => $value,
                 ),
             );
-        },
-    );
+        });
 
-    yield proof(
-        'Attempt::unwrap()',
-        given(
+    yield $prove
+        ->proof('Attempt::unwrap()')
+        ->given(
             Set::type(),
             $exceptions,
-        ),
-        static function($assert, $result, $e) {
+        )
+        ->test(static function($assert, $result, $e) {
             $assert->same(
                 $result,
                 Attempt::result($result)->unwrap(),
@@ -449,18 +440,17 @@ return static function() {
                 static fn() => Attempt::error($e)->unwrap(),
                 $e::class,
             );
-        },
-    );
+        });
 
-    yield proof(
-        'Attempt::eitherWay()',
-        given(
+    yield $prove
+        ->proof('Attempt::eitherWay()')
+        ->given(
             Set::type(),
             Set::type(),
             $exceptions,
             $exceptions,
-        ),
-        static function($assert, $result1, $result2, $error1, $error2) {
+        )
+        ->test(static function($assert, $result1, $result2, $error1, $error2) {
             $assert->same(
                 $result1,
                 Attempt::result($result1)
@@ -521,18 +511,17 @@ return static function() {
                         static fn($value) => $value,
                     ),
             );
-        },
-    );
+        });
 
-    yield proof(
-        'Attempt::defer()->eitherWay()',
-        given(
+    yield $prove
+        ->proof('Attempt::defer()->eitherWay()')
+        ->given(
             Set::type(),
             Set::type(),
             $exceptions,
             $exceptions,
-        ),
-        static function($assert, $result1, $result2, $error1, $error2) {
+        )
+        ->test(static function($assert, $result1, $result2, $error1, $error2) {
             $loaded = false;
             $attempt = Attempt::defer(static function() use (&$loaded, $result1) {
                 $loaded = true;
@@ -622,16 +611,15 @@ return static function() {
                     static fn($value) => $value,
                 ),
             );
-        },
-    );
+        });
 
-    yield proof(
-        'Attempt::guard()',
-        given(
+    yield $prove
+        ->proof('Attempt::guard()')
+        ->given(
             Set::integers()->above(1),
             Set::integers()->below(-1),
-        ),
-        static function($assert, $positive, $negative) {
+        )
+        ->test(static function($assert, $positive, $negative) {
             $fail = new Exception;
             $assert->same(
                 $positive,
@@ -676,16 +664,15 @@ return static function() {
                         static fn($e) => $e,
                     ),
             );
-        },
-    );
+        });
 
-    yield proof(
-        'Attempt::defer()->guard()',
-        given(
+    yield $prove
+        ->proof('Attempt::defer()->guard()')
+        ->given(
             Set::integers()->above(1),
             Set::integers()->below(-1),
-        ),
-        static function($assert, $positive, $negative) {
+        )
+        ->test(static function($assert, $positive, $negative) {
             $fail = new Exception;
             $assert->same(
                 $positive,
@@ -730,6 +717,5 @@ return static function() {
                         static fn($e) => $e,
                     ),
             );
-        },
-    );
+        });
 };

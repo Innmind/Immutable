@@ -4,14 +4,14 @@ declare(strict_types = 1);
 use Innmind\Immutable\Map;
 use Innmind\BlackBox\Set;
 
-return static function() {
-    yield proof(
-        'Map::toSequence()',
-        given(
+return static function($prove) {
+    yield $prove
+        ->proof('Map::toSequence()')
+        ->given(
             Set::sequence(Set::type()),
             Set::sequence(Set::type()),
-        ),
-        static function($assert, $keys, $values) {
+        )
+        ->test(static function($assert, $keys, $values) {
             $map = Map::of();
 
             foreach ($keys as $index => $key) {
@@ -26,6 +26,5 @@ return static function() {
                         ->toList(),
                 )),
             );
-        },
-    );
+        });
 };

@@ -20,7 +20,7 @@ final class Monoid
      */
     public static function properties(Set $values, callable $equals): Set
     {
-        return Set\Properties::any(...self::list($values, $equals))->atMost(10);
+        return Set::properties(...self::list($values, $equals))->atMost(10);
     }
 
     /**
