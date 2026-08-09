@@ -399,6 +399,13 @@ final class Str implements \Stringable
     #[\NoDiscard]
     public function take(int $size): self
     {
+        if ($size === 0) {
+            return new self(
+                '',
+                $this->encoding,
+            );
+        }
+
         return $this->substring(0, $size);
     }
 
@@ -424,6 +431,10 @@ final class Str implements \Stringable
     #[\NoDiscard]
     public function drop(int $size): self
     {
+        if ($size === 0) {
+            return $this;
+        }
+
         return $this->substring($size);
     }
 
@@ -433,6 +444,10 @@ final class Str implements \Stringable
     #[\NoDiscard]
     public function dropEnd(int $size): self
     {
+        if ($size === 0) {
+            return $this;
+        }
+
         return $this->substring(0, \max(0, $this->length() - $size));
     }
 

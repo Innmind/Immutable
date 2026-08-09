@@ -271,6 +271,11 @@ Return a new string with only the n first characters.
 Str::of('foobar')->take(3)->equals(Str::of('foo')); // true
 ```
 
+??? warning
+    When working with `Encoding::utf8` certain sequences of utf8 characters may lead to unexpected results.
+
+    Make sure to either use it on trusted input or switch to `Encoding::ascii`.
+
 ## `->takeEnd()`
 
 Return a new string with only the n last characters.
@@ -278,6 +283,11 @@ Return a new string with only the n last characters.
 ```php
 Str::of('foobar')->takeEnd(3)->equals(Str::of('bar')); // true
 ```
+
+??? warning
+    When working with `Encoding::utf8` certain sequences of utf8 characters may lead to unexpected results.
+
+    Make sure to either use it on trusted input or switch to `Encoding::ascii`.
 
 ## `->drop()`
 
@@ -287,6 +297,11 @@ Return a new string without the n first characters.
 Str::of('foobar')->drop(3)->equals(Str::of('bar')); // true
 ```
 
+??? warning
+    When working with `Encoding::utf8` certain sequences of utf8 characters may lead to unexpected results.
+
+    Make sure to either use it on trusted input or switch to `Encoding::ascii`.
+
 ## `->dropEnd()`
 
 Return a new string without the n last characters.
@@ -294,6 +309,11 @@ Return a new string without the n last characters.
 ```php
 Str::of('foobar')->dropEnd(3)->equals(Str::of('foo')); // true
 ```
+
+??? warning
+    When working with `Encoding::utf8` certain sequences of utf8 characters may lead to unexpected results.
+
+    Make sure to either use it on trusted input or switch to `Encoding::ascii`.
 
 ## `->sprintf()`
 
