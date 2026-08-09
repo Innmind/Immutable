@@ -5,6 +5,7 @@
 ### Changed
 
 - Requires PHP `8.5`
+- Exception messages raised in `RegExp` now uses `preg_last_error_msg()` for better debuggability
 
 ### Fixed
 
