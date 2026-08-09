@@ -6,6 +6,10 @@
 
 - Requires PHP `8.5`
 
+### Fixed
+
+- `Str::takeEnd(0)` would return the exact same string instead of an empty string
+
 ## 6.2.0 - 2026-05-14
 
 ### Changed
