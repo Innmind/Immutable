@@ -2,7 +2,10 @@
     "name": "innmind/immutable",
     "type": "library",
     "description": "Immutable PHP primitive wrappers",
-    "keywords": ["wrapper", "immutable"],
+    "keywords": [
+        "wrapper",
+        "immutable"
+    ],
     "homepage": "http://github.com/Innmind/Immutable",
     "license": "MIT",
     "authors": [
