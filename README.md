@@ -1,6 +1,6 @@
 # Immutable
 
-[![Build Status](https://github.com/Innmind/Immutable/workflows/CI/badge.svg?branch=master)](https://github.com/Innmind/Immutable/actions?query=workflow%3ACI)
+[![CI](https://github.com/Innmind/Immutable/actions/workflows/ci.yml/badge.svg)](https://github.com/Innmind/Immutable/actions/workflows/ci.yml)
 [![codecov](https://codecov.io/gh/Innmind/Immutable/branch/develop/graph/badge.svg)](https://codecov.io/gh/Innmind/Immutable)
 [![Type Coverage](https://shepherd.dev/github/Innmind/Immutable/coverage.svg)](https://shepherd.dev/github/Innmind/Immutable)
 
