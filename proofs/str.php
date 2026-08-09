@@ -37,12 +37,12 @@ return static function(Prove $prove) {
         'Str',
         Properties::properties(),
         $strings,
-    )->tag(\Innmind\BlackBox\Tag::wip);
+    );
 
     foreach (Properties::list() as $property) {
         yield $prove->property(
             $property,
             $strings,
-        )->tag(\Innmind\BlackBox\Tag::wip);
+        );
     }
 };
