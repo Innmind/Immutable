@@ -20,7 +20,7 @@ final class RegExp
         /** @psalm-suppress ArgumentTypeCoercion */
         if (@\preg_match($pattern, '') === false) {
             /** @psalm-suppress ImpureFunctionCall */
-            throw new LogicException($pattern, \preg_last_error());
+            throw new LogicException(\preg_last_error_msg(), \preg_last_error());
         }
 
         $this->pattern = $pattern;
@@ -46,7 +46,7 @@ final class RegExp
 
         if ($value === false) {
             /** @psalm-suppress ImpureFunctionCall */
-            throw new InvalidRegex('', \preg_last_error());
+            throw new InvalidRegex(\preg_last_error_msg(), \preg_last_error());
         }
 
         return (bool) $value;
@@ -66,7 +66,7 @@ final class RegExp
 
         if ($value === false) {
             /** @psalm-suppress ImpureFunctionCall */
-            throw new InvalidRegex('', \preg_last_error());
+            throw new InvalidRegex(\preg_last_error_msg(), \preg_last_error());
         }
 
         /** @var Map<int|string, Str> */
