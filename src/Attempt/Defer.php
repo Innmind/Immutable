@@ -140,6 +140,7 @@ final class Defer implements Implementation
     {
         /**
          * @psalm-suppress InaccessibleProperty
+         * @psalm-suppress ImpurePropertyAssignment
          * @psalm-suppress ImpureFunctionCall
          */
         return $this->value ??= ($this->deferred)()->memoize();
@@ -167,9 +168,11 @@ final class Defer implements Implementation
     private static function detonate(array $captured): Attempt
     {
         [$ref, $deferred] = $captured;
+        /** @psalm-suppress ImpureMethodCall */
         $self = $ref->get();
 
         if (\is_null($self)) {
+            /** @psalm-suppress ImpureFunctionCall */
             return $deferred();
         }
 

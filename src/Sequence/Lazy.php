@@ -1172,6 +1172,7 @@ final class Lazy implements Implementation
         }
 
         $iterator = $sequence->iterator();
+        /** @psalm-suppress ImpureMethodCall */
         $registerCleanup(static fn() => $iterator->cleanup());
 
         return $iterator;

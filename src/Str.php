@@ -129,6 +129,7 @@ final class Str implements \Stringable
     #[\NoDiscard]
     public function position(string|\Stringable $needle, int $offset = 0): Maybe
     {
+        /** @psalm-suppress ImpureMethodCall */
         $position = \mb_strpos($this->value, (string) $needle, $offset, $this->encoding->toString());
 
         if ($position === false) {
@@ -150,10 +151,12 @@ final class Str implements \Stringable
             return $this;
         }
 
+        /** @psalm-suppress ImpureMethodCall */
         $parts = $this
             ->split((string) $search)
             ->map(static fn($v) => $v->toString());
 
+        /** @psalm-suppress ImpureMethodCall */
         return self::of((string) $replacement, $this->encoding)->join($parts);
     }
 
@@ -270,6 +273,7 @@ final class Str implements \Stringable
     #[\NoDiscard]
     public function wordCount(string|\Stringable $charlist = ''): int
     {
+        /** @psalm-suppress ImpureMethodCall */
         return \str_word_count(
             $this->value,
             0,
@@ -285,7 +289,10 @@ final class Str implements \Stringable
     #[\NoDiscard]
     public function words(string|\Stringable $charlist = ''): Map
     {
-        /** @var list<string> */
+        /**
+         * @var list<string>
+         * @psalm-suppress ImpureMethodCall
+         */
         $words = \str_word_count($this->value, 2, (string) $charlist);
         /** @var Map<int, self> */
         $map = Map::of();
@@ -307,7 +314,10 @@ final class Str implements \Stringable
     #[\NoDiscard]
     public function pregSplit(string|\Stringable $regex, int $limit = -1): Sequence
     {
-        /** @psalm-suppress ArgumentTypeCoercion */
+        /**
+         * @psalm-suppress ImpureMethodCall
+         * @psalm-suppress ArgumentTypeCoercion
+         */
         $strings = \preg_split((string) $regex, $this->value, $limit);
 
         if ($strings === false) {
@@ -333,6 +343,7 @@ final class Str implements \Stringable
     #[\NoDiscard]
     public function matches(string|\Stringable $regex): bool
     {
+        /** @psalm-suppress ImpureMethodCall */
         return RegExp::of((string) $regex)->matches($this);
     }
 
@@ -346,6 +357,7 @@ final class Str implements \Stringable
     #[\NoDiscard]
     public function capture(string|\Stringable $regex): Map
     {
+        /** @psalm-suppress ImpureMethodCall */
         return RegExp::of((string) $regex)->capture($this);
     }
 
@@ -360,7 +372,10 @@ final class Str implements \Stringable
         string|\Stringable $replacement,
         int $limit = -1,
     ): self {
-        /** @psalm-suppress ArgumentTypeCoercion */
+        /**
+         * @psalm-suppress ImpureMethodCall
+         * @psalm-suppress ArgumentTypeCoercion
+         */
         $value = \preg_replace(
             (string) $regex,
             (string) $replacement,
@@ -505,6 +520,7 @@ final class Str implements \Stringable
     #[\NoDiscard]
     public function append(string|\Stringable $string): self
     {
+        /** @psalm-suppress ImpureMethodCall */
         return new self($this->value.((string) $string), $this->encoding);
     }
 
@@ -514,6 +530,7 @@ final class Str implements \Stringable
     #[\NoDiscard]
     public function prepend(string|\Stringable $string): self
     {
+        /** @psalm-suppress ImpureMethodCall */
         return new self(((string) $string).$this->value, $this->encoding);
     }
 
@@ -568,6 +585,7 @@ final class Str implements \Stringable
     #[\NoDiscard]
     public function contains(string|\Stringable $value): bool
     {
+        /** @psalm-suppress ImpureMethodCall */
         return \mb_strpos($this->value, (string) $value, 0, $this->encoding->toString()) !== false;
     }
 
@@ -577,6 +595,7 @@ final class Str implements \Stringable
     #[\NoDiscard]
     public function startsWith(string|\Stringable $value): bool
     {
+        /** @psalm-suppress ImpureMethodCall */
         return \str_starts_with($this->value, (string) $value);
     }
 
@@ -586,6 +605,7 @@ final class Str implements \Stringable
     #[\NoDiscard]
     public function endsWith(string|\Stringable $value): bool
     {
+        /** @psalm-suppress ImpureMethodCall */
         return \str_ends_with($this->value, (string) $value);
     }
 
@@ -595,6 +615,7 @@ final class Str implements \Stringable
     #[\NoDiscard]
     public function pregQuote(string|\Stringable $delimiter = ''): self
     {
+        /** @psalm-suppress ImpureMethodCall */
         return new self(\preg_quote($this->value, (string) $delimiter), $this->encoding);
     }
 
@@ -623,6 +644,7 @@ final class Str implements \Stringable
      */
     private function pad(int $length, string|\Stringable $character, int $direction): self
     {
+        /** @psalm-suppress ImpureMethodCall */
         return new self(\mb_str_pad(
             $this->value,
             $length,
