@@ -30,6 +30,7 @@ final class Positionned
      *
      * @return self<A>
      */
+    #[\NoDiscard]
     public static function of(mixed $value): self
     {
         return new self($value, Position::only);
@@ -40,6 +41,7 @@ final class Positionned
      *
      * @return Sequence<self<T>>
      */
+    #[\NoDiscard]
     public function and(self $next): Sequence
     {
         if ($this->position === Position::only) {
@@ -68,6 +70,7 @@ final class Positionned
      *
      * @return self<U>
      */
+    #[\NoDiscard]
     public function map(callable $map): self
     {
         /** @psalm-suppress ImpureFunctionCall */
@@ -84,6 +87,7 @@ final class Positionned
      *
      * @return self<T|U>
      */
+    #[\NoDiscard]
     public function mapPosition(Position $position, callable $map): self
     {
         if ($this->position !== $position) {
@@ -100,21 +104,25 @@ final class Positionned
     /**
      * @return T
      */
+    #[\NoDiscard]
     public function unwrap(): mixed
     {
         return $this->value;
     }
 
+    #[\NoDiscard]
     public function position(): Position
     {
         return $this->position;
     }
 
+    #[\NoDiscard]
     public function first(): bool
     {
         return $this->position->first();
     }
 
+    #[\NoDiscard]
     public function last(): bool
     {
         return $this->position->last();
