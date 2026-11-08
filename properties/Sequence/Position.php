@@ -15,9 +15,14 @@ use Innmind\BlackBox\{
  */
 final class Position implements Property
 {
+    private function __construct(
+        private mixed $value,
+    ) {
+    }
+
     public static function any(): Set
     {
-        return Set::of(new self);
+        return Set::type()->map(static fn($value) => new self($value));
     }
 
     public function applicableTo(object $systemUnderTest): bool
@@ -97,6 +102,45 @@ final class Position implements Property
             ->foreach(static fn($position) => $assert->same(
                 Sequence\Position::only,
                 $position,
+            ));
+        (void) $systemUnderTest
+            ->via(Sequence\Position::tag(...))
+            ->map(fn($value) => $value->map(
+                fn() => $this->value,
+            ))
+            ->map(static fn($value) => $value->unwrap())
+            ->foreach(fn($value) => $assert->same($this->value, $value));
+        (void) $systemUnderTest
+            ->exclude(fn($value) => $value === $this->value)
+            ->via(Sequence\Position::tag(...))
+            ->map(fn($value) => $value->mapPosition(
+                Sequence\Position::first,
+                fn() => $this->value,
+            ))
+            ->filter(fn($value) => $value->unwrap() === $this->value)
+            ->map(static fn($value) => [
+                $value->position(),
+                $value->unwrap(),
+            ])
+            ->foreach(fn($value) => $assert->same(
+                [Sequence\Position::first, $this->value],
+                $value,
+            ));
+        (void) $systemUnderTest
+            ->exclude(fn($value) => $value === $this->value)
+            ->via(Sequence\Position::tag(...))
+            ->map(fn($value) => $value->mapPosition(
+                Sequence\Position::last,
+                fn() => $this->value,
+            ))
+            ->filter(fn($value) => $value->unwrap() === $this->value)
+            ->map(static fn($value) => [
+                $value->position(),
+                $value->unwrap(),
+            ])
+            ->foreach(fn($value) => $assert->same(
+                [Sequence\Position::last, $this->value],
+                $value,
             ));
 
         return $systemUnderTest;

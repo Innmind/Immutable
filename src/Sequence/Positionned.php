@@ -62,6 +62,40 @@ final class Positionned
     }
 
     /**
+     * @template U
+     *
+     * @param callable(T): U $map
+     *
+     * @return self<U>
+     */
+    public function map(callable $map): self
+    {
+        return new self(
+            $map($this->value),
+            $this->position,
+        );
+    }
+
+    /**
+     * @template U
+     *
+     * @param callable(T): U $map
+     *
+     * @return self<T|U>
+     */
+    public function mapPosition(Position $position, callable $map): self
+    {
+        if ($this->position !== $position) {
+            return $this;
+        }
+
+        return new self(
+            $map($this->value),
+            $this->position,
+        );
+    }
+
+    /**
      * @return T
      */
     public function unwrap(): mixed
