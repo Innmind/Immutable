@@ -319,7 +319,7 @@ This method configures the `Sequence` via the provided callable. It allows a mor
 In both cases it returns `#!php Sequence::of(4, 8, 12)`, but `#!php ->via()` offers a more readable experience.
 
 ??? tip
-    For [lazy](#lazy) sequences the callable will be called everytime you call un unwrapping method :material-memory-arrow-down:.
+    For [lazy](#lazy) sequences the callable will be called everytime you call an unwrapping method :material-memory-arrow-down:.
 
     This allows to have stateful configuration.
 
