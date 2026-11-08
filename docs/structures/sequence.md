@@ -471,7 +471,7 @@ $sequence->indices()->equals(Sequence::ints(...\range(0, $sequence->size() - 1))
 When transforming values if you want to know if the value is the first one, the last one or neither you can do so like this:
 
 ```php
-$_ = Sequence::of(1, 2, 3, 4)
+(void) Sequence::of(1, 2, 3, 4)
     ->via(Sequence\Position::tag(...))
     ->map(static fn(Sequence\Positionned $value) => match ($value->position()) {
         Sequence\Position::first => 'first: '.$value->unwrap(),

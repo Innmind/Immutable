@@ -78,7 +78,7 @@ final class Position implements Property
                     static fn() => null,
                 ),
         );
-        $_ = $positionned
+        (void) $positionned
             ->exclude(static fn($value) => $value->first() || $value->last())
             ->map(static fn($value) => $value->position())
             ->foreach(static fn($position) => $assert->same(
@@ -95,7 +95,7 @@ final class Position implements Property
                         ->dropEnd(1),
                 ),
         );
-        $_ = $systemUnderTest
+        (void) $systemUnderTest
             ->map(Sequence::of(...))
             ->flatMap(static fn($sequence) => $sequence->via(Sequence\Position::tag(...)))
             ->map(static fn($value) => $value->position())

@@ -430,7 +430,7 @@ class MaybeTest extends TestCase
 
                 $this->assertInstanceOf(Maybe\Comprehension::class, $comprehension);
                 $called = false;
-                $_ = $comprehension->map(static function(...$args) use (&$called) {
+                (void) $comprehension->map(static function(...$args) use (&$called) {
                     $called = true;
 
                     return $args[0];
@@ -453,7 +453,7 @@ class MaybeTest extends TestCase
 
                 $this->assertInstanceOf(Maybe\Comprehension::class, $comprehension);
                 $called = false;
-                $_ = $comprehension->flatMap(static function(...$args) use (&$called) {
+                (void) $comprehension->flatMap(static function(...$args) use (&$called) {
                     $called = true;
 
                     return Maybe::just($args[0]);
