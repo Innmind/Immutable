@@ -553,7 +553,7 @@ $sequence = Sequence::ints(5, 4, 3, 2, 1)->drop(2);
 $sequence->equals(Sequence::ints(3, 2, 1)); // true
 ```
 
-### `->dropEnd()` :material-memory-arrow-down:
+### `->dropEnd()`
 
 This removes the number of elements from the end of the sequence.
 

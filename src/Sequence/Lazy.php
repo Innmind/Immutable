@@ -202,9 +202,26 @@ final class Lazy implements Implementation
     #[\Override]
     public function dropEnd(int $size): Implementation
     {
-        // this cannot be optimised as the whole generator needs to be loaded
-        // in order to know the elements to drop
-        return $this->load()->dropEnd($size);
+        $values = $this->values;
+
+        return new self(
+            static function(RegisterCleanup $registerCleanup) use ($values, $size): \Generator {
+                $buffer = [];
+                $iterator = $values($registerCleanup);
+                $iterator->rewind();
+
+                while ($iterator->valid()) {
+                    $value = $iterator->current();
+                    $iterator->next();
+
+                    $buffer[] = $value;
+
+                    if (\count($buffer) > $size) {
+                        yield \array_shift($buffer);
+                    }
+                }
+            },
+        );
     }
 
     /**
