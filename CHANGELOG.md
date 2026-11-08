@@ -1,5 +1,12 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+
+- `Innmind\Immutable\Sequence\Position`
+- `Innmind\Immutable\Sequence\Positionned`
+
 ## 6.3.0 - 2026-08-09
 
 ### Changed
