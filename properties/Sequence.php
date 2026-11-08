@@ -41,6 +41,7 @@ final class Sequence
             Sequence\LookupLastAttempt::class,
             Sequence\LookupLastEither::class,
             Sequence\Union::class,
+            Sequence\Position::class,
         ];
     }
 }
