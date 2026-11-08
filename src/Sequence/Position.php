@@ -9,7 +9,8 @@ use Innmind\Immutable\Sequence;
 /**
  * @psalm-immutable
  */
-enum Position {
+enum Position
+{
     case first;
     case middle;
     case last;
