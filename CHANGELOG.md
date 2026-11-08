@@ -9,7 +9,7 @@
 
 ### Changed
 
-- `Sequence::dropEnd()` on a lazy sequence no longer loads the whole sequence in memory
+- `Sequence::dropEnd()` on a lazy/deferred sequence no longer loads the whole sequence in memory
 
 ## 6.3.0 - 2026-08-09
 
