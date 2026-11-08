@@ -31,6 +31,7 @@ enum Position
             ->aggregate(static fn(Positionned $a, $b) => $a->and($b));
     }
 
+    #[\NoDiscard]
     public function first(): bool
     {
         return match ($this) {
@@ -41,6 +42,7 @@ enum Position
         };
     }
 
+    #[\NoDiscard]
     public function last(): bool
     {
         return match ($this) {
