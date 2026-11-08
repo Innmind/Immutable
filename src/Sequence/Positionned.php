@@ -70,6 +70,7 @@ final class Positionned
      */
     public function map(callable $map): self
     {
+        /** @psalm-suppress ImpureFunctionCall */
         return new self(
             $map($this->value),
             $this->position,
@@ -89,6 +90,7 @@ final class Positionned
             return $this;
         }
 
+        /** @psalm-suppress ImpureFunctionCall */
         return new self(
             $map($this->value),
             $this->position,
