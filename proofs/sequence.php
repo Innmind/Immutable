@@ -77,12 +77,12 @@ return static function($prove) {
                 ->split()
                 ->chunk($chunk);
 
-            $_ = $chunks->foreach(
+            (void) $chunks->foreach(
                 static fn($chars) => $assert
                     ->number($chars->size())
                     ->lessThanOrEqual($chunk),
             );
-            $_ = $chunks
+            (void) $chunks
                 ->dropEnd(1)
                 ->foreach(
                     static fn($chars) => $assert->same(
@@ -157,7 +157,7 @@ return static function($prove) {
             }
 
             try {
-                $_ = $sequence->toList();
+                (void) $sequence->toList();
                 $assert->fail('it should throw');
             } catch (Exception $e) {
                 $assert->same($expected, $e);

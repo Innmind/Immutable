@@ -291,7 +291,7 @@ function runMac(): Attempt { /* ... */ }
  */
 function runLinux(): Attempt { /* ... */ }
 
-$_ = isMac()->eitherWay(runMac(...), runLinux(...));
+(void) isMac()->eitherWay(runMac(...), runLinux(...));
 ```
 
 In this case we want to run `runLinux` only when `isMac` returns an error which is possible thanks to `->eitherWay()`. Contrary to `isMac()->flatMap(runMac(...))->recover(runLinux(...))` that could lead to `runLinux` to be called if `runMac` returns an error.

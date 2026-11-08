@@ -1021,7 +1021,7 @@ class SequenceTest extends TestCase
         $stop = new \Exception;
 
         try {
-            $_ = Sequence::of(1, 2, 3, 1)->safeguard(
+            (void) Sequence::of(1, 2, 3, 1)->safeguard(
                 Set::of(),
                 static fn($unique, $value) => match ($unique->contains($value)) {
                     true => throw $stop,
@@ -1049,7 +1049,7 @@ class SequenceTest extends TestCase
                 },
             );
             $this->assertFalse($loaded);
-            $_ = $sequence->toList();
+            (void) $sequence->toList();
             $this->fail('it should throw');
         } catch (\Exception $e) {
             $this->assertSame($stop, $e);
@@ -1071,7 +1071,7 @@ class SequenceTest extends TestCase
                 },
             );
             $this->assertFalse($loaded);
-            $_ = $sequence->toList();
+            (void) $sequence->toList();
             $this->fail('it should throw');
         } catch (\Exception $e) {
             $this->assertSame($stop, $e);
@@ -1135,12 +1135,12 @@ class SequenceTest extends TestCase
                     $lines->toList(),
                 );
                 $this->assertSame(1, $loaded);
-                $_ = $lines->toList();
+                (void) $lines->toList();
                 $this->assertSame(2, $loaded);
             });
 
         try {
-            $_ = Str::of("foo\nbar\nbaz")
+            (void) Str::of("foo\nbar\nbaz")
                 ->chunk(1)
                 ->aggregate(static fn() => Sequence::of())
                 ->toList();

@@ -235,7 +235,7 @@ function runMac(): Maybe { /* ... */ }
  */
 function runLinux(): Maybe { /* ... */ }
 
-$_ = isMac()->eitherWay(runMac(...), runLinux(...));
+(void) isMac()->eitherWay(runMac(...), runLinux(...));
 ```
 
 In this case we want to run `runLinux` only when `isMac` returns nothing which is possible thanks to `->eitherWay()`. Contrary to `isMac()->flatMap(runMac(...))->otherwise(runLinux(...))` that could lead to `runLinux` to be called if `runMac` returns nothing.

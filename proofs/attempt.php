@@ -350,7 +350,7 @@ return static function($prove) {
                         static fn() => null,
                     ),
             );
-            $_ = $attempt->memoize();
+            (void) $attempt->memoize();
             $assert->same(1, $called);
 
             $called = 0;
@@ -370,7 +370,7 @@ return static function($prove) {
                         static fn($value) => $value,
                     ),
             );
-            $_ = $attempt->memoize();
+            (void) $attempt->memoize();
             $assert->same(1, $called);
         });
 
@@ -394,12 +394,12 @@ return static function($prove) {
                 ->recover(static fn() => Attempt::error($e2));
 
             $assert->false($loaded);
-            $_ = $attempt->maybe();
+            (void) $attempt->maybe();
             $assert->false($loaded);
-            $_ = $attempt->either();
+            (void) $attempt->either();
             $assert->false($loaded);
 
-            $_ = $attempt->memoize();
+            (void) $attempt->memoize();
             $assert->true($loaded);
 
             $assert->same(

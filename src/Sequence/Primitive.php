@@ -644,7 +644,7 @@ final class Primitive implements Implementation
     #[\Override]
     public function safeguard($carry, callable $assert): self
     {
-        $_ = $this->reduce($carry, $assert);
+        (void) $this->reduce($carry, $assert);
 
         return $this;
     }

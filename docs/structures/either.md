@@ -248,7 +248,7 @@ function runMac(): Either { /* ... */ }
  */
 function runLinux(): Either { /* ... */ }
 
-$_ = isMac()->eitherWay(runMac(...), runLinux(...));
+(void) isMac()->eitherWay(runMac(...), runLinux(...));
 ```
 
 In this case we want to run `runLinux` only when `isMac` returns a `SideEffect` which is possible thanks to `->eitherWay()`. Contrary to `isMac()->flatMap(runMac(...))->otherwise(runLinux(...))` that could lead to `runLinux` to be called if `runMac` returns an error.

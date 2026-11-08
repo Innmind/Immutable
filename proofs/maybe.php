@@ -58,7 +58,7 @@ return static function($prove) {
                 });
 
             $assert->false($loaded);
-            $_ = $maybe->memoize();
+            (void) $maybe->memoize();
             $assert->true($loaded);
         });
 
