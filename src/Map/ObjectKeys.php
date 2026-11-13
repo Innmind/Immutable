@@ -37,7 +37,7 @@ final class ObjectKeys implements Implementation
     public function __invoke($key, $value): Implementation
     {
         if (!\is_object($key)) {
-            return (new DoubleIndex)->merge($this)($key, $value);
+            return new DoubleIndex($this->toSequence()(new Pair($key, $value)));
         }
 
         /** @var \SplObjectStorage<object, mixed> */
@@ -446,11 +446,22 @@ final class ObjectKeys implements Implementation
     #[\Override]
     public function toSequence(): Sequence
     {
-        /** @var Sequence<Pair<T, S>> */
-        return $this->reduce(
-            Sequence::of(),
-            static fn(Sequence $pairs, $key, $value) => ($pairs)(new Pair($key, $value)),
-        );
+        /** @var list<Pair<T, S>> */
+        $pairs = [];
+
+        /** @psalm-suppress ImpureMethodCall */
+        foreach ($this->values as $k) {
+            /** @var T $key */
+            $key = $k;
+            /**
+             * @psalm-suppress ImpureMethodCall
+             * @var S $v
+             */
+            $v = $this->values[$k];
+            $pairs[] = new Pair($key, $v);
+        }
+
+        return Sequence::of(...$pairs);
     }
 
     /**

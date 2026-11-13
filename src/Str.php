@@ -87,15 +87,11 @@ final class Str implements \Stringable
             return $this->chunk();
         }
 
-        $parts = \explode($delimiter, $this->value);
-        /** @var Sequence<self> */
-        $sequence = Sequence::of();
-
-        foreach ($parts as $part) {
-            $sequence = ($sequence)(new self($part, $this->encoding));
-        }
-
-        return $sequence;
+        /** @psalm-suppress ImpureFunctionCall */
+        return Sequence::of(...\array_map(
+            fn($value) => new self($value, $this->encoding),
+            \explode($delimiter, $this->value),
+        ));
     }
 
     /**
@@ -108,15 +104,11 @@ final class Str implements \Stringable
     #[\NoDiscard]
     public function chunk(int $size = 1): Sequence
     {
-        /** @var Sequence<self> */
-        $sequence = Sequence::of();
-        $parts = \mb_str_split($this->value, $size, $this->encoding->toString());
-
-        foreach ($parts as $value) {
-            $sequence = ($sequence)(new self($value, $this->encoding));
-        }
-
-        return $sequence;
+        /** @psalm-suppress ImpureFunctionCall */
+        return Sequence::of(...\array_map(
+            fn($value) => new self($value, $this->encoding),
+            \mb_str_split($this->value, $size, $this->encoding->toString()),
+        ));
     }
 
     /**
@@ -287,14 +279,14 @@ final class Str implements \Stringable
     {
         /** @var list<string> */
         $words = \str_word_count($this->value, 2, (string) $charlist);
-        /** @var Map<int, self> */
-        $map = Map::of();
+        /** @var list<array{int, self}> */
+        $pairs = [];
 
         foreach ($words as $position => $word) {
-            $map = ($map)($position, new self($word, $this->encoding));
+            $pairs[] = [$position, new self($word, $this->encoding)];
         }
 
-        return $map;
+        return Map::of(...$pairs);
     }
 
     /**
@@ -315,14 +307,11 @@ final class Str implements \Stringable
             throw new InvalidRegex('', \preg_last_error());
         }
 
-        /** @var Sequence<self> */
-        $sequence = Sequence::of();
-
-        foreach ($strings as $string) {
-            $sequence = ($sequence)(new self($string, $this->encoding));
-        }
-
-        return $sequence;
+        /** @psalm-suppress ImpureFunctionCall */
+        return Sequence::of(...\array_map(
+            fn($value) => new self($value, $this->encoding),
+            $strings,
+        ));
     }
 
     /**

@@ -1,5 +1,12 @@
 # Changelog
 
+## [Unreleased]
+
+### Changed
+
+- Reduced the number of intermediate objects created on some `Str` methods
+- Reduced the number of intermediate objects created when switching from differents `Map` implementations
+
 ## 6.4.0 - 2026-11-08
 
 ### Added
