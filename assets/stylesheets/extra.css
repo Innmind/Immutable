@@ -1,0 +1,113 @@
+@font-face {
+  font-family: "Monaspace Neon";
+  font-weight: normal;
+  font-style: normal;
+  src: url("../fonts/MonaspaceNeon-Regular.woff");
+}
+
+:root {
+  --md-code-font: "Monaspace Neon";
+}
+
+:root {
+  --light-md-code-hl-number-color: #f76d47;
+  --light-md-code-hl-function-color: #6384b9;
+  --light-md-code-hl-operator-color: #39adb5;
+  --light-md-code-hl-constant-color: #7c4dff;
+  --light-md-code-hl-string-color: #9fc06f;
+  --light-md-code-hl-punctuation-color: #39adb5;
+  --light-md-code-hl-keyword-color: #7c4dff;
+  --light-md-code-hl-variable-color: #80cbc4;
+  --light-md-code-hl-comment-color: #ccd7da;
+  --light-md-code-bg-color: #fafafa;
+  --light-md-code-fg-color: #ffb62c;
+  --light-md-code-hl-variable-color: #6384b9;
+  --dark-md-code-hl-number-color: #f78c6c;
+  --dark-md-code-hl-function-color: #82aaff;
+  --dark-md-code-hl-operator-color: #89ddff;
+  --dark-md-code-hl-constant-color: #c792ea;
+  --dark-md-code-hl-string-color: #c3e88d;
+  --dark-md-code-hl-punctuation-color: #89ddff;
+  --dark-md-code-hl-keyword-color: #c792ea;
+  --dark-md-code-hl-variable-color: #e8f9f9;
+  --dark-md-code-hl-comment-color: #546e7a;
+  --dark-md-code-bg-color: #263238;
+  --dark-md-code-fg-color: #ffcb6b;
+  --dark-md-code-hl-variable-color: #82aaff;
+}
+
+@media (prefers-color-scheme: light) {
+  .language-php > * {
+    --md-code-hl-number-color: var(--light-md-code-hl-number-color);
+    --md-code-hl-function-color: var(--light-md-code-hl-function-color);
+    --md-code-hl-operator-color: var(--light-md-code-hl-operator-color);
+    --md-code-hl-constant-color: var(--light-md-code-hl-constant-color);
+    --md-code-hl-string-color: var(--light-md-code-hl-string-color);
+    --md-code-hl-punctuation-color: var(--light-md-code-hl-punctuation-color);
+    --md-code-hl-keyword-color: var(--light-md-code-hl-keyword-color);
+    --md-code-hl-variable-color: var(--light-md-code-hl-variable-color);
+    --md-code-hl-comment-color: var(--light-md-code-hl-comment-color);
+    --md-code-bg-color: var(--light-md-code-bg-color);
+    --md-code-fg-color: var(--light-md-code-fg-color);
+  }
+
+  .language-php .na {
+    --md-code-hl-variable-color: var(--light-md-code-hl-variable-color);
+  }
+}
+
+[data-md-color-media="(prefers-color-scheme: light)"] .language-php > * {
+  --md-code-hl-number-color: var(--light-md-code-hl-number-color);
+  --md-code-hl-function-color: var(--light-md-code-hl-function-color);
+  --md-code-hl-operator-color: var(--light-md-code-hl-operator-color);
+  --md-code-hl-constant-color: var(--light-md-code-hl-constant-color);
+  --md-code-hl-string-color: var(--light-md-code-hl-string-color);
+  --md-code-hl-punctuation-color: var(--light-md-code-hl-punctuation-color);
+  --md-code-hl-keyword-color: var(--light-md-code-hl-keyword-color);
+  --md-code-hl-variable-color: var(--light-md-code-hl-variable-color);
+  --md-code-hl-comment-color: var(--light-md-code-hl-comment-color);
+  --md-code-bg-color: var(--light-md-code-bg-color);
+  --md-code-fg-color: var(--light-md-code-fg-color);
+}
+
+[data-md-color-media="(prefers-color-scheme: light)"] .language-php .na {
+  --md-code-hl-variable-color: var(--light-md-code-hl-variable-color);
+}
+
+@media (prefers-color-scheme: dark) {
+  .language-php > * {
+    --md-code-hl-number-color: var(--dark-md-code-hl-number-color);
+    --md-code-hl-function-color: var(--dark-md-code-hl-function-color);
+    --md-code-hl-operator-color: var(--dark-md-code-hl-operator-color);
+    --md-code-hl-constant-color: var(--dark-md-code-hl-constant-color);
+    --md-code-hl-string-color: var(--dark-md-code-hl-string-color);
+    --md-code-hl-punctuation-color: var(--dark-md-code-hl-punctuation-color);
+    --md-code-hl-keyword-color: var(--dark-md-code-hl-keyword-color);
+    --md-code-hl-variable-color: var(--dark-md-code-hl-variable-color);
+    --md-code-hl-comment-color: var(--dark-md-code-hl-comment-color);
+    --md-code-bg-color: var(--dark-md-code-bg-color);
+    --md-code-fg-color: var(--dark-md-code-fg-color);
+  }
+
+  .language-php .na {
+    --md-code-hl-variable-color: var(--dark-md-code-hl-variable-color);
+  }
+}
+
+[data-md-color-media="(prefers-color-scheme: dark)"] .language-php > * {
+  --md-code-hl-number-color: var(--dark-md-code-hl-number-color);
+  --md-code-hl-function-color: var(--dark-md-code-hl-function-color);
+  --md-code-hl-operator-color: var(--dark-md-code-hl-operator-color);
+  --md-code-hl-constant-color: var(--dark-md-code-hl-constant-color);
+  --md-code-hl-string-color: var(--dark-md-code-hl-string-color);
+  --md-code-hl-punctuation-color: var(--dark-md-code-hl-punctuation-color);
+  --md-code-hl-keyword-color: var(--dark-md-code-hl-keyword-color);
+  --md-code-hl-variable-color: var(--dark-md-code-hl-variable-color);
+  --md-code-hl-comment-color: var(--dark-md-code-hl-comment-color);
+  --md-code-bg-color: var(--dark-md-code-bg-color);
+  --md-code-fg-color: var(--dark-md-code-fg-color);
+}
+
+[data-md-color-media="(prefers-color-scheme: dark)"] .language-php .na {
+  --md-code-hl-variable-color: var(--dark-md-code-hl-variable-color);
+}
