@@ -93,17 +93,16 @@ final class Primitive implements Implementation
     #[\Override]
     public function distinct(): self
     {
-        return $this->reduce(
-            $this->clear(),
-            static function(self $values, mixed $value): self {
-                /** @var T $value */
-                if ($values->contains($value)) {
-                    return $values;
-                }
+        /** @var list<T> */
+        $unique = [];
 
-                return ($values)($value);
-            },
-        );
+        foreach ($this->values as $value) {
+            if (!\in_array($value, $unique, true)) {
+                $unique[] = $value;
+            }
+        }
+
+        return new self($unique);
     }
 
     /**
