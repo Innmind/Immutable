@@ -24,6 +24,13 @@ final class Result implements Implementation
     ) {
     }
 
+    /**
+     * @template R
+     *
+     * @param callable(R1): R $map
+     *
+     * @return self<R>
+     */
     #[\Override]
     public function map(callable $map): self
     {

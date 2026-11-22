@@ -665,6 +665,7 @@ final class Defer implements Implementation
         /** @psalm-suppress ImpureFunctionCall */
         return new self(
             (static function(int $toDrop) use (&$captured): \Generator {
+                /** @var \SplQueue<T> */
                 $buffer = new \SplQueue;
                 $buffer->setIteratorMode(\SplQueue::IT_MODE_FIFO);
                 /**

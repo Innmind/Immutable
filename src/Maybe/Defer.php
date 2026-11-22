@@ -31,6 +31,13 @@ final class Defer implements Implementation
         $this->deferred = $deferred;
     }
 
+    /**
+     * @template R
+     *
+     * @param callable(V): R $map
+     *
+     * @return self<R>
+     */
     #[\Override]
     public function map(callable $map): self
     {

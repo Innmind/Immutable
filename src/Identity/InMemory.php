@@ -21,6 +21,13 @@ final class InMemory implements Implementation
     ) {
     }
 
+    /**
+     * @template R
+     *
+     * @param callable(T): R $map
+     *
+     * @return self<R>
+     */
     #[\Override]
     public function map(callable $map): self
     {

@@ -35,15 +35,31 @@ final class Error implements Implementation
         return $this;
     }
 
+    /**
+     * @template R
+     *
+     * @param callable(R1): Implementation<R> $map
+     *
+     * @return self<R>
+     */
     #[\Override]
     public function flatMap(callable $map): self
     {
+        /** @var self<R> */
         return $this;
     }
 
+    /**
+     * @template R
+     *
+     * @param callable(R1): Implementation<R> $map
+     *
+     * @return self<R>
+     */
     #[\Override]
     public function guard(callable $map): self
     {
+        /** @var self<R> */
         return $this;
     }
 

@@ -31,6 +31,13 @@ final class Defer implements Implementation
         $this->deferred = $deferred;
     }
 
+    /**
+     * @template R
+     *
+     * @param callable(R1): R $map
+     *
+     * @return self<L1, R>
+     */
     #[\Override]
     public function map(callable $map): self
     {
@@ -47,6 +54,13 @@ final class Defer implements Implementation
         return Either::defer(static fn() => self::detonate($captured)->flatMap($map));
     }
 
+    /**
+     * @template R
+     *
+     * @param callable(L1): R $map
+     *
+     * @return self<R, R1>
+     */
     #[\Override]
     public function leftMap(callable $map): self
     {
@@ -102,6 +116,9 @@ final class Defer implements Implementation
         return $this->unwrap();
     }
 
+    /**
+     * @return self<R1, L1>
+     */
     #[\Override]
     public function flip(): self
     {
