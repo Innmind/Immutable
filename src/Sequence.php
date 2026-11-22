@@ -424,10 +424,9 @@ final class Sequence
     #[\NoDiscard]
     public function flatMap(callable $map): self
     {
-        /** @var callable(self<S>): Sequence\Implementation<S> */
-        $exfiltrate = static fn(self $sequence): Sequence\Implementation => $sequence->implementation;
-
-        return new self($this->implementation->flatMap($map, $exfiltrate));
+        return new self($this->implementation->flatMap(
+            static fn($value) => /** @var T $value */ $map($value)->implementation,
+        ));
     }
 
     /**

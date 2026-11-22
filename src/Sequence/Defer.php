@@ -473,21 +473,19 @@ final class Defer implements Implementation
 
     /**
      * @template S
-     * @template C of Sequence<S>|Set<S>
      *
-     * @param callable(T): C $map
-     * @param callable(C): Implementation<S> $exfiltrate
+     * @param callable(T): Implementation<S> $map
      *
      * @return self<S>
      */
     #[\Override]
-    public function flatMap(callable $map, callable $exfiltrate): self
+    public function flatMap(callable $map): self
     {
         $captured = $this->capture();
 
         /** @psalm-suppress ImpureFunctionCall */
         return new self(
-            (static function(callable $map, callable $exfiltrate) use (&$captured): \Generator {
+            (static function(callable $map) use (&$captured): \Generator {
                 /**
                  * @psalm-suppress PossiblyNullArgument
                  * @var Iterator<T>
@@ -497,11 +495,10 @@ final class Defer implements Implementation
 
                 while ($values->valid()) {
                     /**
-                     * @var callable(T): C $map
-                     * @var callable(C): Implementation<S> $exfiltrate
+                     * @var callable(T): Implementation<S> $map
                      * @psalm-suppress PossiblyNullArgument
                      */
-                    $inner = $exfiltrate($map($values->current()))->iterator();
+                    $inner = $map($values->current())->iterator();
                     $inner->rewind();
 
                     while ($inner->valid()) {
@@ -511,7 +508,7 @@ final class Defer implements Implementation
 
                     $values->next();
                 }
-            })($map, $exfiltrate),
+            })($map),
         );
     }
 

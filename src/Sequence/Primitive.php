@@ -259,13 +259,12 @@ final class Primitive implements Implementation
      * @template S
      * @template C of Sequence<S>|Set<S>
      *
-     * @param callable(T): C $map
-     * @param callable(C): Implementation<S> $exfiltrate
+     * @param callable(T): Implementation<C> $map
      *
      * @return Implementation<S>
      */
     #[\Override]
-    public function flatMap(callable $map, callable $exfiltrate): Implementation
+    public function flatMap(callable $map): Implementation
     {
         /**
          * @psalm-suppress MixedArgument
@@ -275,7 +274,7 @@ final class Primitive implements Implementation
          */
         return $this->reduce(
             new self,
-            static fn(self $carry, $value) => $carry->append($exfiltrate($map($value))),
+            static fn(self $carry, $value) => $carry->append($map($value)),
         );
     }
 

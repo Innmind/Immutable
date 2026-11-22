@@ -210,15 +210,14 @@ final class Snap implements Implementation
      * @template S
      * @template C of Sequence<S>|Set<S>
      *
-     * @param callable(T): C $map
-     * @param callable(C): Implementation<S> $exfiltrate
+     * @param callable(T): Implementation<C> $map
      *
      * @return Implementation<S>
      */
     #[\Override]
-    public function flatMap(callable $map, callable $exfiltrate): Implementation
+    public function flatMap(callable $map): Implementation
     {
-        return $this->will(static fn($self) => $self->flatMap($map, $exfiltrate));
+        return $this->will(static fn($self) => $self->flatMap($map));
     }
 
     /**

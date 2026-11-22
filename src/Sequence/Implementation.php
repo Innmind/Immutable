@@ -160,12 +160,11 @@ interface Implementation
      * @template S
      * @template C of Sequence<S>|Set<S>
      *
-     * @param callable(T): C $map
-     * @param callable(C): self<S> $exfiltrate
+     * @param callable(T): self<C> $map
      *
      * @return self<S>
      */
-    public function flatMap(callable $map, callable $exfiltrate): self;
+    public function flatMap(callable $map): self;
 
     /**
      * @template S
