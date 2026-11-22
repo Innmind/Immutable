@@ -710,16 +710,12 @@ final class Sequence
         /** @var list<T> */
         $all = [];
 
-        /** @var list<T> */
-        return $this->reduce(
-            $all,
-            static function(array $carry, $value): array {
-                /** @var T $value */
-                $carry[] = $value;
+        /** @psalm-suppress ImpureMethodCall */
+        foreach ($this->implementation->iterator() as $value) {
+            $all[] = $value;
+        }
 
-                return $carry;
-            },
-        );
+        return $all;
     }
 
     /**

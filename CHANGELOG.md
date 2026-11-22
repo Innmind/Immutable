@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Changed
+
+- `Sequence::toList()` no longer use a quadratic `reduce` to build the list
+
 ## 6.5.0 - 2026-11-13
 
 ### Changed
