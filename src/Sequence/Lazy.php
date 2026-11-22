@@ -1135,6 +1135,25 @@ final class Lazy implements Implementation
         );
     }
 
+    #[\Override]
+    public function toList(): array
+    {
+        $values = [];
+        $iterator = $this->iterator();
+        /** @psalm-suppress ImpureMethodCall */
+        $iterator->rewind();
+
+        /** @psalm-suppress ImpureMethodCall */
+        while ($iterator->valid()) {
+            /** @psalm-suppress ImpureMethodCall */
+            $values[] = $iterator->current();
+            /** @psalm-suppress ImpureMethodCall */
+            $iterator->next();
+        }
+
+        return $values;
+    }
+
     /**
      * @return Primitive<T>
      */

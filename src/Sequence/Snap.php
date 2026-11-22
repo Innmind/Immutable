@@ -544,6 +544,12 @@ final class Snap implements Implementation
         return $this->will(static fn($self) => $self->takeWhile($condition));
     }
 
+    #[\Override]
+    public function toList(): array
+    {
+        return $this->memoize()->toList();
+    }
+
     /**
      * @template S
      *

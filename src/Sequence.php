@@ -707,15 +707,7 @@ final class Sequence
     #[\NoDiscard]
     public function toList(): array
     {
-        /** @var list<T> */
-        $all = [];
-
-        /** @psalm-suppress ImpureMethodCall */
-        foreach ($this->implementation->iterator() as $value) {
-            $all[] = $value;
-        }
-
-        return $all;
+        return $this->implementation->toList();
     }
 
     /**

@@ -1260,6 +1260,20 @@ final class Defer implements Implementation
         );
     }
 
+    #[\Override]
+    public function toList(): array
+    {
+        $values = [];
+        $this->values->rewind();
+
+        while ($this->values->valid()) {
+            $values[] = $this->values->current();
+            $this->values->next();
+        }
+
+        return $values;
+    }
+
     /**
      * @return array{
      *     Accumulate<T>,

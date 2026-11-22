@@ -752,6 +752,12 @@ final class Primitive implements Implementation
         return new self($values);
     }
 
+    #[\Override]
+    public function toList(): array
+    {
+        return $this->values;
+    }
+
     private function has(int $index): bool
     {
         return \array_key_exists($index, $this->values);

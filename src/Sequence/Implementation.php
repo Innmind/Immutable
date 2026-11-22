@@ -387,4 +387,9 @@ interface Implementation
      * @return self<T>
      */
     public function takeWhile(callable $condition): self;
+
+    /**
+     * @return list<T>
+     */
+    public function toList(): array;
 }
