@@ -63,7 +63,9 @@ final class Attempt
     #[\NoDiscard]
     public static function defer(callable $deferred): self
     {
-        return new self(new Defer($deferred));
+        return new self(new Defer(
+            static fn() => $deferred()->implementation,
+        ));
     }
 
     /**
@@ -109,8 +111,7 @@ final class Attempt
     public function flatMap(callable $map): self
     {
         return new self($this->implementation->flatMap(
-            $map,
-            static fn(self $self) => $self->implementation,
+            static fn($value) => /** @var T $value */ $map($value)->implementation,
         ));
     }
 
@@ -125,8 +126,7 @@ final class Attempt
     public function guard(callable $map): self
     {
         return new self($this->implementation->guard(
-            $map,
-            static fn(self $self) => $self->implementation,
+            static fn($value) => /** @var T $value */ $map($value)->implementation,
         ));
     }
 
@@ -200,8 +200,7 @@ final class Attempt
     public function recover(callable $recover): self
     {
         return new self($this->implementation->recover(
-            $recover,
-            static fn(self $self) => $self->implementation,
+            static fn($value) => $recover($value)->implementation,
         ));
     }
 
@@ -236,8 +235,7 @@ final class Attempt
     public function xrecover(callable $recover): self
     {
         return new self($this->implementation->xrecover(
-            $recover,
-            static fn(self $self) => $self->implementation,
+            static fn($value) => $recover($value)->implementation,
         ));
     }
 
@@ -267,9 +265,7 @@ final class Attempt
     #[\NoDiscard]
     public function memoize(): self
     {
-        return new self($this->implementation->memoize(
-            static fn(self $self) => $self->implementation,
-        ));
+        return new self($this->implementation->memoize());
     }
 
     /**
@@ -284,9 +280,8 @@ final class Attempt
     public function eitherWay(callable $result, callable $error): self
     {
         return new self($this->implementation->eitherWay(
-            $result,
-            $error,
-            static fn(self $self) => $self->implementation,
+            static fn($value) => /** @var T $value */ $result($value)->implementation,
+            static fn($value) => $error($value)->implementation,
         ));
     }
 }

@@ -11,6 +11,7 @@
 - `Map` with objects as keys no longer have to lookup the storage to access associated values
 - Reduced the number of intermediate objects for `Map::parition()`
 - Reduce the number of variables for `Sequence::flatMap()`/`::aggregate()`
+- Reduce the number of variables to handle deferred `Attempt`s
 
 ## 6.5.0 - 2026-11-13
 

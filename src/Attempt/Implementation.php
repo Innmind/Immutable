@@ -4,7 +4,6 @@ declare(strict_types = 1);
 namespace Innmind\Immutable\Attempt;
 
 use Innmind\Immutable\{
-    Attempt,
     Maybe,
     Either,
 };
@@ -28,28 +27,20 @@ interface Implementation
     /**
      * @template U
      *
-     * @param callable(T): Attempt<U> $map
-     * @param pure-callable(Attempt<U>): self<U> $exfiltrate
+     * @param callable(T): self<U> $map
      *
      * @return self<U>
      */
-    public function flatMap(
-        callable $map,
-        callable $exfiltrate,
-    ): self;
+    public function flatMap(callable $map): self;
 
     /**
      * @template U
      *
-     * @param callable(T): Attempt<U> $map
-     * @param pure-callable(Attempt<U>): self<U> $exfiltrate
+     * @param callable(T): self<U> $map
      *
      * @return self<U>
      */
-    public function guard(
-        callable $map,
-        callable $exfiltrate,
-    ): self;
+    public function guard(callable $map): self;
 
     /**
      * @return self<T>
@@ -76,28 +67,20 @@ interface Implementation
     /**
      * @template U
      *
-     * @param callable(\Throwable): Attempt<U> $recover
-     * @param pure-callable(Attempt<U>): self<U> $exfiltrate
+     * @param callable(\Throwable): self<U> $recover
      *
      * @return self<T|U>
      */
-    public function recover(
-        callable $recover,
-        callable $exfiltrate,
-    ): self;
+    public function recover(callable $recover): self;
 
     /**
      * @template U
      *
-     * @param callable(\Throwable): Attempt<U> $recover
-     * @param pure-callable(Attempt<U>): self<U> $exfiltrate
+     * @param callable(\Throwable): self<U> $recover
      *
      * @return self<T|U>
      */
-    public function xrecover(
-        callable $recover,
-        callable $exfiltrate,
-    ): self;
+    public function xrecover(callable $recover): self;
 
     /**
      * @return Maybe<T>
@@ -110,24 +93,20 @@ interface Implementation
     public function either(): Either;
 
     /**
-     * @param pure-callable(Attempt<T>): self<T> $exfiltrate
-     *
      * @return self<T>
      */
-    public function memoize(callable $exfiltrate): self;
+    public function memoize(): self;
 
     /**
      * @template V
      *
-     * @param callable(T): Attempt<V> $result
-     * @param callable(\Throwable): Attempt<V> $error
-     * @param pure-callable(Attempt<V>): self<V> $exfiltrate
+     * @param callable(T): self<V> $result
+     * @param callable(\Throwable): self<V> $error
      *
      * @return self<V>
      */
     public function eitherWay(
         callable $result,
         callable $error,
-        callable $exfiltrate,
     ): self;
 }
