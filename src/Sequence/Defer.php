@@ -665,6 +665,7 @@ final class Defer implements Implementation
         /** @psalm-suppress ImpureFunctionCall */
         return new self(
             (static function(int $toDrop) use (&$captured): \Generator {
+                /** @var \SplQueue<T> */
                 $buffer = new \SplQueue;
                 $buffer->setIteratorMode(\SplQueue::IT_MODE_FIFO);
                 /**
@@ -1308,6 +1309,7 @@ final class Defer implements Implementation
             return Iterator::defer($values);
         }
 
+        /** @psalm-suppress ImpureByReferenceAssignment */
         $captured = null;
         // By wrapping $values with a weak reference and assigning it to the
         // same variable we decrement its refcount by 1. This means that when
@@ -1316,7 +1318,9 @@ final class Defer implements Implementation
         // it no longer exist.
         // And if the object no longer exist then this object was the last one
         // using it and we can safely use the generator.
+        /** @psalm-suppress ImpureMethodCall */
         $values = \WeakReference::create($values);
+        /** @psalm-suppress ImpureMethodCall */
         $values = $values->get();
 
         if (\is_null($values)) {

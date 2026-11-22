@@ -46,6 +46,13 @@ final class Left implements Implementation
         return Either::left($this->value);
     }
 
+    /**
+     * @template R
+     *
+     * @param callable(L1): R $map
+     *
+     * @return self<R, R1>
+     */
     #[\Override]
     public function leftMap(callable $map): self
     {

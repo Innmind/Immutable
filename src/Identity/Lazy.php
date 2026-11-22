@@ -26,6 +26,13 @@ final class Lazy implements Implementation
         $this->value = $value;
     }
 
+    /**
+     * @template R
+     *
+     * @param callable(T): R $map
+     *
+     * @return self<R>
+     */
     #[\Override]
     public function map(callable $map): self
     {

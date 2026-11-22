@@ -29,6 +29,13 @@ final class Defer implements Implementation
         $this->value = $value;
     }
 
+    /**
+     * @template R
+     *
+     * @param callable(T): R $map
+     *
+     * @return self<R>
+     */
     #[\Override]
     public function map(callable $map): self
     {
@@ -72,10 +79,14 @@ final class Defer implements Implementation
 
         /**
          * @psalm-suppress InaccessibleProperty
+         * @psalm-suppress ImpurePropertyAssignment
          * @psalm-suppress ImpureFunctionCall
          */
         $this->computed = ($this->value)();
-        /** @psalm-suppress InaccessibleProperty */
+        /**
+         * @psalm-suppress InaccessibleProperty
+         * @psalm-suppress ImpurePropertyAssignment
+         */
         $this->loaded = true;
 
         return $this->computed;
@@ -103,9 +114,11 @@ final class Defer implements Implementation
     private static function detonate(array $captured): mixed
     {
         [$ref, $value] = $captured;
+        /** @psalm-suppress ImpureMethodCall */
         $self = $ref->get();
 
         if (\is_null($self)) {
+            /** @psalm-suppress ImpureFunctionCall */
             return $value();
         }
 

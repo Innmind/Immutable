@@ -509,11 +509,17 @@ final class Snap implements Implementation
         // reference it. If the user does, then it's still kept in memory and
         // memoized itself due to the ->memoize() call before applying the
         // action on this version.
-        /** @psalm-suppress InaccessibleProperty */
+        /**
+         * @psalm-suppress InaccessibleProperty
+         * @psalm-suppress ImpurePropertyAssignment
+         */
         $this->implementation = ($this->will)($this->implementation->memoize());
         // Overwriting the action here allows to free from memory any variable
         // captured in the user provided callable.
-        /** @psalm-suppress InaccessibleProperty */
+        /**
+         * @psalm-suppress InaccessibleProperty
+         * @psalm-suppress ImpurePropertyAssignment
+         */
         $this->will = static fn(Implementation $sequence): Implementation => $sequence;
 
         /** @var Primitive<T> */

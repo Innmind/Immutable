@@ -26,6 +26,13 @@ final class Just implements Implementation
     ) {
     }
 
+    /**
+     * @template R
+     *
+     * @param callable(V): R $map
+     *
+     * @return self<R>
+     */
     #[\Override]
     public function map(callable $map): self
     {

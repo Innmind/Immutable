@@ -36,7 +36,10 @@ final class Accumulate implements \Iterator
     #[\Override]
     public function current(): mixed
     {
-        /** @psalm-suppress InaccessibleProperty */
+        /**
+         * @psalm-suppress ImpurePropertyAssignment
+         * @psalm-suppress InaccessibleProperty
+         */
         $this->started = true;
         /** @psalm-suppress UnusedMethodCall */
         $this->pop();
@@ -51,7 +54,10 @@ final class Accumulate implements \Iterator
     #[\Override]
     public function key(): ?int
     {
-        /** @psalm-suppress InaccessibleProperty */
+        /**
+         * @psalm-suppress ImpurePropertyAssignment
+         * @psalm-suppress InaccessibleProperty
+         */
         $this->started = true;
         /** @psalm-suppress UnusedMethodCall */
         $this->pop();
@@ -62,9 +68,15 @@ final class Accumulate implements \Iterator
     #[\Override]
     public function next(): void
     {
-        /** @psalm-suppress InaccessibleProperty */
+        /**
+         * @psalm-suppress ImpurePropertyAssignment
+         * @psalm-suppress InaccessibleProperty
+         */
         $this->started = true;
-        /** @psalm-suppress InaccessibleProperty */
+        /**
+         * @psalm-suppress ImpurePropertyAssignment
+         * @psalm-suppress InaccessibleProperty
+         */
         \next($this->values);
 
         if ($this->reachedCacheEnd()) {
@@ -77,20 +89,29 @@ final class Accumulate implements \Iterator
     public function rewind(): void
     {
         if ($this->started && !\is_null($key = $this->key())) {
-            /** @psalm-suppress InaccessibleProperty */
+            /**
+             * @psalm-suppress ImpurePropertyAssignment
+             * @psalm-suppress InaccessibleProperty
+             */
             $this->cursors[] = $key;
         }
 
         /** @psalm-suppress InaccessibleProperty */
         $this->started = true;
-        /** @psalm-suppress InaccessibleProperty */
+        /**
+         * @psalm-suppress ImpurePropertyAssignment
+         * @psalm-suppress InaccessibleProperty
+         */
         \reset($this->values);
     }
 
     #[\Override]
     public function valid(): bool
     {
-        /** @psalm-suppress InaccessibleProperty */
+        /**
+         * @psalm-suppress ImpurePropertyAssignment
+         * @psalm-suppress InaccessibleProperty
+         */
         $this->started = true;
         /** @psalm-suppress ImpureMethodCall */
         $valid = !$this->reachedCacheEnd() || $this->generator->valid();
@@ -111,7 +132,10 @@ final class Accumulate implements \Iterator
 
     public function cleanup(): void
     {
-        /** @psalm-suppress InaccessibleProperty */
+        /**
+         * @psalm-suppress ImpurePropertyAssignment
+         * @psalm-suppress InaccessibleProperty
+         */
         $previousCursor = \array_pop($this->cursors);
 
         if (\is_null($previousCursor)) {
@@ -121,11 +145,17 @@ final class Accumulate implements \Iterator
         // Re-position the cursor to the previous position before entering a new
         // loop. It only iterate over the cached values because the previous
         // cursor must be in the cache.
-        /** @psalm-suppress InaccessibleProperty */
+        /**
+         * @psalm-suppress ImpurePropertyAssignment
+         * @psalm-suppress InaccessibleProperty
+         */
         \reset($this->values);
 
         while (\is_int(\key($this->values)) && \key($this->values) !== $previousCursor) {
-            /** @psalm-suppress InaccessibleProperty */
+            /**
+             * @psalm-suppress ImpurePropertyAssignment
+             * @psalm-suppress InaccessibleProperty
+             */
             \next($this->values);
         }
     }
@@ -141,6 +171,7 @@ final class Accumulate implements \Iterator
         if ($this->reachedCacheEnd() && $this->generator->valid()) {
             /**
              * @psalm-suppress InaccessibleProperty
+             * @psalm-suppress ImpurePropertyAssignment
              * @psalm-suppress ImpureMethodCall
              */
             $this->values[] = $this->generator->current();

@@ -26,6 +26,13 @@ final class Defer implements Implementation
     {
     }
 
+    /**
+     * @template R
+     *
+     * @param callable(R1): R $map
+     *
+     * @return self<R>
+     */
     #[\Override]
     public function map(callable $map): self
     {
@@ -34,6 +41,13 @@ final class Defer implements Implementation
         return new self(static fn() => self::detonate($captured)->map($map));
     }
 
+    /**
+     * @template R
+     *
+     * @param callable(R1): Implementation<R> $map
+     *
+     * @return self<R>
+     */
     #[\Override]
     public function flatMap(callable $map): self
     {
@@ -42,6 +56,13 @@ final class Defer implements Implementation
         return new self(static fn() => self::detonate($captured)->flatMap($map));
     }
 
+    /**
+     * @template R
+     *
+     * @param callable(R1): Implementation<R> $map
+     *
+     * @return self<R>
+     */
     #[\Override]
     public function guard(callable $map): self
     {
@@ -108,6 +129,14 @@ final class Defer implements Implementation
         return $this->unwrap();
     }
 
+    /**
+     * @template R
+     *
+     * @param callable(R1): Implementation<R> $result
+     * @param callable(\Throwable): Implementation<R> $error
+     *
+     * @return self<R>
+     */
     #[\Override]
     public function eitherWay(
         callable $result,
@@ -127,6 +156,7 @@ final class Defer implements Implementation
     {
         /**
          * @psalm-suppress InaccessibleProperty
+         * @psalm-suppress ImpurePropertyAssignment
          * @psalm-suppress ImpureFunctionCall
          */
         return $this->value ??= ($this->deferred)();
@@ -154,9 +184,11 @@ final class Defer implements Implementation
     private static function detonate(array $captured): Implementation
     {
         [$ref, $deferred] = $captured;
+        /** @psalm-suppress ImpureMethodCall */
         $self = $ref->get();
 
         if (\is_null($self)) {
+            /** @psalm-suppress ImpureFunctionCall */
             return $deferred();
         }
 

@@ -42,6 +42,7 @@ final class Primitive implements Implementation
             // numeric-string keys are casted to ints by php, so when iterating
             // over the array afterward the type is not conserved so we switch
             // the implementation to DoubleIndex so keep the type
+            /** @psalm-suppress IncompatibleTypeParameters */
             return new DoubleIndex($this->toSequence()(new Pair($key, $value)));
         }
 
@@ -344,6 +345,7 @@ final class Primitive implements Implementation
     {
         /**
          * @psalm-suppress InaccessibleProperty
+         * @psalm-suppress ImpurePropertyAssignment
          * @psalm-suppress MixedArgumentTypeCoercion
          */
         \reset($this->values);

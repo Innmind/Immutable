@@ -217,7 +217,13 @@ final class Primitive implements Implementation
     #[\Override]
     public function last(): Maybe
     {
-        return $this->get($this->size() - 1);
+        $index = $this->size() - 1;
+
+        if ($index === -1) {
+            return Maybe::nothing();
+        }
+
+        return $this->get($index);
     }
 
     /**
@@ -359,7 +365,10 @@ final class Primitive implements Implementation
     #[\Override]
     public function takeEnd(int $size): self
     {
-        return $this->slice($this->size() - $size, $this->size());
+        return $this->slice(
+            \max(0, $this->size() - $size),
+            $this->size(),
+        );
     }
 
     /**

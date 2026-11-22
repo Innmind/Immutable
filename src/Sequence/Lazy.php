@@ -585,12 +585,14 @@ final class Lazy implements Implementation
 
         return new self(
             static function(RegisterCleanup $register) use ($values, $size): \Generator {
+                /** @var \SplQueue<T> */
                 $buffer = new \SplQueue;
                 $buffer->setIteratorMode(\SplQueue::IT_MODE_FIFO);
                 $iterator = $values($register);
                 $iterator->rewind();
 
                 while ($iterator->valid()) {
+                    /** @psalm-suppress PossiblyNullArgument */
                     $buffer->enqueue($iterator->current());
 
                     if ($buffer->count() > $size) {
@@ -1180,6 +1182,7 @@ final class Lazy implements Implementation
         }
 
         $iterator = $sequence->iterator();
+        /** @psalm-suppress ImpureMethodCall */
         $registerCleanup(static fn() => $iterator->cleanup());
 
         return $iterator;
