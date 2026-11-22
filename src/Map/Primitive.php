@@ -43,11 +43,11 @@ final class Primitive implements Implementation
             // over the array afterward the type is not conserved so we switch
             // the implementation to DoubleIndex so keep the type
             /** @psalm-suppress IncompatibleTypeParameters */
-            return (new DoubleIndex)->merge($this)($key, $value);
+            return new DoubleIndex($this->toSequence()(new Pair($key, $value)));
         }
 
         if (!\is_string($key) && !\is_int($key)) {
-            return (new DoubleIndex)->merge($this)($key, $value);
+            return new DoubleIndex($this->toSequence()(new Pair($key, $value)));
         }
 
         $values = $this->values;
@@ -131,7 +131,7 @@ final class Primitive implements Implementation
     #[\Override]
     public function equals(Implementation $map): bool
     {
-        if (!$map->keys()->equals($this->keys())) {
+        if ($map->size() !== $this->size()) {
             return false;
         }
 
@@ -184,7 +184,7 @@ final class Primitive implements Implementation
             $function($k, $v);
         }
 
-        return SideEffect::identity();
+        return SideEffect::identity;
     }
 
     /**
@@ -206,7 +206,7 @@ final class Primitive implements Implementation
 
             $group = $groups->get($discriminant)->match(
                 static fn($group) => $group,
-                fn() => $this->clearMap(),
+                static fn() => /** @var Map<T, S> */ Map::of(),
             );
             $groups = ($groups)($discriminant, ($group)($key, $value));
         }
@@ -301,21 +301,23 @@ final class Primitive implements Implementation
     #[\Override]
     public function partition(callable $predicate): array
     {
-        $truthy = $this->clearMap();
-        $falsy = $this->clearMap();
+        /** @var list<array{T, S}> */
+        $truthy = [];
+        /** @var list<array{T, S}> */
+        $falsy = [];
 
         foreach ($this->values as $k => $v) {
             /** @psalm-suppress ImpureFunctionCall */
             $return = $predicate($k, $v);
 
             if ($return === true) {
-                $truthy = ($truthy)($k, $v);
+                $truthy[] = [$k, $v];
             } else {
-                $falsy = ($falsy)($k, $v);
+                $falsy[] = [$k, $v];
             }
         }
 
-        return [$truthy, $falsy];
+        return [Map::of(...$truthy), Map::of(...$falsy)];
     }
 
     /**
@@ -369,11 +371,14 @@ final class Primitive implements Implementation
     #[\Override]
     public function toSequence(): Sequence
     {
-        /** @var Sequence<Pair<T, S>> */
-        return $this->reduce(
-            Sequence::of(),
-            static fn(Sequence $pairs, $key, $value) => ($pairs)(new Pair($key, $value)),
-        );
+        /** @var list<Pair<T, S>> */
+        $pairs = [];
+
+        foreach ($this->values as $k => $v) {
+            $pairs[] = new Pair($k, $v);
+        }
+
+        return Sequence::of(...$pairs);
     }
 
     /**

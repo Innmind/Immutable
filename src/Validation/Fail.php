@@ -59,13 +59,12 @@ final class Fail implements Implementation
      * @template T
      * @template V
      *
-     * @param callable(S): Validation<T, V> $map
-     * @param pure-callable(Validation<T, V>): Implementation<T, V> $exfiltrate
+     * @param callable(S): Implementation<T, V> $map
      *
      * @return Implementation<F|T, V>
      */
     #[\Override]
-    public function flatMap(callable $map, callable $exfiltrate): Implementation
+    public function flatMap(callable $map): Implementation
     {
         /** @var Implementation<F|T, V> */
         return $this;
@@ -75,13 +74,12 @@ final class Fail implements Implementation
      * @template T
      * @template V
      *
-     * @param callable(S): Validation<T, V> $map
-     * @param pure-callable(Validation<T, V>): Implementation<T, V> $exfiltrate
+     * @param callable(S): Implementation<T, V> $map
      *
      * @return Implementation<F|T, V>
      */
     #[\Override]
-    public function guard(callable $map, callable $exfiltrate): Implementation
+    public function guard(callable $map): Implementation
     {
         /** @var Implementation<F|T, V> */
         return $this;
@@ -136,19 +134,16 @@ final class Fail implements Implementation
      * @template T
      * @template V
      *
-     * @param callable(Sequence<F>): Validation<T, V> $map
-     * @param callable(Implementation<F|T, S|V>): Validation<F|T, S|V> $wrap
+     * @param callable(Sequence<F>): Implementation<T, V> $map
      *
-     * @return Validation<F|T, S|V>
+     * @return Implementation<F|T, S|V>
      */
     #[\Override]
-    public function xotherwise(
-        callable $map,
-        callable $wrap,
-    ): Validation {
+    public function xotherwise(callable $map): Implementation
+    {
         if ($this->failures instanceof Guard) {
             /** @psalm-suppress ImpureFunctionCall */
-            return $wrap($this);
+            return $this;
         }
 
         /** @psalm-suppress ImpureFunctionCall */

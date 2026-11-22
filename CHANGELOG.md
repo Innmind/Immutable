@@ -1,5 +1,27 @@
 # Changelog
 
+## [Unreleased]
+
+### Changed
+
+- `Sequence::toList()` no longer use a quadratic `reduce` to build the list
+- `Sequence::distinct()` no longer use a quadratic `reduce` to build the new in memory sequence
+- `Map::equals()` no longer apply redundant keys comparison
+- Lazy and deferred `Sequence::takeEnd()`/`::dropEnd()` no longer re-index the sliding window on each new value
+- `Map` with objects as keys no longer have to lookup the storage to access associated values
+- Reduced the number of intermediate objects for `Map::parition()`
+- Reduce the number of variables for `Sequence::flatMap()`/`::aggregate()`
+- Reduce the number of variables to handle deferred `Attempt`s
+- Reduce the number of variables to handle `Validation` methods composition
+- Remove useless calls to `SideEffect::identity()`
+
+## 6.5.0 - 2026-11-13
+
+### Changed
+
+- Reduced the number of intermediate objects created on some `Str` methods
+- Reduced the number of intermediate objects created when switching from differents `Map` implementations
+
 ## 6.4.0 - 2026-11-08
 
 ### Added

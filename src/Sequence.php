@@ -424,10 +424,9 @@ final class Sequence
     #[\NoDiscard]
     public function flatMap(callable $map): self
     {
-        /** @var callable(self<S>): Sequence\Implementation<S> */
-        $exfiltrate = static fn(self $sequence): Sequence\Implementation => $sequence->implementation;
-
-        return new self($this->implementation->flatMap($map, $exfiltrate));
+        return new self($this->implementation->flatMap(
+            static fn($value) => /** @var T $value */ $map($value)->implementation,
+        ));
     }
 
     /**
@@ -707,19 +706,7 @@ final class Sequence
     #[\NoDiscard]
     public function toList(): array
     {
-        /** @var list<T> */
-        $all = [];
-
-        /** @var list<T> */
-        return $this->reduce(
-            $all,
-            static function(array $carry, $value): array {
-                /** @var T $value */
-                $carry[] = $value;
-
-                return $carry;
-            },
-        );
+        return $this->implementation->toList();
     }
 
     /**
@@ -851,10 +838,14 @@ final class Sequence
     #[\NoDiscard]
     public function aggregate(callable $map): self
     {
-        /** @var callable(self<A>): Sequence\Implementation<A> */
-        $exfiltrate = static fn(self $sequence): Sequence\Implementation => $sequence->implementation;
-
-        return new self($this->implementation->aggregate($map, $exfiltrate));
+        return new self($this->implementation->aggregate(
+            static fn($a, $b) =>
+                /**
+                 * @var T|A $a
+                 * @var T $b
+                 */
+                $map($a, $b)->implementation,
+        ));
     }
 
     /**

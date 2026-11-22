@@ -105,7 +105,7 @@ final class DoubleIndex implements Implementation
     #[\Override]
     public function equals(Implementation $map): bool
     {
-        if (!$map->keys()->equals($this->keys())) {
+        if ($map->size() !== $this->size()) {
             return false;
         }
 
@@ -255,33 +255,21 @@ final class DoubleIndex implements Implementation
     #[\Override]
     public function partition(callable $predicate): array
     {
-        $truthy = $this->clearMap();
-        $falsy = $this->clearMap();
+        /** @var list<array{T, S}> */
+        $truthy = [];
+        /** @var list<array{T, S}> */
+        $falsy = [];
 
-        return $this->pairs->reduce(
-            [$truthy, $falsy],
-            static function(array $carry, $pair) use ($predicate) {
-                /**
-                 * @var Map<T, S> $truthy
-                 * @var Map<T, S> $falsy
-                 */
-                [$truthy, $falsy] = $carry;
+        foreach ($this->pairs->toList() as $pair) {
+            /** @psalm-suppress ImpureFunctionCall */
+            if ($predicate($pair->key(), $pair->value()) === true) {
+                $truthy[] = [$pair->key(), $pair->value()];
+            } else {
+                $falsy[] = [$pair->key(), $pair->value()];
+            }
+        }
 
-                $key = $pair->key();
-                $value = $pair->value();
-
-                /** @psalm-suppress ImpureFunctionCall */
-                $return = $predicate($key, $value);
-
-                if ($return === true) {
-                    $truthy = ($truthy)($key, $value);
-                } else {
-                    $falsy = ($falsy)($key, $value);
-                }
-
-                return [$truthy, $falsy];
-            },
-        );
+        return [Map::of(...$truthy), Map::of(...$falsy)];
     }
 
     /**

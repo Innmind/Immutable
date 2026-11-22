@@ -113,7 +113,7 @@ final class Uninitialized implements Implementation
     #[\Override]
     public function foreach(callable $function): SideEffect
     {
-        return SideEffect::identity();
+        return SideEffect::identity;
     }
 
     /**

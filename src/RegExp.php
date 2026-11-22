@@ -69,21 +69,15 @@ final class RegExp
             throw new InvalidRegex(\preg_last_error_msg(), \preg_last_error());
         }
 
-        /** @var Map<int|string, Str> */
-        $map = Map::of();
+        /** @var list<array{int|string, Str}> */
+        $map = [];
 
         foreach ($matches as $key => $match) {
             /** @psalm-suppress RedundantCast Don't trust the types of preg_match */
-            $map = ($map)(
-                $key,
-                Str::of(
-                    (string) $match,
-                    $string->encoding(),
-                ),
-            );
+            $map[] = [$key, Str::of((string) $match, $string->encoding())];
         }
 
-        return $map;
+        return Map::of(...$map);
     }
 
     #[\NoDiscard]

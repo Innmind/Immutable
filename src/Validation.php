@@ -73,8 +73,7 @@ final class Validation
     public function flatMap(callable $map): self
     {
         return new self($this->implementation->flatMap(
-            $map,
-            static fn(self $self) => $self->implementation,
+            static fn($value) => /** @var S $value */ $map($value)->implementation,
         ));
     }
 
@@ -90,8 +89,7 @@ final class Validation
     public function guard(callable $map): self
     {
         return new self($this->implementation->guard(
-            $map,
-            static fn(self $self) => $self->implementation,
+            static fn($value) => /** @var S $value */ $map($value)->implementation,
         ));
     }
 
@@ -135,10 +133,9 @@ final class Validation
     #[\NoDiscard]
     public function xotherwise(callable $map): self
     {
-        return $this->implementation->xotherwise(
-            $map,
-            static fn(Validation\Implementation $implementation) => new self($implementation),
-        );
+        return new self($this->implementation->xotherwise(
+            static fn($failures) => $map($failures)->implementation,
+        ));
     }
 
     /**

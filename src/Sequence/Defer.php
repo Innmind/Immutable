@@ -223,7 +223,8 @@ final class Defer implements Implementation
         /** @psalm-suppress ImpureFunctionCall */
         return new self(
             (static function(int $toDrop) use (&$captured): \Generator {
-                $buffer = [];
+                $buffer = new \SplQueue;
+                $buffer->setIteratorMode(\SplQueue::IT_MODE_FIFO);
                 /**
                  * @psalm-suppress PossiblyNullArgument
                  * @var Iterator<T>
@@ -235,10 +236,10 @@ final class Defer implements Implementation
                     $value = $values->current();
                     $values->next();
 
-                    $buffer[] = $value;
+                    $buffer->enqueue($value);
 
-                    if (\count($buffer) > $toDrop) {
-                        yield \array_shift($buffer);
+                    if ($buffer->count() > $toDrop) {
+                        yield $buffer->dequeue();
                     }
                 }
             })($size),
@@ -301,7 +302,7 @@ final class Defer implements Implementation
             $this->values->next();
         }
 
-        return SideEffect::identity();
+        return SideEffect::identity;
     }
 
     /**
@@ -472,21 +473,19 @@ final class Defer implements Implementation
 
     /**
      * @template S
-     * @template C of Sequence<S>|Set<S>
      *
-     * @param callable(T): C $map
-     * @param callable(C): Implementation<S> $exfiltrate
+     * @param callable(T): Implementation<S> $map
      *
      * @return self<S>
      */
     #[\Override]
-    public function flatMap(callable $map, callable $exfiltrate): self
+    public function flatMap(callable $map): self
     {
         $captured = $this->capture();
 
         /** @psalm-suppress ImpureFunctionCall */
         return new self(
-            (static function(callable $map, callable $exfiltrate) use (&$captured): \Generator {
+            (static function(callable $map) use (&$captured): \Generator {
                 /**
                  * @psalm-suppress PossiblyNullArgument
                  * @var Iterator<T>
@@ -496,11 +495,10 @@ final class Defer implements Implementation
 
                 while ($values->valid()) {
                     /**
-                     * @var callable(T): C $map
-                     * @var callable(C): Implementation<S> $exfiltrate
+                     * @var callable(T): Implementation<S> $map
                      * @psalm-suppress PossiblyNullArgument
                      */
-                    $inner = $exfiltrate($map($values->current()))->iterator();
+                    $inner = $map($values->current())->iterator();
                     $inner->rewind();
 
                     while ($inner->valid()) {
@@ -510,7 +508,7 @@ final class Defer implements Implementation
 
                     $values->next();
                 }
-            })($map, $exfiltrate),
+            })($map),
         );
     }
 
@@ -662,9 +660,36 @@ final class Defer implements Implementation
     #[\Override]
     public function takeEnd(int $size): Implementation
     {
-        // this cannot be optimised as the whole generator needs to be loaded
-        // in order to know the elements to drop
-        return $this->memoize()->takeEnd($size);
+        $captured = $this->capture();
+
+        /** @psalm-suppress ImpureFunctionCall */
+        return new self(
+            (static function(int $toDrop) use (&$captured): \Generator {
+                $buffer = new \SplQueue;
+                $buffer->setIteratorMode(\SplQueue::IT_MODE_FIFO);
+                /**
+                 * @psalm-suppress PossiblyNullArgument
+                 * @var Iterator<T>
+                 */
+                $values = self::detonate($captured);
+                $values->rewind();
+
+                while ($values->valid()) {
+                    $value = $values->current();
+                    $values->next();
+
+                    $buffer->enqueue($value);
+
+                    if ($buffer->count() > $toDrop) {
+                        $buffer->dequeue();
+                    }
+                }
+
+                foreach ($buffer as $value) {
+                    yield $value;
+                }
+            })($size),
+        );
     }
 
     /**
@@ -1117,18 +1142,17 @@ final class Defer implements Implementation
     /**
      * @template A
      *
-     * @param callable(T|A, T): Sequence<A> $map
-     * @param callable(Sequence<A>): Implementation<A> $exfiltrate
+     * @param callable(T|A, T): Implementation<A> $map
      *
      * @return self<T|A>
      */
     #[\Override]
-    public function aggregate(callable $map, callable $exfiltrate): self
+    public function aggregate(callable $map): self
     {
         $aggregate = new Aggregate($this->iterator());
 
         /** @psalm-suppress MixedArgument */
-        return new self($aggregate(static fn($a, $b) => $exfiltrate($map($a, $b))->iterator()));
+        return new self($aggregate(static fn($a, $b) => $map($a, $b)->iterator()));
     }
 
     /**
@@ -1230,6 +1254,20 @@ final class Defer implements Implementation
                 }
             })($condition),
         );
+    }
+
+    #[\Override]
+    public function toList(): array
+    {
+        $values = [];
+        $this->values->rewind();
+
+        while ($this->values->valid()) {
+            $values[] = $this->values->current();
+            $this->values->next();
+        }
+
+        return $values;
     }
 
     /**
