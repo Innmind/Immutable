@@ -254,13 +254,18 @@ final class ObjectKeys implements Implementation
     #[\Override]
     public function keys(): Set
     {
-        /** @var Set<T> */
-        $keys = Set::of();
+        /** @var list<T> */
+        $keys = [];
 
-        return $this->reduce(
-            $keys,
-            static fn(Set $keys, $key): Set => ($keys)($key),
-        );
+        /**
+         * @psalm-suppress ImpureMethodCall
+         * @var T $key
+         */
+        foreach ($this->values as $key) {
+            $keys[] = $key;
+        }
+
+        return Set::of(...$keys);
     }
 
     /**
@@ -269,13 +274,16 @@ final class ObjectKeys implements Implementation
     #[\Override]
     public function values(): Sequence
     {
-        /** @var Sequence<S> */
-        $values = Sequence::of();
+        /** @var list<S> */
+        $values = [];
 
-        return $this->reduce(
-            $values,
-            static fn(Sequence $values, $_, $value): Sequence => ($values)($value),
-        );
+        /** @psalm-suppress ImpureMethodCall */
+        foreach ($this->values as $key) {
+            /** @var S */
+            $values[] = $this->values->getInfo();
+        }
+
+        return Sequence::of(...$values);
     }
 
     /**
