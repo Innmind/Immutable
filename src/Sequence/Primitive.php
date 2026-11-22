@@ -217,7 +217,13 @@ final class Primitive implements Implementation
     #[\Override]
     public function last(): Maybe
     {
-        return $this->get($this->size() - 1);
+        $index = $this->size() - 1;
+
+        if ($index === -1) {
+            return Maybe::nothing();
+        }
+
+        return $this->get($index);
     }
 
     /**
