@@ -183,7 +183,7 @@ final class Primitive implements Implementation
             $function($k, $v);
         }
 
-        return SideEffect::identity();
+        return SideEffect::identity;
     }
 
     /**

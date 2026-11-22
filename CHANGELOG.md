@@ -13,6 +13,7 @@
 - Reduce the number of variables for `Sequence::flatMap()`/`::aggregate()`
 - Reduce the number of variables to handle deferred `Attempt`s
 - Reduce the number of variables to handle `Validation` methods composition
+- Remove useless calls to `SideEffect::identity()`
 
 ## 6.5.0 - 2026-11-13
 
