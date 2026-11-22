@@ -12,6 +12,7 @@
 - Reduced the number of intermediate objects for `Map::parition()`
 - Reduce the number of variables for `Sequence::flatMap()`/`::aggregate()`
 - Reduce the number of variables to handle deferred `Attempt`s
+- Reduce the number of variables to handle `Validation` methods composition
 
 ## 6.5.0 - 2026-11-13
 
