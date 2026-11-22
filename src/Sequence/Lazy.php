@@ -231,7 +231,7 @@ final class Lazy implements Implementation
     #[\Override]
     public function equals(Implementation $sequence): bool
     {
-        return $this->load()->equals($sequence);
+        return $this->memoize()->equals($sequence);
     }
 
     /**
@@ -298,7 +298,7 @@ final class Lazy implements Implementation
     public function groupBy(callable $discriminator): Map
     {
         /** @var Map<D, Sequence<T>> */
-        return $this->load()->groupBy($discriminator);
+        return $this->memoize()->groupBy($discriminator);
     }
 
     /**
@@ -516,7 +516,7 @@ final class Lazy implements Implementation
     public function partition(callable $predicate): array
     {
         /** @var array{Sequence<T>, Sequence<T>} */
-        return $this->load()->partition($predicate);
+        return $this->memoize()->partition($predicate);
     }
 
     /**
@@ -1044,7 +1044,20 @@ final class Lazy implements Implementation
     #[\Override]
     public function memoize(): Primitive
     {
-        return $this->load();
+        $values = [];
+        $iterator = $this->iterator();
+        /** @psalm-suppress ImpureMethodCall */
+        $iterator->rewind();
+
+        /** @psalm-suppress ImpureMethodCall */
+        while ($iterator->valid()) {
+            /** @psalm-suppress ImpureMethodCall */
+            $values[] = $iterator->current();
+            /** @psalm-suppress ImpureMethodCall */
+            $iterator->next();
+        }
+
+        return new Primitive($values);
     }
 
     /**
@@ -1149,27 +1162,6 @@ final class Lazy implements Implementation
         }
 
         return $values;
-    }
-
-    /**
-     * @return Primitive<T>
-     */
-    private function load(): Primitive
-    {
-        $values = [];
-        $iterator = $this->iterator();
-        /** @psalm-suppress ImpureMethodCall */
-        $iterator->rewind();
-
-        /** @psalm-suppress ImpureMethodCall */
-        while ($iterator->valid()) {
-            /** @psalm-suppress ImpureMethodCall */
-            $values[] = $iterator->current();
-            /** @psalm-suppress ImpureMethodCall */
-            $iterator->next();
-        }
-
-        return new Primitive($values);
     }
 
     /**
