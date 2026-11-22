@@ -300,21 +300,23 @@ final class Primitive implements Implementation
     #[\Override]
     public function partition(callable $predicate): array
     {
-        $truthy = $this->clearMap();
-        $falsy = $this->clearMap();
+        /** @var list<array{T, S}> */
+        $truthy = [];
+        /** @var list<array{T, S}> */
+        $falsy = [];
 
         foreach ($this->values as $k => $v) {
             /** @psalm-suppress ImpureFunctionCall */
             $return = $predicate($k, $v);
 
             if ($return === true) {
-                $truthy = ($truthy)($k, $v);
+                $truthy[] = [$k, $v];
             } else {
-                $falsy = ($falsy)($k, $v);
+                $falsy[] = [$k, $v];
             }
         }
 
-        return [$truthy, $falsy];
+        return [Map::of(...$truthy), Map::of(...$falsy)];
     }
 
     /**

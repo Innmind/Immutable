@@ -355,8 +355,10 @@ final class ObjectKeys implements Implementation
     #[\Override]
     public function partition(callable $predicate): array
     {
-        $truthy = $this->clearMap();
-        $falsy = $this->clearMap();
+        /** @var list<array{T, S}> */
+        $truthy = [];
+        /** @var list<array{T, S}> */
+        $falsy = [];
 
         /** @psalm-suppress ImpureMethodCall */
         foreach ($this->values as $k) {
@@ -372,13 +374,13 @@ final class ObjectKeys implements Implementation
             $return = $predicate($key, $v);
 
             if ($return === true) {
-                $truthy = ($truthy)($key, $v);
+                $truthy[] = [$key, $v];
             } else {
-                $falsy = ($falsy)($key, $v);
+                $falsy[] = [$key, $v];
             }
         }
 
-        return [$truthy, $falsy];
+        return [Map::of(...$truthy), Map::of(...$falsy)];
     }
 
     /**

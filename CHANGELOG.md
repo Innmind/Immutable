@@ -9,6 +9,7 @@
 - `Map::equals()` no longer apply redundant keys comparison
 - Lazy and deferred `Sequence::takeEnd()`/`::dropEnd()` no longer re-index the sliding window on each new value
 - `Map` with objects as keys no longer have to lookup the storage to access associated values
+- Reduced the number of intermediate objects for `Map::parition()`
 
 ## 6.5.0 - 2026-11-13
 
