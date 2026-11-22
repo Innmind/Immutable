@@ -40,6 +40,7 @@ final class Str implements \Stringable
     #[\NoDiscard]
     public function join(Set|Sequence $structure): self
     {
+        /** @psalm-suppress ImpureMethodCall */
         return new self(
             \implode($this->value, $structure->toList()),
             $this->encoding,
