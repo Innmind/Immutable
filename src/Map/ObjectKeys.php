@@ -239,7 +239,7 @@ final class ObjectKeys implements Implementation
 
             $group = $groups->get($discriminant)->match(
                 static fn($group) => $group,
-                fn() => $this->clearMap(),
+                static fn() => /** @var Map<T, S> */ Map::of(),
             );
             $groups = ($groups)($discriminant, ($group)($key, $v));
         }
