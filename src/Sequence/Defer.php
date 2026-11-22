@@ -663,9 +663,36 @@ final class Defer implements Implementation
     #[\Override]
     public function takeEnd(int $size): Implementation
     {
-        // this cannot be optimised as the whole generator needs to be loaded
-        // in order to know the elements to drop
-        return $this->memoize()->takeEnd($size);
+        $captured = $this->capture();
+
+        /** @psalm-suppress ImpureFunctionCall */
+        return new self(
+            (static function(int $toDrop) use (&$captured): \Generator {
+                $buffer = new \SplQueue;
+                $buffer->setIteratorMode(\SplQueue::IT_MODE_FIFO);
+                /**
+                 * @psalm-suppress PossiblyNullArgument
+                 * @var Iterator<T>
+                 */
+                $values = self::detonate($captured);
+                $values->rewind();
+
+                while ($values->valid()) {
+                    $value = $values->current();
+                    $values->next();
+
+                    $buffer->enqueue($value);
+
+                    if ($buffer->count() > $toDrop) {
+                        $buffer->dequeue();
+                    }
+                }
+
+                foreach ($buffer as $value) {
+                    yield $value;
+                }
+            })($size),
+        );
     }
 
     /**
