@@ -206,7 +206,8 @@ final class Lazy implements Implementation
 
         return new self(
             static function(RegisterCleanup $registerCleanup) use ($values, $size): \Generator {
-                $buffer = [];
+                $buffer = new \SplQueue;
+                $buffer->setIteratorMode(\SplQueue::IT_MODE_FIFO);
                 $iterator = $values($registerCleanup);
                 $iterator->rewind();
 
@@ -214,10 +215,10 @@ final class Lazy implements Implementation
                     $value = $iterator->current();
                     $iterator->next();
 
-                    $buffer[] = $value;
+                    $buffer->enqueue($value);
 
-                    if (\count($buffer) > $size) {
-                        yield \array_shift($buffer);
+                    if ($buffer->count() > $size) {
+                        yield $buffer->dequeue();
                     }
                 }
             },
@@ -586,17 +587,16 @@ final class Lazy implements Implementation
 
         return new self(
             static function(RegisterCleanup $register) use ($values, $size): \Generator {
-                $buffer = [];
-                $count = 0;
+                $buffer = new \SplQueue;
+                $buffer->setIteratorMode(\SplQueue::IT_MODE_FIFO);
                 $iterator = $values($register);
                 $iterator->rewind();
 
                 while ($iterator->valid()) {
-                    $buffer[] = $iterator->current();
-                    ++$count;
+                    $buffer->enqueue($iterator->current());
 
-                    if ($count > $size) {
-                        \array_shift($buffer);
+                    if ($buffer->count() > $size) {
+                        $buffer->dequeue();
                     }
 
                     $iterator->next();

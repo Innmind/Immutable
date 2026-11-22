@@ -223,7 +223,8 @@ final class Defer implements Implementation
         /** @psalm-suppress ImpureFunctionCall */
         return new self(
             (static function(int $toDrop) use (&$captured): \Generator {
-                $buffer = [];
+                $buffer = new \SplQueue;
+                $buffer->setIteratorMode(\SplQueue::IT_MODE_FIFO);
                 /**
                  * @psalm-suppress PossiblyNullArgument
                  * @var Iterator<T>
@@ -235,10 +236,10 @@ final class Defer implements Implementation
                     $value = $values->current();
                     $values->next();
 
-                    $buffer[] = $value;
+                    $buffer->enqueue($value);
 
-                    if (\count($buffer) > $toDrop) {
-                        yield \array_shift($buffer);
+                    if ($buffer->count() > $toDrop) {
+                        yield $buffer->dequeue();
                     }
                 }
             })($size),
