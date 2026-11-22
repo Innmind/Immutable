@@ -135,7 +135,7 @@ final class ObjectKeys implements Implementation
     #[\Override]
     public function equals(Implementation $map): bool
     {
-        if (!$map->keys()->equals($this->keys())) {
+        if ($map->size() !== $this->size()) {
             return false;
         }
 
@@ -144,7 +144,7 @@ final class ObjectKeys implements Implementation
             /** @var T $key */
             $key = $k;
             /** @var S $v */
-            $v = $this->values[$k];
+            $v = $this->values->getInfo();
             $equals = $map
                 ->get($key)
                 ->filter(static fn($value) => $value === $v)
@@ -177,7 +177,7 @@ final class ObjectKeys implements Implementation
             /** @var T $key */
             $key = $k;
             /** @var S $v */
-            $v = $this->values[$k];
+            $v = $this->values->getInfo();
 
             /** @psalm-suppress ImpureFunctionCall */
             if ($predicate($key, $v) === true) {
@@ -202,13 +202,13 @@ final class ObjectKeys implements Implementation
              * @psalm-suppress ImpureMethodCall
              * @var S $v
              */
-            $v = $this->values[$k];
+            $v = $this->values->getInfo();
 
             /** @psalm-suppress ImpureFunctionCall */
             $function($key, $v);
         }
 
-        return SideEffect::identity();
+        return SideEffect::identity;
     }
 
     /**
@@ -232,14 +232,14 @@ final class ObjectKeys implements Implementation
              * @psalm-suppress ImpureMethodCall
              * @var S
              */
-            $v = $this->values[$k];
+            $v = $this->values->getInfo();
 
             /** @psalm-suppress ImpureFunctionCall */
             $discriminant = $discriminator($key, $v);
 
             $group = $groups->get($discriminant)->match(
                 static fn($group) => $group,
-                fn() => $this->clearMap(),
+                static fn() => /** @var Map<T, S> */ Map::of(),
             );
             $groups = ($groups)($discriminant, ($group)($key, $v));
         }
@@ -254,13 +254,18 @@ final class ObjectKeys implements Implementation
     #[\Override]
     public function keys(): Set
     {
-        /** @var Set<T> */
-        $keys = Set::of();
+        /** @var list<T> */
+        $keys = [];
 
-        return $this->reduce(
-            $keys,
-            static fn(Set $keys, $key): Set => ($keys)($key),
-        );
+        /**
+         * @psalm-suppress ImpureMethodCall
+         * @var T $key
+         */
+        foreach ($this->values as $key) {
+            $keys[] = $key;
+        }
+
+        return Set::of(...$keys);
     }
 
     /**
@@ -269,13 +274,16 @@ final class ObjectKeys implements Implementation
     #[\Override]
     public function values(): Sequence
     {
-        /** @var Sequence<S> */
-        $values = Sequence::of();
+        /** @var list<S> */
+        $values = [];
 
-        return $this->reduce(
-            $values,
-            static fn(Sequence $values, $_, $value): Sequence => ($values)($value),
-        );
+        /** @psalm-suppress ImpureMethodCall */
+        foreach ($this->values as $key) {
+            /** @var S */
+            $values[] = $this->values->getInfo();
+        }
+
+        return Sequence::of(...$values);
     }
 
     /**
@@ -299,7 +307,7 @@ final class ObjectKeys implements Implementation
              * @psalm-suppress ImpureMethodCall
              * @var S
              */
-            $v = $this->values[$k];
+            $v = $this->values->getInfo();
 
             /** @psalm-suppress ImpureFunctionCall */
             $values[$k] = $function($key, $v);
@@ -355,8 +363,10 @@ final class ObjectKeys implements Implementation
     #[\Override]
     public function partition(callable $predicate): array
     {
-        $truthy = $this->clearMap();
-        $falsy = $this->clearMap();
+        /** @var list<array{T, S}> */
+        $truthy = [];
+        /** @var list<array{T, S}> */
+        $falsy = [];
 
         /** @psalm-suppress ImpureMethodCall */
         foreach ($this->values as $k) {
@@ -366,19 +376,19 @@ final class ObjectKeys implements Implementation
              * @psalm-suppress ImpureMethodCall
              * @var S $v
              */
-            $v = $this->values[$k];
+            $v = $this->values->getInfo();
 
             /** @psalm-suppress ImpureFunctionCall */
             $return = $predicate($key, $v);
 
             if ($return === true) {
-                $truthy = ($truthy)($key, $v);
+                $truthy[] = [$key, $v];
             } else {
-                $falsy = ($falsy)($key, $v);
+                $falsy[] = [$key, $v];
             }
         }
 
-        return [$truthy, $falsy];
+        return [Map::of(...$truthy), Map::of(...$falsy)];
     }
 
     /**
@@ -401,7 +411,7 @@ final class ObjectKeys implements Implementation
              * @psalm-suppress ImpureMethodCall
              * @var S $v
              */
-            $v = $this->values[$k];
+            $v = $this->values->getInfo();
 
             /** @psalm-suppress ImpureFunctionCall */
             $carry = $reducer($carry, $key, $v);
@@ -431,7 +441,7 @@ final class ObjectKeys implements Implementation
              * @psalm-suppress ImpureMethodCall
              * @var S $v
              */
-            $v = $this->values[$k];
+            $v = $this->values->getInfo();
 
             /** @psalm-suppress ImpureFunctionCall */
             if ($predicate($key, $v)) {
@@ -457,7 +467,7 @@ final class ObjectKeys implements Implementation
              * @psalm-suppress ImpureMethodCall
              * @var S $v
              */
-            $v = $this->values[$k];
+            $v = $this->values->getInfo();
             $pairs[] = new Pair($key, $v);
         }
 

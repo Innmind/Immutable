@@ -87,9 +87,11 @@ final class Str implements \Stringable
             return $this->chunk();
         }
 
+        $encoding = $this->encoding;
+
         /** @psalm-suppress ImpureFunctionCall */
         return Sequence::of(...\array_map(
-            fn($value) => new self($value, $this->encoding),
+            static fn($value) => new self($value, $encoding),
             \explode($delimiter, $this->value),
         ));
     }
@@ -104,9 +106,11 @@ final class Str implements \Stringable
     #[\NoDiscard]
     public function chunk(int $size = 1): Sequence
     {
+        $encoding = $this->encoding;
+
         /** @psalm-suppress ImpureFunctionCall */
         return Sequence::of(...\array_map(
-            fn($value) => new self($value, $this->encoding),
+            static fn($value) => new self($value, $encoding),
             \mb_str_split($this->value, $size, $this->encoding->toString()),
         ));
     }
@@ -307,9 +311,11 @@ final class Str implements \Stringable
             throw new InvalidRegex('', \preg_last_error());
         }
 
+        $encoding = $this->encoding;
+
         /** @psalm-suppress ImpureFunctionCall */
         return Sequence::of(...\array_map(
-            fn($value) => new self($value, $this->encoding),
+            static fn($value) => new self($value, $encoding),
             $strings,
         ));
     }

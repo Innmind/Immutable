@@ -93,17 +93,16 @@ final class Primitive implements Implementation
     #[\Override]
     public function distinct(): self
     {
-        return $this->reduce(
-            $this->clear(),
-            static function(self $values, mixed $value): self {
-                /** @var T $value */
-                if ($values->contains($value)) {
-                    return $values;
-                }
+        /** @var list<T> */
+        $unique = [];
 
-                return ($values)($value);
-            },
-        );
+        foreach ($this->values as $value) {
+            if (!\in_array($value, $unique, true)) {
+                $unique[] = $value;
+            }
+        }
+
+        return new self($unique);
     }
 
     /**
@@ -172,7 +171,7 @@ final class Primitive implements Implementation
             $function($value);
         }
 
-        return SideEffect::identity();
+        return SideEffect::identity;
     }
 
     /**
@@ -260,13 +259,12 @@ final class Primitive implements Implementation
      * @template S
      * @template C of Sequence<S>|Set<S>
      *
-     * @param callable(T): C $map
-     * @param callable(C): Implementation<S> $exfiltrate
+     * @param callable(T): Implementation<C> $map
      *
      * @return Implementation<S>
      */
     #[\Override]
-    public function flatMap(callable $map, callable $exfiltrate): Implementation
+    public function flatMap(callable $map): Implementation
     {
         /**
          * @psalm-suppress MixedArgument
@@ -276,7 +274,7 @@ final class Primitive implements Implementation
          */
         return $this->reduce(
             new self,
-            static fn(self $carry, $value) => $carry->append($exfiltrate($map($value))),
+            static fn(self $carry, $value) => $carry->append($map($value)),
         );
     }
 
@@ -652,17 +650,16 @@ final class Primitive implements Implementation
     /**
      * @template A
      *
-     * @param callable(T|A, T): Sequence<A> $map
-     * @param callable(Sequence<A>): Implementation<A> $exfiltrate
+     * @param callable(T|A, T): Implementation<A> $map
      *
      * @return self<T|A>
      */
     #[\Override]
-    public function aggregate(callable $map, callable $exfiltrate): self
+    public function aggregate(callable $map): self
     {
         $aggregate = new Aggregate($this->iterator());
         /** @psalm-suppress MixedArgument */
-        $values = $aggregate(static fn($a, $b) => $exfiltrate($map($a, $b))->iterator());
+        $values = $aggregate(static fn($a, $b) => $map($a, $b)->iterator());
         /** @psalm-suppress ImpureMethodCall */
         $values->rewind();
         $aggregated = [];
@@ -751,6 +748,12 @@ final class Primitive implements Implementation
         }
 
         return new self($values);
+    }
+
+    #[\Override]
+    public function toList(): array
+    {
+        return $this->values;
     }
 
     private function has(int $index): bool

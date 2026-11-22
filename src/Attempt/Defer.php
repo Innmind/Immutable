@@ -4,7 +4,6 @@ declare(strict_types = 1);
 namespace Innmind\Immutable\Attempt;
 
 use Innmind\Immutable\{
-    Attempt,
     Maybe,
     Either
 };
@@ -17,17 +16,14 @@ use Innmind\Immutable\{
  */
 final class Defer implements Implementation
 {
-    /** @var callable(): Attempt<R1> */
-    private $deferred;
-    /** @var ?Attempt<R1> */
-    private ?Attempt $value = null;
+    /** @var ?Implementation<R1> */
+    private ?Implementation $value = null;
 
     /**
-     * @param callable(): Attempt<R1> $deferred
+     * @param \Closure(): Implementation<R1> $deferred
      */
-    public function __construct(callable $deferred)
+    public function __construct(private \Closure $deferred)
     {
-        $this->deferred = $deferred;
     }
 
     #[\Override]
@@ -39,20 +35,16 @@ final class Defer implements Implementation
     }
 
     #[\Override]
-    public function flatMap(
-        callable $map,
-        callable $exfiltrate,
-    ): self {
+    public function flatMap(callable $map): self
+    {
         $captured = $this->capture();
 
         return new self(static fn() => self::detonate($captured)->flatMap($map));
     }
 
     #[\Override]
-    public function guard(
-        callable $map,
-        callable $exfiltrate,
-    ): self {
+    public function guard(callable $map): self
+    {
         $captured = $this->capture();
 
         return new self(static fn() => self::detonate($captured)->guard($map));
@@ -79,20 +71,16 @@ final class Defer implements Implementation
     }
 
     #[\Override]
-    public function recover(
-        callable $recover,
-        callable $exfiltrate,
-    ): self {
+    public function recover(callable $recover): self
+    {
         $captured = $this->capture();
 
         return new self(static fn() => self::detonate($captured)->recover($recover));
     }
 
     #[\Override]
-    public function xrecover(
-        callable $recover,
-        callable $exfiltrate,
-    ): self {
+    public function xrecover(callable $recover): self
+    {
         $captured = $this->capture();
 
         return new self(static fn() => self::detonate($captured)->xrecover($recover));
@@ -115,16 +103,15 @@ final class Defer implements Implementation
     }
 
     #[\Override]
-    public function memoize(callable $exfiltrate): Implementation
+    public function memoize(): Implementation
     {
-        return $exfiltrate($this->unwrap());
+        return $this->unwrap();
     }
 
     #[\Override]
     public function eitherWay(
         callable $result,
         callable $error,
-        callable $exfiltrate,
     ): self {
         $captured = $this->capture();
 
@@ -134,19 +121,19 @@ final class Defer implements Implementation
     }
 
     /**
-     * @return Attempt<R1>
+     * @return Implementation<R1>
      */
-    private function unwrap(): Attempt
+    private function unwrap(): Implementation
     {
         /**
          * @psalm-suppress InaccessibleProperty
          * @psalm-suppress ImpureFunctionCall
          */
-        return $this->value ??= ($this->deferred)()->memoize();
+        return $this->value ??= ($this->deferred)();
     }
 
     /**
-     * @return array{\WeakReference<self<R1>>, callable(): Attempt<R1>}
+     * @return array{\WeakReference<self<R1>>, callable(): Implementation<R1>}
      */
     private function capture(): array
     {
@@ -160,11 +147,11 @@ final class Defer implements Implementation
     /**
      * @template A
      *
-     * @param array{\WeakReference<self<A>>, callable(): Attempt<A>} $captured
+     * @param array{\WeakReference<self<A>>, callable(): Implementation<A>} $captured
      *
-     * @return Attempt<A>
+     * @return Implementation<A>
      */
-    private static function detonate(array $captured): Attempt
+    private static function detonate(array $captured): Implementation
     {
         [$ref, $deferred] = $captured;
         $self = $ref->get();

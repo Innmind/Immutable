@@ -210,15 +210,14 @@ final class Snap implements Implementation
      * @template S
      * @template C of Sequence<S>|Set<S>
      *
-     * @param callable(T): C $map
-     * @param callable(C): Implementation<S> $exfiltrate
+     * @param callable(T): Implementation<C> $map
      *
      * @return Implementation<S>
      */
     #[\Override]
-    public function flatMap(callable $map, callable $exfiltrate): Implementation
+    public function flatMap(callable $map): Implementation
     {
-        return $this->will(static fn($self) => $self->flatMap($map, $exfiltrate));
+        return $this->will(static fn($self) => $self->flatMap($map));
     }
 
     /**
@@ -485,15 +484,14 @@ final class Snap implements Implementation
     /**
      * @template A
      *
-     * @param callable(T|A, T): Sequence<A> $map
-     * @param callable(Sequence<A>): Implementation<A> $exfiltrate
+     * @param callable(T|A, T): Implementation<A> $map
      *
      * @return Implementation<T|A>
      */
     #[\Override]
-    public function aggregate(callable $map, callable $exfiltrate): Implementation
+    public function aggregate(callable $map): Implementation
     {
-        return $this->will(static fn($self) => $self->aggregate($map, $exfiltrate));
+        return $this->will(static fn($self) => $self->aggregate($map));
     }
 
     /**
@@ -542,6 +540,12 @@ final class Snap implements Implementation
     public function takeWhile(callable $condition): Implementation
     {
         return $this->will(static fn($self) => $self->takeWhile($condition));
+    }
+
+    #[\Override]
+    public function toList(): array
+    {
+        return $this->memoize()->toList();
     }
 
     /**

@@ -206,7 +206,8 @@ final class Lazy implements Implementation
 
         return new self(
             static function(RegisterCleanup $registerCleanup) use ($values, $size): \Generator {
-                $buffer = [];
+                $buffer = new \SplQueue;
+                $buffer->setIteratorMode(\SplQueue::IT_MODE_FIFO);
                 $iterator = $values($registerCleanup);
                 $iterator->rewind();
 
@@ -214,10 +215,10 @@ final class Lazy implements Implementation
                     $value = $iterator->current();
                     $iterator->next();
 
-                    $buffer[] = $value;
+                    $buffer->enqueue($value);
 
-                    if (\count($buffer) > $size) {
-                        yield \array_shift($buffer);
+                    if ($buffer->count() > $size) {
+                        yield $buffer->dequeue();
                     }
                 }
             },
@@ -230,7 +231,7 @@ final class Lazy implements Implementation
     #[\Override]
     public function equals(Implementation $sequence): bool
     {
-        return $this->load()->equals($sequence);
+        return $this->memoize()->equals($sequence);
     }
 
     /**
@@ -284,7 +285,7 @@ final class Lazy implements Implementation
             $iterator->next();
         }
 
-        return SideEffect::identity();
+        return SideEffect::identity;
     }
 
     /**
@@ -297,7 +298,7 @@ final class Lazy implements Implementation
     public function groupBy(callable $discriminator): Map
     {
         /** @var Map<D, Sequence<T>> */
-        return $this->load()->groupBy($discriminator);
+        return $this->memoize()->groupBy($discriminator);
     }
 
     /**
@@ -426,27 +427,25 @@ final class Lazy implements Implementation
 
     /**
      * @template S
-     * @template C of Sequence<S>|Set<S>
      *
-     * @param callable(T): C $map
-     * @param callable(C): Implementation<S> $exfiltrate
+     * @param callable(T): Implementation<S> $map
      *
      * @return self<S>
      */
     #[\Override]
-    public function flatMap(callable $map, callable $exfiltrate): self
+    public function flatMap(callable $map): self
     {
         $values = $this->values;
 
         return new self(
-            static function(RegisterCleanup $registerCleanup) use ($values, $map, $exfiltrate): \Generator {
+            static function(RegisterCleanup $registerCleanup) use ($values, $map): \Generator {
                 $outer = $values($registerCleanup);
                 $outer->rewind();
 
                 while ($outer->valid()) {
                     /** @psalm-suppress PossiblyNullArgument */
                     $inner = self::open(
-                        $exfiltrate($map($outer->current())),
+                        $map($outer->current()),
                         $registerCleanup->push(),
                     );
                     $inner->rewind();
@@ -517,7 +516,7 @@ final class Lazy implements Implementation
     public function partition(callable $predicate): array
     {
         /** @var array{Sequence<T>, Sequence<T>} */
-        return $this->load()->partition($predicate);
+        return $this->memoize()->partition($predicate);
     }
 
     /**
@@ -586,17 +585,16 @@ final class Lazy implements Implementation
 
         return new self(
             static function(RegisterCleanup $register) use ($values, $size): \Generator {
-                $buffer = [];
-                $count = 0;
+                $buffer = new \SplQueue;
+                $buffer->setIteratorMode(\SplQueue::IT_MODE_FIFO);
                 $iterator = $values($register);
                 $iterator->rewind();
 
                 while ($iterator->valid()) {
-                    $buffer[] = $iterator->current();
-                    ++$count;
+                    $buffer->enqueue($iterator->current());
 
-                    if ($count > $size) {
-                        \array_shift($buffer);
+                    if ($buffer->count() > $size) {
+                        $buffer->dequeue();
                     }
 
                     $iterator->next();
@@ -1014,22 +1012,21 @@ final class Lazy implements Implementation
     /**
      * @template A
      *
-     * @param callable(T|A, T): Sequence<A> $map
-     * @param callable(Sequence<A>): Implementation<A> $exfiltrate
+     * @param callable(T|A, T): Implementation<A> $map
      *
      * @return self<T|A>
      */
     #[\Override]
-    public function aggregate(callable $map, callable $exfiltrate): self
+    public function aggregate(callable $map): self
     {
         $values = $this->values;
 
-        return new self(static function(RegisterCleanup $registerCleanup) use ($values, $map, $exfiltrate) {
+        return new self(static function(RegisterCleanup $registerCleanup) use ($values, $map) {
             $noop = RegisterCleanup::noop();
             $aggregate = new Aggregate($values($noop));
             /** @psalm-suppress MixedArgument */
             $values = $aggregate(static fn($a, $b) => self::open(
-                $exfiltrate($map($a, $b)),
+                $map($a, $b),
                 $registerCleanup,
             ));
             $values->rewind();
@@ -1047,7 +1044,20 @@ final class Lazy implements Implementation
     #[\Override]
     public function memoize(): Primitive
     {
-        return $this->load();
+        $values = [];
+        $iterator = $this->iterator();
+        /** @psalm-suppress ImpureMethodCall */
+        $iterator->rewind();
+
+        /** @psalm-suppress ImpureMethodCall */
+        while ($iterator->valid()) {
+            /** @psalm-suppress ImpureMethodCall */
+            $values[] = $iterator->current();
+            /** @psalm-suppress ImpureMethodCall */
+            $iterator->next();
+        }
+
+        return new Primitive($values);
     }
 
     /**
@@ -1135,10 +1145,8 @@ final class Lazy implements Implementation
         );
     }
 
-    /**
-     * @return Primitive<T>
-     */
-    private function load(): Primitive
+    #[\Override]
+    public function toList(): array
     {
         $values = [];
         $iterator = $this->iterator();
@@ -1153,7 +1161,7 @@ final class Lazy implements Implementation
             $iterator->next();
         }
 
-        return new Primitive($values);
+        return $values;
     }
 
     /**

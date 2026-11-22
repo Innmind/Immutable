@@ -32,21 +32,17 @@ final class Result implements Implementation
     }
 
     #[\Override]
-    public function flatMap(
-        callable $map,
-        callable $exfiltrate,
-    ): Implementation {
+    public function flatMap(callable $map): Implementation
+    {
         /** @psalm-suppress ImpureFunctionCall */
-        return $exfiltrate($map($this->value));
+        return $map($this->value);
     }
 
     #[\Override]
-    public function guard(
-        callable $map,
-        callable $exfiltrate,
-    ): Implementation {
+    public function guard(callable $map): Implementation
+    {
         /** @psalm-suppress ImpureFunctionCall */
-        return $exfiltrate($map($this->value))->guardError();
+        return $map($this->value)->guardError();
     }
 
     #[\Override]
@@ -69,18 +65,14 @@ final class Result implements Implementation
     }
 
     #[\Override]
-    public function recover(
-        callable $recover,
-        callable $exfiltrate,
-    ): self {
+    public function recover(callable $recover): self
+    {
         return $this;
     }
 
     #[\Override]
-    public function xrecover(
-        callable $recover,
-        callable $exfiltrate,
-    ): self {
+    public function xrecover(callable $recover): self
+    {
         return $this;
     }
 
@@ -97,7 +89,7 @@ final class Result implements Implementation
     }
 
     #[\Override]
-    public function memoize(callable $exfiltrate): self
+    public function memoize(): self
     {
         return $this;
     }
@@ -106,9 +98,8 @@ final class Result implements Implementation
     public function eitherWay(
         callable $result,
         callable $error,
-        callable $exfiltrate,
     ): Implementation {
         /** @psalm-suppress ImpureFunctionCall */
-        return $exfiltrate($result($this->value));
+        return $result($this->value);
     }
 }

@@ -160,12 +160,11 @@ interface Implementation
      * @template S
      * @template C of Sequence<S>|Set<S>
      *
-     * @param callable(T): C $map
-     * @param callable(C): self<S> $exfiltrate
+     * @param callable(T): self<C> $map
      *
      * @return self<S>
      */
-    public function flatMap(callable $map, callable $exfiltrate): self;
+    public function flatMap(callable $map): self;
 
     /**
      * @template S
@@ -362,12 +361,11 @@ interface Implementation
     /**
      * @template A
      *
-     * @param callable(T|A, T): Sequence<A> $map
-     * @param callable(Sequence<A>): Implementation<A> $exfiltrate
+     * @param callable(T|A, T): self<A> $map
      *
      * @return self<T|A>
      */
-    public function aggregate(callable $map, callable $exfiltrate): self;
+    public function aggregate(callable $map): self;
 
     /**
      * @return Primitive<T>
@@ -387,4 +385,9 @@ interface Implementation
      * @return self<T>
      */
     public function takeWhile(callable $condition): self;
+
+    /**
+     * @return list<T>
+     */
+    public function toList(): array;
 }

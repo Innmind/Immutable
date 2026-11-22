@@ -130,7 +130,7 @@ final class Primitive implements Implementation
     #[\Override]
     public function equals(Implementation $map): bool
     {
-        if (!$map->keys()->equals($this->keys())) {
+        if ($map->size() !== $this->size()) {
             return false;
         }
 
@@ -183,7 +183,7 @@ final class Primitive implements Implementation
             $function($k, $v);
         }
 
-        return SideEffect::identity();
+        return SideEffect::identity;
     }
 
     /**
@@ -205,7 +205,7 @@ final class Primitive implements Implementation
 
             $group = $groups->get($discriminant)->match(
                 static fn($group) => $group,
-                fn() => $this->clearMap(),
+                static fn() => /** @var Map<T, S> */ Map::of(),
             );
             $groups = ($groups)($discriminant, ($group)($key, $value));
         }
@@ -300,21 +300,23 @@ final class Primitive implements Implementation
     #[\Override]
     public function partition(callable $predicate): array
     {
-        $truthy = $this->clearMap();
-        $falsy = $this->clearMap();
+        /** @var list<array{T, S}> */
+        $truthy = [];
+        /** @var list<array{T, S}> */
+        $falsy = [];
 
         foreach ($this->values as $k => $v) {
             /** @psalm-suppress ImpureFunctionCall */
             $return = $predicate($k, $v);
 
             if ($return === true) {
-                $truthy = ($truthy)($k, $v);
+                $truthy[] = [$k, $v];
             } else {
-                $falsy = ($falsy)($k, $v);
+                $falsy[] = [$k, $v];
             }
         }
 
-        return [$truthy, $falsy];
+        return [Map::of(...$truthy), Map::of(...$falsy)];
     }
 
     /**

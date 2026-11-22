@@ -36,18 +36,14 @@ final class Error implements Implementation
     }
 
     #[\Override]
-    public function flatMap(
-        callable $map,
-        callable $exfiltrate,
-    ): self {
+    public function flatMap(callable $map): self
+    {
         return $this;
     }
 
     #[\Override]
-    public function guard(
-        callable $map,
-        callable $exfiltrate,
-    ): self {
+    public function guard(callable $map): self
+    {
         return $this;
     }
 
@@ -88,30 +84,26 @@ final class Error implements Implementation
     }
 
     #[\Override]
-    public function recover(
-        callable $recover,
-        callable $exfiltrate,
-    ): Implementation {
+    public function recover(callable $recover): Implementation
+    {
         if ($this->value instanceof Guard) {
             /** @psalm-suppress ImpureFunctionCall */
-            return $exfiltrate($recover($this->value->unwrap()));
+            return $recover($this->value->unwrap());
         }
 
         /** @psalm-suppress ImpureFunctionCall */
-        return $exfiltrate($recover($this->value));
+        return $recover($this->value);
     }
 
     #[\Override]
-    public function xrecover(
-        callable $recover,
-        callable $exfiltrate,
-    ): Implementation {
+    public function xrecover(callable $recover): Implementation
+    {
         if ($this->value instanceof Guard) {
             return $this;
         }
 
         /** @psalm-suppress ImpureFunctionCall */
-        return $exfiltrate($recover($this->value));
+        return $recover($this->value);
     }
 
     #[\Override]
@@ -131,7 +123,7 @@ final class Error implements Implementation
     }
 
     #[\Override]
-    public function memoize(callable $exfiltrate): self
+    public function memoize(): self
     {
         return $this;
     }
@@ -140,14 +132,13 @@ final class Error implements Implementation
     public function eitherWay(
         callable $result,
         callable $error,
-        callable $exfiltrate,
     ): Implementation {
         if ($this->value instanceof Guard) {
             /** @psalm-suppress ImpureFunctionCall */
-            return $exfiltrate($error($this->value->unwrap()));
+            return $error($this->value->unwrap());
         }
 
         /** @psalm-suppress ImpureFunctionCall */
-        return $exfiltrate($error($this->value));
+        return $error($this->value);
     }
 }
