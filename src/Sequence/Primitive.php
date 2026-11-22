@@ -359,7 +359,10 @@ final class Primitive implements Implementation
     #[\Override]
     public function takeEnd(int $size): self
     {
-        return $this->slice($this->size() - $size, $this->size());
+        return $this->slice(
+            \max(0, $this->size() - $size),
+            $this->size(),
+        );
     }
 
     /**

@@ -15,6 +15,10 @@
 - Reduce the number of variables to handle `Validation` methods composition
 - Remove useless calls to `SideEffect::identity()`
 
+### Fixed
+
+- Out ouf bound `Sequence::takeEnd()`
+
 ## 6.5.0 - 2026-11-13
 
 ### Changed
