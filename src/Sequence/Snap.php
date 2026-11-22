@@ -484,15 +484,14 @@ final class Snap implements Implementation
     /**
      * @template A
      *
-     * @param callable(T|A, T): Sequence<A> $map
-     * @param callable(Sequence<A>): Implementation<A> $exfiltrate
+     * @param callable(T|A, T): Implementation<A> $map
      *
      * @return Implementation<T|A>
      */
     #[\Override]
-    public function aggregate(callable $map, callable $exfiltrate): Implementation
+    public function aggregate(callable $map): Implementation
     {
-        return $this->will(static fn($self) => $self->aggregate($map, $exfiltrate));
+        return $this->will(static fn($self) => $self->aggregate($map));
     }
 
     /**

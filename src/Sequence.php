@@ -838,10 +838,14 @@ final class Sequence
     #[\NoDiscard]
     public function aggregate(callable $map): self
     {
-        /** @var callable(self<A>): Sequence\Implementation<A> */
-        $exfiltrate = static fn(self $sequence): Sequence\Implementation => $sequence->implementation;
-
-        return new self($this->implementation->aggregate($map, $exfiltrate));
+        return new self($this->implementation->aggregate(
+            static fn($a, $b) =>
+                /**
+                 * @var T|A $a
+                 * @var T $b
+                 */
+                $map($a, $b)->implementation,
+        ));
     }
 
     /**

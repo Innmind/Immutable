@@ -10,7 +10,7 @@
 - Lazy and deferred `Sequence::takeEnd()`/`::dropEnd()` no longer re-index the sliding window on each new value
 - `Map` with objects as keys no longer have to lookup the storage to access associated values
 - Reduced the number of intermediate objects for `Map::parition()`
-- Reduce the number of variables for `Sequence::flatMap()`
+- Reduce the number of variables for `Sequence::flatMap()`/`::aggregate()`
 
 ## 6.5.0 - 2026-11-13
 

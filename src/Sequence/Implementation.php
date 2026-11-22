@@ -361,12 +361,11 @@ interface Implementation
     /**
      * @template A
      *
-     * @param callable(T|A, T): Sequence<A> $map
-     * @param callable(Sequence<A>): Implementation<A> $exfiltrate
+     * @param callable(T|A, T): self<A> $map
      *
      * @return self<T|A>
      */
-    public function aggregate(callable $map, callable $exfiltrate): self;
+    public function aggregate(callable $map): self;
 
     /**
      * @return Primitive<T>

@@ -1012,22 +1012,21 @@ final class Lazy implements Implementation
     /**
      * @template A
      *
-     * @param callable(T|A, T): Sequence<A> $map
-     * @param callable(Sequence<A>): Implementation<A> $exfiltrate
+     * @param callable(T|A, T): Implementation<A> $map
      *
      * @return self<T|A>
      */
     #[\Override]
-    public function aggregate(callable $map, callable $exfiltrate): self
+    public function aggregate(callable $map): self
     {
         $values = $this->values;
 
-        return new self(static function(RegisterCleanup $registerCleanup) use ($values, $map, $exfiltrate) {
+        return new self(static function(RegisterCleanup $registerCleanup) use ($values, $map) {
             $noop = RegisterCleanup::noop();
             $aggregate = new Aggregate($values($noop));
             /** @psalm-suppress MixedArgument */
             $values = $aggregate(static fn($a, $b) => self::open(
-                $exfiltrate($map($a, $b)),
+                $map($a, $b),
                 $registerCleanup,
             ));
             $values->rewind();

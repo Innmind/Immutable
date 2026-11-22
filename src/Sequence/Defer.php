@@ -1142,18 +1142,17 @@ final class Defer implements Implementation
     /**
      * @template A
      *
-     * @param callable(T|A, T): Sequence<A> $map
-     * @param callable(Sequence<A>): Implementation<A> $exfiltrate
+     * @param callable(T|A, T): Implementation<A> $map
      *
      * @return self<T|A>
      */
     #[\Override]
-    public function aggregate(callable $map, callable $exfiltrate): self
+    public function aggregate(callable $map): self
     {
         $aggregate = new Aggregate($this->iterator());
 
         /** @psalm-suppress MixedArgument */
-        return new self($aggregate(static fn($a, $b) => $exfiltrate($map($a, $b))->iterator()));
+        return new self($aggregate(static fn($a, $b) => $map($a, $b)->iterator()));
     }
 
     /**
