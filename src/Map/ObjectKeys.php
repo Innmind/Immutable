@@ -144,7 +144,7 @@ final class ObjectKeys implements Implementation
             /** @var T $key */
             $key = $k;
             /** @var S $v */
-            $v = $this->values[$k];
+            $v = $this->values->getInfo();
             $equals = $map
                 ->get($key)
                 ->filter(static fn($value) => $value === $v)
@@ -177,7 +177,7 @@ final class ObjectKeys implements Implementation
             /** @var T $key */
             $key = $k;
             /** @var S $v */
-            $v = $this->values[$k];
+            $v = $this->values->getInfo();
 
             /** @psalm-suppress ImpureFunctionCall */
             if ($predicate($key, $v) === true) {
@@ -202,7 +202,7 @@ final class ObjectKeys implements Implementation
              * @psalm-suppress ImpureMethodCall
              * @var S $v
              */
-            $v = $this->values[$k];
+            $v = $this->values->getInfo();
 
             /** @psalm-suppress ImpureFunctionCall */
             $function($key, $v);
@@ -232,7 +232,7 @@ final class ObjectKeys implements Implementation
              * @psalm-suppress ImpureMethodCall
              * @var S
              */
-            $v = $this->values[$k];
+            $v = $this->values->getInfo();
 
             /** @psalm-suppress ImpureFunctionCall */
             $discriminant = $discriminator($key, $v);
@@ -299,7 +299,7 @@ final class ObjectKeys implements Implementation
              * @psalm-suppress ImpureMethodCall
              * @var S
              */
-            $v = $this->values[$k];
+            $v = $this->values->getInfo();
 
             /** @psalm-suppress ImpureFunctionCall */
             $values[$k] = $function($key, $v);
@@ -366,7 +366,7 @@ final class ObjectKeys implements Implementation
              * @psalm-suppress ImpureMethodCall
              * @var S $v
              */
-            $v = $this->values[$k];
+            $v = $this->values->getInfo();
 
             /** @psalm-suppress ImpureFunctionCall */
             $return = $predicate($key, $v);
@@ -401,7 +401,7 @@ final class ObjectKeys implements Implementation
              * @psalm-suppress ImpureMethodCall
              * @var S $v
              */
-            $v = $this->values[$k];
+            $v = $this->values->getInfo();
 
             /** @psalm-suppress ImpureFunctionCall */
             $carry = $reducer($carry, $key, $v);
@@ -431,7 +431,7 @@ final class ObjectKeys implements Implementation
              * @psalm-suppress ImpureMethodCall
              * @var S $v
              */
-            $v = $this->values[$k];
+            $v = $this->values->getInfo();
 
             /** @psalm-suppress ImpureFunctionCall */
             if ($predicate($key, $v)) {
@@ -457,7 +457,7 @@ final class ObjectKeys implements Implementation
              * @psalm-suppress ImpureMethodCall
              * @var S $v
              */
-            $v = $this->values[$k];
+            $v = $this->values->getInfo();
             $pairs[] = new Pair($key, $v);
         }
 
