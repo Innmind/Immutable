@@ -130,7 +130,7 @@ final class Primitive implements Implementation
     #[\Override]
     public function equals(Implementation $map): bool
     {
-        if (!$map->keys()->equals($this->keys())) {
+        if ($map->size() !== $this->size()) {
             return false;
         }
 

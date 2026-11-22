@@ -6,6 +6,7 @@
 
 - `Sequence::toList()` no longer use a quadratic `reduce` to build the list
 - `Sequence::distinct()` no longer use a quadratic `reduce` to build the new in memory sequence
+- `Map::equals()` no longer apply redundant keys comparison
 
 ## 6.5.0 - 2026-11-13
 
